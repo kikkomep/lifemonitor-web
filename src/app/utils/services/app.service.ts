@@ -1,30 +1,40 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppService {
   public user = {
-    firstName: 'Alexander',
-    lastName: 'Pierce',
+    firstName: 'FirstName',
+    lastName: 'LastName',
     image: 'assets/img/user2-160x160.jpg',
   };
 
-  constructor(private router: Router) {}
+  private _userLogged = new Subject<boolean>();
+
+  constructor() {}
 
   login() {
     localStorage.setItem('token', 'LOGGED_IN');
-    this.router.navigate(['/']);
+    this._userLogged.next(true);
   }
 
   register() {
-    localStorage.setItem('token', 'LOGGED_IN');
-    this.router.navigate(['/']);
+    return this.login();
+  }
+
+  isUserLogged() {
+    return localStorage.getItem('token') != null;
+  }
+
+  checkUserLogged(): Observable<boolean> {
+    return this._userLogged.asObservable();
   }
 
   logout() {
     localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+    this._userLogged.next(false);
   }
 }
