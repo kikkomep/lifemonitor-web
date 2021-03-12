@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
+import { HomeComponent } from './pages/home/home.component';
 import { AppComponent } from './app.component';
 import { MainComponent } from './pages/main/main.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -27,8 +28,9 @@ import { UserDropdownMenuComponent } from './pages/main/header/user-dropdown-men
 registerLocaleData(localeEn, 'en-EN');
 
 @NgModule({
-  declarations: [
+  declarations: [    
     AppComponent,
+    HomeComponent,
     MainComponent,
     LoginComponent,
     HeaderComponent,
