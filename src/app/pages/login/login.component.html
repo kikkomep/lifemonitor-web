@@ -1,11 +1,44 @@
 <div class="login-box">
-  <div class="login-logo">
-    <a [routerLink]="['/']"><b>Admin</b>LTE</a>
-  </div>
-  <!-- /.login-logo -->
-  <div class="card">
+  <!-- <div class="auth-bg">
+    <span class="r"></span>
+    <span class="r s"></span>
+    <span class="r s"></span>
+    <span class="r"></span>
+</div> -->
+  <!-- 
+<a [routerLink]="['/']">
+  <img
+      src="assets/img/LifeMonitorLogo.png"
+      alt="User Avatar"
+      class="img-fluid img-top "
+      style="margin-bottom: 20px;"
+    />
+</a> -->
+
+
+<div class="login-logo">
+  <a [routerLink]="['/']">
+    <img
+      src="assets/img/LifeMonitorLogo.png"
+      alt="User Avatar"
+      class="img-fluid img-top"
+      style="margin-bottom: 20px; margin-left: -10px; width: 70%"
+    />
+  </a>
+</div>
+
+  <!-- <div class="text-center">
+    <img
+      src="assets/img/LifeMonitorLogo.png"
+      alt="User Avatar"
+      class="img-fluid img-top"
+      style="margin-bottom: 20px; margin-left: -10px; width: 70%"
+    />
+  </div> -->
+
+  <div class="card shadow-lg p-3 mb-5 bg-white rounded">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">Sign in to start your session</p>
+      <h5 class="login-box-msg">Sign in</h5>
 
       <form [formGroup]="loginForm" (ngSubmit)="login()">
         <div class="input-group mb-3">
@@ -57,21 +90,22 @@
       <div class="social-auth-links text-center mb-3">
         <p>- OR -</p>
         <a href="#" class="btn btn-block btn-primary">
-          <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
+          <img style="width: 1.5em;margin: 3px;"src="assets/img/workflowhub-icon-128.png" />
+          Sign in using WorkflowHub
         </a>
-        <a href="#" class="btn btn-block btn-danger">
-          <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
+        <a href="#" class="btn btn-block bg-dark">
+          <i class="fab fa-github mr-2"></i> Sign in using Github
         </a>
       </div>
       <!-- /.social-auth-links -->
 
       <p class="mb-1">
-        <a [routerLink]="['/forgot-password']">I forgot my password</a>
+        Forgot password?
+        <a [routerLink]="['/forgot-password']">Reset</a>
       </p>
       <p class="mb-0">
-        <a [routerLink]="['/register']" class="text-center"
-          >Register a new membership</a
-        >
+        Don’t have an account?
+        <a [routerLink]="['/register']" class="text-center">SignUp</a>
       </p>
     </div>
     <!-- /.login-card-body -->

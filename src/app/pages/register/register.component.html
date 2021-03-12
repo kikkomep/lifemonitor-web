@@ -1,11 +1,18 @@
 <div class="register-box">
   <div class="register-logo">
-    <a [routerLink]="['/']"><b>Admin</b>LTE</a>
+    <a [routerLink]="['/']">
+      <img
+        src="assets/img/LifeMonitorLogo.png"
+        alt="User Avatar"
+        class="img-fluid img-top"
+        style="margin-bottom: 20px; margin-left: -10px; width: 70%"
+      />
+    </a>
   </div>
 
   <div class="card">
     <div class="card-body register-card-body">
-      <p class="login-box-msg">Register a new membership</p>
+      <h5 class="login-box-msg">Sign Up</h5>
 
       <form [formGroup]="registerForm" (ngSubmit)="register()">
         <div class="input-group mb-3">
@@ -87,18 +94,16 @@
       <div class="social-auth-links text-center">
         <p>- OR -</p>
         <a href="#" class="btn btn-block btn-primary">
-          <i class="fab fa-facebook mr-2"></i>
-          Sign up using Facebook
+          <img style="width: 1.5em;margin: 3px;"src="assets/img/workflowhub-icon-128.png" />
+          Sign in using WorkflowHub
         </a>
-        <a href="#" class="btn btn-block btn-danger">
-          <i class="fab fa-google-plus mr-2"></i>
-          Sign up using Google+
+        <a href="#" class="btn btn-block bg-dark">
+          <i class="fab fa-github mr-2"></i> Sign in using Github
         </a>
       </div>
 
-      <a [routerLink]="['/login']" class="text-center"
-        >I already have a membership</a
-      >
+      Already have an account?
+      <a [routerLink]="['/login']" class="text-center"> Log in</a>
     </div>
     <!-- /.form-box -->
   </div>
