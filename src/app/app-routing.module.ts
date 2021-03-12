@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
 
 const routes: Routes = [
   {
-    path: 'home',
+    path: '',
     component: HomeComponent,
     canActivate: [NonAuthGuard],
   },
@@ -48,7 +48,7 @@ const routes: Routes = [
     component: RegisterComponent,
     canActivate: [NonAuthGuard],
   },
-  { path: '**', redirectTo: 'login' },
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({
