@@ -28,7 +28,7 @@ export class UserDropdownMenuComponent implements OnInit {
     private elementRef: ElementRef,
     private renderer: Renderer2,
     private appService: AppService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.user = this.appService.user;
