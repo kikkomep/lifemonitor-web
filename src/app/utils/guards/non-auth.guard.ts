@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { AppService } from 'src/app/utils/services/app.service';
 import {
   CanActivate,
   CanActivateChild,
@@ -8,6 +9,7 @@ import {
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   UrlTree,
+  Router,
 } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -15,6 +17,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
+  constructor(private userService: AppService, private router: Router) {}
+
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -23,7 +27,12 @@ export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    return true;
+    console.log(
+      'Can Activate, ',
+      this.userService.user,
+      this.userService.isUserLogged()
+    );
+    return !this.userService.isUserLogged();
   }
   canActivateChild(
     next: ActivatedRouteSnapshot,
@@ -33,12 +42,14 @@ export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    return true;
+    console.log('Can ActivateChild');
+    return !this.userService.isUserLogged();
   }
   canLoad(
     route: Route,
     segments: UrlSegment[]
   ): Observable<boolean> | Promise<boolean> | boolean {
-    return true;
+    console.log('Can Load');
+    return !this.userService.isUserLogged();
   }
 }
