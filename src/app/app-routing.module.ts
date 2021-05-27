@@ -1,15 +1,16 @@
-import { NgModule } from '@angular/core';
-import { AppService } from 'src/app/utils/services/app.service';
-import { Routes, RouterModule, Router } from '@angular/router';
-import { MainComponent } from './pages/main/main.component';
+import { Router, RouterModule, Routes } from '@angular/router';
+
+import { AuthGuard } from './utils/guards/auth.guard';
+import { AuthService } from 'src/app/utils/services/auth.service';
 import { BlankComponent } from './views/blank/blank.component';
+import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
+import { MainComponent } from './pages/main/main.component';
+import { NgModule } from '@angular/core';
+import { NonAuthGuard } from './utils/guards/non-auth.guard';
 import { ProfileComponent } from './views/profile/profile.component';
 import { RegisterComponent } from './pages/register/register.component';
-import { DashboardComponent } from './views/dashboard/dashboard.component';
-import { AuthGuard } from './utils/guards/auth.guard';
-import { NonAuthGuard } from './utils/guards/non-auth.guard';
 import { Subscription } from 'rxjs';
 
 const routes: Routes = [
@@ -58,8 +59,8 @@ const routes: Routes = [
 export class AppRoutingModule {
   userLoggedSubscription: Subscription;
 
-  constructor(private appService: AppService, private router: Router) {
-    this.userLoggedSubscription = this.appService
+  constructor(private authService: AuthService, private router: Router) {
+    this.userLoggedSubscription = this.authService
       .checkUserLogged()
       .subscribe((userLogged) => {
         if (userLogged) {
@@ -70,9 +71,14 @@ export class AppRoutingModule {
           console.info('User logout... redirecting');
         }
       });
+
+    if (this.authService.isUserLogged()) {
+      this.handleRedirect('/dashboard');
+    }
   }
 
   handleRedirect(redirectTo: string = null) {
+    console.log('RedirectTO: ', redirectTo);
     console.info('Current router state', this.router.routerState);
     // get return url from route parameters or default to '/'
     let returnUrl =

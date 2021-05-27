@@ -1,12 +1,14 @@
 import {
   Component,
-  OnInit,
-  ViewChild,
-  HostListener,
   ElementRef,
+  HostListener,
+  OnInit,
   Renderer2,
+  ViewChild,
 } from '@angular/core';
-import { AppService } from 'src/app/utils/services/app.service';
+
+import { ApiService } from 'src/app/utils/services/api.service';
+import { AuthService } from 'src/app/utils/services/auth.service';
 
 @Component({
   selector: 'app-user-dropdown-menu',
@@ -27,8 +29,9 @@ export class UserDropdownMenuComponent implements OnInit {
   constructor(
     private elementRef: ElementRef,
     private renderer: Renderer2,
-    private appService: AppService
-  ) { }
+    private authService: AuthService,
+    private apiService: ApiService
+  ) {}
 
   ngOnInit(): void {
     this.user = this.appService.user;
@@ -51,6 +54,6 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   logout() {
-    this.appService.logout();
+    this.authService.logout();
   }
 }

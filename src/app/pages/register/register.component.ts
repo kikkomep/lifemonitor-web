@@ -1,6 +1,7 @@
-import { Component, OnInit, Renderer2, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { AppService } from 'src/app/utils/services/app.service';
+import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { AuthService } from 'src/app/utils/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -13,7 +14,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private toastr: ToastrService,
-    private appService: AppService
+    private appService: AuthService
   ) {}
 
   ngOnInit() {

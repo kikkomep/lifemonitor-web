@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy, Renderer2 } from '@angular/core';
-import { AppService } from '../../utils/services/app.service';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { AuthService } from '../../utils/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -14,7 +15,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private toastr: ToastrService,
-    private appService: AppService
+    private appService: AuthService
   ) {
     this.message = "LifeMonitor HomePage!";
   }

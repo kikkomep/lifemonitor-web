@@ -1,12 +1,13 @@
 import {
-  Component,
-  OnInit,
   AfterViewInit,
-  ViewChild,
-  Output,
+  Component,
   EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
 } from '@angular/core';
-import { AppService } from 'src/app/utils/services/app.service';
+
+import { AuthService } from 'src/app/utils/services/auth.service';
 
 @Component({
   selector: 'app-menu-sidebar',
@@ -16,7 +17,7 @@ import { AppService } from 'src/app/utils/services/app.service';
 export class MenuSidebarComponent implements OnInit, AfterViewInit {
   @ViewChild('mainSidebar', { static: false }) mainSidebar;
   @Output() mainSidebarHeight: EventEmitter<any> = new EventEmitter<any>();
-  constructor(public appService: AppService) {}
+  constructor(public appService: AuthService) {}
 
   ngOnInit() {}
 
