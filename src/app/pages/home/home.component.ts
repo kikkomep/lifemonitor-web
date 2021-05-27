@@ -17,15 +17,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     private toastr: ToastrService,
     private appService: AuthService
   ) {
-    this.message = "LifeMonitor HomePage!";
+    this.message = 'LifeMonitor HomePage!';
   }
 
   ngOnInit() {
-    this.renderer.addClass(document.querySelector('app-root'), 'home-page');
+    this.renderer.addClass(document.querySelector('app-root'), 'login-page');
   }
 
-
   ngOnDestroy() {
-    this.renderer.removeClass(document.querySelector('app-root'), 'home-page');
+    this.renderer.removeClass(document.querySelector('app-root'), 'login-page');
   }
 }
