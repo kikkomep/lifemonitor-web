@@ -1,6 +1,9 @@
-import { Component, OnInit, OnDestroy, Renderer2 } from '@angular/core';
-import { AppService } from '../../utils/services/app.service';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { AuthService } from '../../utils/services/auth.service';
+import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -11,26 +14,34 @@ import { ToastrService } from 'ngx-toastr';
 export class LoginComponent implements OnInit, OnDestroy {
   public loginForm: FormGroup;
   public isAuthLoading = false;
+  private userLoggedSubscription: Subscription;
   constructor(
     private renderer: Renderer2,
     private toastr: ToastrService,
-    private appService: AppService
+    private appService: AuthService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
     this.renderer.addClass(document.querySelector('app-root'), 'login-page');
-    this.loginForm = new FormGroup({
-      email: new FormControl(null, Validators.required),
-      password: new FormControl(null, Validators.required),
+    this.activatedRoute.queryParams.subscribe((params) => {
+      let callback = params['callback'];
+      console.log('Callback... ', callback, !callback, callback == 'undefined');
+      if (typeof callback === 'undefined') {
+        this.toastr.info('Loading...');
+        this.appService.login();
+      }
     });
-  }
 
-  login() {
-    if (this.loginForm.valid) {
-      this.appService.login();
-    } else {
-      this.toastr.error('Hello world!', 'Toastr fun!');
-    }
+    this.userLoggedSubscription = this.appService
+      .checkUserLogged()
+      .subscribe((userLogged) => {
+        if (userLogged) {
+          this.toastr.success('Logging OK');
+        } else {
+          this.toastr.success('Logged out');
+        }
+      });
   }
 
   ngOnDestroy() {
