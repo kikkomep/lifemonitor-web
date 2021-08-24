@@ -11,6 +11,9 @@ import { NgModule } from '@angular/core';
 import { NonAuthGuard } from './utils/guards/non-auth.guard';
 import { RegisterComponent } from './pages/register/register.component';
 import { Subscription } from 'rxjs';
+import { WorkflowComponent } from './views/workflow/workflow.component';
+import { BuildComponent } from './views/build/build.component';
+import { SuiteComponent } from './views/suite/suite.component';
 
 const routes: Routes = [
   {
@@ -32,6 +35,18 @@ const routes: Routes = [
         path: 'dashboard',
         component: DashboardComponent,
       },
+      {
+        path: 'workflow',
+        component: WorkflowComponent,
+      },
+      {
+        path: 'suite',
+        component: SuiteComponent,
+      }
+      // {
+      //   path: 'build',
+      //   component: BuildComponent,
+      // }
     ],
   },
   {
@@ -44,11 +59,16 @@ const routes: Routes = [
     component: RegisterComponent,
     canActivate: [NonAuthGuard],
   },
-  { path: '**', redirectTo: '' },
+  { path: '**', redirectTo: '/dashboard' },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
+  imports: [
+    RouterModule.forRoot(routes, {
+      relativeLinkResolution: 'legacy',
+      // onSameUrlNavigation: 'reload',
+    }),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {
@@ -62,14 +82,10 @@ export class AppRoutingModule {
           console.info('User logged... redirecting');
           this.handleRedirect('/dashboard');
         } else {
-          this.handleRedirect('/home');
+          this.handleRedirect('/');
           console.info('User logout... redirecting');
         }
       });
-
-    if (this.authService.isUserLogged()) {
-      this.handleRedirect('/dashboard');
-    }
   }
 
   handleRedirect(redirectTo: string = null) {
