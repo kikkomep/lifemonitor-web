@@ -9,6 +9,7 @@ import {
 
 import { ApiService } from 'src/app/utils/services/api.service';
 import { AuthService } from 'src/app/utils/services/auth.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-user-dropdown-menu',
@@ -16,7 +17,11 @@ import { AuthService } from 'src/app/utils/services/auth.service';
   styleUrls: ['./user-dropdown-menu.component.scss'],
 })
 export class UserDropdownMenuComponent implements OnInit {
-  public user;
+  public user = {
+    username: '',
+    identifier: '',
+    picture: '',
+  };
 
   @ViewChild('dropdownMenu', { static: false }) dropdownMenu;
   @HostListener('document:click', ['$event'])
@@ -31,10 +36,18 @@ export class UserDropdownMenuComponent implements OnInit {
     private renderer: Renderer2,
     private authService: AuthService,
     private apiService: ApiService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.user = this.appService.user;
+    this.apiService.get_current_user().subscribe((data) => {
+      console.log('Current user', data);
+      let info = data['identities']['lifemonitor'];
+      this.user = {
+        username: info['username'],
+        identifier: info['sub'],
+        picture: info['picture'],
+      };
+    });
   }
 
   toggleDropdownMenu() {
@@ -43,6 +56,10 @@ export class UserDropdownMenuComponent implements OnInit {
     } else {
       this.showDropdownMenu();
     }
+  }
+
+  public get profileUrl(): string {
+    return environment.backend_base_url + "/profile";
   }
 
   showDropdownMenu() {
