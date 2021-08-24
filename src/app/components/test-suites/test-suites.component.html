@@ -1,0 +1,58 @@
+<div class="card card-primary card-outline">
+  <div *ngIf="!suites" class="overlay dark">
+    <i class="fas fa-3x fa-sync-alt"></i>
+  </div>
+  <div class="card-body box-profile">
+    <!-- /.card-header -->
+    <div class="card-body mt-4 p-0">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th style="width: 10px" scope="col"></th>
+            <th class="">Test Suites</th>
+            <th class="text-center" scope="col">Engine</th>
+            <th class="text-center" scope="col" style="width: 100px">
+              Instances
+            </th>
+            <th class="text-center" scope="col">Latest Builds</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="suites">
+          <tr *ngFor="
+                let s of suites;
+                index as i;
+                first as isFirst
+              ">
+            <td [ngClass]="s.class">
+              <i class="{{ s.statusIcon }} fa-2x"></i>
+            </td>
+            <td class="align-middle">
+              <div class="font-weight-light text-lg">
+                <a [routerLink]="['/suite', { uuid: s.uuid }]" style="color: black; font-size: larger;">{{ s.roc_suite
+                  }}</a>
+              </div>
+              <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
+            </td>
+            <td class="text-center align-middle">
+              <div style="height: 100%; margin: auto">
+                <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
+                <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>
+              </div>
+            </td>
+            <td class="text-center align-middle font-weight-light">
+              <a [routerLink]="['/suite', { uuid: s.uuid }]">
+                <stats-pie-chart [stats]="s.instances"></stats-pie-chart>
+              </a>
+            </td>
+            <td class="text-center align-middle font-weight-light" width="50">
+              <stats-bar-chart [stats]="s.getLatestBuilds()" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- /.card-body -->
+  </div>
+  <!-- /.card-body -->
+</div>
+<!-- /.card -->
