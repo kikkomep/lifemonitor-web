@@ -12,7 +12,6 @@ import { NonAuthGuard } from './utils/guards/non-auth.guard';
 import { RegisterComponent } from './pages/register/register.component';
 import { Subscription } from 'rxjs';
 import { WorkflowComponent } from './views/workflow/workflow.component';
-import { BuildComponent } from './views/build/build.component';
 import { SuiteComponent } from './views/suite/suite.component';
 
 const routes: Routes = [
@@ -43,10 +42,6 @@ const routes: Routes = [
         path: 'suite',
         component: SuiteComponent,
       }
-      // {
-      //   path: 'build',
-      //   component: BuildComponent,
-      // }
     ],
   },
   {

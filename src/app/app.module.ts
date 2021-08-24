@@ -27,7 +27,6 @@ import { UserDropdownMenuComponent } from './pages/main/header/user-dropdown-men
 import { WorkflowComponent } from './views/workflow/workflow.component';
 import { StatsPieChartComponent } from './components/stats-pie-chart/stats-pie-chart.component';
 import { StatsBarChartComponent } from './components/stats-bar-chart/stats-bar-chart.component';
-import { BuildComponent } from './views/build/build.component';
 import { TestSuitesComponent } from './components/test-suites/test-suites.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { TestInstancesComponent } from './components/test-instances/test-instances.component';
@@ -56,7 +55,6 @@ registerLocaleData(localeEn, 'en-EN');
     WorkflowComponent,
     StatsPieChartComponent,
     StatsBarChartComponent,
-    BuildComponent,
     TestSuitesComponent,
     SuiteComponent,
     TestInstancesComponent,
