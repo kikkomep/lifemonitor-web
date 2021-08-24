@@ -1,0 +1,20 @@
+<div
+  *ngIf="!stats"
+  style="display: flex; align-items: center; width: 100px;"
+>
+  <div class="text-center w-100">
+    <i class="fas fa-2x fa-sync-alt text-muted"></i>
+  </div>
+</div>
+<div *ngIf="stats" class="wrapper text-sm text-center" style="width: 100px">
+  <canvas
+    baseChart
+    [datasets]="pieChartData"
+    [labels]="pieChartLabels"
+    [chartType]="pieChartType"
+    [options]="pieChartOptions"
+    [plugins]="pieChartPlugins"
+    [legend]="pieChartLegend"
+  >
+  </canvas>
+</div>
