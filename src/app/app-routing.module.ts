@@ -9,7 +9,6 @@ import { LoginComponent } from './pages/login/login.component';
 import { MainComponent } from './pages/main/main.component';
 import { NgModule } from '@angular/core';
 import { NonAuthGuard } from './utils/guards/non-auth.guard';
-import { ProfileComponent } from './views/profile/profile.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { Subscription } from 'rxjs';
 
@@ -25,10 +24,6 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
-      {
-        path: 'profile',
-        component: ProfileComponent,
-      },
       {
         path: 'blank',
         component: BlankComponent,

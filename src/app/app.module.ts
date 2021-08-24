@@ -10,8 +10,7 @@ import { HeaderComponent } from './pages/main/header/header.component';
 import { FooterComponent } from './pages/main/footer/footer.component';
 import { MenuSidebarComponent } from './pages/main/menu-sidebar/menu-sidebar.component';
 import { BlankComponent } from './views/blank/blank.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { ProfileComponent } from './views/profile/profile.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RegisterComponent } from './pages/register/register.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
@@ -37,7 +36,6 @@ registerLocaleData(localeEn, 'en-EN');
     FooterComponent,
     MenuSidebarComponent,
     BlankComponent,
-    ProfileComponent,
     RegisterComponent,
     DashboardComponent,
     MessagesDropdownMenuComponent,
