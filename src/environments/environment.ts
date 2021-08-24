@@ -4,6 +4,8 @@
 
 export const environment = {
   production: false,
+  backend_base_url: 'https://api.lifemonitor.eu',
+  oauth2_client_id: '<LIFEMONITOR_OAUTH2_CLIENT_ID>'
 };
 
 /*
