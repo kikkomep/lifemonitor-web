@@ -1,7 +1,5 @@
 <!-- <nav class="main-header navbar navbar-expand navbar-white navbar-light"> -->
-<nav
-  class="main-header navbar navbar-toggleable-sm navbar-expand-md navbar-white"
-  style="
+<nav class="main-header navbar navbar-toggleable-sm navbar-expand-md navbar-white" style="
     height: 80px;
     background: rgb(9, 75, 75);
     background: radial-gradient(
@@ -9,22 +7,15 @@
       rgba(0, 75, 75, 1) 0%,
       rgba(26, 118, 118, 1) 80%
     );
-  "
->
-  <a class="navbar-brand mx-auto mt-0 text-center" href="#">
-    <img
-      src="/assets/img/logo/lm/LifeMonitorLogo.png"
-      alt="LifeMonitor Web App"
-      width="90px"
-      class="brand-image"
-      style="
+  ">
+  <a [routerLink]="['/dashboard']" class="navbar-brand mx-auto mt-0 text-center" href="#">
+    <img src="/assets/img/logo/lm/LifeMonitorLogo.png" alt="LifeMonitor Web App" width="90px" class="brand-image" style="
         position: absolute;
         left: 50%;
         margin-top: -35px;
         margin-left: -45px !important;
         height: 70px;
-      "
-    />
+      " />
     <!-- <img
       src="/assets/img/logo/lm/LifeMonitor_Text.svg"
       style="color: white"
@@ -64,18 +55,14 @@
       </div>
     </div>
   </form> -->
-  <button
-    class="navbar-toggler navbar-toggler-right"
-    type="button"
-    data-toggle="collapse"
-    data-target=".navbar-collapse"
-  >
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+    data-target=".navbar-collapse">
     ☰
   </button>
   <div class="navbar-collapse collapse">
     <ul class="nav navbar-nav ml-auto float-right">
 
-      <app-messages-dropdown-menu></app-messages-dropdown-menu>
+      <!-- <app-messages-dropdown-menu></app-messages-dropdown-menu> -->
       <app-notifications-dropdown-menu></app-notifications-dropdown-menu>
       <app-user-dropdown-menu></app-user-dropdown-menu>
       <!-- <li class="nav-item">
