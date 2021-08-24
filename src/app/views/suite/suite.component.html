@@ -1,0 +1,268 @@
+<div *ngIf="suite">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark"></h1>
+        </div>
+        <!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right mr-lg-4 mr-md-2">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/dashboard']"
+                ><i class="fas fa-home p-1"></i>Home</a
+              >
+            </li>
+            <li class="breadcrumb-item active">
+              <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid }]">
+                <i class="fas fa-cogs p-1"></i>Workflow
+              </a>
+            </li>
+            <li class="breadcrumb-item active">
+              <div class="d-inline" style="margin-top: 0.5px">
+                <i class="fas fa-cubes p-1"></i>
+              </div>
+              Suite
+            </li>
+          </ol>
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+  </div>
+  <!-- /.content-header -->
+
+  <section *ngIf="suite.workflow" class="content mx-lg-4 mt-md-3 p-2">
+    <div
+      class="row p-0"
+      style="color: var(--primary); font-weight: 300; height: 100%"
+    >
+      <div
+        class="col-md-1 col-sm-1 align-middle"
+        style="max-width: 50px; font-size: 2.4rem; margin-top: 3px; color: {{ suite.color }}"
+      >
+        <i class="{{ suite.workflow.statusIcon }}"></i>
+      </div>
+      <div class="col-md-10 col-sm-10" style="font-size: 2.5rem">
+        {{ suite.name }} <em>of</em> {{ suite.workflow.name }}
+      </div>
+      <div
+        class="col-md-1 col-sm-1 float-right"
+        style="font-size: 1rem; font-weight: 300; width: 100%"
+      >
+        <img
+          src="/assets/img/logo/crates/ro-crate-workflow.svg"
+          height="50"
+          style="float: right"
+        />
+      </div>
+    </div>
+    <div
+      class="row"
+      style="color: gray; font-size: 1.2rem; font-weight: 300"
+    >
+      <div class="col-1 p-0 m-0 align-middle" style="max-width: 50px">
+        <img class="mx-3" src="{{ suite.workflow.typeIcon }}" height="25" />
+      </div>
+      <div class="col-6 ml-1"><b>uuid: </b>{{ suite.uuid }}</div>
+    </div>
+
+    <!-- <div
+      *ngIf="suite"
+      class="row"
+      style="color: var(--primary); font-weight: 300"
+    >
+      <div class="col-1 p-0 m-0" style="max-width: 50px"></div>
+      <div class="col-6 ml-1">
+        <b>name: </b>
+          {{ suite.name }}
+      </div>
+    </div> -->
+
+    <div *ngIf="suite.workflow && suite.workflow.suites" class="mt-5">
+      <h3 style="color: var(--primary)">Test instances</h3>
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-primary" (click)="filterByStatus('passed')">
+            <div *ngIf="!suite.instances" class="overlay dark">
+              <i class="fas fa-3x fa-sync-alt"></i>
+            </div>
+            <div
+              *ngIf="suite.instances && statusFilter && statusFilter != 'passed'"
+              class="overlay dark"
+            ></div>
+            <div class="inner">
+              <h3>
+                {{ suite.instances ? suite.instances.passed.length : 0 }}
+              </h3>
+              <p>Passed</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-thumbs-up"></i>
+            </div>
+            <a href="#" class="small-box-footer" style="height: 22px">
+              <div style="display: inline-block; padding: 0"></div>
+              <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+            </a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-warning" (click)="filterByStatus('error')">
+            <div *ngIf="!suite.instances" class="overlay dark">
+              <i class="fas fa-3x fa-sync-alt"></i>
+            </div>
+            <div
+              *ngIf="suite.instances && statusFilter && statusFilter != 'error'"
+              class="overlay dark"
+            ></div>
+            <div class="inner">
+              <h3>
+                {{ suite.instances ? suite.instances.error.length : 0 }}
+              </h3>
+              <p>Error</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-bug"></i>
+            </div>
+            <a href="#" class="small-box-footer" style="height: 22px">
+              <div style="display: inline-block; padding: 0"></div>
+              <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+            </a>
+          </div>
+        </div>
+        <!-- ./col -->
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-danger" (click)="filterByStatus('failed')">
+            <div *ngIf="!suite.instances" class="overlay dark">
+              <i class="fas fa-3x fa-sync-alt"></i>
+            </div>
+            <div
+              *ngIf="suite.instances && statusFilter && statusFilter != 'failed'"
+              class="overlay dark"
+            ></div>
+            <div class="inner">
+              <h3>
+                {{ suite.instances ? suite.instances.failed.length : 0 }}
+              </h3>
+              <p>Failed</p>
+            </div>
+            <div class="icon">
+              <i class="fa fa-thumbs-down"></i>
+            </div>
+            <a href="#" class="small-box-footer" style="height: 22px">
+              <div style="display: inline-block; padding: 0"></div>
+              <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+            </a>
+          </div>
+        </div>
+        <!-- ./col -->
+
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-orange" (click)="filterByStatus('waiting')">
+            <div *ngIf="!suite.instances" class="overlay dark">
+              <i class="fas fa-3x fa-sync-alt"></i>
+            </div>
+            <div
+              *ngIf="suite.instances && statusFilter && statusFilter != 'waiting'"
+              class="overlay dark"
+            ></div>
+            <div class="inner">
+              <h3>
+                {{ suite.instances ? suite.instances.waiting.length : 0 }}
+              </h3>
+
+              <p>Waiting</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-pause"></i>
+            </div>
+            <a href="#" class="small-box-footer" style="height: 22px">
+              <div style="display: inline-block; padding: 0"></div>
+              <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+            </a>
+          </div>
+        </div>
+        <!-- ./col -->
+
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-cyan" (click)="filterByStatus('running')">
+            <div *ngIf="!suite.instances" class="overlay dark">
+              <i class="fas fa-3x fa-sync-alt"></i>
+            </div>
+            <div
+              *ngIf="suite.instances && statusFilter && statusFilter != 'running'"
+              class="overlay dark"
+            ></div>
+            <div class="inner">
+              <h3>
+                {{ suite.instances ? suite.instances.running.length : 0 }}
+              </h3>
+
+              <p>Running</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-sync"></i>
+            </div>
+            <a href="#" class="small-box-footer" style="height: 22px">
+              <div style="display: inline-block; padding: 0"></div>
+              <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+            </a>
+          </div>
+        </div>
+        <!-- ./col -->
+
+        <div class="col-lg-2 col-6">
+          <!-- small box -->
+          <div class="small-box bg-gray" (click)="filterByStatus('aborted')">
+            <div *ngIf="!suite.instances" class="overlay dark">
+              <i class="fas fa-3x fa-sync-alt"></i>
+            </div>
+            <div
+              *ngIf="suite.instances && statusFilter && statusFilter != 'aborted'"
+              class="overlay dark"
+            ></div>
+            <div class="inner">
+              <h3>
+                {{ suite.instances ? suite.instances.aborted.length : 0 }}
+              </h3>
+
+              <p>Aborted</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-ban"></i>
+            </div>
+            <a href="#" class="small-box-footer" style="height: 22px">
+              <div style="display: inline-block; padding: 0"></div>
+              <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+            </a>
+          </div>
+        </div>
+        <!-- ./col -->
+      </div>
+      <!-- /.row -->
+    </div>
+
+    <!-- Search Bar -->
+    <item-search-bar
+      [(filterValue)]="instanceNameFilter"
+      [(sortingOrder)]="instanceSortingOrder"
+    ></item-search-bar>
+
+    <test-instances
+      [testInstances]="
+        instances
+          | itemFilterPipe: instanceNameFilter
+          | sortingFilter: instanceSortingOrder
+      "
+    ></test-instances>
+  </section>
+</div>
