@@ -28,6 +28,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/chart.js/dist/Chart.min.css",
               "src/styles.scss"
             ],
             "scripts": [
@@ -120,7 +121,9 @@
             "devServerTarget": "lifemonitor:serve"
           },
           "chromeOptions": {
-            "args": ["--headless", "--no-sandbox"
+            "args": [
+              "--headless",
+              "--no-sandbox"
             ]
           },
           "configurations": {

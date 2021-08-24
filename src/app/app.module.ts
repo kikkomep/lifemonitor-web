@@ -19,15 +19,26 @@ import { MessagesDropdownMenuComponent } from './pages/main/header/messages-drop
 import { NotificationsDropdownMenuComponent } from './pages/main/header/notifications-dropdown-menu/notifications-dropdown-menu.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppButtonComponent } from './components/app-button/app-button.component';
-
+import { HttpClientModule } from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
 import localeEn from '@angular/common/locales/en';
+import { ChartsModule } from 'ng2-charts';
 import { UserDropdownMenuComponent } from './pages/main/header/user-dropdown-menu/user-dropdown-menu.component';
+import { WorkflowComponent } from './views/workflow/workflow.component';
+import { StatsPieChartComponent } from './components/stats-pie-chart/stats-pie-chart.component';
+import { StatsBarChartComponent } from './components/stats-bar-chart/stats-bar-chart.component';
+import { BuildComponent } from './views/build/build.component';
+import { TestSuitesComponent } from './components/test-suites/test-suites.component';
+import { SuiteComponent } from './views/suite/suite.component';
+import { TestInstancesComponent } from './components/test-instances/test-instances.component';
+import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
+import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
 
 registerLocaleData(localeEn, 'en-EN');
 
 @NgModule({
-  declarations: [    
+  declarations: [
     AppComponent,
     HomeComponent,
     MainComponent,
@@ -42,17 +53,30 @@ registerLocaleData(localeEn, 'en-EN');
     NotificationsDropdownMenuComponent,
     AppButtonComponent,
     UserDropdownMenuComponent,
+    WorkflowComponent,
+    StatsPieChartComponent,
+    StatsBarChartComponent,
+    BuildComponent,
+    TestSuitesComponent,
+    SuiteComponent,
+    TestInstancesComponent,
+    ItemFilterPipe,
+    SortingFilterPipe,
+    SearchBarComponent,
   ],
   imports: [
+    FormsModule,
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     ToastrModule.forRoot({
       timeOut: 10000,
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }),
+    ChartsModule,
     NgbModule,
   ],
   providers: [],
