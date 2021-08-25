@@ -1,3 +1,4 @@
+import { AppConfigService } from './../../../../utils/services/config.service';
 import {
   Component,
   ElementRef,
@@ -9,7 +10,6 @@ import {
 
 import { ApiService } from 'src/app/utils/services/api.service';
 import { AuthService } from 'src/app/utils/services/auth.service';
-import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-user-dropdown-menu',
@@ -35,8 +35,9 @@ export class UserDropdownMenuComponent implements OnInit {
     private elementRef: ElementRef,
     private renderer: Renderer2,
     private authService: AuthService,
-    private apiService: ApiService
-  ) { }
+    private apiService: ApiService,
+    private config: AppConfigService
+  ) {}
 
   ngOnInit(): void {
     this.apiService.get_current_user().subscribe((data) => {
@@ -59,7 +60,7 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   public get profileUrl(): string {
-    return environment.backend_base_url + "/profile";
+    return this.config.getConfig()['apiBaseUrl'] + '/profile';
   }
 
   showDropdownMenu() {

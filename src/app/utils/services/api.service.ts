@@ -1,9 +1,9 @@
+import { AppConfigService } from './config.service';
 import { Injectable } from '@angular/core';
 import { Observable, of, Subject, throwError, forkJoin, from } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 import { Workflow } from 'src/app/models/workflow.model';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 import { Suite } from 'src/app/models/suite.models';
@@ -22,8 +22,8 @@ export class ApiService {
   private apiBaseUrl: string = null;
   private httpOptions: object = null;
 
-  constructor(private http: HttpClient) {
-    this.apiBaseUrl = environment.backend_base_url;
+  constructor(private http: HttpClient, private config: AppConfigService) {
+    this.apiBaseUrl = this.config.getConfig()['apiBaseUrl'];
     console.log('API Service created');
     this.get_workflows().subscribe((data) => {
       console.log('Loaded workflows', data);

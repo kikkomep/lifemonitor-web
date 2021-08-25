@@ -1,3 +1,4 @@
+import { AppConfigService } from './config.service';
 import { Location, LocationStrategy } from '@angular/common';
 import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
@@ -6,7 +7,6 @@ import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -21,9 +21,10 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private location: Location,
+    private config: AppConfigService,
     private locationStrategy: LocationStrategy
   ) {
-    let baseUrl = environment.backend_base_url;
+    let baseUrl = this.config.getConfig()['apiBaseUrl'];
 
     this.oauth = new OAuth2AuthCodePKCE({
       extraAuthorizationParams: {
@@ -31,7 +32,7 @@ export class AuthService {
       },
       authorizationUrl: baseUrl + '/oauth2/authorize',
       tokenUrl: baseUrl + '/oauth2/token',
-      clientId: environment.oauth2_client_id,
+      clientId: this.config.getConfig()['clientId'],
       scopes: [
         'openid',
         'user.profile',
@@ -89,8 +90,6 @@ export class AuthService {
     } else {
       this._userLogged.next(true);
     }
-
-
   }
 
   nonce(length: number) {

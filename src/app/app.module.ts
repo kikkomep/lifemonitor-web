@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { HomeComponent } from './pages/home/home.component';
@@ -33,8 +33,15 @@ import { TestInstancesComponent } from './components/test-instances/test-instanc
 import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { AppConfigService } from './utils/services/config.service';
 
 registerLocaleData(localeEn, 'en-EN');
+
+export function initConfigService(appConfig: AppConfigService) {
+  return (): Promise<any> => {
+    return appConfig.loadConfig();
+  };
+}
 
 @NgModule({
   declarations: [
@@ -77,7 +84,15 @@ registerLocaleData(localeEn, 'en-EN');
     ChartsModule,
     NgbModule,
   ],
-  providers: [],
+  providers: [
+    AppConfigService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initConfigService,
+      deps: [AppConfigService],
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
