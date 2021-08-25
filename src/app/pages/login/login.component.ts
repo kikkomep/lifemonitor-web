@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private toastr: ToastrService,
-    private appService: AuthService,
+    private authService: AuthService,
     private activatedRoute: ActivatedRoute
   ) {}
 
@@ -28,13 +28,16 @@ export class LoginComponent implements OnInit, OnDestroy {
       let callback = params['callback'];
       console.log('Callback... ', callback, !callback, callback == 'undefined');
       if (typeof callback === 'undefined') {
-        this.toastr.info('Loading...');
-        this.appService.login();
+        this.toastr.info('Authorizing...');
+        this.authService.authorize();
+      } else {
+        this.toastr.info('Logging in...');
+        this.authService.login();
       }
     });
 
-    this.userLoggedSubscription = this.appService
-      .checkUserLogged()
+    this.userLoggedSubscription = this.authService
+      .userLoggedAsObservable()
       .subscribe((userLogged) => {
         if (userLogged) {
           this.toastr.success('Logging OK');
@@ -46,5 +49,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.renderer.removeClass(document.querySelector('app-root'), 'login-page');
+    if (this.userLoggedSubscription) {
+      this.userLoggedSubscription.unsubscribe();
+    }
   }
 }

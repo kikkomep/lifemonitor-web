@@ -16,7 +16,7 @@ export class AppConfigService {
         .toPromise()
         .then((config) => {
           this.config = Object.assign({}, environment, config);
-          console.log(
+          console.debug(
             'Configuration updated from ' + environment['configFile']
           );
         })

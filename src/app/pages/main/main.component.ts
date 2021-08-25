@@ -1,6 +1,6 @@
 import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { NavigationStart, NavigationEnd, Router } from '@angular/router';
-import { filter } from "rxjs/operators";
+import { filter } from 'rxjs/operators';
 import { AppService } from 'src/app/utils/services/app.service';
 import { AuthService } from 'src/app/utils/services/auth.service';
 
@@ -19,20 +19,7 @@ export class MainComponent implements OnInit {
     private renderer: Renderer2,
     private appService: AppService,
     private authService: AuthService
-  ) {
-
-    // this.userLoggedSubscription = this.authService
-    //   .checkUserLogged()
-    //   .subscribe((userLogged) => {
-    //     if (userLogged) {
-    //       console.info('User logged... redirecting');
-    //       this.router.navigateByUrl('/dashboard');
-    //     } else {
-    //       this.router.navigateByUrl('/');
-    //       console.info('User logout... redirecting');
-    //     }
-    //   });
-  }
+  ) {}
 
   ngOnInit() {
     this.renderer.removeClass(document.querySelector('app-root'), 'login-page');
@@ -51,9 +38,8 @@ export class MainComponent implements OnInit {
         })
       )
       .subscribe((event: NavigationStart) => {
-
         console.group('NavigationStart Event');
-        console.log("event", event);
+        console.log('event', event);
         // Every navigation sequence is given a unique ID. Even "popstate"
         // navigations are really just "roll forward" navigations that get
         // a new, unique ID.

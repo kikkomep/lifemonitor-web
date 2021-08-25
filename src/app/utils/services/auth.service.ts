@@ -1,12 +1,7 @@
-import { AppConfigService } from './config.service';
-import { Location, LocationStrategy } from '@angular/common';
-import { Observable, Subject, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
-
-import { HttpClient } from '@angular/common/http';
-import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
+import { Observable, Subject } from 'rxjs';
+import { AppConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,60 +11,69 @@ export class AuthService {
 
   private _userLogged = new Subject<boolean>();
 
-  private oauth: OAuth2AuthCodePKCE = null;
+  private _oauth: OAuth2AuthCodePKCE = null;
 
-  constructor(
-    private http: HttpClient,
-    private location: Location,
-    private config: AppConfigService,
-    private locationStrategy: LocationStrategy
-  ) {
-    let baseUrl = this.config.getConfig()['apiBaseUrl'];
+  constructor(private config: AppConfigService) {}
 
-    this.oauth = new OAuth2AuthCodePKCE({
-      extraAuthorizationParams: {
-        nonce: this.nonce(64),
-      },
-      authorizationUrl: baseUrl + '/oauth2/authorize',
-      tokenUrl: baseUrl + '/oauth2/token',
-      clientId: this.config.getConfig()['clientId'],
-      scopes: [
-        'openid',
-        'user.profile',
-        'user.workflow.read',
-        'user.workflow.write',
-        'workflow.read',
-        'workflow.write',
-        'testingService.read',
-        'testingService.write',
-      ],
-      redirectUrl: window.location.origin + '/login?callback',
-      onAccessTokenExpiry(refreshAccessToken) {
-        console.log('Expired! Access token needs to be renewed.');
-        alert(
-          'We will try to get a new access token via grant code or refresh token.'
-        );
-        return refreshAccessToken();
-      },
-      onInvalidGrant(refreshAuthCodeOrRefreshToken) {
-        console.log('Expired! Auth code or refresh token needs to be renewed.');
-        alert('Redirecting to auth server to obtain a new auth grant code.');
-        //return refreshAuthCodeOrRefreshToken();
-      },
-    });
+  get oauth(): OAuth2AuthCodePKCE {
+    if (!this._oauth) {
+      let baseUrl = this.config.getConfig()['apiBaseUrl'];
+      this._oauth = new OAuth2AuthCodePKCE({
+        extraAuthorizationParams: {
+          nonce: this.nonce(64),
+        },
+        authorizationUrl: baseUrl + '/oauth2/authorize',
+        tokenUrl: baseUrl + '/oauth2/token',
+        clientId: this.config.getConfig()['clientId'],
+        scopes: [
+          'openid',
+          'user.profile',
+          'user.workflow.read',
+          'user.workflow.write',
+          'workflow.read',
+          'workflow.write',
+          'testingService.read',
+          'testingService.write',
+        ],
+        redirectUrl: window.location.origin + '/login?callback',
+        onAccessTokenExpiry(refreshAccessToken) {
+          console.log('Expired! Access token needs to be renewed.');
+          alert(
+            'We will try to get a new access token via grant code or refresh token.'
+          );
+          return refreshAccessToken();
+        },
+        onInvalidGrant(refreshAuthCodeOrRefreshToken) {
+          console.log(
+            'Expired! Auth code or refresh token needs to be renewed.'
+          );
+          alert('Redirecting to auth server to obtain a new auth grant code.');
+          //return refreshAuthCodeOrRefreshToken();
+        },
+      });
+    }
+    return this._oauth;
+  }
 
+  private nonce(length: number) {
+    let text = '';
+    let possible =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  }
+
+  public authorize() {
+    console.log('Getting authorization code...');
+    this.oauth.fetchAuthorizationCode();
+  }
+
+  public login() {
     console.log('Is authorized: ', this.oauth.isAuthorized());
     console.log('Is expired: ', this.oauth.isAccessTokenExpired());
 
-    // console.log('', this.oauth.getAccessToken());
-
-    // if (this.oauth.isAuthorized()) {
-    //   this.get_workflows();
-    // }
-
-    // this.oauth.getAccessToken()..then((token) => {
-    //   console.log('This is the access token: ',token);
-    // });
     if (!this.oauth.isAuthorized()) {
       this.oauth
         .isReturningFromAuthServer()
@@ -92,29 +96,15 @@ export class AuthService {
     }
   }
 
-  nonce(length: number) {
-    let text = '';
-    let possible =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < length; i++) {
-      text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
+  public register() {
+    return this.authorize();
   }
 
-  login() {
-    this.oauth.fetchAuthorizationCode();
-  }
-
-  register() {
-    return this.login();
-  }
-
-  isUserLogged() {
+  public isUserLogged() {
     return localStorage.getItem('token') != null;
   }
 
-  checkUserLogged(): Observable<boolean> {
+  public userLoggedAsObservable(): Observable<boolean> {
     return this._userLogged.asObservable();
   }
 
@@ -122,7 +112,7 @@ export class AuthService {
     return this._user;
   }
 
-  logout() {
+  public logout() {
     this.oauth.reset();
     localStorage.removeItem('token');
     this._userLogged.next(false);

@@ -71,7 +71,7 @@ export class AppRoutingModule {
 
   constructor(private authService: AuthService, private router: Router) {
     this.userLoggedSubscription = this.authService
-      .checkUserLogged()
+      .userLoggedAsObservable()
       .subscribe((userLogged) => {
         if (userLogged) {
           console.info('User logged... redirecting');
