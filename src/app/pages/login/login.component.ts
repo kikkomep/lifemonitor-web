@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { AuthService } from '../../utils/services/auth.service';
 import { Subscription } from 'rxjs';
-import { ToastrService } from 'ngx-toastr';
+import { ActiveToast, ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 export class LoginComponent implements OnInit, OnDestroy {
   public loginForm: FormGroup;
   public isAuthLoading = false;
+  private previousToast: ActiveToast<any> = null;
   private userLoggedSubscription: Subscription;
   constructor(
     private renderer: Renderer2,
@@ -28,10 +29,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       let callback = params['callback'];
       console.log('Callback... ', callback, !callback, callback == 'undefined');
       if (typeof callback === 'undefined') {
-        this.toastr.info('Authorizing...');
+        this.previousToast = this.toastr.info('Authorizing...');
         this.authService.authorize();
       } else {
-        this.toastr.info('Logging in...');
+        this.previousToast = this.toastr.info('Logging in...');
         this.authService.login();
       }
     });
@@ -39,6 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.userLoggedSubscription = this.authService
       .userLoggedAsObservable()
       .subscribe((userLogged) => {
+        if (this.previousToast) this.toastr.remove(this.previousToast.toastId);
         if (userLogged) {
           this.toastr.success('Logging OK');
         } else {
