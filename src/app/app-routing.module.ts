@@ -16,9 +16,8 @@ import { SuiteComponent } from './views/suite/suite.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'home',
     component: HomeComponent,
-    canActivate: [NonAuthGuard],
   },
   {
     path: '',
@@ -26,13 +25,14 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
-      {
-        path: 'blank',
-        component: BlankComponent,
-      },
+      // {
+      //   path: 'blank',
+      //   component: BlankComponent,
+      // },
       {
         path: 'dashboard',
         component: DashboardComponent,
+        pathMatch: 'full',
       },
       {
         path: 'workflow',
@@ -41,20 +41,20 @@ const routes: Routes = [
       {
         path: 'suite',
         component: SuiteComponent,
-      }
+      },
+      { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
     ],
   },
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [NonAuthGuard],
   },
-  {
-    path: 'register',
-    component: RegisterComponent,
-    canActivate: [NonAuthGuard],
-  },
-  { path: '**', redirectTo: '/dashboard' },
+  // {
+  //   path: 'register',
+  //   component: RegisterComponent,
+  //   canActivate: [NonAuthGuard],
+  // },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
 ];
 
 @NgModule({
@@ -77,7 +77,7 @@ export class AppRoutingModule {
           console.info('User logged... redirecting');
           this.handleRedirect('/dashboard');
         } else {
-          this.handleRedirect('/');
+          this.handleRedirect('/home');
           console.info('User logout... redirecting');
         }
       });

@@ -15,20 +15,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate, CanActivateChild {
-
-  constructor(
-    private userService: AuthService,
-    private router: Router) { }
-
-  check(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    let pass = this.userService.isUserLogged();
-    if (!pass)
-      // this.router.navigateByUrl('/login');
-      // not logged in so redirect to login page with the return url and return false
-      //this.router.navigate(['login'], { queryParams: { returnUrl: state.url }});
-      console.log("User not logged!");
-    return pass;
-  }
+  constructor(private userService: AuthService, private router: Router) {}
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -38,8 +25,14 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    console.log("Can Activate, ", this.userService.user, this.userService.isUserLogged());
-    return this.check(next, state);
+    console.log(
+      'Can Activate, ',
+      this.userService.user,
+      this.userService.isUserLogged()
+    );
+    if (!this.userService.isUserLogged())
+      return this.router.createUrlTree(['/home']);
+    return true;
   }
   canActivateChild(
     next: ActivatedRouteSnapshot,
@@ -49,7 +42,13 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    console.log("Can Activate Child ", this.userService.user, this.userService.isUserLogged());
-    return this.check(next, state);
+    console.log(
+      'Can Activate Child ',
+      this.userService.user,
+      this.userService.isUserLogged()
+    );
+    if (!this.userService.isUserLogged())
+      return this.router.createUrlTree(['/home']);
+    return true;
   }
 }

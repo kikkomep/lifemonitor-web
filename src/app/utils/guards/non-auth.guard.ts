@@ -33,7 +33,10 @@ export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
       this.userService.user,
       this.userService.isUserLogged()
     );
-    return !this.userService.isUserLogged();
+    console.log('NonAuth can activate: ', !this.userService.isUserLogged());
+    return !this.userService.isUserLogged()
+      ? this.router.createUrlTree(['/home'])
+      : true;
   }
   canActivateChild(
     next: ActivatedRouteSnapshot,
@@ -44,7 +47,9 @@ export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
     | boolean
     | UrlTree {
     console.log('Can ActivateChild');
-    return !this.userService.isUserLogged();
+    return !this.userService.isUserLogged()
+      ? this.router.createUrlTree(['/dashboard'])
+      : true;
   }
   canLoad(
     route: Route,
