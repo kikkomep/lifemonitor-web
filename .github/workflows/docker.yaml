@@ -27,6 +27,12 @@ jobs:
         env:
           USER_REPO: ${{ secrets.DOCKERHUB_REPO }}
 
+      - name: Set software version
+        run: |
+          sw_version=$(jq -r ".version" package.json)
+          echo "SOFTWARE_VERSION=${sw_version}" >> $GITHUB_ENV
+          echo ::set-output name=sw_version::${sw_version}
+
       # Extract Docker metadata
       - name: Extract Docker metadata
         id: meta
@@ -38,12 +44,12 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=${{ env.SOFTWARE_VERSION_AS_DOCKER_TAG }}
-            type=raw,value=${{ env.SOFTWARE_VERSION_AS_DOCKER_TAG}}.build${{ github.run_number }}
+            type=raw,value=${{ env.SOFTWARE_VERSION }}
+            type=raw,value=${{ env.SOFTWARE_VERSION}}.build${{ github.run_number }}
             type=sha
           labels: |
             org.opencontainers.image.version=${{ env.SOFTWARE_VERSION }}.build${{ github.run_number }}
-      
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
         with:
@@ -60,7 +66,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       # Build and push
       - name: Build
         uses: docker/build-push-action@v2
