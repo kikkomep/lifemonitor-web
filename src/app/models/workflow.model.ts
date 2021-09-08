@@ -32,11 +32,26 @@ export class Workflow extends AggregatedStatusStatsItem {
     return 'assets/img/logo/wf/GalaxyLogoSquare.png';
   }
 
+  public get externalLink(): string {
+    if (this.version) {
+      return this.version['links']['origin'];
+    } else {
+      return null;
+    }
+  }
+
+  public get metadataLink(): string {
+    return this.version['ro_crate']['links']['metadata'];
+  }
+
+  public get downloadLink(): string {
+    return this.version['ro_crate']['links']['download'];
+  }
+
   get testInstances() {
     let instances = [];
     for (let s of this.suites.all) {
-      for (let i of s['instances']['all'])
-        instances.push(i);
+      for (let i of s['instances']['all']) instances.push(i);
     }
     return instances;
   }
