@@ -73,7 +73,10 @@
 
   <div *ngIf="workflow.registry" class="row" style="font-weight: 300">
     <div class="col-1 p-0 m-0" style="max-width: 50px"></div>
-    <div class="col-11 ml-1">
+    <div
+      class="col-11 ml-1"
+      style="color: gray; font-size: 1.2rem; font-weight: 300"
+    >
       <b>registry: </b>
       <a href="{{ workflow.registry['uri'] }}">{{
         workflow.registry['uri']
@@ -83,14 +86,16 @@
   </div>
 
   <!-- <div class="container-fluid"> -->
-
   <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">
     <h3 style="color: var(--primary)">Suites</h3>
     <!-- Small boxes (Stat box) -->
     <div class="row">
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-primary" (click)="filterByStatus('all_passing')">
+        <div
+          class="small-box bg-primary"
+          (click)="filterByStatus('all_passing')"
+        >
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>

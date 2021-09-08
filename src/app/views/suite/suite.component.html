@@ -108,7 +108,9 @@
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
             <div
-              *ngIf="suite.instances && statusFilter && statusFilter != 'passed'"
+              *ngIf="
+                suite.instances && statusFilter && statusFilter != 'passed'
+              "
               class="overlay dark"
             ></div>
             <div class="inner">
