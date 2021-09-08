@@ -41,6 +41,7 @@
     >
       {{ workflow.name }}
     </div>
+
     <div
       class="col-md-1 col-sm-1 float-right"
       style="font-size: 1rem; font-weight: 300; width: 100%"
@@ -56,7 +57,18 @@
     <div class="col-1 p-0 m-0" style="max-width: 50px">
       <img class="mx-3" src="{{ workflow.typeIcon }}" height="25" />
     </div>
-    <div class="col-11 ml-1"><b>uuid: </b>{{ workflow.uuid }}</div>
+    <div class="col-11 ml-1">
+      <b>uuid: </b>{{ workflow.uuid }}
+      <div
+        *ngIf="workflow.registry"
+        class="d-inline text-sm"
+        style="position: relative; top: 0; left: 5px"
+      >
+        <a href="{{ workflow.externalLink }}" target="_blank"
+          >[details <i class="fas fa-external-link-alt"></i>]</a
+        >
+      </div>
+    </div>
   </div>
 
   <div *ngIf="workflow.registry" class="row" style="font-weight: 300">

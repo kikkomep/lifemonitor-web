@@ -208,6 +208,11 @@
                 </td>
                 <td class="text-center align-middle font-weight-light">
                   {{ w.latest_version }}
+                  <div *ngIf="w.registry" class="text-sm">
+                    <a href="{{ w.externalLink }}" target="_blank"
+                      >[details <i class="fas fa-external-link-alt"></i>]</a
+                    >
+                  </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
                   <a [routerLink]="['/workflow', { uuid: w.uuid }]">

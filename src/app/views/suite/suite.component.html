@@ -59,6 +59,22 @@
         />
       </div>
     </div>
+    <div class="row" style="color: gray; font-size: 1.2rem; font-weight: 300">
+      <div class="col-1 p-0 m-0 align-middle" style="max-width: 50px">
+        <img class="mx-3" src="{{ suite.workflow.typeIcon }}" height="25" />
+      </div>
+      <div class="col-md-9 col-sm-9">
+        <b>uuid: </b>{{ suite.uuid }}
+        <div *ngIf="suite.workflow.registry"
+          class="d-inline text-sm"
+          style="position: relative; top: 0; left: 5px"
+        >
+          <a href="{{ suite.workflow.externalLink }}" target="_blank"
+            >[details <i class="fas fa-external-link-alt"></i>]</a
+          >
+        </div>
+      </div>
+
     <div
       class="row"
       style="color: gray; font-size: 1.2rem; font-weight: 300"
