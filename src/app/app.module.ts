@@ -36,6 +36,7 @@ import { SearchBarComponent } from './components/search-bar/search-bar.component
 import { AppConfigService } from './utils/services/config.service';
 import { LoaderComponent } from './components/loader/loader.component';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
+import { RocrateLogoComponent } from './components/rocrate-logo/rocrate-logo.component';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -71,6 +72,7 @@ export function initConfigService(appConfig: AppConfigService) {
     SortingFilterPipe,
     SearchBarComponent,
     LoaderComponent,
+    RocrateLogoComponent,
   ],
   imports: [
     FormsModule,

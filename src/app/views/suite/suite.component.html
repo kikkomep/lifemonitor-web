@@ -49,19 +49,15 @@
       >
         <i class="{{ suite.workflow.statusIcon }}"></i>
       </div>
-      <div class="col-md-10 col-sm-10" style="font-size: 2.5rem">
+      <div class="col-md-9 col-sm-9" style="font-size: 2.5rem">
         {{ suite.workflow.name }}:
         <span class="font-weight-bold">{{ suite.name }}</span>
       </div>
       <div
-        class="col-md-1 col-sm-1 float-right"
+        class="col-md-2 col-sm-2 float-right"
         style="font-size: 1rem; font-weight: 300; width: 100%"
       >
-        <img
-          src="/assets/img/logo/crates/ro-crate-workflow.svg"
-          height="50"
-          style="float: right"
-        />
+        <rocrate-logo [workflow]="suite.workflow"></rocrate-logo>
       </div>
     </div>
     <div class="row" style="color: gray; font-size: 1.2rem; font-weight: 300">
@@ -90,12 +86,13 @@
           color: var(--primary);
         "
       >
-        <div class="d-line" style="margin-left: 50px">
-          <a href="{{ suite.workflow.downloadLink }}" target="_blank">
+        <!-- <div class="d-line ro-crate-download-link" style="margin-left: 50px">
+          <!-- <a href="{{ suite.workflow.downloadLink }}" target="_blank" > -->
+        <!-- <a [routerLink]="" (click)="downloadROCrate()">
             download
             <i class="fas fa-cloud-download-alt"></i>
           </a>
-        </div>
+        </div> -->
       </div>
     </div>
 
