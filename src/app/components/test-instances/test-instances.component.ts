@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { InstanceStats } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
@@ -10,10 +18,10 @@ import { AppService } from 'src/app/utils/services/app.service';
 @Component({
   selector: 'test-instances',
   templateUrl: './test-instances.component.html',
-  styleUrls: ['./test-instances.component.scss']
+  styleUrls: ['./test-instances.component.scss'],
 })
 export class TestInstancesComponent implements OnInit {
-
+  @Input() workflow: Workflow;
   @Input() testInstances: TestInstance[];
   @Output() suiteSelected = new EventEmitter<TestInstance>();
 
@@ -30,13 +38,12 @@ export class TestInstancesComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  public selectTestInstance(event, testInstance: TestInstance){
-    console.log("Selected TestInstace: ", testInstance);
+  public selectTestInstance(event, testInstance: TestInstance) {
+    console.log('Selected TestInstace: ', testInstance);
   }
 
-
   public selectTestBuild(testBuild: TestBuild) {
-    console.log("TestBuild", testBuild);
+    console.log('TestBuild', testBuild);
     if (testBuild) {
       console.log('Test Build selected', testBuild);
       // this.suiteSelected.emit(testBuild);
@@ -57,8 +64,11 @@ export class TestInstancesComponent implements OnInit {
                   //     build_id: testBuild.build_id,
                   //   },
                   // });
-                  console.log("TestBuild external link: ", testBuild.externalLink);
-                  window.open(testBuild.externalLink, "_blank");
+                  console.log(
+                    'TestBuild external link: ',
+                    testBuild.externalLink
+                  );
+                  window.open(testBuild.externalLink, '_blank');
                 });
             });
         });

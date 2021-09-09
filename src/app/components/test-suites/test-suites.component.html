@@ -1,3 +1,9 @@
+<div class="row" style="color: var(--primary)">
+  <a [routerLink]="['/dashboard']">
+    <i class="fas fa-caret-left" style="margin: 0px 2px 0 15px"></i> workflows
+  </a>
+</div>
+
 <div class="card card-primary card-outline">
   <div *ngIf="!suites" class="overlay dark">
     <i class="fas fa-3x fa-sync-alt"></i>
@@ -18,25 +24,31 @@
           </tr>
         </thead>
         <tbody *ngIf="suites">
-          <tr *ngFor="
-                let s of suites;
-                index as i;
-                first as isFirst
-              ">
+          <tr *ngFor="let s of suites; index as i; first as isFirst">
             <td [ngClass]="s.class">
               <i class="{{ s.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
               <div class="font-weight-light text-lg">
-                <a [routerLink]="['/suite', { uuid: s.uuid }]" style="color: black; font-size: larger;">{{ s.roc_suite
-                  }}</a>
+                <a
+                  [routerLink]="['/suite', { uuid: s.uuid }]"
+                  style="color: black; font-size: larger"
+                  >{{ s.roc_suite }}</a
+                >
               </div>
               <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
             </td>
             <td class="text-center align-middle">
               <div style="height: 100%; margin: auto">
-                <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
-                <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>
+                <img
+                  *ngIf="s.engineIcon"
+                  src="{{ s.engineIcon }}"
+                  width="100"
+                />
+                <i
+                  *ngIf="!s.engineIcon"
+                  class="far fa-question-circle fa-2x"
+                ></i>
               </div>
             </td>
             <td class="text-center align-middle font-weight-light">
@@ -45,7 +57,10 @@
               </a>
             </td>
             <td class="text-center align-middle font-weight-light" width="50">
-              <stats-bar-chart [stats]="s.getLatestBuilds()" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+              <stats-bar-chart
+                [stats]="s.getLatestBuilds()"
+                (selectedItem)="selectTestBuild($event)"
+              ></stats-bar-chart>
             </td>
           </tr>
         </tbody>

@@ -1,3 +1,8 @@
+<div class="row" style="color: var(--primary)">
+  <a [routerLink]="['/workflow', { uuid: workflow.uuid }]">
+    <i class="fas fa-caret-left" style="margin: 0px 2px 0 15px"></i> workflow
+  </a>
+</div>
 <div class="card card-primary card-outline">
   <div *ngIf="!testInstances" class="overlay dark">
     <i class="fas fa-3x fa-sync-alt"></i>
@@ -18,11 +23,13 @@
           </tr>
         </thead>
         <tbody *ngIf="testInstances">
-          <tr *ngFor="
-                let testInstance of testInstances;
-                index as i;
-                first as isFirst
-              ">
+          <tr
+            *ngFor="
+              let testInstance of testInstances;
+              index as i;
+              first as isFirst
+            "
+          >
             <td [ngClass]="testInstance.class">
               <i class="{{ testInstance.statusIcon }} fa-2x"></i>
             </td>
@@ -31,20 +38,29 @@
                 <!-- <a [routerLink]="['/suite', { uuid: testInstance.uuid }]" style="color: black; font-size: larger;">{{
                   testInstance.roc_instance
                   }}</a> -->
-                  <a href="{{ testInstance.externalLink }}" target="_blank"
-                    style="color: black; font-size: larger;" (click)="selectTestInstance($event,testInstance)">
-                    {{ testInstance.roc_instance }}
-                  </a>
+                <a
+                  href="{{ testInstance.externalLink }}"
+                  target="_blank"
+                  style="color: black; font-size: larger"
+                  (click)="selectTestInstance($event, testInstance)"
+                >
+                  {{ testInstance.roc_instance }}
+                </a>
               </div>
               <div class="text-sm"><b>uuid:</b> {{ testInstance.uuid }}</div>
             </td>
             <td class="text-center">
               <br />
               <div style="height: 100%; margin: auto">
-                <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
-                  src="{{ testInstance.suite.engineIcon }}" width="100" />
-                <i *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
-                  class="far fa-question-circle fa-2x"></i>
+                <img
+                  *ngIf="testInstance.suite && testInstance.suite.engineIcon"
+                  src="{{ testInstance.suite.engineIcon }}"
+                  width="100"
+                />
+                <i
+                  *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
+                  class="far fa-question-circle fa-2x"
+                ></i>
               </div>
             </td>
             <td class="text-center align-middle font-weight-light">
@@ -53,7 +69,10 @@
               </a>
             </td>
             <td class="text-center align-middle font-weight-light" width="50">
-              <stats-bar-chart [stats]="testInstance.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
+              <stats-bar-chart
+                [stats]="testInstance.getLatestBuilds()"
+                (selectedItem)="selectTestBuild($event)"
+              >
               </stats-bar-chart>
             </td>
           </tr>

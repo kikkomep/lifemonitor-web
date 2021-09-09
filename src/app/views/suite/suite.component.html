@@ -298,6 +298,7 @@
     ></item-search-bar>
 
     <test-instances
+      [workflow]="suite.workflow"
       [testInstances]="
         instances
           | itemFilterPipe: instanceNameFilter
