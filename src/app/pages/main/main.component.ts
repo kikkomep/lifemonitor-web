@@ -1,7 +1,8 @@
+import { User } from 'src/app/models/user.modes';
 import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { NavigationStart, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { AppService } from 'src/app/utils/services/app.service';
+import { ApiService } from 'src/app/utils/services/api.service';
 import { AuthService } from 'src/app/utils/services/auth.service';
 
 @Component({
@@ -14,12 +15,19 @@ export class MainComponent implements OnInit {
   @ViewChild('contentWrapper', { static: false }) contentWrapper;
   private userLoggedSubscription: any;
 
+  public user: User;
+
   constructor(
     private router: Router,
     private renderer: Renderer2,
-    private appService: AppService,
+    private apiService: ApiService,
     private authService: AuthService
-  ) {}
+  ) {
+    this.apiService.get_current_user().subscribe((data) => {
+      console.log('Current user', data);
+      this.user = data;
+    });
+  }
 
   ngOnInit() {
     this.renderer.removeClass(document.querySelector('app-root'), 'login-page');

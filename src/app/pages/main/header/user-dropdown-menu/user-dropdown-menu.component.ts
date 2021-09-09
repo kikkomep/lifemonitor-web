@@ -10,6 +10,7 @@ import {
 
 import { ApiService } from 'src/app/utils/services/api.service';
 import { AuthService } from 'src/app/utils/services/auth.service';
+import { User } from 'src/app/models/user.modes';
 
 @Component({
   selector: 'app-user-dropdown-menu',
@@ -17,11 +18,7 @@ import { AuthService } from 'src/app/utils/services/auth.service';
   styleUrls: ['./user-dropdown-menu.component.scss'],
 })
 export class UserDropdownMenuComponent implements OnInit {
-  public user = {
-    username: '',
-    identifier: '',
-    picture: '',
-  };
+  public user: User;
 
   @ViewChild('dropdownMenu', { static: false }) dropdownMenu;
   @HostListener('document:click', ['$event'])
@@ -42,12 +39,7 @@ export class UserDropdownMenuComponent implements OnInit {
   ngOnInit(): void {
     this.apiService.get_current_user().subscribe((data) => {
       console.log('Current user', data);
-      let info = data['identities']['lifemonitor'];
-      this.user = {
-        username: info['username'],
-        identifier: info['sub'],
-        picture: info['picture'],
-      };
+      this.user = data;
     });
   }
 

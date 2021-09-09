@@ -1,4 +1,4 @@
-<li *ngIf="user.username" class="nav-item dropdown user-menu">
+<li *ngIf="user && user.picture" class="nav-item dropdown user-menu">
   <a class="nav-link dropdown-toggle" data-toggle="dropdown" (click)="toggleDropdownMenu()">
     <img [src]="user.picture" class="user-image img-circle" alt="User Image" style="height: 2.2rem; width: 2.2rem;" />
     <span class="p-2">

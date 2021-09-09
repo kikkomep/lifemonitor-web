@@ -14,6 +14,7 @@ import {
 } from 'src/app/models/stats.model';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { User } from 'src/app/models/user.modes';
 
 @Injectable({
   providedIn: 'root',
@@ -41,11 +42,14 @@ export class ApiService {
     };
   }
 
-  get_current_user() {
-    return this.http.get(
-      this.apiBaseUrl + '/users/current',
-      this.get_http_options()
-    );
+  get_current_user(): Observable<User> {
+    return this.http
+      .get(this.apiBaseUrl + '/users/current', this.get_http_options())
+      .pipe(
+        map((data) => {
+          return new User(data);
+        })
+      );
   }
 
   get_workflows(): Observable<object> {
