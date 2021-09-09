@@ -19,7 +19,7 @@ import { MessagesDropdownMenuComponent } from './pages/main/header/messages-drop
 import { NotificationsDropdownMenuComponent } from './pages/main/header/notifications-dropdown-menu/notifications-dropdown-menu.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppButtonComponent } from './components/app-button/app-button.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
 import localeEn from '@angular/common/locales/en';
 import { ChartsModule } from 'ng2-charts';
@@ -35,6 +35,7 @@ import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { AppConfigService } from './utils/services/config.service';
 import { LoaderComponent } from './components/loader/loader.component';
+import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -93,6 +94,12 @@ export function initConfigService(appConfig: AppConfigService) {
       useFactory: initConfigService,
       deps: [AppConfigService],
       multi: true,
+    },
+    {
+      // interceptor for HTTP errors
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
+      multi: true, // multiple interceptors are possible
     },
   ],
   bootstrap: [AppComponent],
