@@ -79,14 +79,22 @@
         </div>
       </div>
 
-    <div
-      class="row"
-      style="color: gray; font-size: 1.2rem; font-weight: 300"
-    >
-      <div class="col-1 p-0 m-0 align-middle" style="max-width: 50px">
-        <img class="mx-3" src="{{ suite.workflow.typeIcon }}" height="25" />
+      <div
+        class="col-md-2 col-sm-2 float-right"
+        style="
+          font-size: 1rem;
+          font-weight: 300;
+          width: 100%;
+          color: var(--primary);
+        "
+      >
+        <div class="d-line" style="margin-left: 50px">
+          <a href="{{ suite.workflow.downloadLink }}" target="_blank">
+            download
+            <i class="fas fa-cloud-download-alt"></i>
+          </a>
+        </div>
       </div>
-      <div class="col-6 ml-1"><b>uuid: </b>{{ suite.uuid }}</div>
     </div>
 
     <!-- <div
