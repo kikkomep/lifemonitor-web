@@ -34,6 +34,7 @@ import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { AppConfigService } from './utils/services/config.service';
+import { LoaderComponent } from './components/loader/loader.component';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -68,6 +69,7 @@ export function initConfigService(appConfig: AppConfigService) {
     ItemFilterPipe,
     SortingFilterPipe,
     SearchBarComponent,
+    LoaderComponent,
   ],
   imports: [
     FormsModule,

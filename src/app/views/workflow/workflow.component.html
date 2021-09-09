@@ -25,6 +25,8 @@
 </div>
 <!-- /.content-header -->
 
+<app-loader [enabled]="!workflow"></app-loader>
+
 <section *ngIf="workflow" class="content mx-lg-4 mt-md-3 p-2">
   <div class="row p-0" style="font-weight: 300; height: 100%">
     <div
