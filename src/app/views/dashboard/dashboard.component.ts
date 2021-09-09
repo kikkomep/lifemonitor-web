@@ -36,6 +36,9 @@ export class DashboardComponent implements OnInit, OnChanges {
         console.log('Stats', data);
       }
     );
+    console.debug('Initializing workflow data!!');
+    this._workflowStats = this.appService.workflowStats;
+    if (this._workflowStats) this.filteredWorkflows = this._workflowStats.all;
   }
 
   ngOnInit() {}
@@ -87,7 +90,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public filterByStatus(status: string) {
-    console.log("Filter by status", status);
+    console.log('Filter by status', status);
     if (!this._workflowStats) return;
     try {
       status = status == 'any' ? 'all' : status;

@@ -18,11 +18,6 @@ export class MainComponent implements OnInit {
   private userLoggedSubscription: any;
 
   public user: User;
-  // reference to workflows stats
-  public workflows: AggregatedStatusStats | null;
-
-  // reference to the current subscription
-  private workflowsStatsSubscription: Subscription;
 
   constructor(
     private router: Router,
@@ -36,15 +31,6 @@ export class MainComponent implements OnInit {
         console.log('Current user', data);
         this.user = data;
       });
-
-    this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
-      (data) => {
-        this.workflows = data;
-        console.log('Stats', data);
-      }
-    );
-    // reload workflows (using cache)
-    this.appService.loadWorkflows(true);
   }
 
   ngOnInit() {
@@ -132,8 +118,6 @@ export class MainComponent implements OnInit {
   ngOnDestroy() {
     // prevent memory leak when component destroyed
     if (this.userLoggedSubscription) this.userLoggedSubscription.unsubscribe();
-    if (this.workflowsStatsSubscription)
-      this.workflowsStatsSubscription.unsubscribe();
     console.log('Destroying dashboard component');
   }
 }
