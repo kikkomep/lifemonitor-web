@@ -77,8 +77,7 @@ export class AppRoutingModule {
           console.info('User logged... redirecting');
           this.handleRedirect('/dashboard');
         } else {
-          this.handleRedirect('/home');
-          console.info('User logout... redirecting');
+          console.info('User logged out...');
         }
       });
   }

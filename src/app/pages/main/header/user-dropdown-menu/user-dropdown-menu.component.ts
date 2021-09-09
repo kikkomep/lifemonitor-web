@@ -11,6 +11,7 @@ import {
 import { ApiService } from 'src/app/utils/services/api.service';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { User } from 'src/app/models/user.modes';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-dropdown-menu',
@@ -33,7 +34,8 @@ export class UserDropdownMenuComponent implements OnInit {
     private renderer: Renderer2,
     private authService: AuthService,
     private apiService: ApiService,
-    private config: AppConfigService
+    private config: AppConfigService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -65,5 +67,7 @@ export class UserDropdownMenuComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    console.info('User logout... redirecting');
+    this.router.navigateByUrl('/home');
   }
 }
