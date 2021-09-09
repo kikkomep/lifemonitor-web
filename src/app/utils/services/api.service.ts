@@ -1,3 +1,4 @@
+import { Params } from '@angular/router';
 import { AppConfigService } from './config.service';
 import { Injectable } from '@angular/core';
 import { Observable, of, Subject, throwError, forkJoin, from } from 'rxjs';
@@ -49,6 +50,21 @@ export class ApiService {
         map((data) => {
           return new User(data);
         })
+      );
+  }
+
+  downloadROCrate(workflow: Workflow): Observable<any> {
+    let token = JSON.parse(localStorage.getItem('token'));
+    return this.http
+      .get(workflow.downloadLink, {
+        headers: new HttpHeaders({
+          Authorization: 'Bearer ' + token['token']['value'],
+        }),
+        responseType: 'blob',
+      })
+      .pipe(
+        tap((data) => console.log('RO-Create downloaded')),
+        catchError(this.handleError('download RO-Crate', []))
       );
   }
 

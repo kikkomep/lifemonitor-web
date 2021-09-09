@@ -196,7 +196,7 @@ export class AppService {
     );
   }
 
-  loadLatestTestInstanceBuilds(instance: Object) { }
+  loadLatestTestInstanceBuilds(instance: Object) {}
 
   public selectWorkflow(uuid: string): Observable<Workflow> {
     let w: Workflow;
@@ -327,6 +327,14 @@ export class AppService {
 
   public getTestBuildLogs(build: TestBuild): Observable<string> {
     return this.api.getBuildLogs(build.instance.uuid, build.build_id);
+  }
+
+  public downloadROCrate(workflow: Workflow) {
+    this.api.downloadROCrate(workflow).subscribe((data) => {
+      const blob = new Blob([data], { type: 'application/zip' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    });
   }
 
   ngOnDestroy() {
