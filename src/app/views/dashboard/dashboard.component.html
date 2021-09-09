@@ -1,4 +1,6 @@
-<div class="content-header">
+<app-loader [enabled]="!workflows"></app-loader>
+
+<div *ngIf="workflows" class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
@@ -26,7 +28,7 @@
 <!-- /.content-header -->
 
 <!-- Main content -->
-<section class="content mx-lg-4 mx-md-2 mt-md-3">
+<section *ngIf="workflows" class="content mx-lg-4 mx-md-2 mt-md-3">
   <h2 class="text-primary font-weight-light p-2">Workflows</h2>
 
   <div class="container-fluid">

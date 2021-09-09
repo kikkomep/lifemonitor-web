@@ -36,8 +36,6 @@ export class DashboardComponent implements OnInit, OnChanges {
         console.log('Stats', data);
       }
     );
-    // reload workflows (using cache)
-    this.appService.loadWorkflows(true);
   }
 
   ngOnInit() {}

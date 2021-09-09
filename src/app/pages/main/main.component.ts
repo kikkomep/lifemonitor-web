@@ -1,9 +1,11 @@
-import { User } from 'src/app/models/user.modes';
 import { Component, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { NavigationStart, NavigationEnd, Router } from '@angular/router';
+import { NavigationStart, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { AggregatedStatusStats } from 'src/app/models/stats.model';
+import { User } from 'src/app/models/user.modes';
 import { ApiService } from 'src/app/utils/services/api.service';
-import { AuthService } from 'src/app/utils/services/auth.service';
+import { AppService } from './../../utils/services/app.service';
 
 @Component({
   selector: 'app-main',
@@ -16,17 +18,33 @@ export class MainComponent implements OnInit {
   private userLoggedSubscription: any;
 
   public user: User;
+  // reference to workflows stats
+  public workflows: AggregatedStatusStats | null;
+
+  // reference to the current subscription
+  private workflowsStatsSubscription: Subscription;
 
   constructor(
     private router: Router,
     private renderer: Renderer2,
     private apiService: ApiService,
-    private authService: AuthService
+    private appService: AppService
   ) {
-    this.apiService.get_current_user().subscribe((data) => {
-      console.log('Current user', data);
-      this.user = data;
-    });
+    this.userLoggedSubscription = this.apiService
+      .get_current_user()
+      .subscribe((data) => {
+        console.log('Current user', data);
+        this.user = data;
+      });
+
+    this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
+      (data) => {
+        this.workflows = data;
+        console.log('Stats', data);
+      }
+    );
+    // reload workflows (using cache)
+    this.appService.loadWorkflows(true);
   }
 
   ngOnInit() {
@@ -109,5 +127,13 @@ export class MainComponent implements OnInit {
       );
       this.sidebarMenuOpened = true;
     }
+  }
+
+  ngOnDestroy() {
+    // prevent memory leak when component destroyed
+    if (this.userLoggedSubscription) this.userLoggedSubscription.unsubscribe();
+    if (this.workflowsStatsSubscription)
+      this.workflowsStatsSubscription.unsubscribe();
+    console.log('Destroying dashboard component');
   }
 }
