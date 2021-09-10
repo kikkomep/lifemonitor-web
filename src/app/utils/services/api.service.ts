@@ -58,7 +58,7 @@ export class ApiService {
     return this.http
       .get(workflow.downloadLink, {
         headers: new HttpHeaders({
-          Authorization: 'Bearer ' + token['token']['value'],
+          'Authorization': 'Bearer ' + token['token']['value']
         }),
         responseType: 'blob',
       })
