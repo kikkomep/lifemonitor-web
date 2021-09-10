@@ -30,7 +30,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
   // current workflow
   public workflow: Workflow;
   // suites of the current workflow
-  public suites: AggregatedStatusStatsItem[] = [];
+  public suites: AggregatedStatusStatsItem[] = null;
 
   private paramSubscription: Subscription;
   private workflowSubscription: Subscription;
@@ -61,30 +61,22 @@ export class WorkflowComponent implements OnInit, OnChanges {
           console.log('Changed workflow', w, w.suites);
           if (w) {
             this.workflow = w;
-            this.suites = this.workflow.suites.all;
-            // this.workflowChangesSubscription = w.suites
-            //   .asObservable()
-            //   .subscribe((p) => {
-            //     this.cdr.detectChanges();
-            //     console.log('Handle change', p);
-            //   });
+            if (w.suites) {
+              this.suites = w.suites.all;
+              this.workflowChangesSubscription = w.suites
+                .asObservable()
+                .subscribe((p) => {
+                  this.suites = w.suites.all;
+                  this.cdr.detectChanges();
+                  console.log('Handle change', p);
+                });
+            }
           }
         }
       );
 
       // select a workflow
       this.appService.selectWorkflow(params['uuid']);
-
-      // this.apiService
-      //   .get_workflow(params['uuid'], true, true)
-      //   .subscribe((data: Workflow) => {
-      //     console.log('Workflow data: ', data.statusIcon);
-      //     this.workflow = data as Workflow;
-      //     console.log('Workflow data: ', this.workflow.statusIcon);
-      //     this.apiService.get_suites(params['uuid']).subscribe((data) => {
-      //       console.log('Suites', data);
-      //     });
-      //   });
     });
   }
 
