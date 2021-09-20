@@ -179,7 +179,7 @@ export class AppService {
     console.log('Workflows', this._workflows, this._workflowsStats);
     if (this._workflows) {
       w = this._workflows.find((w: Workflow) => w.uuid == uuid);
-      if (w) {
+      if (w && w.suites) {
         sessionStorage.setItem(this.WORKFLOW_UUID, w.uuid);
         this.subjectWorkflow.next(w);
         return of(w);
@@ -188,34 +188,14 @@ export class AppService {
 
     if (!this.workflows || !this.workflow || this.workflow.uuid != uuid) {
       console.log('');
-      // return this.api
-      //   .get_workflow(uuid, true, true)
-      //   .subscribe((w: Workflow) => {
-      //     sessionStorage.setItem(this.WORKFLOW_UUID, w.uuid);
-      //     // return this.loadWorkflow(w).pipe(map(w => {
-      //     //   return of(w);
-      //     // }))
-      //     return of(w);
-      //   });
 
-      return this.api.get_workflow(uuid, true, true).pipe(
-        mergeMap((w: Workflow) => {
-          return this.loadWorkflow(w).pipe(
-            map((w: Workflow) => {
-              sessionStorage.setItem(this.WORKFLOW_UUID, w.uuid);
-              this.subjectWorkflow.next(w);
-              return w;
-            })
-          );
+      return this.api.get_workflow(uuid, true, true, true).pipe(
+        map((w: Workflow) => {
+          sessionStorage.setItem(this.WORKFLOW_UUID, w.uuid);
+          this.subjectWorkflow.next(w);
+          return w;
         })
       );
-
-      // return this.observableWorkflows.pipe(
-      //   mergeMap((wfs) => {
-      //     console.log('Loaded workflows', wfs);
-      //     return this.selectWorkflow(uuid);
-      //   })
-      // );
     }
   }
 
