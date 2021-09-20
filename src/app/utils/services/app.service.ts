@@ -163,35 +163,11 @@ export class AppService {
 
   loadWorkflow(w: Workflow): Observable<Workflow> {
     return this.api.get_workflow(w.uuid).pipe(
-      mergeMap((wdata: Workflow) => {
-        // FIXME: remove this (just for testing)
-        let astatus = w.status;
-        let wname = w.name;
-        // update status
-        Object.assign(w, wdata);
-        // FIXME: remove this (just for testing)
-        w.name = wname;
-        w.status.aggregate_test_status = astatus.aggregate_test_status;
+      map((wdata: Workflow) => {
         console.log('Loaded data:', w);
-
-        // Load workflow's suites
-        return this.api.get_suites(w).pipe(
-          map((suites: AggregatedStatusStatsItem[]) => {
-            console.log('Loaded suites (from app service)', suites);
-            w.suites = new AggregatedStatusStats(suites);
-            //this.subjectWorkflow.next(w);
-            console.log('Workflow fully loaded!');
-            return w;
-          })
-        );
-
-        // .subscribe((suites) => {
-        //   console.log('Loaded suites (from app service)', suites);
-        //   w.suites = new AggregatedStatusStats(suites);
-        //   //this.subjectWorkflow.next(w);
-        //   console.log('Workflow fully loaded!');
-
-        // });
+        w.update(wdata);
+        console.log('Workflow data updated!');
+        return w;
       })
     );
   }
