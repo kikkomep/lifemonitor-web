@@ -29,6 +29,10 @@ export class Model {
   private _asObservable = this.subject.asObservable();
 
   constructor(private rawData?: Object, skip?: []) {
+    this.update(rawData);
+  }
+
+  public update(rawData: Object){
     if (rawData) {
       Object.assign(this, rawData);
       this._rawData = rawData;
