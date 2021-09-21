@@ -2,7 +2,7 @@
 
 
 <div align="center" style="text-align: center; margin-top: 50px;">
-<img src="/docs/life_monitor_logo.png" alt="Life-Monitor logo"
+<img src="/src/assets/img/logo/lm/LifeMonitorLogo.png" alt="Life-Monitor logo"
      width="300px" style="margin-top: 50px;" align="center" />
 </div>
 
@@ -14,5 +14,5 @@ workflows. Head over to the [LifeMonitor back-end repository](https://github.com
 site](https://crs4.github.io/life_monitor) for more information.
 
 
-Front-end for the LifeMonitor service.
+
 
