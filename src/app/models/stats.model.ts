@@ -84,7 +84,9 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
   }
 
   public get aggregatedStatus(): string {
-    return this.status instanceof String || typeof this.status === 'string'
+    return !this.status
+      ? 'unknown'
+      : this.status instanceof String || typeof this.status === 'string'
       ? this.status
       : 'aggregated_test_status' in this.status
       ? this.status['aggregated_test_status']
