@@ -22,6 +22,18 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private toastr: ToastrService
   ) {}
 
+  private isOAuthError(error: HttpErrorResponse): boolean {
+    console.error('Checking HTTP error: ', error);
+    return (
+      error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl']) &&
+      (error.status == 401 ||
+        error.status == 403 ||
+        (error.status == 500 &&
+          'extra_info' in error.error &&
+          error.error['extra_info']['exception_type'] == 'OAuthError'))
+    );
+  }
+
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
@@ -35,10 +47,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
         // if error code is 401 and the server is the LifeMonitor back-end
         // then try to restart the authentication process
-        if (
-          error.status == 401 &&
-          error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl'])
-        ) {
+        if (this.isOAuthError(error)) {
           console.log('Trying to reauthenticate user');
           // clear user session
           this.authService.logout();
@@ -48,7 +57,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
               () => {},
               (err: any) => {
                 if (err instanceof HttpErrorResponse) {
-                  if (err.status !== 401) {
+                  if (!this.isOAuthError(err)) {
                     return;
                   }
                   this.router.navigateByUrl('/login');
