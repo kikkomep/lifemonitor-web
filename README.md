@@ -14,6 +14,19 @@ workflows. Head over to the [LifeMonitor back-end repository](https://github.com
 site](https://crs4.github.io/life_monitor) for more information.
 
 
+## Development server
+
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+
+## Build
+
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+
 <br><br><br>
 <div align="center" style="text-align: center;">
   <div><b style="font-size: larger">Acknowledgements</b></div>
@@ -24,16 +37,3 @@ site](https://crs4.github.io/life_monitor) for more information.
        src="https://github.com/crs4/life_monitor/raw/master/docs/footer-logo.svg"
 	   width="350" align="center"/>
 </div>
-
-
-
-Life Monitor is being developed as part of the [EOSC-Life project](https://www.eosc-life.eu/).
-
-<img alt="EOSC-Life Logo" src="https://github.com/crs4/life_monitor/raw/master/docs/logo_EOSC-Life.png" width="100" />
-<img alt="CRS4 Logo" src="https://github.com/crs4/life_monitor/raw/master/docs/logo_crs4-transparent.png" width="100" />
-<img alt="BBMRI-ERIC Logo" src="https://github.com/crs4/life_monitor/raw/master/docs/logo_bbmri-eric.png" width="100" />
-
-
-
-
-
