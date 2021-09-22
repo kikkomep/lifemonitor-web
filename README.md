@@ -31,7 +31,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 <div align="center" style="text-align: center;">
   <div><b style="font-size: larger">Acknowledgements</b></div>
   <div>
-    Life Monitor is being developed as part of the [EOSC-Life project](https://www.eosc-life.eu/).
+    Life Monitor is being developed as part of the <a href="https://www.eosc-life.eu/">EOSC-Life project</a>.
   </div>
   <img alt="EOSC-Life, CRS4, BBMRI-ERIC Logos"
        src="https://github.com/crs4/life_monitor/raw/master/docs/footer-logo.svg"
