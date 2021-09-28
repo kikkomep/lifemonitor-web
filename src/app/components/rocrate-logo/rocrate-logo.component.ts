@@ -1,7 +1,9 @@
+import { Observable } from 'rxjs';
 import { AppService } from 'src/app/utils/services/app.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { Workflow } from 'src/app/models/workflow.model';
 
+declare var $: any;
 @Component({
   selector: 'rocrate-logo',
   templateUrl: './rocrate-logo.component.html',
@@ -10,9 +12,25 @@ import { Workflow } from 'src/app/models/workflow.model';
 export class RocrateLogoComponent implements OnInit {
   @Input() workflow: Workflow;
 
+  private _availableForDownload: boolean;
+
   constructor(private appService: AppService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this._availableForDownload = null;
+    this.appService
+      .checkROCrateAvailability(this.workflow)
+      .subscribe((active: boolean) => {
+        this._availableForDownload = active;
+      });
+  }
+
+  public get availableForDownload(): boolean {
+    $('[data-toggle="tooltip"]').tooltip({
+      delay: 2000,
+    });
+    return this._availableForDownload;
+  }
 
   public downloadROCrate() {
     if (this.workflow) {

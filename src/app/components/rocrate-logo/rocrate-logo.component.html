@@ -1,7 +1,33 @@
-<a [routerLink]="" (click)="downloadROCrate()">
+<a
+  *ngIf="availableForDownload === true"
+  [routerLink]=""
+  (click)="downloadROCrate()"
+  class="hvr-float-shadow"
+  data-toggle="tooltip"
+  data-placement="left"
+  title="Download Workflow RO-Crate"
+  style="float: right;"
+>
+  <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50" />
+  <div style="margin-left: 60px">
+    <span>Download</span>
+    <i class="fas fa-cloud-download-alt m-1"></i>
+  </div>
+</a>
+
+<div
+  *ngIf="availableForDownload === false"
+  class="text-muted disabled"
+  data-toggle="tooltip"
+  data-placement="left"
+  title="Download not available"
+>
   <img
     src="/assets/img/logo/crates/ro-crate-workflow.svg"
     height="50"
-    style="float: right"
+    style="filter: brightness(1) sepia(0) hue-rotate(10deg) saturate(0)"
   />
-</a>
+  <div style="margin-left: 20px">
+    <span>Download unavailable</span>
+  </div>
+</div>
