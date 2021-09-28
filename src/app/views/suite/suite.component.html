@@ -3,7 +3,7 @@
 <div *ngIf="suite">
   <div class="content-header">
     <div class="container-fluid">
-      <div class="row mb-2">
+      <div class="row">
         <div class="col-sm-6">
           <h1 class="m-0 text-dark"></h1>
         </div>
@@ -31,83 +31,100 @@
         <!-- /.col -->
       </div>
       <!-- /.row -->
+
+      <div
+        class="row mx-md-2 mx-sm-0 mt-4"
+        style="font-weight: 300; color: gray"
+      >
+        <div class="col-md-10 col-sm-12">
+          <div class="row">
+            <div
+              class="col-2 align-middle"
+              style="max-width: 50px; font-size: 2.4rem; margin-top: 3px; color: {{
+                suite.workflow.color
+              }}"
+            >
+              <i class="{{ suite.workflow.statusIcon }}"></i>
+            </div>
+            <div
+              class="col-10"
+              style="font-size: 2.5rem; color: {{ suite.workflow.color }};"
+            >
+              {{ suite.workflow.name }}:
+              <span class="font-weight-bold">{{ suite.name }}</span>
+            </div>
+          </div>
+          <!-- row -->
+
+          <div class="row" style="font-size: 1.2rem">
+            <div class="col-2 p-0 m-0" style="max-width: 50px">
+              <img
+                class="mx-3"
+                src="{{ suite.workflow.typeIcon }}"
+                height="25"
+              />
+            </div>
+            <div class="col-10"><b>uuid: </b>{{ suite.workflow.uuid }}</div>
+            <!-- <div
+              *ngIf="workflow.registry"
+              class="col-2 d-inline text-sm"
+              style="position: relative; top: 0; left: 5px"
+            >
+              <a href="{{ workflow.externalLink }}" target="_blank"
+                >[details <i class="fas fa-external-link-alt"></i>]</a
+              >
+            </div> -->
+          </div>
+          <!-- row -->
+
+          <div class="row" style="font-size: 1.2rem">
+            <div class="col-2 p-0 m-0" style="max-width: 50px"></div>
+            <div
+              class="col-1"
+              style="
+                color: gray;
+                font-size: 1.2rem;
+                font-weight: 300;
+                max-width: 50px;
+              "
+            >
+              <b>source: </b>
+            </div>
+            <div
+              class="col-9 mx-3"
+              style="color: gray; font-size: 1.2rem; font-weight: 300"
+            >
+              <a href="{{ suite.workflow.externalLink }}">{{
+                suite.workflow.externalLink
+              }}</a>
+              <!-- <span class="">
+                @
+                <a href="{{ workflow.registry['uri'] }}" target="_blank">
+                  {{ workflow.registry['name'] }}
+                </a>
+                registry
+              </span> -->
+            </div>
+          </div>
+        </div>
+        <!-- /.col -->
+        <div
+          class="col-lg-2 d-none d-sm-none d-md-none d-lg-block mt-sm-3 float-right"
+        >
+          <rocrate-logo
+            [workflow]="suite.workflow"
+            class="float-right"
+          ></rocrate-logo>
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
     </div>
     <!-- /.container-fluid -->
   </div>
   <!-- /.content-header -->
 
-  <section *ngIf="suite.workflow" class="content mx-lg-4 mt-md-3 p-2">
-    <div
-      class="row p-0"
-      style="color: var(--primary); font-weight: 300; height: 100%"
-    >
-      <div
-        class="col-md-1 col-sm-1 align-middle"
-        style="max-width: 50px; font-size: 2.4rem; margin-top: 3px; color: {{
-          suite.color
-        }}"
-      >
-        <i class="{{ suite.workflow.statusIcon }}"></i>
-      </div>
-      <div class="col-md-9 col-sm-9" style="font-size: 2.5rem">
-        {{ suite.workflow.name }}:
-        <span class="font-weight-bold">{{ suite.name }}</span>
-      </div>
-      <div
-        class="col-md-2 col-sm-2 float-right"
-        style="font-size: 1rem; font-weight: 300; width: 100%"
-      >
-        <rocrate-logo [workflow]="suite.workflow"></rocrate-logo>
-      </div>
-    </div>
-    <div class="row" style="color: gray; font-size: 1.2rem; font-weight: 300">
-      <div class="col-1 p-0 m-0 align-middle" style="max-width: 50px">
-        <img class="mx-3" src="{{ suite.workflow.typeIcon }}" height="25" />
-      </div>
-      <div class="col-md-9 col-sm-9">
-        <b>uuid: </b>{{ suite.uuid }}
-        <div
-          *ngIf="suite.workflow.registry"
-          class="d-inline text-sm"
-          style="position: relative; top: 0; left: 5px"
-        >
-          <a href="{{ suite.workflow.externalLink }}" target="_blank"
-            >[details <i class="fas fa-external-link-alt"></i>]</a
-          >
-        </div>
-      </div>
-
-      <div
-        class="col-md-2 col-sm-2 float-right"
-        style="
-          font-size: 1rem;
-          font-weight: 300;
-          width: 100%;
-          color: var(--primary);
-        "
-      >
-        <!-- <div class="d-line ro-crate-download-link" style="margin-left: 50px">
-          <!-- <a href="{{ suite.workflow.downloadLink }}" target="_blank" > -->
-        <!-- <a [routerLink]="" (click)="downloadROCrate()">
-            download
-            <i class="fas fa-cloud-download-alt"></i>
-          </a>
-        </div> -->
-      </div>
-    </div>
-
-    <!-- <div
-      *ngIf="suite"
-      class="row"
-      style="color: var(--primary); font-weight: 300"
-    >
-      <div class="col-1 p-0 m-0" style="max-width: 50px"></div>
-      <div class="col-6 ml-1">
-        <b>name: </b>
-          {{ suite.name }}
-      </div>
-    </div> -->
-
+  <section *ngIf="suite.workflow" class="content mx-lg-4 p-2">
     <div *ngIf="suite.workflow && suite.workflow.suites" class="mt-5">
       <h3 style="color: var(--primary)">Test instances</h3>
       <!-- Small boxes (Stat box) -->
