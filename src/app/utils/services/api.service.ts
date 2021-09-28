@@ -2,7 +2,11 @@ import { Params } from '@angular/router';
 import { AppConfigService } from './config.service';
 import { Injectable } from '@angular/core';
 import { Observable, of, Subject, throwError, forkJoin, from } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpParams,
+} from '@angular/common/http';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { HttpHeaders } from '@angular/common/http';
 import { Workflow } from 'src/app/models/workflow.model';
@@ -344,6 +348,21 @@ export class ApiService {
         }),
         tap((result) => {
           console.debug('Loaded logs of test instance build', buildID, result);
+        })
+      );
+  }
+
+  public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
+    return this.http
+      .head(workflow.downloadLink, this.get_http_options({}, true))
+      .pipe(
+        map((result) => {
+          console.log('Result: ', result);
+          return true;
+        }),
+        catchError((err) => {
+          console.log("Error", err);
+          return of(false);
         })
       );
   }

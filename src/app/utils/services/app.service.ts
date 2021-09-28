@@ -4,7 +4,7 @@ import {
   AggregatedStatusStatsItem,
 } from 'src/app/models/stats.model';
 import { from, Observable, of, Subject, Subscription } from 'rxjs';
-
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { Injectable } from '@angular/core';
 import { Workflow } from 'src/app/models/workflow.model';
@@ -50,7 +50,7 @@ export class AppService {
   private TEST_INSTANCE_UUID = 'test_instance_uuid';
   private TEST_BUILD_ID = 'test_build_id';
 
-  constructor(private api: ApiService) {
+  constructor(private api: ApiService, private http: HttpClient) {
     console.log('AppService created!');
 
     // subscribe for the current selected workflow
@@ -283,6 +283,10 @@ export class AppService {
 
   public getTestBuildLogs(build: TestBuild): Observable<string> {
     return this.api.getBuildLogs(build.instance.uuid, build.build_id);
+  }
+
+  public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
+    return this.api.checkROCrateAvailability(workflow);
   }
 
   public downloadROCrate(workflow: Workflow) {
