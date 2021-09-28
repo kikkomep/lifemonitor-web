@@ -66,8 +66,14 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             )
           );
         }
-        // Show the error message
-        this.toastr.error(`${error.status}: ${error.message}`);
+        if (
+          !request.headers.has('skip') ||
+          request.headers.get('skip') == 'false'
+        ) {
+          // Show the error message
+          this.toastr.error(`${error.status}: ${error.message}`);
+        }
+
         // show dialog for error message
         //this.errorDialogService.openDialog(error.message ?? JSON.stringify(error), error.status);
         return throwError(error);

@@ -33,12 +33,13 @@ export class ApiService {
     });
   }
 
-  private get_http_options(params = {}) {
+  private get_http_options(params = {}, skip: boolean = false) {
     let token = JSON.parse(localStorage.getItem('token'));
     return {
       headers: new HttpHeaders({
         // 'Content-Type':  'application/json',
         Authorization: 'Bearer ' + token['token']['value'],
+        skip: String(skip),
       }),
       params: params,
     };
