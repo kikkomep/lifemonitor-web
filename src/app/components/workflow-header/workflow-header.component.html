@@ -41,7 +41,7 @@
             </div>
             <div class="col-10 mx-1" style="color: gray;">
                 <b>external workflow ID: </b>
-                <a href="{{ workflow.externalLink }}">{{
+                <a href="{{ workflow.externalLink }}" target="_blank">{{
                     workflow.externalLink
                     }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
                 </a>
@@ -52,8 +52,8 @@
     <!-- /.col -->
 
     <div class="col-lg-2 d-none d-sm-none d-md-none d-lg-block mt-n4 text-center">
-        <a *ngIf="workflow.registry" [routerLink]="" class="hvr-float-shadow" data-toggle="tooltip"
-            data-placement="left" title="Download Workflow RO-Crate">
+        <a *ngIf="workflow.registry" class="hvr-float-shadow" data-toggle="tooltip" target="_blank"
+            data-placement="left" title="See on '{{workflow.registry['name']}}' registry" href="{{workflow.externalLink}}">
             <img src="/assets/img/logo/registries/workflowhub.svg" class="p-0 m-0" height="150" />
             <div class="text-center mt-n3" style="font-size: 0.9rem;">
                 <span>see on <b>registry</b></span>
