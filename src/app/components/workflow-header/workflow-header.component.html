@@ -55,7 +55,7 @@
         <a *ngIf="workflow.registry" [routerLink]="" class="hvr-float-shadow" data-toggle="tooltip"
             data-placement="left" title="Download Workflow RO-Crate">
             <img src="/assets/img/logo/registries/workflowhub.svg" class="p-0 m-0" height="150" />
-            <div class="text-center mt-n3">
+            <div class="text-center mt-n3" style="font-size: 0.9rem;">
                 <span>see on <b>registry</b></span>
                 <i class="fas fa-sm fa-external-link-alt mx-2"></i>
             </div>
@@ -63,12 +63,12 @@
     </div>
     <!-- /.col -->
 
-    <div class="col-lg-2 d-none d-sm-none d-md-none d-lg-block mt-3">
+    <div class="col-lg-3 d-none d-sm-none d-md-none d-lg-block mt-3 px-5">
         <rocrate-logo [workflow]="workflow"></rocrate-logo>
     </div>
     <!-- /.col -->
 
-    <div class="col-lg-1" style="max-width: 25px;"></div>
+    <!-- <div class="col-lg-1" style="max-width: 25px;"></div> -->
     <!-- /.col -->
 
 </div>
