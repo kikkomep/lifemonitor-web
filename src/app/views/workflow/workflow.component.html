@@ -10,9 +10,7 @@
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right mr-lg-4 mr-md-2">
           <li class="breadcrumb-item">
-            <a [routerLink]="['/dashboard']"
-              ><i class="fas fa-home p-1"></i>Home</a
-            >
+            <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
           </li>
           <li class="breadcrumb-item active">
             <i class="fas fa-cogs p-1"></i>Workflow
@@ -99,7 +97,7 @@
 </div>
 <!-- /.content-header -->
 
-<section *ngIf="workflow && suites" class="content mx-lg-4 p-2">  
+<section *ngIf="workflow && suites" class="content mx-lg-4 p-2">
   <!-- <div class="container-fluid"> -->
   <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">
     <h3 style="color: var(--primary)">Suites</h3>
@@ -107,17 +105,11 @@
     <div class="row">
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-primary"
-          (click)="filterByStatus('all_passing')"
-        >
+        <div class="small-box bg-primary" (click)="filterByStatus('all_passing')">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'all_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
               {{ workflow.suites ? workflow.suites.all_passing.length : 0 }}
@@ -136,17 +128,11 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-warning"
-          (click)="filterByStatus('some_passing')"
-        >
+        <div class="small-box bg-warning" (click)="filterByStatus('some_passing')">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'some_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
               {{ workflow.suites ? workflow.suites.some_passing.length : 0 }}
@@ -166,17 +152,11 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-danger"
-          (click)="filterByStatus('all_failing')"
-        >
+        <div class="small-box bg-danger" (click)="filterByStatus('all_failing')">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'all_failing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
               {{ workflow.suites ? workflow.suites.all_failing.length : 0 }}
@@ -200,10 +180,7 @@
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'unknown'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflow.suites ? workflow.suites.unknown.length : 0 }}</h3>
             <p>Unavailable</p>
@@ -223,16 +200,11 @@
   </div>
 
   <!-- Search Bar -->
-  <item-search-bar
-    [(filterValue)]="suiteNameFilter"
-    [(sortingOrder)]="suiteSortingOrder"
-  ></item-search-bar>
+  <item-search-bar [(filterValue)]="suiteNameFilter" [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
 
-  <test-suites
-    [suites]="
+  <test-suites [suites]="
       suites
         | itemFilterPipe: suiteNameFilter
         | sortingFilter: suiteSortingOrder
-    "
-  ></test-suites>
+    "></test-suites>
 </section>

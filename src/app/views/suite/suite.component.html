@@ -11,9 +11,7 @@
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right mr-lg-4 mr-md-2">
             <li class="breadcrumb-item">
-              <a [routerLink]="['/dashboard']"
-                ><i class="fas fa-home p-1"></i>Home</a
-              >
+              <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
             </li>
             <li class="breadcrumb-item active">
               <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid }]">
@@ -135,12 +133,7 @@
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
-                suite.instances && statusFilter && statusFilter != 'passed'
-              "
-              class="overlay dark"
-            ></div>
+            <div *ngIf="suite.instances && statusFilter && statusFilter != 'passed'" class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.passed.length : 0 }}
@@ -163,10 +156,7 @@
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="suite.instances && statusFilter && statusFilter != 'error'"
-              class="overlay dark"
-            ></div>
+            <div *ngIf="suite.instances && statusFilter && statusFilter != 'error'" class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.error.length : 0 }}
@@ -189,12 +179,9 @@
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'failed'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.failed.length : 0 }}
@@ -218,12 +205,9 @@
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'waiting'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.waiting.length : 0 }}
@@ -248,12 +232,9 @@
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'running'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.running.length : 0 }}
@@ -278,12 +259,9 @@
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'aborted'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.aborted.length : 0 }}
@@ -306,18 +284,12 @@
     </div>
 
     <!-- Search Bar -->
-    <item-search-bar
-      [(filterValue)]="instanceNameFilter"
-      [(sortingOrder)]="instanceSortingOrder"
-    ></item-search-bar>
+    <item-search-bar [(filterValue)]="instanceNameFilter" [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
 
-    <test-instances
-      [workflow]="suite.workflow"
-      [testInstances]="
+    <test-instances [workflow]="suite.workflow" [testInstances]="
         instances
           | itemFilterPipe: instanceNameFilter
           | sortingFilter: instanceSortingOrder
-      "
-    ></test-instances>
+      "></test-instances>
   </section>
 </div>
