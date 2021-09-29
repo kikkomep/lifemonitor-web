@@ -37,6 +37,7 @@ import { AppConfigService } from './utils/services/config.service';
 import { LoaderComponent } from './components/loader/loader.component';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
 import { RocrateLogoComponent } from './components/rocrate-logo/rocrate-logo.component';
+import { WorkflowHeaderComponent } from './components/workflow-header/workflow-header.component';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -73,6 +74,7 @@ export function initConfigService(appConfig: AppConfigService) {
     SearchBarComponent,
     LoaderComponent,
     RocrateLogoComponent,
+    WorkflowHeaderComponent,
   ],
   imports: [
     FormsModule,

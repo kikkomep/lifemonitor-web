@@ -21,77 +21,10 @@
     </div>
     <!-- /.row -->
 
-    <div class="row mx-md-2 mx-sm-0 mt-4" style="font-weight: 300; color: gray;">
-      <div class="col-md-10 col-sm-12">
-        <div class="row">
-          <div
-            class="col-2 align-middle"
-            style="max-width: 50px; font-size: 2.4rem; margin-top: 3px; color: {{
-              workflow.color
-            }}"
-          >
-            <i class="{{ workflow.statusIcon }}"></i>
-          </div>
-          <div
-            class="col-10"
-            style="font-size: 2.5rem; color: {{ workflow.color }};"
-          >
-            {{ workflow.name }}
-          </div>
-        </div>
-        <!-- row -->
+    <!-- /.workflow header -->
+    <workflow-header [workflow]="workflow"></workflow-header>
+    <!-- /.workflow header -->
 
-        <div class="row" style="font-size: 1.2rem;">
-          <div class="col-2 p-0 m-0" style="max-width: 50px">
-            <img class="mx-3" src="{{ workflow.typeIcon }}" height="25" />
-          </div>
-          <div class="col-10">
-            <b>uuid: </b>{{ workflow.uuid }}
-          </div>
-          <!-- <div
-            *ngIf="workflow.registry"
-            class="col-2 d-inline text-sm"
-            style="position: relative; top: 0; left: 5px"
-          >
-            <a href="{{ workflow.externalLink }}" target="_blank"
-              >[details <i class="fas fa-external-link-alt"></i>]</a
-            >
-          </div> -->
-        </div>
-        <!-- row -->
-
-        <div class="row" style="font-size: 1.2rem;">
-          <div class="col-2 p-0 m-0" style="max-width: 50px"></div>
-          <div
-            class="col-1"
-            style="color: gray; font-size: 1.2rem; font-weight: 300; max-width: 50px;"
-          >
-            <b>source: </b>
-          </div>
-          <div
-            class="col-9 mx-3"
-            style="color: gray; font-size: 1.2rem; font-weight: 300;"
-          >
-            <a href="{{ workflow.externalLink }}">{{
-              workflow.externalLink
-            }}</a>
-            <!-- <span class="">
-              @
-              <a href="{{ workflow.registry['uri'] }}" target="_blank">
-                {{ workflow.registry['name'] }}
-              </a>
-              registry
-            </span> -->
-          </div>
-        </div>
-      </div>
-      <!-- /.col -->
-      <div class="col-lg-2 d-none d-sm-none d-md-none d-lg-block mt-sm-3 float-right">
-        <rocrate-logo [workflow]="workflow" class="float-right"></rocrate-logo>
-      </div>
-      <!-- /.col -->
-    </div>
-    <!-- /.row -->
   </div>
   <!-- /.container-fluid -->
 </div>
