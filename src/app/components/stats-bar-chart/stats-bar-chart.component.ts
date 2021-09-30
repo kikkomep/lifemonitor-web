@@ -5,15 +5,13 @@ import {
   OnChanges,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChartData, ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-
-
 
 @Component({
   selector: 'stats-bar-chart',
@@ -44,7 +42,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
         title: (tooltipItem, data: ChartData) => {
           let index = tooltipItem[0]['datasetIndex'];
           let item = this.stats[index] as TestBuild;
-          return 'Build ' + item.build_id + ' (' + item.status + ')';
+          return 'Build ' + item.build_id + ': ' + item.status;
         },
         label: function (tooltipItem, data) {
           let label = data.labels[tooltipItem.index];
@@ -57,7 +55,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
           if (date.getHours() > 0) duration += date.getHours() + 'h ';
           if (date.getMinutes() > 0) duration += date.getMinutes() + 'm ';
           if (date.getSeconds() > 0) duration += date.getSeconds() + 's';
-          return ' duration: ' + duration;
+          return ' duration ' + duration;
         },
       },
     },
