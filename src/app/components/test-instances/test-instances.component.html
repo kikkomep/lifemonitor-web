@@ -34,14 +34,20 @@
               <i class="{{ testInstance.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg">
+              <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
+                title="See on {{testInstance.service.type}} service">
                 <!-- <a [routerLink]="['/suite', { uuid: testInstance.uuid }]" style="color: black; font-size: larger;">{{
                   testInstance.roc_instance
                   }}</a> -->
+                <a href="{{ testInstance.externalLink }}" target="_blank" style="color: black; font-size: larger"
+                  (click)="selectTestInstance($event, testInstance)">
+                  <div>{{ testInstance.roc_instance }}</div>
+                  <div class="text-sm">
+                    <b>uuid:</b> {{ testInstance.uuid }}
+                  </div>
                   <div class="text-sm cut-text"><b>url:</b> {{ testInstance.externalLink }}</div>
                 </a>
               </div>
-              <div class="text-sm"><b>uuid:</b> {{ testInstance.uuid }}</div>
             </td>
             <td class="text-center">
               <br />

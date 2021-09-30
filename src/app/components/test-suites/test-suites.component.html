@@ -29,14 +29,13 @@
               <i class="{{ s.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg">
-                <a
-                  [routerLink]="['/suite', { uuid: s.uuid }]"
-                  style="color: black; font-size: larger"
-                  >{{ s.roc_suite }}</a
-                >
+              <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
+                title="See test instances">
+                <a [routerLink]="['/suite', { uuid: s.uuid }]" style="color: black; font-size: larger">{{ s.roc_suite
+                  }}</a>
+                <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
               </div>
-              <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
+
             </td>
             <td class="text-center align-middle">
               <div style="height: 100%; margin: auto">
