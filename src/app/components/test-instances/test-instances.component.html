@@ -23,13 +23,11 @@
           </tr>
         </thead>
         <tbody *ngIf="testInstances">
-          <tr
-            *ngFor="
+          <tr *ngFor="
               let testInstance of testInstances;
               index as i;
               first as isFirst
-            "
-          >
+            ">
             <td [ngClass]="testInstance.class">
               <i class="{{ testInstance.statusIcon }} fa-2x"></i>
             </td>
@@ -52,15 +50,10 @@
             <td class="text-center">
               <br />
               <div style="height: 100%; margin: auto">
-                <img
-                  *ngIf="testInstance.suite && testInstance.suite.engineIcon"
-                  src="{{ testInstance.suite.engineIcon }}"
-                  width="100"
-                />
-                <i
-                  *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
-                  class="far fa-question-circle fa-2x"
-                ></i>
+                <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
+                  src="{{ testInstance.suite.engineIcon }}" width="100" />
+                <i *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
+                  class="far fa-question-circle fa-2x"></i>
               </div>
             </td>
             <td class="text-center align-middle font-weight-light">
@@ -69,10 +62,7 @@
               </a>
             </td>
             <td class="text-center align-middle font-weight-light" width="50">
-              <stats-bar-chart
-                [stats]="testInstance.getLatestBuilds()"
-                (selectedItem)="selectTestBuild($event)"
-              >
+              <stats-bar-chart [stats]="testInstance.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
               </stats-bar-chart>
             </td>
           </tr>

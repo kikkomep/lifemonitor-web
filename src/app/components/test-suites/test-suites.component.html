@@ -39,15 +39,8 @@
             </td>
             <td class="text-center align-middle">
               <div style="height: 100%; margin: auto">
-                <img
-                  *ngIf="s.engineIcon"
-                  src="{{ s.engineIcon }}"
-                  width="100"
-                />
-                <i
-                  *ngIf="!s.engineIcon"
-                  class="far fa-question-circle fa-2x"
-                ></i>
+                <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
+                <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>
               </div>
             </td>
             <td class="text-center align-middle font-weight-light">
@@ -56,10 +49,7 @@
               </a>
             </td>
             <td class="text-center align-middle font-weight-light" width="50">
-              <stats-bar-chart
-                [stats]="s.getLatestBuilds()"
-                (selectedItem)="selectTestBuild($event)"
-              ></stats-bar-chart>
+              <stats-bar-chart [stats]="s.getLatestBuilds()" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
             </td>
           </tr>
         </tbody>
