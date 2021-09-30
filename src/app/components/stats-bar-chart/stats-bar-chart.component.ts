@@ -5,14 +5,15 @@ import {
   OnChanges,
   OnInit,
   Output,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { Chart, ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-//import * as pluginDataLabels from 'chartjs-plugin-datalabels';
+import { ChartData, ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
-
 import { StatusStatsItem } from 'src/app/models/stats.model';
+import { TestBuild } from 'src/app/models/testBuild.models';
+
+
 
 @Component({
   selector: 'stats-bar-chart',
@@ -37,6 +38,29 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
         },
       ],
     },
+    tooltips: {
+      enabled: true,
+      callbacks: {
+        title: (tooltipItem, data: ChartData) => {
+          let index = tooltipItem[0]['datasetIndex'];
+          let item = this.stats[index] as TestBuild;
+          return 'Build ' + item.build_id + ' (' + item.status + ')';
+        },
+        label: function (tooltipItem, data) {
+          let label = data.labels[tooltipItem.index];
+          let seconds = data.datasets[tooltipItem.datasetIndex].data[
+            tooltipItem.index
+          ] as number;
+          let duration = '';
+          let date = new Date(null);
+          date.setSeconds(seconds);
+          if (date.getHours() > 0) duration += date.getHours() + 'h ';
+          if (date.getMinutes() > 0) duration += date.getMinutes() + 'm ';
+          if (date.getSeconds() > 0) duration += date.getSeconds() + 's';
+          return ' duration: ' + duration;
+        },
+      },
+    },
     plugins: {
       datalabels: {
         anchor: 'end',
@@ -47,7 +71,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
       position: 'right',
     },
   };
-  public barChartLabels: Label[] = ['Build'];
+  public barChartLabels: Label[] = ['build'];
   public barChartType: ChartType = 'bar';
   public barChartLegend = false;
   public barChartPlugins = []; //[pluginDataLabels];
@@ -55,12 +79,12 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
   public barColors = [];
 
   private mappings = {
-    passed: { color: '#1f8787', label: 'Passed' },
-    failed: { color: '#dc3545', label: 'Failed' },
-    error: { color: '#ffc107', label: 'Failed' },
-    aborted: { color: '#6c757d', label: 'Aborted' },
-    running: { color: '#17a2b8', label: 'Running' },
-    waiting: { color: '#fd7e14', label: 'Waiting' },
+    passed: { color: '#1f8787' },
+    failed: { color: '#dc3545' },
+    error: { color: '#ffc107' },
+    aborted: { color: '#6c757d' },
+    running: { color: '#17a2b8' },
+    waiting: { color: '#fd7e14' },
   };
 
   public selectedObject: StatusStatsItem;
@@ -90,10 +114,9 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
     this.barColors = [];
     for (let i in this.stats) {
       let build: StatusStatsItem = this.stats[i];
-      console.log('build....', build);
       this.barChartData.push({
         data: [build.duration],
-        label: this.mappings[build.status]['label'],
+        label: 'duration',
       });
       this.barColors.push(this.getColor(build.status));
     }
