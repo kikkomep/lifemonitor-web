@@ -38,6 +38,9 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
     },
     tooltips: {
       enabled: true,
+      footerFontSize: 9,
+      footerFontColor: 'lightgray',
+      footerAlign: 'right',
       callbacks: {
         title: (tooltipItem, data: ChartData) => {
           let index = tooltipItem[0]['datasetIndex'];
@@ -57,6 +60,11 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
           if (minutes > 0) duration += minutes + 'm ';
           if (sec > 0) duration += seconds + 's';
           return ' duration ' + duration;
+        },
+        footer: (tooltipItem, data) => {
+          let index = tooltipItem[0]['datasetIndex'];
+          let item = this.stats[index] as TestBuild;
+          return 'click to see on ' + item.instance.service.type;
         },
       },
     },
