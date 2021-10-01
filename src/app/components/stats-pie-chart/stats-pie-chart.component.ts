@@ -24,8 +24,42 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
 
   public pieChartOptions: ChartOptions = {
     responsive: true,
-    cutoutPercentage: 20,
+    cutoutPercentage: 30,
     // circumference: 10,
+    tooltips: {
+      mode: 'label',
+      enabled: true,
+      footerFontSize: 9,
+      footerFontColor: 'lightgray',
+      footerAlign: 'right',
+      callbacks: {
+        // title: (tooltipItem, data) => {
+        //   return 'Test Instances ';
+        // },
+        label: function (tooltipItem, data) {
+          var indice = tooltipItem.index;
+          return (
+            ' ' +
+            data.labels[indice] +
+            ': ' +
+            data.datasets[0].data[indice] +
+            ''
+          );
+        },
+        footer: (item, data) => {
+          return 'click to see more';
+        },
+      },
+    },
+    plugins: {
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+      },
+    },
+    legend: {
+      position: 'right',
+    },
   };
   public pieChartLabels: Label[] = [];
 
