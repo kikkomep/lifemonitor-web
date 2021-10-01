@@ -10,6 +10,8 @@ import { Suite } from 'src/app/models/suite.models';
 import { Router } from '@angular/router';
 import { Workflow } from 'src/app/models/workflow.model';
 
+declare var $: any;
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -34,6 +36,10 @@ export class DashboardComponent implements OnInit, OnChanges {
         this._workflowStats = data;
         this.filteredWorkflows = this._workflowStats.all;
         console.log('Stats', data);
+        $('[data-toggle="tooltip"]').tooltip({
+          delay: { show: 1500, hide: 50 },
+          html: true,
+        });
       }
     );
     console.debug('Initializing workflow data!!');
@@ -42,6 +48,13 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {}
+
+  ngAfterViewInit() {
+    $('[data-toggle="tooltip"]').tooltip({
+      delay: { show: 1500, hide: 50 },
+      html: true,
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('Changes', changes);

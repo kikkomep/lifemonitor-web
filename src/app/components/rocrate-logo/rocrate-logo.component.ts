@@ -4,6 +4,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Workflow } from 'src/app/models/workflow.model';
 
 declare var $: any;
+
 @Component({
   selector: 'rocrate-logo',
   templateUrl: './rocrate-logo.component.html',
@@ -28,6 +29,7 @@ export class RocrateLogoComponent implements OnInit {
   public get availableForDownload(): boolean {
     $('[data-toggle="tooltip"]').tooltip({
       delay: { show: 1500, hide: 50 },
+      html: true,
     });
     return this._availableForDownload;
   }

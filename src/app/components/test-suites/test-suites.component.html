@@ -30,20 +30,20 @@
             </td>
             <td class="align-middle">
               <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
-                title="See test instances">
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                 <a [routerLink]="['/suite', { uuid: s.uuid }]" style="color: black; font-size: larger">{{ s.roc_suite
                   }}</a>
                 <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
               </div>
 
             </td>
-            <td class="text-center align-middle">
+            <td class="text-center align-middle font-weight-light h-100">
               <div style="height: 100%; margin: auto">
                 <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
                 <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>
               </div>
             </td>
-            <td class="text-center align-middle font-weight-light">
+            <td class="text-center align-middle font-weight-light h-100">
               <a [routerLink]="['/suite', { uuid: s.uuid }]">
                 <stats-pie-chart [stats]="s.instances"></stats-pie-chart>
               </a>

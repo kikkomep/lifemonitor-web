@@ -33,7 +33,7 @@
             </td>
             <td class="align-middle">
               <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
-                title="See on {{testInstance.service.type}} service">
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> see on <b>{{testInstance.service.type}}</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                 <!-- <a [routerLink]="['/suite', { uuid: testInstance.uuid }]" style="color: black; font-size: larger;">{{
                   testInstance.roc_instance
                   }}</a> -->
@@ -47,16 +47,15 @@
                 </a>
               </div>
             </td>
-            <td class="text-center">
-              <br />
-              <div style="height: 100%; margin: auto">
+            <td class="text-center align-middle font-weight-light h-100">
+              <div class="text-center">
                 <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
                   src="{{ testInstance.suite.engineIcon }}" width="100" />
                 <i *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
                   class="far fa-question-circle fa-2x"></i>
               </div>
             </td>
-            <td class="text-center align-middle font-weight-light">
+            <td class="text-center align-middle font-weight-light h-100">
               <a href="{{ testInstance.service.url }}">
                 <img src="{{ testInstance.platformIcon }}" height="60px" />
               </a>

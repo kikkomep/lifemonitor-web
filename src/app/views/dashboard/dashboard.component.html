@@ -168,11 +168,12 @@
                   <i class="{{ w.statusIcon }} fa-2x"></i>
                 </td>
                 <td class="align-middle">
-                  <div class="font-weight-light text-lg">
+                  <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
+                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                     <a [routerLink]="['/workflow', { uuid: w.uuid }]" style="color: black; font-size: larger">{{ w.name
                       }}
                       <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
-                    </a>                    
+                    </a>
                   </div>
                 </td>
                 <td class="text-center align-middle">
