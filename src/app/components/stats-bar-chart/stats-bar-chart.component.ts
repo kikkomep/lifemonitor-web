@@ -42,7 +42,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
         title: (tooltipItem, data: ChartData) => {
           let index = tooltipItem[0]['datasetIndex'];
           let item = this.stats[index] as TestBuild;
-          return 'Build ' + item.build_id + ': ' + item.status;
+          return 'Build ' + item.build_id + ' : ' + item.status;
         },
         label: function (tooltipItem, data) {
           let label = data.labels[tooltipItem.index];
