@@ -75,7 +75,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
       },
     },
     legend: {
-      position: 'right',
+      position: 'top',
     },
   };
   public barChartLabels: Label[] = ['build'];
