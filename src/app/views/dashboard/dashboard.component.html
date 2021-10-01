@@ -36,7 +36,9 @@
     <div class="row">
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-test-passed" (click)="filterByStatus('all_passing')">
+        <div class="small-box bg-test-passed" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
@@ -59,7 +61,9 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-test-error" (click)="filterByStatus('some_passing')">
+        <div class="small-box bg-test-error" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows partially <b>passing</b></span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
@@ -81,7 +85,9 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-test-failed" (click)="filterByStatus('all_failing')">
+        <div class="small-box bg-test-failed" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
@@ -104,7 +110,9 @@
 
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-test-aborted" (click)="filterByStatus('unknown')">
+        <div class="small-box bg-test-aborted" (click)="filterByStatus('unknown')" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows in <b>unknown</b> state</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
@@ -190,8 +198,8 @@
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
-                  <div data-toggle="tooltip" data-placement="top" 
-                  title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
+                  <div data-toggle="tooltip" data-placement="top"
+                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
                     {{ w.latest_version }}
                   </div>
                   <div *ngIf="w.registry" class="text-sm" title="{{ w.externalLink }}">

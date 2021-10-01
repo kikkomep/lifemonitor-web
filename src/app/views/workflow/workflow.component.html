@@ -38,7 +38,9 @@
     <div class="row">
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-primary" (click)="filterByStatus('all_passing')">
+        <div class="small-box bg-primary" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> suites</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
@@ -61,7 +63,9 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-warning" (click)="filterByStatus('some_passing')">
+        <div class="small-box bg-warning" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter partially <b>passing</b> suites</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
@@ -85,7 +89,9 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-danger" (click)="filterByStatus('all_failing')">
+        <div class="small-box bg-danger" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> suites</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
@@ -109,7 +115,8 @@
 
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-gray" (click)="filterByStatus('unknown')">
+        <div class="small-box bg-gray" (click)="filterByStatus('unknown')" data-toggle="tooltip" data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter suites in <b>unknown</b> state</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
