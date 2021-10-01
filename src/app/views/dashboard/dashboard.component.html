@@ -36,18 +36,12 @@
     <div class="row">
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-passed"
-          (click)="filterByStatus('all_passing')"
-        >
+        <div class="small-box bg-test-passed" (click)="filterByStatus('all_passing')">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'all_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
           <!-- end loading -->
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_passing.length : 0 }}</h3>
@@ -65,18 +59,12 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-error"
-          (click)="filterByStatus('some_passing')"
-        >
+        <div class="small-box bg-test-error" (click)="filterByStatus('some_passing')">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'some_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.some_passing.length : 0 }}</h3>
             <p>Some passing</p>
@@ -93,18 +81,12 @@
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-failed"
-          (click)="filterByStatus('all_failing')"
-        >
+        <div class="small-box bg-test-failed" (click)="filterByStatus('all_failing')">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'all_failing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_failing.length : 0 }}</h3>
             <p>Failing</p>
@@ -122,18 +104,12 @@
 
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-aborted"
-          (click)="filterByStatus('unknown')"
-        >
+        <div class="small-box bg-test-aborted" (click)="filterByStatus('unknown')">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'unknown'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.unknown.length : 0 }}</h3>
 
@@ -156,10 +132,7 @@
 
   <div class="container-fluid">
     <!-- Search Bar -->
-    <item-search-bar
-      [(filterValue)]="workflowNameFilter"
-      [(sortingOrder)]="workflowSortingOrder"
-    ></item-search-bar>
+    <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
     <div class="card card-primary card-outline">
       <!-- Loading (remove the following to stop the loading)-->
@@ -184,15 +157,13 @@
             </thead>
             <tbody *ngIf="workflows">
               <!-- end loading -->
-              <tr
-                *ngFor="
+              <tr *ngFor="
                   let w of workflows
                     | itemFilterPipe: workflowNameFilter
                     | sortingFilter: workflowSortingOrder;
                   index as i;
                   first as isFirst
-                "
-              >
+                ">
                 <td [ngClass]="w.class">
                   <i class="{{ w.statusIcon }} fa-2x"></i>
                 </td>
@@ -212,9 +183,8 @@
                 <td class="text-center align-middle font-weight-light">
                   {{ w.latest_version }}
                   <div *ngIf="w.registry" class="text-sm">
-                    <a href="{{ w.externalLink }}" target="_blank"
-                      >[details <i class="fas fa-external-link-alt"></i>]</a
-                    >
+                    <a href="{{ w.externalLink }}" target="_blank">[details <i
+                        class="fas fa-external-link-alt"></i>]</a>
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
@@ -222,14 +192,8 @@
                     <stats-pie-chart [stats]="w.suites"></stats-pie-chart>
                   </a>
                 </td>
-                <td
-                  class="text-center align-middle font-weight-light"
-                  width="50"
-                >
-                  <stats-bar-chart
-                    [stats]="w.getLatestBuilds()"
-                    (selectedItem)="selectTestBuild($event)"
-                  >
+                <td class="text-center align-middle font-weight-light" width="50">
+                  <stats-bar-chart [stats]="w.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
               </tr>
