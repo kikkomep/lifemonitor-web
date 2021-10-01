@@ -46,15 +46,16 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
         },
         label: function (tooltipItem, data) {
           let label = data.labels[tooltipItem.index];
-          let seconds = data.datasets[tooltipItem.datasetIndex].data[
+          let sec = data.datasets[tooltipItem.datasetIndex].data[
             tooltipItem.index
           ] as number;
           let duration = '';
-          let date = new Date(null);
-          date.setSeconds(seconds);
-          if (date.getHours() > 0) duration += date.getHours() + 'h ';
-          if (date.getMinutes() > 0) duration += date.getMinutes() + 'm ';
-          if (date.getSeconds() > 0) duration += date.getSeconds() + 's';
+          let hours = Math.floor(sec / 3600);
+          let minutes = Math.floor((sec - hours * 3600) / 60);
+          let seconds = sec - hours * 3600 - minutes * 60;
+          if (hours > 0) duration += hours + 'h ';
+          if (minutes > 0) duration += minutes + 'm ';
+          if (sec > 0) duration += seconds + 's';
           return ' duration ' + duration;
         },
       },
