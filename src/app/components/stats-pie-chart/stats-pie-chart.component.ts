@@ -24,7 +24,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
 
   public pieChartOptions: ChartOptions = {
     responsive: true,
-    cutoutPercentage: 30,
+    cutoutPercentage: 15,
     // circumference: 10,
     tooltips: {
       mode: 'label',
