@@ -198,13 +198,11 @@
                 </td>
                 <td class="align-middle">
                   <div class="font-weight-light text-lg">
-                    <a
-                      [routerLink]="['/workflow', { uuid: w.uuid }]"
-                      style="color: black; font-size: larger"
-                      >{{ w.name }}</a
-                    >
+                    <a [routerLink]="['/workflow', { uuid: w.uuid }]" style="color: black; font-size: larger">{{ w.name
+                      }}
+                      <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
+                    </a>                    
                   </div>
-                  <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
                 </td>
                 <td class="text-center align-middle">
                   <div style="height: 100%; margin: auto">
