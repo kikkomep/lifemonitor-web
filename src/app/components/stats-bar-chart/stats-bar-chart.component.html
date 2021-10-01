@@ -1,6 +1,6 @@
 <div
   *ngIf="!stats"
-  style="display: flex; align-items: center; width: 300px; height: 80px"
+  style="display: flex; align-items: center; width: 300px; height: 120px"
 >
   <div class="text-center w-100">
     <i class="fas fa-2x fa-sync-alt text-muted"></i>
@@ -9,7 +9,7 @@
 <div *ngIf="stats" class="wrapper text-sm text-center">
   <canvas
     width="300px"
-    height="80px"
+    height="90px"
     baseChart
     [datasets]="barChartData"
     [labels]="barChartLabels"
