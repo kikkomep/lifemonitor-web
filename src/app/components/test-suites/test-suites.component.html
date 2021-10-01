@@ -38,7 +38,8 @@
 
             </td>
             <td class="text-center align-middle font-weight-light h-100">
-              <div style="height: 100%; margin: auto">
+              <div style="height: 100%; margin: auto" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{s.engineType}}</b> engine</span>">
                 <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
                 <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>
               </div>

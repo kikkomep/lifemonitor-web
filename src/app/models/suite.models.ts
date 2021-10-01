@@ -41,6 +41,10 @@ export class Suite extends AggregatedStatusStatsItem {
     return this._latest;
   }
 
+  public get engineType(): string {
+    return this.definition.test_engine.type;
+  }
+
   public get engineIcon(): string {
     let engine_logo_base_path = '/assets/img/logo/engines/';
     if (this.definition.test_engine.type === 'planemo') {

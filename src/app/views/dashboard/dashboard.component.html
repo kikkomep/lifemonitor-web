@@ -184,13 +184,17 @@
                   </div>
                 </td>
                 <td class="text-center align-middle">
-                  <div style="height: 100%; margin: auto">
+                  <div style="height: 100%; margin: auto" data-toggle="tooltip" data-placement="top"
+                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
                     <img src="{{ w.typeIcon }}" width="30" />
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
-                  {{ w.latest_version }}
-                  <div *ngIf="w.registry" class="text-sm">
+                  <div data-toggle="tooltip" data-placement="top" 
+                  title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
+                    {{ w.latest_version }}
+                  </div>
+                  <div *ngIf="w.registry" class="text-sm" title="{{ w.externalLink }}">
                     <a href="{{ w.externalLink }}" target="_blank">[details <i
                         class="fas fa-external-link-alt"></i>]</a>
                   </div>

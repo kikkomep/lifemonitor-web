@@ -48,7 +48,8 @@
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
-              <div class="text-center">
+              <div class="text-center" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.suite.engineType}}</b> engine</span>">
                 <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
                   src="{{ testInstance.suite.engineIcon }}" width="100" />
                 <i *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
@@ -56,9 +57,12 @@
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
-              <a href="{{ testInstance.service.url }}">
-                <img src="{{ testInstance.platformIcon }}" height="60px" />
-              </a>
+              <div class="text-center" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.service.type}}</b> service</span>">
+                <a href="{{ testInstance.service.url }}">
+                  <img src="{{ testInstance.platformIcon }}" height="60px" />
+                </a>
+              </div>
             </td>
             <td class="text-center align-middle font-weight-light" width="50">
               <stats-bar-chart [stats]="testInstance.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">

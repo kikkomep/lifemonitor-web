@@ -10,6 +10,7 @@ export class Workflow extends AggregatedStatusStatsItem {
   registry: Object;
   version: Object;
   status: Status;
+  type: string = 'galaxy'; // FIXME
   suites: AggregatedStatusStats;
   private _latestBuilds: TestBuild[];
 
