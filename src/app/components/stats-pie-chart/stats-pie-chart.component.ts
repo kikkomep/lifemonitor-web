@@ -43,10 +43,10 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   }
 
   ngAfterViewInit() {
-    console.log("after view init " + this.stats);
-}
+    console.log('after view init ' + this.stats);
+  }
 
-  public update(){
+  public update() {
     if (this.stats) {
       this.pieChartLabels = this.getLabels();
       this.pieChartData = [
@@ -56,7 +56,12 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
         },
       ];
       // this.cdr.detectChanges();
-      console.log("workflow pie data", this.pieChartData, this.pieChartLabels, this.stats );
+      console.log(
+        'workflow pie data',
+        this.pieChartData,
+        this.pieChartLabels,
+        this.stats
+      );
     }
   }
 
@@ -72,7 +77,14 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
     return this.stats instanceof AggregatedStatusStats
       ? [['Passing'], ['Some passing'], ['Failing'], ['Unavailable']]
       : this.stats instanceof InstanceStats
-      ? [['Passed'], ['Failed'], ['Error'], ['Aborted'], ['Running'], ['Waiting']]
+      ? [
+          ['Passed'],
+          ['Failed'],
+          ['Error'],
+          ['Aborted'],
+          ['Running'],
+          ['Waiting'],
+        ]
       : [['Unknown']];
   }
 
