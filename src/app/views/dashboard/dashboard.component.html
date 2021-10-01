@@ -175,6 +175,13 @@
                       <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
                     </a>
                   </div>
+                  <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
+                    <b>external ID: </b>
+                    <a href="{{ w.externalLink }}" target="_blank">{{
+                      w.externalLink
+                      }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
+                    </a>
+                  </div>
                 </td>
                 <td class="text-center align-middle">
                   <div style="height: 100%; margin: auto">
