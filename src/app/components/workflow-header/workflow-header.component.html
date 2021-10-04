@@ -52,7 +52,7 @@
     <!-- /.col -->
 
     <div class="col-lg-2 d-none d-sm-none d-md-none d-lg-block mt-n4 text-center">
-        <a *ngIf="workflow.registry" class="hvr-float-shadow" data-toggle="tooltip" target="_blank"
+        <a *ngIf="workflow.registry" class="hvr-float-shadow" data-html="true" data-toggle="tooltip" target="_blank"
             data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
                 click to see the workflow on <b>{{workflow.registry['name']}}</b> registry 
                 <i class='fas fa-sm fa-external-link-alt mx-1'></i>" href="{{workflow.externalLink}}">

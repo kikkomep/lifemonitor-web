@@ -36,10 +36,6 @@ export class DashboardComponent implements OnInit, OnChanges {
         this._workflowStats = data;
         this.filteredWorkflows = this._workflowStats.all;
         console.log('Stats', data);
-        $('[data-toggle="tooltip"]').tooltip({
-          delay: { show: 1500, hide: 50 },
-          html: true,
-        });
       }
     );
     console.debug('Initializing workflow data!!');
@@ -49,12 +45,7 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   ngOnInit() {}
 
-  ngAfterViewInit() {
-    $('[data-toggle="tooltip"]').tooltip({
-      delay: { show: 1500, hide: 50 },
-      html: true,
-    });
-  }
+  ngAfterViewInit() {}
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('Changes', changes);

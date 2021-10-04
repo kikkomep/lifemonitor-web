@@ -27,10 +27,6 @@ export class RocrateLogoComponent implements OnInit {
   }
 
   public get availableForDownload(): boolean {
-    $('[data-toggle="tooltip"]').tooltip({
-      delay: { show: 1500, hide: 50 },
-      html: true,
-    });
     return this._availableForDownload;
   }
 

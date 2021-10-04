@@ -32,7 +32,7 @@
               <i class="{{ testInstance.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
+              <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> see on <b>{{testInstance.service.type}}</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                 <!-- <a [routerLink]="['/suite', { uuid: testInstance.uuid }]" style="color: black; font-size: larger;">{{
                   testInstance.roc_instance
@@ -48,7 +48,7 @@
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
-              <div class="text-center" data-toggle="tooltip" data-placement="top"
+              <div class="text-center" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.suite.engineType}}</b> engine</span>">
                 <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
                   src="{{ testInstance.suite.engineIcon }}" width="100" />
@@ -57,7 +57,7 @@
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
-              <div class="text-center" data-toggle="tooltip" data-placement="top"
+              <div class="text-center" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.service.type}}</b> service</span>">
                 <a href="{{ testInstance.service.url }}">
                   <img src="{{ testInstance.platformIcon }}" height="60px" />

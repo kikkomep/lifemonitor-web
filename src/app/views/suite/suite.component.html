@@ -46,7 +46,7 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-primary" (click)="filterByStatus('passed')" data-toggle="tooltip"
-            data-placement="bottom"
+            data-placement="bottom" data-html="true"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>passing</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
@@ -71,7 +71,7 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-warning" (click)="filterByStatus('error')" data-toggle="tooltip"
-            data-placement="bottom"
+            data-placement="bottom" data-html="true"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>error</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
@@ -96,7 +96,7 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-danger" (click)="filterByStatus('failed')" data-toggle="tooltip"
-            data-placement="bottom"
+            data-placement="bottom" data-html="true"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>failed</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
@@ -124,7 +124,7 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-orange" (click)="filterByStatus('waiting')" data-toggle="tooltip"
-            data-placement="bottom"
+            data-placement="bottom" data-html="true"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>waiting</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
@@ -153,7 +153,7 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-cyan" (click)="filterByStatus('running')" data-toggle="tooltip"
-            data-placement="bottom"
+            data-placement="bottom" data-html="true"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>running</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
@@ -182,7 +182,7 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-gray" (click)="filterByStatus('aborted')" data-toggle="tooltip"
-            data-placement="bottom"
+            data-placement="bottom" data-html="true"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>aborted</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>

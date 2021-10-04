@@ -29,7 +29,7 @@
               <i class="{{ s.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
+              <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                 <a [routerLink]="['/suite', { uuid: s.uuid }]" style="color: black; font-size: larger">{{ s.roc_suite
                   }}</a>
@@ -38,7 +38,7 @@
 
             </td>
             <td class="text-center align-middle font-weight-light h-100">
-              <div style="height: 100%; margin: auto" data-toggle="tooltip" data-placement="top"
+              <div style="height: 100%; margin: auto" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{s.engineType}}</b> engine</span>">
                 <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
                 <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>

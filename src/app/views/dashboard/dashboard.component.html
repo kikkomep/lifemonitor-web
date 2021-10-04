@@ -37,7 +37,7 @@
       <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-test-passed" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
-          data-placement="bottom"
+          data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
@@ -62,7 +62,7 @@
       <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-test-error" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
-          data-placement="bottom"
+          data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows partially <b>passing</b></span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
@@ -86,7 +86,7 @@
       <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-test-failed" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
-          data-placement="bottom"
+          data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
@@ -110,8 +110,8 @@
 
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-test-aborted" (click)="filterByStatus('unknown')" data-toggle="tooltip"
-          data-placement="bottom"
+        <div class="small-box bg-test-aborted" (click)="filterByStatus('unknown')" data-html="true"
+          data-toggle="tooltip" data-placement="bottom"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows in <b>unknown</b> state</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
@@ -176,7 +176,7 @@
                   <i class="{{ w.statusIcon }} fa-2x"></i>
                 </td>
                 <td class="align-middle">
-                  <div class="font-weight-light text-lg" data-toggle="tooltip" data-placement="top"
+                  <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                     <a [routerLink]="['/workflow', { uuid: w.uuid }]" style="color: black; font-size: larger">{{ w.name
                       }}
@@ -192,13 +192,13 @@
                   </div>
                 </td>
                 <td class="text-center align-middle">
-                  <div style="height: 100%; margin: auto" data-toggle="tooltip" data-placement="top"
+                  <div style="height: 100%; margin: auto" data-html="true" data-toggle="tooltip" data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
                     <img src="{{ w.typeIcon }}" width="30" />
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
-                  <div data-toggle="tooltip" data-placement="top"
+                  <div data-toggle="tooltip" data-placement="top" data-html="true"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
                     {{ w.latest_version }}
                   </div>
