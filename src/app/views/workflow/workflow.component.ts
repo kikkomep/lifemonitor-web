@@ -20,6 +20,7 @@ import { Subscription } from 'rxjs';
 import { Workflow } from 'src/app/models/workflow.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Suite } from 'src/app/models/suite.models';
+import { Model, Property } from 'src/app/models/base.models';
 
 @Component({
   selector: 'app-workflow',
@@ -51,29 +52,23 @@ export class WorkflowComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
-    console.log('Created component Workfoow');
-    this.paramSubscription = this.route.params.subscribe((params) => {
-      console.log('Params:', params);
+    console.log('Created component Workflow');
 
-      // subscribe for the current selected workflow
-      this.workflowSubscription = this.appService.observableWorkflow.subscribe(
-        (w: Workflow) => {
-          console.log('Changed workflow', w, w.suites);
-          if (w) {
-            this.workflow = w;
-            if (w.suites) {
-              this.suites = w.suites.all;
-              this.workflowChangesSubscription = w.suites
-                .asObservable()
-                .subscribe((p) => {
-                  this.suites = w.suites.all;
-                  this.cdr.detectChanges();
-                  console.log('Handle change', p);
-                });
-            }
-          }
-        }
-      );
+    // subscribe for the current selected workflow
+    this.workflowSubscription = this.appService.observableWorkflow.subscribe(
+      (w: Workflow) => {
+        console.log('Changed workflow', w, w.suites);
+        this.workflow = w;
+        this.workflowChangesSubscription = this.workflow
+          .asObservable()
+          .subscribe((change) => {
+            this.suites = this.workflow.suites.all;
+            this.cdr.detectChanges();
+            console.log('Handle change', change);
+          });
+        if (this.workflow.suites) this.suites = this.workflow.suites.all;
+      }
+    );
 
     this.paramSubscription = this.route.params.subscribe((params) => {
       // select a workflow
@@ -127,6 +122,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
     // prevent memory leak when component destroyed
     this.paramSubscription.unsubscribe();
     this.workflowSubscription.unsubscribe();
-    // this.workflowChangesSubscription.unsubscribe();
+    if (this.workflowChangesSubscription)
+      this.workflowChangesSubscription.unsubscribe();
   }
 }
