@@ -365,7 +365,7 @@ export class ApiService {
           return true;
         }),
         catchError((err) => {
-          console.log("Error", err);
+          console.log('Error', err);
           return of(false);
         })
       );

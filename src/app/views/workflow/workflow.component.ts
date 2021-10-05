@@ -100,22 +100,21 @@ export class WorkflowComponent implements OnInit, OnChanges {
 
   public selectTestBuild(testBuild: TestBuild) {
     console.log('Test Build selected', testBuild);
-    this.appService
-      .selectTestSuite(testBuild.suite_uuid)
-      .subscribe((s: Suite) => {
-        console.log('Selected suite from wf cmp: ', s);
-        this.appService
-          .selectTestInstance(testBuild.instance.uuid)
-          .subscribe((ti) => {
-            console.log('Selected test instance from wf component', ti);
-            this.router.navigate(['/build'], {
-              queryParams: {
-                instance_uuid: testBuild.instance.uuid,
-                build_id: testBuild.build_id,
-              },
-            });
-          });
-      });
+    // this.appService.observableTestSuite.subscribe((s: Suite) => {
+    //   console.log('Selected suite from wf cmp: ', s);
+    //   this.appService
+    //     .selectTestInstance(testBuild.instance.uuid)
+    //     .subscribe((ti) => {
+    //       console.log('Selected test instance from wf component', ti);
+    //       this.router.navigate(['/build'], {
+    //         queryParams: {
+    //           instance_uuid: testBuild.instance.uuid,
+    //           build_id: testBuild.build_id,
+    //         },
+    //       });
+    //     });
+    // });
+    // this.appService.selectTestSuite(testBuild.suite_uuid);
   }
 
   ngOnDestroy() {
