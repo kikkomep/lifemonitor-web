@@ -59,9 +59,6 @@ export class AppService {
         this._workflow = w;
       })
     );
-
-    // preload workflows
-    this.loadWorkflows();
   }
 
   public get workflows(): Workflow[] {
