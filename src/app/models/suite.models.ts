@@ -20,6 +20,15 @@ export class Suite extends AggregatedStatusStatsItem {
     this.name = this.roc_suite.replace('#', '');
   }
 
+  public asUrlParam() {
+    return btoa(
+      JSON.stringify({
+        workflow: this.workflow.uuid,
+        suite: this.uuid,
+      })
+    );
+  }
+
   public get latestTestInstanceBuilds(): InstanceStats {
     return new InstanceStats(
       this.latestBuilds.map((x: Object) => new StatusStatsItem(x))

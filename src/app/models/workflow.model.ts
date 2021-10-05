@@ -28,6 +28,10 @@ export class Workflow extends AggregatedStatusStatsItem {
     }
   }
 
+  public asUrlParam() {
+    return this.uuid;
+  }
+
   public get typeIcon(): string {
     // FIXME: set the right icon type
     return 'assets/img/logo/wf/GalaxyLogoSquare.png';

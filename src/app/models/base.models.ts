@@ -44,6 +44,10 @@ export class Model {
     return this._asObservable;
   }
 
+  public asUrlParam() {
+    return btoa(JSON.stringify({}));
+  }
+
   // Allow subclasses to notify changes
   protected notifyChanges(propertyName?: string, propertyValue?: any) {
     if (propertyName && propertyValue) {
