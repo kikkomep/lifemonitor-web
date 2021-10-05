@@ -105,7 +105,11 @@ export class AppService {
     return this._observableTestBuild;
   }
 
-  loadWorkflows(useCache = false) {
+  public decodeUrl(url: string) {
+    let data = JSON.parse(atob(url));
+    return data;
+  }
+
     if (this.loadingWorkflows) return;
     if (useCache) {
       console.log('Using cache', this._workflowsStats);
