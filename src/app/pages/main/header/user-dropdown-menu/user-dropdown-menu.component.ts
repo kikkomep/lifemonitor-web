@@ -57,6 +57,11 @@ export class UserDropdownMenuComponent implements OnInit {
     return this.config.getConfig()['apiBaseUrl'] + '/profile?back=true';
   }
 
+  public openProfile() {
+    this.hideDropdownMenu();
+    window.open(this.profileUrl);
+  }
+
   showDropdownMenu() {
     this.renderer.addClass(this.dropdownMenu.nativeElement, 'show');
   }
