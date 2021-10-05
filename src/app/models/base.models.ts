@@ -32,10 +32,11 @@ export class Model {
     this.update(rawData);
   }
 
-  public update(rawData: Object){
+  public update(rawData: Object) {
     if (rawData) {
       Object.assign(this, rawData);
       this._rawData = rawData;
+      this.notifyChanges();
     }
   }
 
