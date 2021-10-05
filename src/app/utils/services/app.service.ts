@@ -209,65 +209,6 @@ export class AppService {
     this.subjectTestSuite.next(suite);
   }
 
-  // public selectTestInstance(uuid: string): Observable<TestInstance> {
-  //   if (!this._suite) {
-  //     // let suite_uuid = sessionStorage.getItem(this.SUITE_UUID);
-  //     // if (suite_uuid) {
-  //     //   console.log('FIXME');
-  //     //   //return this.selectTestSuite(suite_uuid).pipe(
-  //     //   //   mergeMap((s: Suite) => {
-  //     //   //     console.log('TestInstance loaded', s);
-  //     //   //     return this._selectTestInstance(uuid);
-  //     //   //   })
-  //     //   // );
-  //     //   return of({} as TestInstance);
-  //     // }
-  //     return of({} as TestInstance);
-  //   } else {
-  //     return this._selectTestInstance(uuid);
-  //   }
-  // }
-
-  // private _selectTestInstance(uuid: string): Observable<TestInstance> {
-  //   let instance: TestInstance = this._suite.instances.all.find(
-  //     (i: TestInstance) => i.uuid === uuid
-  //   ) as TestInstance;
-  //   console.log('Selected test instance', instance);
-  //   this._testInstance = instance;
-  //   this.subjectTestInstance.next(instance);
-  //   return of(instance);
-  // }
-
-  // public selectTestBuild(buildId: string): Observable<TestBuild> {
-  //   if (!this._testInstance) {
-  //     // let instance_uuid = sessionStorage.getItem(this.TEST_INSTANCE_UUID);
-  //     // if (instance_uuid) {
-  //     //   return this.selectTestInstance(instance_uuid).pipe(
-  //     //     mergeMap((i: TestInstance) => {
-  //     //       console.log('TestInstance loaded', i);
-  //     //       return this._selectTestBuild(buildId);
-  //     //     })
-  //     //   );
-  //     // }
-  //   } else {
-  //     return this._selectTestBuild(buildId);
-  //   }
-  // }
-
-  // private _selectTestBuild(buildId: string): Observable<TestBuild> {
-  //   let build: TestBuild = this._testInstance.latestBuilds.find(
-  //     (b: TestBuild) => b.build_id === buildId
-  //   ) as TestBuild;
-  //   console.log('Selected test instance', build);
-  //   this._testBuild = build;
-  //   this.subjectTestBuild.next(build);
-  //   return of(build);
-  // }
-
-  // public getTestBuildLogs(build: TestBuild): Observable<string> {
-  //   return this.api.getBuildLogs(build.instance.uuid, build.build_id);
-  // }
-
   public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
     return this.api.checkROCrateAvailability(workflow);
   }
