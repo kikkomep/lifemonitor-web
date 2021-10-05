@@ -160,8 +160,7 @@ export class ApiService {
           suite.instances = new InstanceStats();
 
           let instanceBuildsQueries = [];
-          for (let isd of suiteData['instances']) {
-            const instanceData = suiteData['instances'][isd];
+          for (let instanceData of suiteData['instances']) {
             instanceBuildsQueries.push(
               this.http
                 .get(
@@ -283,18 +282,23 @@ export class ApiService {
       );
   }
 
-  getSuite(uuid: string): Observable<any> {
+  getSuite(uuid: string): Observable<Suite> {
     return this.http
-      .get(
-        this.apiBaseUrl + '/suites/' + uuid + '/status',
-        this.get_http_options()
-      )
+      .get(this.apiBaseUrl + '/suites/' + uuid, this.get_http_options())
       .pipe(
-        map((data) => {
-          let result = {};
+        mergeMap((data) => {
+          //let s = new Suite({} as Workflow, data);
+          console.log('Suite data:', data);
+          //return of(new Suite({} as Workflow, data));
+          return this.loadSuite(data).pipe(
+            map((suite: Suite) => {
+              return suite;
+            })
+          );
+          //return s;
         }),
         tap((result) => {
-          console.debug('Loaded suites', result);
+          console.debug('Loaded suite', result);
         })
       );
   }
