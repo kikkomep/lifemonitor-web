@@ -1,7 +1,7 @@
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  Status,
+  Status
 } from './stats.model';
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';
@@ -11,7 +11,7 @@ export class Workflow extends AggregatedStatusStatsItem {
   version: Object;
   status: Status;
   type: string = 'galaxy'; // FIXME
-  suites: AggregatedStatusStats;
+  _suites: AggregatedStatusStats;
   private _latestBuilds: TestBuild[];
 
   constructor(
@@ -24,8 +24,21 @@ export class Workflow extends AggregatedStatusStatsItem {
       this.status = new Status(status);
     }
     if (suites) {
-      this.suites = suites;
+      this._suites = suites;
     }
+  }
+
+  public get suites(): AggregatedStatusStats {
+    return this._suites;
+  }
+
+  public set suites(suites: AggregatedStatusStats) {
+    this._suites = suites;
+    this.notifyChanges();
+  }
+
+  public asUrlParam() {
+    return this.uuid;
   }
 
   public get typeIcon(): string {

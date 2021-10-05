@@ -105,9 +105,7 @@ export class AbstractStats extends Model {
     console.log('Statuses', statuses);
     this['all'] = [];
     for (let s of statuses) {
-      console.log('THIS', this[s]);
       if (!Array.isArray(this[s])) this[s] = [];
-      console.log('THIS', s, this[s]);
     }
     if (data) this.update(data);
   }

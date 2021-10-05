@@ -3,12 +3,13 @@ import {
   Component,
   Input,
   OnInit,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
+import { Workflow } from 'src/app/models/workflow.model';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({
@@ -26,6 +27,7 @@ export class SuiteComponent implements OnInit {
   private _instances: StatusStatsItem[] = [];
 
   private paramSubscription: Subscription;
+  private workflowSubscription: Subscription;
   private suiteSubscription: Subscription;
 
   constructor(
@@ -35,25 +37,37 @@ export class SuiteComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log('Created component Workfoow');
+    console.log('Created component Workflow');
     this.paramSubscription = this.route.params.subscribe((params) => {
       console.log('Params:', params);
 
-      // subscribe for the current selected suite
-      this.suiteSubscription = this.appService.observableTestSuite.subscribe(
-        (suite: Suite) => {
-          console.log('Changed suite', suite);
-          if (suite) {
-            this.suite = suite;
-            this._instances = suite.instances.all;
-          }
+      let urlData = this.appService.decodeUrl(params['s']);
+      console.log('UrlData', urlData);
+
+      // subscribe for the current selected workflow
+      this.workflowSubscription = this.appService.observableWorkflow.subscribe(
+        (w: Workflow) => {
+          console.log('Changed workflow', w, w.suites);
+
+          // subscribe for the current selected suite
+          this.suiteSubscription = this.appService.observableTestSuite.subscribe(
+            (suite: Suite) => {
+              console.log('Changed suite', suite);
+              if (suite) {
+                this.suite = suite;
+                this.suite.workflow = w;
+                this._instances = suite.instances.all;
+              }
+            }
+          );
+
+          // // select the suite with uuid = params['uuid']
+          this.appService.selectTestSuite(urlData['suite']);
         }
       );
 
-      // select the suite with uuid = params['uuid']
-      this.appService.selectTestSuite(params['uuid']).subscribe((s: Suite) => {
-        this.suite = s;
-      });
+      // select a workflow
+      this.appService.selectWorkflow(urlData['workflow']);
     });
   }
 
@@ -87,6 +101,7 @@ export class SuiteComponent implements OnInit {
     // prevent memory leak when component destroyed
     this.paramSubscription.unsubscribe();
     this.suiteSubscription.unsubscribe();
+    this.workflowSubscription.unsubscribe();
     // this.workflowChangesSubscription.unsubscribe();
   }
 }

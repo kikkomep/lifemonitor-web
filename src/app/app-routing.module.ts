@@ -1,18 +1,15 @@
+import { NgModule } from '@angular/core';
 import { Router, RouterModule, Routes } from '@angular/router';
-
-import { AuthGuard } from './utils/guards/auth.guard';
+import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/utils/services/auth.service';
-import { BlankComponent } from './views/blank/blank.component';
-import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { MainComponent } from './pages/main/main.component';
-import { NgModule } from '@angular/core';
-import { NonAuthGuard } from './utils/guards/non-auth.guard';
-import { RegisterComponent } from './pages/register/register.component';
-import { Subscription } from 'rxjs';
-import { WorkflowComponent } from './views/workflow/workflow.component';
+import { AuthGuard } from './utils/guards/auth.guard';
+import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
+import { WorkflowComponent } from './views/workflow/workflow.component';
+
 
 const routes: Routes = [
   {

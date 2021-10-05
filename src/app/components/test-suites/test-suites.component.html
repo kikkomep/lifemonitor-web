@@ -31,7 +31,7 @@
             <td class="align-middle">
               <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
-                <a [routerLink]="['/suite', { uuid: s.uuid }]" style="color: black; font-size: larger">{{ s.roc_suite
+                <a [routerLink]="['/suite', { s: s.asUrlParam() }]" style="color: black; font-size: larger">{{ s.roc_suite
                   }}</a>
                 <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
               </div>
@@ -45,7 +45,7 @@
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
-              <a [routerLink]="['/suite', { uuid: s.uuid }]">
+              <a [routerLink]="['/suite', { s: s.asUrlParam() }]">
                 <stats-pie-chart [stats]="s.instances"></stats-pie-chart>
               </a>
             </td>

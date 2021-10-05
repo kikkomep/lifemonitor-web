@@ -1,5 +1,5 @@
 <div class="row" style="color: var(--primary)">
-  <a [routerLink]="['/workflow', { uuid: workflow.uuid }]">
+  <a [routerLink]="['/workflow', { uuid: workflow.asUrlParam() }]">
     <i class="fas fa-caret-left" style="margin: 0px 2px 0 15px"></i> workflow
   </a>
 </div>

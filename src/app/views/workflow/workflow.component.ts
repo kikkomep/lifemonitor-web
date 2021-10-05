@@ -1,25 +1,20 @@
-import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Color, Label, SingleDataSet } from 'ng2-charts';
 import {
   ChangeDetectorRef,
   Component,
   OnChanges,
   OnInit,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
-import {
-  AggregatedStatusStats,
-  AggregatedStatusStatsItem,
-  StatusStatsItem,
-} from 'src/app/models/stats.model';
-
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiService } from 'src/app/utils/services/api.service';
-import { AppService } from 'src/app/utils/services/app.service';
 import { Subscription } from 'rxjs';
-import { Workflow } from 'src/app/models/workflow.model';
+import {
+  AggregatedStatusStatsItem,
+  StatusStatsItem
+} from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { Suite } from 'src/app/models/suite.models';
+import { Workflow } from 'src/app/models/workflow.model';
+import { AppService } from 'src/app/utils/services/app.service';
+
 
 @Component({
   selector: 'app-workflow',
@@ -51,30 +46,25 @@ export class WorkflowComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
-    console.log('Created component Workfoow');
+    console.log('Created component Workflow');
+
+    // subscribe for the current selected workflow
+    this.workflowSubscription = this.appService.observableWorkflow.subscribe(
+      (w: Workflow) => {
+        console.log('Changed workflow', w, w.suites);
+        this.workflow = w;
+        this.workflowChangesSubscription = this.workflow
+          .asObservable()
+          .subscribe((change) => {
+            this.suites = this.workflow.suites.all;
+            this.cdr.detectChanges();
+            console.log('Handle change', change);
+          });
+        if (this.workflow.suites) this.suites = this.workflow.suites.all;
+      }
+    );
+
     this.paramSubscription = this.route.params.subscribe((params) => {
-      console.log('Params:', params);
-
-      // subscribe for the current selected workflow
-      this.workflowSubscription = this.appService.observableWorkflow.subscribe(
-        (w: Workflow) => {
-          console.log('Changed workflow', w, w.suites);
-          if (w) {
-            this.workflow = w;
-            if (w.suites) {
-              this.suites = w.suites.all;
-              this.workflowChangesSubscription = w.suites
-                .asObservable()
-                .subscribe((p) => {
-                  this.suites = w.suites.all;
-                  this.cdr.detectChanges();
-                  console.log('Handle change', p);
-                });
-            }
-          }
-        }
-      );
-
       // select a workflow
       this.appService.selectWorkflow(params['uuid']);
     });
@@ -104,28 +94,13 @@ export class WorkflowComponent implements OnInit, OnChanges {
 
   public selectTestBuild(testBuild: TestBuild) {
     console.log('Test Build selected', testBuild);
-    this.appService
-      .selectTestSuite(testBuild.suite_uuid)
-      .subscribe((s: Suite) => {
-        console.log('Selected suite from wf cmp: ', s);
-        this.appService
-          .selectTestInstance(testBuild.instance.uuid)
-          .subscribe((ti) => {
-            console.log('Selected test instance from wf component', ti);
-            this.router.navigate(['/build'], {
-              queryParams: {
-                instance_uuid: testBuild.instance.uuid,
-                build_id: testBuild.build_id,
-              },
-            });
-          });
-      });
   }
 
   ngOnDestroy() {
     // prevent memory leak when component destroyed
     this.paramSubscription.unsubscribe();
     this.workflowSubscription.unsubscribe();
-    // this.workflowChangesSubscription.unsubscribe();
+    if (this.workflowChangesSubscription)
+      this.workflowChangesSubscription.unsubscribe();
   }
 }
