@@ -1,9 +1,8 @@
 import {
-  AggregatedStatusStats,
   AggregatedStatusStatsItem,
   InstanceStats,
   Status,
-  StatusStatsItem,
+  StatusStatsItem
 } from './stats.model';
 import { Workflow } from './workflow.model';
 

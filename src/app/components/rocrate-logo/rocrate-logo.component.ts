@@ -1,7 +1,6 @@
-import { Observable } from 'rxjs';
-import { AppService } from 'src/app/utils/services/app.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { Workflow } from 'src/app/models/workflow.model';
+import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
 

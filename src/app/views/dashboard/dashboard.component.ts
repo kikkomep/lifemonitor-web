@@ -1,14 +1,12 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { AppService } from 'src/app/utils/services/app.service';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
   AggregatedStatusStats,
-  AggregatedStatusStatsItem,
+  AggregatedStatusStatsItem
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { Suite } from 'src/app/models/suite.models';
-import { Router } from '@angular/router';
-import { Workflow } from 'src/app/models/workflow.model';
+import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
 

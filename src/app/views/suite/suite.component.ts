@@ -3,7 +3,7 @@ import {
   Component,
   Input,
   OnInit,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';

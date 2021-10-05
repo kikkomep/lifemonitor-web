@@ -1,17 +1,13 @@
 import {
-  Component,
-  Input,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  ChangeDetectorRef,
+  ChangeDetectorRef, Component,
+  Input, OnChanges, OnInit, SimpleChanges
 } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Color, Label, SingleDataSet } from 'ng2-charts';
+import { Label } from 'ng2-charts';
 import {
   AbstractStats,
   AggregatedStatusStats,
-  InstanceStats,
+  InstanceStats
 } from 'src/app/models/stats.model';
 
 @Component({

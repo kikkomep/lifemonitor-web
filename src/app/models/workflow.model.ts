@@ -1,7 +1,7 @@
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  Status,
+  Status
 } from './stats.model';
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';

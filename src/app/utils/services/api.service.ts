@@ -1,26 +1,20 @@
-import { Params } from '@angular/router';
-import { AppConfigService } from './config.service';
-import { Injectable } from '@angular/core';
-import { Observable, of, Subject, throwError, forkJoin, from } from 'rxjs';
 import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpParams,
+  HttpClient, HttpHeaders
 } from '@angular/common/http';
-import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
-import { HttpHeaders } from '@angular/common/http';
-import { Workflow } from 'src/app/models/workflow.model';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import { Suite } from 'src/app/models/suite.models';
+import { Injectable } from '@angular/core';
+import { forkJoin, from, Observable, of } from 'rxjs';
+import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status,
-  StatusStatsItem,
+  Status
 } from 'src/app/models/stats.model';
-import { TestInstance } from 'src/app/models/testInstance.models';
+import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
+import { Workflow } from 'src/app/models/workflow.model';
+import { AppConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',

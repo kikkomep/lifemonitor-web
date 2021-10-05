@@ -5,11 +5,9 @@ import {
   Input,
   OnInit,
   Output,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { InstanceStats } from 'src/app/models/stats.model';
-import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { Workflow } from 'src/app/models/workflow.model';

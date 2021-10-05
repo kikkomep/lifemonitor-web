@@ -6,12 +6,11 @@ import {
   OnChanges,
   OnInit,
   Output,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { Workflow } from 'src/app/models/workflow.model';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({

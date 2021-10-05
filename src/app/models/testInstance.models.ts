@@ -1,10 +1,6 @@
 import { TestingService } from './service.modes';
 import {
-  AggregatedStatusStats,
-  AggregatedStatusStatsItem,
-  InstanceStats,
-  Status,
-  StatusStatsItem,
+  InstanceStats, StatusStatsItem
 } from './stats.model';
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';

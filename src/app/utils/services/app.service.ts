@@ -1,17 +1,15 @@
-import {
-  AggregatedTestStatus,
-  AggregatedStatusStats,
-  AggregatedStatusStatsItem,
-} from 'src/app/models/stats.model';
-import { from, Observable, of, Subject, Subscription } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { ApiService } from './api.service';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Workflow } from 'src/app/models/workflow.model';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import {
+  AggregatedStatusStats
+} from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
-import { map, mergeMap } from 'rxjs/operators';
+import { Workflow } from 'src/app/models/workflow.model';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',

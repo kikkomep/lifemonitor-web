@@ -1,26 +1,20 @@
-import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Color, Label, SingleDataSet } from 'ng2-charts';
 import {
   ChangeDetectorRef,
   Component,
   OnChanges,
   OnInit,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
-import {
-  AggregatedStatusStats,
-  AggregatedStatusStatsItem,
-  StatusStatsItem,
-} from 'src/app/models/stats.model';
-
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiService } from 'src/app/utils/services/api.service';
-import { AppService } from 'src/app/utils/services/app.service';
 import { Subscription } from 'rxjs';
-import { Workflow } from 'src/app/models/workflow.model';
+import {
+  AggregatedStatusStatsItem,
+  StatusStatsItem
+} from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { Suite } from 'src/app/models/suite.models';
-import { Model, Property } from 'src/app/models/base.models';
+import { Workflow } from 'src/app/models/workflow.model';
+import { AppService } from 'src/app/utils/services/app.service';
+
 
 @Component({
   selector: 'app-workflow',
