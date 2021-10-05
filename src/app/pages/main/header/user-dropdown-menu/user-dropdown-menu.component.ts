@@ -54,16 +54,7 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   public get profileUrl(): string {
-    return (
-      this.config.getConfig()['apiBaseUrl'] +
-      '/profile?back=' +
-      btoa(
-        JSON.stringify({
-          url: decodeURI(location.href),
-          title: 'Back to LifeMonitor Web',
-        })
-      )
-    );
+    return this.config.getConfig()['apiBaseUrl'] + '/profile?back=true';
   }
 
   showDropdownMenu() {
