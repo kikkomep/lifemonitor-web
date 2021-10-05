@@ -110,12 +110,14 @@ export class AppService {
     return data;
   }
 
+  loadWorkflows(useCache = false): Observable<Workflow> {
     if (this.loadingWorkflows) return;
-    if (useCache) {
+    if (useCache && this._workflowsStats) {
       console.log('Using cache', this._workflowsStats);
       this.subjectWorkflows.next(this._workflowsStats);
       return;
     }
+    let workflow: Subject<Workflow> = new Subject<Workflow>();
     this.loadingWorkflows = true;
     this.api.get_workflows().subscribe(
       (data) => {
@@ -142,24 +144,22 @@ export class AppService {
 
         this._workflows = items;
         this._workflowsStats = stats;
-        this.subjectWorkflows.next(stats);
-
         this.loadingWorkflows = false;
 
-        let wf_uuid = sessionStorage.getItem('workflow_uuid');
         for (let w of this._workflows) {
           console.log('Loading data of workflow ', w);
-          this.loadWorkflow(w).subscribe((w: Workflow) => {
-            if (wf_uuid === w.uuid) {
-              this.selectWorkflow(wf_uuid);
-            }
+          this.loadWorkflow(w).subscribe((wf: Workflow) => {
+            workflow.next(wf);
           });
         }
+        this.subjectWorkflows.next(stats);
       },
       (error) => {
         console.error(error);
       }
     );
+
+    return workflow.asObservable();
   }
 
   loadWorkflow(w: Workflow): Observable<Workflow> {
