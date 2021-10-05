@@ -1,6 +1,6 @@
 {
   "name": "lifemonitor",
-  "version": "0.1.0-alpha1",
+  "version": "0.1.0-alpha2",
   "scripts": {
     "start": "node server.js",
     "dev:start": "ng serve",
@@ -40,6 +40,7 @@
     "chart.js": "^2.9.4",
     "core-js": "3.9.1",
     "express": "4.17.1",
+    "hover.css": "^2.3.2",
     "ng2-charts": "^2.4.2",
     "ngx-toastr": "13.2.0",
     "rxjs": "6.6.6",

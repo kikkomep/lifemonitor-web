@@ -1,6 +1,6 @@
 <div class="row" style="color: var(--primary)">
   <a [routerLink]="['/dashboard']">
-    <i class="fas fa-caret-left" style="margin: 0px 2px 0 15px"></i> workflows
+    <i class="fas fa-caret-left" style="margin: 0px 2px 0 15px"></i> workflow list
   </a>
 </div>
 
@@ -29,38 +29,28 @@
               <i class="{{ s.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg">
-                <a
-                  [routerLink]="['/suite', { uuid: s.uuid }]"
-                  style="color: black; font-size: larger"
-                  >{{ s.roc_suite }}</a
-                >
+              <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
+                <a [routerLink]="['/suite', { s: s.asUrlParam() }]" style="color: black; font-size: larger">{{ s.roc_suite
+                  }}</a>
+                <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
               </div>
-              <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
+
             </td>
-            <td class="text-center align-middle">
-              <div style="height: 100%; margin: auto">
-                <img
-                  *ngIf="s.engineIcon"
-                  src="{{ s.engineIcon }}"
-                  width="100"
-                />
-                <i
-                  *ngIf="!s.engineIcon"
-                  class="far fa-question-circle fa-2x"
-                ></i>
+            <td class="text-center align-middle font-weight-light h-100">
+              <div style="height: 100%; margin: auto" data-html="true" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{s.engineType}}</b> engine</span>">
+                <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
+                <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>
               </div>
             </td>
-            <td class="text-center align-middle font-weight-light">
-              <a [routerLink]="['/suite', { uuid: s.uuid }]">
+            <td class="text-center align-middle font-weight-light h-100">
+              <a [routerLink]="['/suite', { s: s.asUrlParam() }]">
                 <stats-pie-chart [stats]="s.instances"></stats-pie-chart>
               </a>
             </td>
             <td class="text-center align-middle font-weight-light" width="50">
-              <stats-bar-chart
-                [stats]="s.getLatestBuilds()"
-                (selectedItem)="selectTestBuild($event)"
-              ></stats-bar-chart>
+              <stats-bar-chart [stats]="s.getLatestBuilds()" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
             </td>
           </tr>
         </tbody>

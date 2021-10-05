@@ -36,18 +36,14 @@
     <div class="row">
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-passed"
-          (click)="filterByStatus('all_passing')"
-        >
+        <div class="small-box bg-test-passed" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
+          data-placement="bottom" data-html="true"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'all_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
           <!-- end loading -->
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_passing.length : 0 }}</h3>
@@ -56,27 +52,23 @@
           <div class="icon">
             <i class="fa fa-thumbs-up"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-error"
-          (click)="filterByStatus('some_passing')"
-        >
+        <div class="small-box bg-test-error" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
+          data-placement="bottom" data-html="true"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows partially <b>passing</b></span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'some_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.some_passing.length : 0 }}</h3>
             <p>Some passing</p>
@@ -84,27 +76,23 @@
           <div class="icon">
             <i class="fas fa-radiation"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-failed"
-          (click)="filterByStatus('all_failing')"
-        >
+        <div class="small-box bg-test-failed" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
+          data-placement="bottom" data-html="true"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'all_failing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_failing.length : 0 }}</h3>
             <p>Failing</p>
@@ -112,28 +100,24 @@
           <div class="icon">
             <i class="fa fa-thumbs-down"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
 
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-test-aborted"
-          (click)="filterByStatus('unknown')"
-        >
+        <div class="small-box bg-test-aborted" (click)="filterByStatus('unknown')" data-html="true"
+          data-toggle="tooltip" data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows in <b>unknown</b> state</span>">
           <!-- Loading (remove the following to stop the loading)-->
           <div *ngIf="!workflows" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="workflows && statusFilter && statusFilter != 'unknown'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="workflows && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.unknown.length : 0 }}</h3>
 
@@ -142,10 +126,10 @@
           <div class="icon">
             <i class="fa fa-question-circle"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
@@ -156,10 +140,7 @@
 
   <div class="container-fluid">
     <!-- Search Bar -->
-    <item-search-bar
-      [(filterValue)]="workflowNameFilter"
-      [(sortingOrder)]="workflowSortingOrder"
-    ></item-search-bar>
+    <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
     <div class="card card-primary card-outline">
       <!-- Loading (remove the following to stop the loading)-->
@@ -184,54 +165,55 @@
             </thead>
             <tbody *ngIf="workflows">
               <!-- end loading -->
-              <tr
-                *ngFor="
+              <tr *ngFor="
                   let w of workflows
                     | itemFilterPipe: workflowNameFilter
                     | sortingFilter: workflowSortingOrder;
                   index as i;
                   first as isFirst
-                "
-              >
+                ">
                 <td [ngClass]="w.class">
                   <i class="{{ w.statusIcon }} fa-2x"></i>
                 </td>
                 <td class="align-middle">
-                  <div class="font-weight-light text-lg">
-                    <a
-                      [routerLink]="['/workflow', { uuid: w.uuid }]"
-                      style="color: black; font-size: larger"
-                      >{{ w.name }}</a
-                    >
+                  <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
+                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
+                    <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]" style="color: black; font-size: larger">{{ w.name
+                      }}
+                      <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
+                    </a>
                   </div>
-                  <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
+                  <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
+                    <b>external ID: </b>
+                    <a href="{{ w.externalLink }}" target="_blank">{{
+                      w.externalLink
+                      }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
+                    </a>
+                  </div>
                 </td>
                 <td class="text-center align-middle">
-                  <div style="height: 100%; margin: auto">
-                    <img src="{{ w.typeIcon }}" width="30" />
+                  <div style="height: 100%; margin: auto" data-html="true" data-toggle="tooltip" data-placement="top"
+                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
+                    <img src="{{ w.typeIcon }}" width="45" />
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
-                  {{ w.latest_version }}
-                  <div *ngIf="w.registry" class="text-sm">
-                    <a href="{{ w.externalLink }}" target="_blank"
-                      >[details <i class="fas fa-external-link-alt"></i>]</a
-                    >
+                  <div data-toggle="tooltip" data-placement="top" data-html="true"
+                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
+                    {{ w.latest_version }}
+                  </div>
+                  <div *ngIf="w.registry" class="text-sm" title="{{ w.externalLink }}">
+                    <a href="{{ w.externalLink }}" target="_blank">[details <i
+                        class="fas fa-external-link-alt"></i>]</a>
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
-                  <a [routerLink]="['/workflow', { uuid: w.uuid }]">
+                  <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]">
                     <stats-pie-chart [stats]="w.suites"></stats-pie-chart>
                   </a>
                 </td>
-                <td
-                  class="text-center align-middle font-weight-light"
-                  width="50"
-                >
-                  <stats-bar-chart
-                    [stats]="w.getLatestBuilds()"
-                    (selectedItem)="selectTestBuild($event)"
-                  >
+                <td class="text-center align-middle font-weight-light" width="50">
+                  <stats-bar-chart [stats]="w.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
               </tr>

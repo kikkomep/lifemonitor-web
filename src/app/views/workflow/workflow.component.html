@@ -2,7 +2,7 @@
 
 <div *ngIf="workflow && suites" class="content-header">
   <div class="container-fluid">
-    <div class="row mb-2">
+    <div class="row">
       <div class="col-sm-6">
         <h1 class="m-0 text-dark"></h1>
       </div>
@@ -10,9 +10,7 @@
       <div class="col-sm-6">
         <ol class="breadcrumb float-sm-right mr-lg-4 mr-md-2">
           <li class="breadcrumb-item">
-            <a [routerLink]="['/dashboard']"
-              ><i class="fas fa-home p-1"></i>Home</a
-            >
+            <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
           </li>
           <li class="breadcrumb-item active">
             <i class="fas fa-cogs p-1"></i>Workflow
@@ -22,67 +20,17 @@
       <!-- /.col -->
     </div>
     <!-- /.row -->
+
+    <!-- /.workflow header -->
+    <workflow-header [workflow]="workflow"></workflow-header>
+    <!-- /.workflow header -->
+
   </div>
   <!-- /.container-fluid -->
 </div>
 <!-- /.content-header -->
 
-<section *ngIf="workflow && suites" class="content mx-lg-4 mt-md-3 p-2">
-  <div class="row p-0" style="font-weight: 300; height: 100%">
-    <div
-      class="col-md-1 col-sm-1 align-middle"
-      style="max-width: 50px; font-size: 2.4rem; margin-top: 3px; color: {{
-        workflow.color
-      }}"
-    >
-      <i class="{{ workflow.statusIcon }}"></i>
-    </div>
-    <div
-      class="col-md-10 col-sm-10"
-      style="font-size: 2.5rem; color: {{ workflow.color }};"
-    >
-      {{ workflow.name }}
-    </div>
-
-    <div
-      class="col-md-1 col-sm-1 float-right"
-      style="font-size: 1rem; font-weight: 300; width: 100%"
-    >
-      <rocrate-logo [workflow]="workflow"></rocrate-logo>
-    </div>
-  </div>
-  <div class="row" style="color: gray; font-size: 1.2rem; font-weight: 300">
-    <div class="col-1 p-0 m-0" style="max-width: 50px">
-      <img class="mx-3" src="{{ workflow.typeIcon }}" height="25" />
-    </div>
-    <div class="col-11 ml-1">
-      <b>uuid: </b>{{ workflow.uuid }}
-      <div
-        *ngIf="workflow.registry"
-        class="d-inline text-sm"
-        style="position: relative; top: 0; left: 5px"
-      >
-        <a href="{{ workflow.externalLink }}" target="_blank"
-          >[details <i class="fas fa-external-link-alt"></i>]</a
-        >
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="workflow.registry" class="row" style="font-weight: 300">
-    <div class="col-1 p-0 m-0" style="max-width: 50px"></div>
-    <div
-      class="col-11 ml-1"
-      style="color: gray; font-size: 1.2rem; font-weight: 300"
-    >
-      <b>registry: </b>
-      <a href="{{ workflow.registry['uri'] }}">{{
-        workflow.registry['uri']
-      }}</a>
-      ({{ workflow.registry['name'] }})
-    </div>
-  </div>
-
+<section *ngIf="workflow && suites" class="content mx-lg-4 p-2">
   <!-- <div class="container-fluid"> -->
   <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">
     <h3 style="color: var(--primary)">Suites</h3>
@@ -90,17 +38,13 @@
     <div class="row">
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-primary"
-          (click)="filterByStatus('all_passing')"
-        >
+        <div class="small-box bg-primary" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
+          data-placement="bottom" data-html="true"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> suites</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'all_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
               {{ workflow.suites ? workflow.suites.all_passing.length : 0 }}
@@ -110,26 +54,22 @@
           <div class="icon">
             <i class="fa fa-thumbs-up"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-warning"
-          (click)="filterByStatus('some_passing')"
-        >
+        <div class="small-box bg-warning" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
+          data-placement="bottom" data-html="true"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter partially <b>passing</b> suites</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'some_passing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
               {{ workflow.suites ? workflow.suites.some_passing.length : 0 }}
@@ -140,26 +80,22 @@
           <div class="icon">
             <i class="fas fa-radiation"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div
-          class="small-box bg-danger"
-          (click)="filterByStatus('all_failing')"
-        >
+        <div class="small-box bg-danger" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
+          data-placement="bottom" data-html="true"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> suites</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'all_failing'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
               {{ workflow.suites ? workflow.suites.all_failing.length : 0 }}
@@ -169,24 +105,23 @@
           <div class="icon">
             <i class="fa fa-thumbs-down"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
 
       <div class="col-lg-3 col-6">
         <!-- small box -->
-        <div class="small-box bg-gray" (click)="filterByStatus('unknown')">
+        <div class="small-box bg-gray" (click)="filterByStatus('unknown')" data-html="true" data-toggle="tooltip"
+          data-placement="bottom"
+          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter suites in <b>unknown</b> state</span>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div
-            *ngIf="suites && statusFilter && statusFilter != 'unknown'"
-            class="overlay dark"
-          ></div>
+          <div *ngIf="suites && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflow.suites ? workflow.suites.unknown.length : 0 }}</h3>
             <p>Unavailable</p>
@@ -194,10 +129,10 @@
           <div class="icon">
             <i class="fa fa-question-circle"></i>
           </div>
-          <a href="#" class="small-box-footer" style="height: 22px">
+          <div class="small-box-footer" style="height: 22px">
             <div style="display: inline-block; padding: 0"></div>
             <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </a>
+          </div>
         </div>
       </div>
       <!-- ./col -->
@@ -206,16 +141,11 @@
   </div>
 
   <!-- Search Bar -->
-  <item-search-bar
-    [(filterValue)]="suiteNameFilter"
-    [(sortingOrder)]="suiteSortingOrder"
-  ></item-search-bar>
+  <item-search-bar [(filterValue)]="suiteNameFilter" [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
 
-  <test-suites
-    [suites]="
+  <test-suites [suites]="
       suites
         | itemFilterPipe: suiteNameFilter
         | sortingFilter: suiteSortingOrder
-    "
-  ></test-suites>
+    "></test-suites>
 </section>

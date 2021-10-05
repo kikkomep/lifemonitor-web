@@ -32,16 +32,21 @@ export class Model {
     this.update(rawData);
   }
 
-  public update(rawData: Object){
+  public update(rawData: Object) {
     if (rawData) {
       Object.assign(this, rawData);
       this._rawData = rawData;
+      this.notifyChanges();
     }
   }
 
   // Allow class clients to subscribe in order to be notified when a changes occurs
   public asObservable(): Observable<Property | Model> {
     return this._asObservable;
+  }
+
+  public asUrlParam() {
+    return btoa(JSON.stringify({}));
   }
 
   // Allow subclasses to notify changes

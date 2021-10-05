@@ -1,22 +1,20 @@
-import { Params } from '@angular/router';
-import { AppConfigService } from './config.service';
+import {
+  HttpClient, HttpHeaders
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, Subject, throwError, forkJoin, from } from 'rxjs';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
-import { HttpHeaders } from '@angular/common/http';
-import { Workflow } from 'src/app/models/workflow.model';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import { Suite } from 'src/app/models/suite.models';
+import { forkJoin, from, Observable, of } from 'rxjs';
+import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status,
-  StatusStatsItem,
+  Status
 } from 'src/app/models/stats.model';
-import { TestInstance } from 'src/app/models/testInstance.models';
+import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
+import { Workflow } from 'src/app/models/workflow.model';
+import { AppConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,12 +31,13 @@ export class ApiService {
     });
   }
 
-  private get_http_options(params = {}) {
+  private get_http_options(params = {}, skip: boolean = false) {
     let token = JSON.parse(localStorage.getItem('token'));
     return {
       headers: new HttpHeaders({
         // 'Content-Type':  'application/json',
         Authorization: 'Bearer ' + token['token']['value'],
+        skip: String(skip),
       }),
       params: params,
     };
@@ -155,8 +154,7 @@ export class ApiService {
           suite.instances = new InstanceStats();
 
           let instanceBuildsQueries = [];
-          for (let isd of suiteData['instances']) {
-            const instanceData = suiteData['instances'][isd];
+          for (let instanceData of suiteData['instances']) {
             instanceBuildsQueries.push(
               this.http
                 .get(
@@ -278,18 +276,23 @@ export class ApiService {
       );
   }
 
-  getSuite(uuid: string): Observable<any> {
+  getSuite(uuid: string): Observable<Suite> {
     return this.http
-      .get(
-        this.apiBaseUrl + '/suites/' + uuid + '/status',
-        this.get_http_options()
-      )
+      .get(this.apiBaseUrl + '/suites/' + uuid, this.get_http_options())
       .pipe(
-        map((data) => {
-          let result = {};
+        mergeMap((data) => {
+          //let s = new Suite({} as Workflow, data);
+          console.log('Suite data:', data);
+          //return of(new Suite({} as Workflow, data));
+          return this.loadSuite(data).pipe(
+            map((suite: Suite) => {
+              return suite;
+            })
+          );
+          //return s;
         }),
         tap((result) => {
-          console.debug('Loaded suites', result);
+          console.debug('Loaded suite', result);
         })
       );
   }
@@ -343,6 +346,21 @@ export class ApiService {
         }),
         tap((result) => {
           console.debug('Loaded logs of test instance build', buildID, result);
+        })
+      );
+  }
+
+  public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
+    return this.http
+      .head(workflow.downloadLink, this.get_http_options({}, true))
+      .pipe(
+        map((result) => {
+          console.log('Result: ', result);
+          return true;
+        }),
+        catchError((err) => {
+          console.log('Error', err);
+          return of(false);
         })
       );
   }

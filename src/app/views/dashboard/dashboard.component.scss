@@ -1,4 +1,12 @@
 .input-group-prepend > .input-group-text {
-    background-color: transparent;
-    border: none;
+  background-color: transparent;
+  border: none;
+}
+
+.cut-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 200px;
+  height: 1.2em;
+  white-space: nowrap;
 }

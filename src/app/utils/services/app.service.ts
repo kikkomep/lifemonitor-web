@@ -1,17 +1,15 @@
-import {
-  AggregatedTestStatus,
-  AggregatedStatusStats,
-  AggregatedStatusStatsItem,
-} from 'src/app/models/stats.model';
-import { from, Observable, of, Subject, Subscription } from 'rxjs';
-
-import { ApiService } from './api.service';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Workflow } from 'src/app/models/workflow.model';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import {
+  AggregatedStatusStats
+} from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
-import { map, mergeMap } from 'rxjs/operators';
+import { Workflow } from 'src/app/models/workflow.model';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -50,7 +48,7 @@ export class AppService {
   private TEST_INSTANCE_UUID = 'test_instance_uuid';
   private TEST_BUILD_ID = 'test_build_id';
 
-  constructor(private api: ApiService) {
+  constructor(private api: ApiService, private http: HttpClient) {
     console.log('AppService created!');
 
     // subscribe for the current selected workflow
@@ -59,9 +57,6 @@ export class AppService {
         this._workflow = w;
       })
     );
-
-    // preload workflows
-    this.loadWorkflows();
   }
 
   public get workflows(): Workflow[] {
@@ -108,13 +103,19 @@ export class AppService {
     return this._observableTestBuild;
   }
 
-  loadWorkflows(useCache = false) {
+  public decodeUrl(url: string) {
+    let data = JSON.parse(atob(url));
+    return data;
+  }
+
+  loadWorkflows(useCache = false): Observable<Workflow> {
     if (this.loadingWorkflows) return;
-    if (useCache) {
+    if (useCache && this._workflowsStats) {
       console.log('Using cache', this._workflowsStats);
       this.subjectWorkflows.next(this._workflowsStats);
       return;
     }
+    let workflow: Subject<Workflow> = new Subject<Workflow>();
     this.loadingWorkflows = true;
     this.api.get_workflows().subscribe(
       (data) => {
@@ -122,43 +123,26 @@ export class AppService {
 
         // Workflow items
         let items = data['items'];
-
         let stats = new AggregatedStatusStats();
-
-        // patch data
-        // let items_copy = [...items];
-        // items = [];
-        // for (let k of AggregatedTestStatus) {
-        //   let t = JSON.parse(JSON.stringify(items_copy[0]));
-        //   //t.uuid = t.uuid + items.length;
-        //   t.name = t.name + ' (' + k + ')';
-        //   t.status.aggregate_test_status = k;
-        //   items.push(new Workflow(t));
-        // }
-
         items = items.map((i: object) => new Workflow(i));
         stats.update(items);
 
         this._workflows = items;
         this._workflowsStats = stats;
-        this.subjectWorkflows.next(stats);
-
         this.loadingWorkflows = false;
 
-        let wf_uuid = sessionStorage.getItem('workflow_uuid');
         for (let w of this._workflows) {
           console.log('Loading data of workflow ', w);
-          this.loadWorkflow(w).subscribe((w: Workflow) => {
-            if (wf_uuid === w.uuid) {
-              this.selectWorkflow(wf_uuid);
-            }
-          });
+          this.loadWorkflow(w).subscribe((wf: Workflow) => {});
         }
+        this.subjectWorkflows.next(stats);
       },
       (error) => {
         console.error(error);
       }
     );
+
+    return workflow.asObservable();
   }
 
   loadWorkflow(w: Workflow): Observable<Workflow> {
@@ -166,123 +150,65 @@ export class AppService {
       map((wdata: Workflow) => {
         console.log('Loaded data:', w);
         w.update(wdata);
+        w.suites = wdata.suites;
         console.log('Workflow data updated!');
         return w;
       })
     );
   }
 
-  loadLatestTestInstanceBuilds(instance: Object) {}
-
-  public selectWorkflow(uuid: string): Observable<Workflow> {
+  public selectWorkflow(uuid: string) {
     let w: Workflow;
     console.log('Workflows', this._workflows, this._workflowsStats);
-    if (this._workflows) {
-      w = this._workflows.find((w: Workflow) => w.uuid == uuid);
-      if (w && w.suites) {
-        sessionStorage.setItem(this.WORKFLOW_UUID, w.uuid);
-        this.subjectWorkflow.next(w);
-        return of(w);
-      }
-    }
-
-    if (!this.workflows || !this.workflow || this.workflow.uuid != uuid) {
-      console.log('');
-
-      return this.api.get_workflow(uuid, true, true, true).pipe(
-        map((w: Workflow) => {
-          sessionStorage.setItem(this.WORKFLOW_UUID, w.uuid);
-          this.subjectWorkflow.next(w);
-          return w;
-        })
-      );
-    }
-  }
-
-  public selectTestSuite(uuid: string): Observable<Suite> {
-    if (!this._workflow) {
-      let wf_uuid = sessionStorage.getItem(this.WORKFLOW_UUID);
-      if (wf_uuid) {
-        return this.selectWorkflow(wf_uuid).pipe(
-          mergeMap((w) => {
-            console.log('Workflow loaded');
-            return this._selectTestSuite(uuid);
-          })
-        );
-      }
+    if (this._workflow && this._workflow.uuid === uuid) {
+      this._selectWorkflow(this._workflow);
+    } else if (!this._workflows) {
+      this.api.get_workflow(uuid, true, true, true).subscribe((w: Workflow) => {
+        this._selectWorkflow(w);
+      });
     } else {
-      return this._selectTestSuite(uuid);
+      w = this._workflows.find((w: Workflow) => w.uuid === uuid);
+      if (!w || !w.suites) {
+        this.api
+          .get_workflow(uuid, true, true, true)
+          .subscribe((w: Workflow) => {
+            this._selectWorkflow(w);
+          });
+      } else {
+        this._selectWorkflow(w);
+      }
     }
   }
 
-  private _selectTestSuite(uuid: string): Observable<Suite> {
-    let suite: Suite = this._workflow.suites.all.find(
-      (s: Suite) => s.uuid === uuid
-    ) as Suite;
-    sessionStorage.setItem('suite_uuid', suite.uuid);
+  private _selectWorkflow(w: Workflow) {
+    console.log('Selected workflow', w);
+    this._workflow = w;
+    this.subjectWorkflow.next(w);
+  }
+
+  public selectTestSuite(uuid: string) {
+    if (this._suite && this._suite.uuid === uuid) {
+      this._selectTestSuite(this._suite);
+    } else if (!this._workflow) {
+      this.api.getSuite(uuid).subscribe((suite: Suite) => {
+        this._selectTestSuite(suite);
+      });
+    } else {
+      let suite: Suite = this._workflow.suites.all.find(
+        (s: Suite) => s.uuid === uuid
+      ) as Suite;
+      this._selectTestSuite(suite);
+    }
+  }
+
+  private _selectTestSuite(suite: Suite) {
     console.log('Selected suite', suite);
-    sessionStorage.setItem(this.SUITE_UUID, uuid);
     this._suite = suite;
     this.subjectTestSuite.next(suite);
-    return of(suite);
   }
 
-  public selectTestInstance(uuid: string): Observable<TestInstance> {
-    if (!this._suite) {
-      let suite_uuid = sessionStorage.getItem(this.SUITE_UUID);
-      if (suite_uuid) {
-        return this.selectTestSuite(suite_uuid).pipe(
-          mergeMap((s: Suite) => {
-            console.log('TestInstance loaded', s);
-            return this._selectTestInstance(uuid);
-          })
-        );
-      }
-    } else {
-      return this._selectTestInstance(uuid);
-    }
-  }
-
-  private _selectTestInstance(uuid: string): Observable<TestInstance> {
-    let instance: TestInstance = this._suite.instances.all.find(
-      (i: TestInstance) => i.uuid === uuid
-    ) as TestInstance;
-    console.log('Selected test instance', instance);
-    sessionStorage.setItem(this.TEST_INSTANCE_UUID, uuid);
-    this._testInstance = instance;
-    this.subjectTestInstance.next(instance);
-    return of(instance);
-  }
-
-  public selectTestBuild(buildId: string): Observable<TestBuild> {
-    if (!this._testInstance) {
-      let instance_uuid = sessionStorage.getItem(this.TEST_INSTANCE_UUID);
-      if (instance_uuid) {
-        return this.selectTestInstance(instance_uuid).pipe(
-          mergeMap((i: TestInstance) => {
-            console.log('TestInstance loaded', i);
-            return this._selectTestBuild(buildId);
-          })
-        );
-      }
-    } else {
-      return this._selectTestBuild(buildId);
-    }
-  }
-
-  private _selectTestBuild(buildId: string): Observable<TestBuild> {
-    let build: TestBuild = this._testInstance.latestBuilds.find(
-      (b: TestBuild) => b.build_id === buildId
-    ) as TestBuild;
-    console.log('Selected test instance', build);
-    sessionStorage.setItem(this.TEST_BUILD_ID, buildId);
-    this._testBuild = build;
-    this.subjectTestBuild.next(build);
-    return of(build);
-  }
-
-  public getTestBuildLogs(build: TestBuild): Observable<string> {
-    return this.api.getBuildLogs(build.instance.uuid, build.build_id);
+  public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
+    return this.api.checkROCrateAvailability(workflow);
   }
 
   public downloadROCrate(workflow: Workflow) {

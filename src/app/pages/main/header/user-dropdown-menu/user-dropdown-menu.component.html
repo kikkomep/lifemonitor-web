@@ -1,5 +1,5 @@
 <li *ngIf="user && user.picture" class="nav-item dropdown user-menu">
-  <a class="nav-link dropdown-toggle" data-toggle="dropdown" (click)="toggleDropdownMenu()">
+  <a class="nav-link dropdown-toggle" data-html="true" data-toggle="dropdown" (click)="toggleDropdownMenu()">
     <img [src]="user.picture" class="user-image img-circle" alt="User Image" style="height: 2.2rem; width: 2.2rem;" />
     <span class="p-2">
       <i class="fas fa-caret-down"></i>
@@ -31,7 +31,7 @@
     </li> -->
     <!-- Menu Footer-->
     <li class="user-footer">
-      <a href="{{profileUrl}}" class="btn btn-default btn-flat">
+      <a class="btn btn-default btn-flat" (click)="openProfile()">
         Profile
       </a>
       <a (click)="logout()" class="btn btn-default btn-flat float-right">Sign out</a>

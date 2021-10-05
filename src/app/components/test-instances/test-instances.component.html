@@ -1,5 +1,5 @@
 <div class="row" style="color: var(--primary)">
-  <a [routerLink]="['/workflow', { uuid: workflow.uuid }]">
+  <a [routerLink]="['/workflow', { uuid: workflow.asUrlParam() }]">
     <i class="fas fa-caret-left" style="margin: 0px 2px 0 15px"></i> workflow
   </a>
 </div>
@@ -23,56 +23,49 @@
           </tr>
         </thead>
         <tbody *ngIf="testInstances">
-          <tr
-            *ngFor="
+          <tr *ngFor="
               let testInstance of testInstances;
               index as i;
               first as isFirst
-            "
-          >
+            ">
             <td [ngClass]="testInstance.class">
               <i class="{{ testInstance.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg">
+              <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> see on <b>{{testInstance.service.type}}</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                 <!-- <a [routerLink]="['/suite', { uuid: testInstance.uuid }]" style="color: black; font-size: larger;">{{
                   testInstance.roc_instance
                   }}</a> -->
-                <a
-                  href="{{ testInstance.externalLink }}"
-                  target="_blank"
-                  style="color: black; font-size: larger"
-                  (click)="selectTestInstance($event, testInstance)"
-                >
-                  {{ testInstance.roc_instance }}
+                <a href="{{ testInstance.externalLink }}" target="_blank" style="color: black; font-size: larger"
+                  (click)="selectTestInstance($event, testInstance)">
+                  <div>{{ testInstance.roc_instance }}</div>
+                  <div class="text-sm">
+                    <b>uuid:</b> {{ testInstance.uuid }}
+                  </div>
+                  <div class="text-sm cut-text"><b>url:</b> {{ testInstance.externalLink }}</div>
                 </a>
               </div>
-              <div class="text-sm"><b>uuid:</b> {{ testInstance.uuid }}</div>
             </td>
-            <td class="text-center">
-              <br />
-              <div style="height: 100%; margin: auto">
-                <img
-                  *ngIf="testInstance.suite && testInstance.suite.engineIcon"
-                  src="{{ testInstance.suite.engineIcon }}"
-                  width="100"
-                />
-                <i
-                  *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
-                  class="far fa-question-circle fa-2x"
-                ></i>
+            <td class="text-center align-middle font-weight-light h-100">
+              <div class="text-center" data-html="true" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.suite.engineType}}</b> engine</span>">
+                <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
+                  src="{{ testInstance.suite.engineIcon }}" width="100" />
+                <i *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
+                  class="far fa-question-circle fa-2x"></i>
               </div>
             </td>
-            <td class="text-center align-middle font-weight-light">
-              <a href="{{ testInstance.service.url }}">
-                <img src="{{ testInstance.platformIcon }}" height="60px" />
-              </a>
+            <td class="text-center align-middle font-weight-light h-100">
+              <div class="text-center" data-html="true" data-toggle="tooltip" data-placement="top"
+                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.service.type}}</b> service</span>">
+                <a href="{{ testInstance.service.url }}">
+                  <img src="{{ testInstance.platformIcon }}" height="60px" />
+                </a>
+              </div>
             </td>
             <td class="text-center align-middle font-weight-light" width="50">
-              <stats-bar-chart
-                [stats]="testInstance.getLatestBuilds()"
-                (selectedItem)="selectTestBuild($event)"
-              >
+              <stats-bar-chart [stats]="testInstance.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
               </stats-bar-chart>
             </td>
           </tr>

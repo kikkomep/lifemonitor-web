@@ -3,7 +3,7 @@
 <div *ngIf="suite">
   <div class="content-header">
     <div class="container-fluid">
-      <div class="row mb-2">
+      <div class="row">
         <div class="col-sm-6">
           <h1 class="m-0 text-dark"></h1>
         </div>
@@ -11,9 +11,7 @@
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right mr-lg-4 mr-md-2">
             <li class="breadcrumb-item">
-              <a [routerLink]="['/dashboard']"
-                ><i class="fas fa-home p-1"></i>Home</a
-              >
+              <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
             </li>
             <li class="breadcrumb-item active">
               <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid }]">
@@ -31,99 +29,29 @@
         <!-- /.col -->
       </div>
       <!-- /.row -->
+
+      <!-- /.workflow header -->
+      <workflow-header [workflow]="suite.workflow" [suite]="suite"></workflow-header>
+      <!-- /.workflow header -->
     </div>
     <!-- /.container-fluid -->
   </div>
   <!-- /.content-header -->
 
-  <section *ngIf="suite.workflow" class="content mx-lg-4 mt-md-3 p-2">
-    <div
-      class="row p-0"
-      style="color: var(--primary); font-weight: 300; height: 100%"
-    >
-      <div
-        class="col-md-1 col-sm-1 align-middle"
-        style="max-width: 50px; font-size: 2.4rem; margin-top: 3px; color: {{
-          suite.color
-        }}"
-      >
-        <i class="{{ suite.workflow.statusIcon }}"></i>
-      </div>
-      <div class="col-md-9 col-sm-9" style="font-size: 2.5rem">
-        {{ suite.workflow.name }}:
-        <span class="font-weight-bold">{{ suite.name }}</span>
-      </div>
-      <div
-        class="col-md-2 col-sm-2 float-right"
-        style="font-size: 1rem; font-weight: 300; width: 100%"
-      >
-        <rocrate-logo [workflow]="suite.workflow"></rocrate-logo>
-      </div>
-    </div>
-    <div class="row" style="color: gray; font-size: 1.2rem; font-weight: 300">
-      <div class="col-1 p-0 m-0 align-middle" style="max-width: 50px">
-        <img class="mx-3" src="{{ suite.workflow.typeIcon }}" height="25" />
-      </div>
-      <div class="col-md-9 col-sm-9">
-        <b>uuid: </b>{{ suite.uuid }}
-        <div
-          *ngIf="suite.workflow.registry"
-          class="d-inline text-sm"
-          style="position: relative; top: 0; left: 5px"
-        >
-          <a href="{{ suite.workflow.externalLink }}" target="_blank"
-            >[details <i class="fas fa-external-link-alt"></i>]</a
-          >
-        </div>
-      </div>
-
-      <div
-        class="col-md-2 col-sm-2 float-right"
-        style="
-          font-size: 1rem;
-          font-weight: 300;
-          width: 100%;
-          color: var(--primary);
-        "
-      >
-        <!-- <div class="d-line ro-crate-download-link" style="margin-left: 50px">
-          <!-- <a href="{{ suite.workflow.downloadLink }}" target="_blank" > -->
-        <!-- <a [routerLink]="" (click)="downloadROCrate()">
-            download
-            <i class="fas fa-cloud-download-alt"></i>
-          </a>
-        </div> -->
-      </div>
-    </div>
-
-    <!-- <div
-      *ngIf="suite"
-      class="row"
-      style="color: var(--primary); font-weight: 300"
-    >
-      <div class="col-1 p-0 m-0" style="max-width: 50px"></div>
-      <div class="col-6 ml-1">
-        <b>name: </b>
-          {{ suite.name }}
-      </div>
-    </div> -->
-
+  <section *ngIf="suite.workflow" class="content mx-lg-4 p-2">
     <div *ngIf="suite.workflow && suite.workflow.suites" class="mt-5">
       <h3 style="color: var(--primary)">Test instances</h3>
       <!-- Small boxes (Stat box) -->
       <div class="row">
         <div class="col-lg-2 col-6">
           <!-- small box -->
-          <div class="small-box bg-primary" (click)="filterByStatus('passed')">
+          <div class="small-box bg-primary" (click)="filterByStatus('passed')" data-toggle="tooltip"
+            data-placement="bottom" data-html="true"
+            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>passing</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
-                suite.instances && statusFilter && statusFilter != 'passed'
-              "
-              class="overlay dark"
-            ></div>
+            <div *ngIf="suite.instances && statusFilter && statusFilter != 'passed'" class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.passed.length : 0 }}
@@ -133,23 +61,22 @@
             <div class="icon">
               <i class="fa fa-thumbs-up"></i>
             </div>
-            <a href="#" class="small-box-footer" style="height: 22px">
+            <div class="small-box-footer" style="height: 22px">
               <div style="display: inline-block; padding: 0"></div>
               <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-            </a>
+            </div>
           </div>
         </div>
         <!-- ./col -->
         <div class="col-lg-2 col-6">
           <!-- small box -->
-          <div class="small-box bg-warning" (click)="filterByStatus('error')">
+          <div class="small-box bg-warning" (click)="filterByStatus('error')" data-toggle="tooltip"
+            data-placement="bottom" data-html="true"
+            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>error</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="suite.instances && statusFilter && statusFilter != 'error'"
-              class="overlay dark"
-            ></div>
+            <div *ngIf="suite.instances && statusFilter && statusFilter != 'error'" class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.error.length : 0 }}
@@ -159,25 +86,24 @@
             <div class="icon">
               <i class="fas fa-bug"></i>
             </div>
-            <a href="#" class="small-box-footer" style="height: 22px">
+            <div class="small-box-footer" style="height: 22px">
               <div style="display: inline-block; padding: 0"></div>
               <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-            </a>
+            </div>
           </div>
         </div>
         <!-- ./col -->
         <div class="col-lg-2 col-6">
           <!-- small box -->
-          <div class="small-box bg-danger" (click)="filterByStatus('failed')">
+          <div class="small-box bg-danger" (click)="filterByStatus('failed')" data-toggle="tooltip"
+            data-placement="bottom" data-html="true"
+            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>failed</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'failed'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.failed.length : 0 }}
@@ -187,26 +113,25 @@
             <div class="icon">
               <i class="fa fa-thumbs-down"></i>
             </div>
-            <a href="#" class="small-box-footer" style="height: 22px">
+            <div class="small-box-footer" style="height: 22px">
               <div style="display: inline-block; padding: 0"></div>
               <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-            </a>
+            </div>
           </div>
         </div>
         <!-- ./col -->
 
         <div class="col-lg-2 col-6">
           <!-- small box -->
-          <div class="small-box bg-orange" (click)="filterByStatus('waiting')">
+          <div class="small-box bg-orange" (click)="filterByStatus('waiting')" data-toggle="tooltip"
+            data-placement="bottom" data-html="true"
+            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>waiting</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'waiting'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.waiting.length : 0 }}
@@ -217,26 +142,25 @@
             <div class="icon">
               <i class="fas fa-pause"></i>
             </div>
-            <a href="#" class="small-box-footer" style="height: 22px">
+            <div class="small-box-footer" style="height: 22px">
               <div style="display: inline-block; padding: 0"></div>
               <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-            </a>
+            </div>
           </div>
         </div>
         <!-- ./col -->
 
         <div class="col-lg-2 col-6">
           <!-- small box -->
-          <div class="small-box bg-cyan" (click)="filterByStatus('running')">
+          <div class="small-box bg-cyan" (click)="filterByStatus('running')" data-toggle="tooltip"
+            data-placement="bottom" data-html="true"
+            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>running</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'running'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.running.length : 0 }}
@@ -247,26 +171,25 @@
             <div class="icon">
               <i class="fas fa-sync"></i>
             </div>
-            <a href="#" class="small-box-footer" style="height: 22px">
+            <div class="small-box-footer" style="height: 22px">
               <div style="display: inline-block; padding: 0"></div>
               <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-            </a>
+            </div>
           </div>
         </div>
         <!-- ./col -->
 
         <div class="col-lg-2 col-6">
           <!-- small box -->
-          <div class="small-box bg-gray" (click)="filterByStatus('aborted')">
+          <div class="small-box bg-gray" (click)="filterByStatus('aborted')" data-toggle="tooltip"
+            data-placement="bottom" data-html="true"
+            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>aborted</b> status</span>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
-            <div
-              *ngIf="
+            <div *ngIf="
                 suite.instances && statusFilter && statusFilter != 'aborted'
-              "
-              class="overlay dark"
-            ></div>
+              " class="overlay dark"></div>
             <div class="inner">
               <h3>
                 {{ suite.instances ? suite.instances.aborted.length : 0 }}
@@ -277,10 +200,10 @@
             <div class="icon">
               <i class="fas fa-ban"></i>
             </div>
-            <a href="#" class="small-box-footer" style="height: 22px">
+            <div class="small-box-footer" style="height: 22px">
               <div style="display: inline-block; padding: 0"></div>
               <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-            </a>
+            </div>
           </div>
         </div>
         <!-- ./col -->
@@ -289,18 +212,12 @@
     </div>
 
     <!-- Search Bar -->
-    <item-search-bar
-      [(filterValue)]="instanceNameFilter"
-      [(sortingOrder)]="instanceSortingOrder"
-    ></item-search-bar>
+    <item-search-bar [(filterValue)]="instanceNameFilter" [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
 
-    <test-instances
-      [workflow]="suite.workflow"
-      [testInstances]="
+    <test-instances [workflow]="suite.workflow" [testInstances]="
         instances
           | itemFilterPipe: instanceNameFilter
           | sortingFilter: instanceSortingOrder
-      "
-    ></test-instances>
+      "></test-instances>
   </section>
 </div>

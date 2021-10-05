@@ -1,9 +1,8 @@
 import {
-  AggregatedStatusStats,
   AggregatedStatusStatsItem,
   InstanceStats,
   Status,
-  StatusStatsItem,
+  StatusStatsItem
 } from './stats.model';
 import { Workflow } from './workflow.model';
 
@@ -18,6 +17,15 @@ export class Suite extends AggregatedStatusStatsItem {
   constructor(public workflow: Workflow, rawData: object) {
     super(rawData);
     this.name = this.roc_suite.replace('#', '');
+  }
+
+  public asUrlParam() {
+    return btoa(
+      JSON.stringify({
+        workflow: this.workflow.uuid,
+        suite: this.uuid,
+      })
+    );
   }
 
   public get latestTestInstanceBuilds(): InstanceStats {
@@ -39,6 +47,10 @@ export class Suite extends AggregatedStatusStatsItem {
       );
     }
     return this._latest;
+  }
+
+  public get engineType(): string {
+    return this.definition.test_engine.type;
   }
 
   public get engineIcon(): string {
