@@ -1,6 +1,6 @@
 <div
   *ngIf="!stats"
-  style="display: flex; align-items: center; width: 100px;"
+  style="display: flex; align-items: center; width: 150px;"
 >
   <div class="text-center w-100">
     <i class="fas fa-2x fa-sync-alt text-muted"></i>
@@ -8,7 +8,7 @@
 </div>
 <div *ngIf="stats" class="wrapper text-sm text-center">
   <canvas
-    baseChart height="125" width="125"
+    baseChart height="80" width="120"
     [datasets]="pieChartData"
     [labels]="pieChartLabels"
     [chartType]="pieChartType"
