@@ -20,6 +20,10 @@ export class HeaderComponent implements OnInit {
     });
   }
 
+  public get isUserLogged(): boolean {
+    return this.appService.isUserLogged();
+  }
+
   logout() {
     this.appService.logout();
   }

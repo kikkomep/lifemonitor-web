@@ -55,11 +55,15 @@
       </div>
     </div>
   </form> -->
-  <button class="navbar-toggler navbar-toggler-right" type="button" data-html="true" data-toggle="collapse"
-    data-target=".navbar-collapse">
+  <a *ngIf="!isUserLogged" [routerLink]="['/login']" class="btn btn-primary btn-lg" role="button">
+    <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+  </a>
+
+  <button *ngIf="isUserLogged" class="navbar-toggler navbar-toggler-right" type="button" data-html="true"
+    data-toggle="collapse" data-target=".navbar-collapse">
     ☰
   </button>
-  <div class="navbar-collapse collapse">
+  <div *ngIf="isUserLogged" class="navbar-collapse collapse">
     <ul class="nav navbar-nav ml-auto float-right">
 
       <!-- <app-messages-dropdown-menu></app-messages-dropdown-menu> -->
