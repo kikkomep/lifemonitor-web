@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/utils/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -158,14 +159,14 @@ export class AppService {
     return data;
   }
 
-  loadWorkflows(useCache = false): Observable<Workflow> {
+  loadWorkflows(useCache = false): Observable<AggregatedStatusStats> {
     if (this.loadingWorkflows) return;
     if (useCache && this._workflowsStats) {
       console.log('Using cache', this._workflowsStats);
       this.subjectWorkflows.next(this._workflowsStats);
       return;
     }
-    let workflow: Subject<Workflow> = new Subject<Workflow>();
+
     this.loadingWorkflows = true;
     this.api.get_workflows().subscribe(
       (data) => {
@@ -192,7 +193,7 @@ export class AppService {
       }
     );
 
-    return workflow.asObservable();
+    return this.subjectWorkflows.asObservable();
   }
 
   loadWorkflow(w: Workflow): Observable<Workflow> {
