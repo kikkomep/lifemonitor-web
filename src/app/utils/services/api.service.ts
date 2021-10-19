@@ -1,13 +1,11 @@
-import {
-  HttpClient, HttpHeaders
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status
+  Status,
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';

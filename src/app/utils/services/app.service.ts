@@ -2,12 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import {
-  AggregatedStatusStats
-} from 'src/app/models/stats.model';
+import { AggregatedStatusStats } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
+import { User } from 'src/app/models/user.modes';
 import { Workflow } from 'src/app/models/workflow.model';
 import { ApiService } from './api.service';
 
@@ -22,6 +21,7 @@ export class AppService {
   private _suite: Suite;
   private _testInstance: TestInstance;
   private _testBuild: TestBuild;
+  private _currentUser: User;
 
   private loadingWorkflows = false;
 
@@ -57,6 +57,18 @@ export class AppService {
         this._workflow = w;
       })
     );
+
+    // subscribe to the current user
+    this.subscriptions.push(
+      this.api.get_current_user().subscribe((data) => {
+        console.log('Current user', data);
+        this._currentUser = data;
+      })
+    );
+  }
+
+  public get currentUser(): User {
+    return this._currentUser;
   }
 
   public get workflows(): Workflow[] {
@@ -182,6 +194,13 @@ export class AppService {
 
   public changeWorkflowVisibility(w: Workflow) {
     return this.api.changeWorkflowVisibility(w).subscribe((data) => {});
+  }
+
+  public isEditable(workflow: Workflow): boolean {
+    if (!this.currentUser || !workflow) {
+      return false;
+    }
+    return this.currentUser.id === workflow.submitter['id'] ? true : false;
   }
 
   private _selectWorkflow(w: Workflow) {
