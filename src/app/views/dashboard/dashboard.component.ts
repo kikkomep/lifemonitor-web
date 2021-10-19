@@ -3,9 +3,10 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {
   AggregatedStatusStats,
-  AggregatedStatusStatsItem
+  AggregatedStatusStatsItem,
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { Workflow } from 'src/app/models/workflow.model';
 import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
@@ -48,6 +49,14 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('Changes', changes);
+  }
+
+  public isEditable(w: Workflow) {
+    return this.appService.isEditable(w);
+  }
+
+  public changeVisibility(w: Workflow) {
+    this.appService.changeWorkflowVisibility(w);
   }
 
   public selectTestBuild(testBuild: TestBuild) {
