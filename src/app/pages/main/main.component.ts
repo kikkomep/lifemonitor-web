@@ -24,14 +24,7 @@ export class MainComponent implements OnInit {
     private renderer: Renderer2,
     private apiService: ApiService,
     private appService: AppService
-  ) {
-    this.userLoggedSubscription = this.apiService
-      .get_current_user()
-      .subscribe((data) => {
-        console.log('Current user', data);
-        this.user = data;
-      });
-  }
+  ) {}
 
   ngOnInit() {
     this.renderer.removeClass(document.querySelector('app-root'), 'login-page');
