@@ -1,3 +1,4 @@
+import { AppService } from 'src/app/utils/services/app.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -20,6 +21,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private toastr: ToastrService,
     private authService: AuthService,
+    private appService: AppService,
     private activatedRoute: ActivatedRoute
   ) {}
 
@@ -30,10 +32,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       console.log('Callback... ', callback, !callback, callback == 'undefined');
       if (typeof callback === 'undefined') {
         this.previousToast = this.toastr.info('Authorizing...');
-        this.authService.authorize();
+        this.appService.authorize();
       } else {
         this.previousToast = this.toastr.info('Logging in...');
-        this.authService.login();
+        this.appService.login();
       }
     });
 
