@@ -10,7 +10,6 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
 
-
 const routes: Routes = [
   {
     path: 'home',
@@ -19,13 +18,9 @@ const routes: Routes = [
   {
     path: '',
     component: MainComponent,
-    canActivate: [AuthGuard],
-    canActivateChild: [AuthGuard],
+    // canActivate: [AuthGuard],
+    // canActivateChild: [AuthGuard],
     children: [
-      // {
-      //   path: 'blank',
-      //   component: BlankComponent,
-      // },
       {
         path: 'dashboard',
         component: DashboardComponent,
