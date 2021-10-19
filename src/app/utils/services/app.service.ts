@@ -180,6 +180,10 @@ export class AppService {
     }
   }
 
+  public changeWorkflowVisibility(w: Workflow) {
+    return this.api.changeWorkflowVisibility(w).subscribe((data) => {});
+  }
+
   private _selectWorkflow(w: Workflow) {
     console.log('Selected workflow', w);
     this._workflow = w;

@@ -53,6 +53,26 @@ export class ApiService {
       );
   }
 
+  changeWorkflowVisibility(workflow: Workflow): Observable<any> {
+    let body = {
+      public: !workflow.public,
+    };
+    return this.http
+      .put(
+        this.apiBaseUrl + '/workflows/' + workflow.uuid,
+        body,
+        this.get_http_options()
+      )
+      .pipe(
+        map((data) => {
+          workflow.public = !workflow.public;
+          console.log('Changed workflow visibility: public=' + workflow.public);
+        }),
+        tap((data) => console.log('Workflow visibility changed to: ', data)),
+        catchError(this.handleError('Updating workflow', []))
+      );
+  }
+
   downloadROCrate(workflow: Workflow): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
     return this.http
