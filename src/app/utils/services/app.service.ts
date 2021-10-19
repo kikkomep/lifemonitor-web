@@ -192,8 +192,8 @@ export class AppService {
     }
   }
 
-  public changeWorkflowVisibility(w: Workflow) {
-    return this.api.changeWorkflowVisibility(w).subscribe((data) => {});
+  public changeWorkflowVisibility(w: Workflow): Observable<any> {
+    return this.api.changeWorkflowVisibility(w);
   }
 
   public isEditable(workflow: Workflow): boolean {

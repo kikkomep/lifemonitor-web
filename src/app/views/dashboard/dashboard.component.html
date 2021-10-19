@@ -198,8 +198,8 @@
                     <i class="fas fa-2x fa-sync-alt text-muted"></i>
                   </div>
                   <div *ngIf="w.public !== undefined" style="height: 100%; margin: auto" data-html="true"
-                    data-toggle="tooltip" data-placement="top"
-                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{ w.public ? 'public': 'private'}} workflow</span>">
+                    data-toggle="tooltip" data-placement="top" class="workflow-visibility-{{w.uuid}}"
+                    title="{{ getWorkflowVisibilityTitle(w) }}">
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>

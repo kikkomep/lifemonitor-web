@@ -55,8 +55,21 @@ export class DashboardComponent implements OnInit, OnChanges {
     return this.appService.isEditable(w);
   }
 
+  public getWorkflowVisibilityTitle(w: Workflow) {
+    return (
+      "<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>" +
+      (w.public ? 'public' : 'private') +
+      ' workflow</span>'
+    );
+  }
+
   public changeVisibility(w: Workflow) {
-    this.appService.changeWorkflowVisibility(w);
+    this.appService.changeWorkflowVisibility(w).subscribe(() => {
+      $('.workflow-visibility-' + w.uuid)
+        .tooltip('hide')
+        .attr('data-original-title', this.getWorkflowVisibilityTitle(w))
+        .tooltip('show');
+    });
   }
 
   public selectTestBuild(testBuild: TestBuild) {
