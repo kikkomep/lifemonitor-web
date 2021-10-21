@@ -197,6 +197,21 @@
                       }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
                     </a>
                   </div>
+                  <div *ngIf="isUserLogged() && w.subscriptions !== undefined">
+                    <a *ngIf="searchModeEnabled && !isEditable(w) && (!w.subscriptions || w.subscriptions.length == 0)"
+                      class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
+                      SUBSCRIBE
+                    </a>
+                    <div
+                      *ngIf="!editModeEnabled && searchModeEnabled && (isEditable(w) || w.subscriptions && w.subscriptions.length > 0)"
+                      class="badge badge-primary mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
+                      SUBSCRIBED
+                    </div>
+                    <a *ngIf="editModeEnabled && !isEditable(w) && w.subscriptions && w.subscriptions.length > 0"
+                      class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
+                      UNSUBSCRIBE
+                    </a>
+                  </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
                   <div *ngIf="w.public === undefined">

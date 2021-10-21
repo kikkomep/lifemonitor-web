@@ -101,6 +101,25 @@ export class DashboardComponent implements OnInit, OnChanges {
     return this.appService.isEditable(w);
   }
 
+  public subscribeWorkflow(w: Workflow) {
+    console.log('Subscribing to workflow: ', w);
+    this.appService.subscribeWorkflow(w).subscribe((w) => {
+      console.log('Workflow subscription created!');
+    });
+  }
+
+  public unsubscribeWorkflow(w: Workflow) {
+    console.log('Unsubscribing from workflow: ', w);
+    this.appService.unsubscribeWorkflow(w).subscribe((w) => {
+      console.log('Workflow subscription deleted!');
+      this.appService.loadWorkflows(
+        !this.isUserLogged(),
+        this.isUserLogged(),
+        this.isUserLogged()
+      );
+    });
+  }
+
   public getWorkflowVisibilityTitle(w: Workflow) {
     return (
       "<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>" +
