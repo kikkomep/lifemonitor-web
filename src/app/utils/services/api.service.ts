@@ -90,14 +90,65 @@ export class ApiService {
       );
   }
 
-  get_workflows(): Observable<object> {
-    console.log('Request login');
+  subscribeWorkflow(workflow: Workflow): Observable<Workflow> {
     return this.http
-      .get(this.apiBaseUrl + '/workflows', this.get_http_options())
+      .post(
+        this.apiBaseUrl + '/workflows/' + workflow.uuid + '/subscribe',
+        {},
+        this.get_http_options()
+      )
       .pipe(
-        tap((data) => console.log('Loaded workflows: ', data)),
-        catchError(this.handleError('get_workflows', []))
+        map((subscription) => {
+          console.log('Created new subscription', subscription);
+          if (subscription) {
+            workflow.subscriptions.push(subscription);
+          }
+          return workflow;
+        }),
+        tap((data) => console.log('Workflow visibility changed to: ', data))
       );
+  }
+
+  unsubscribeWorkflow(workflow: Workflow): Observable<Workflow> {
+    return this.http
+      .post(
+        this.apiBaseUrl + '/workflows/' + workflow.uuid + '/unsubscribe',
+        {},
+        this.get_http_options()
+      )
+      .pipe(
+        map(() => {
+          console.log('Subscription to workflow deleted');
+          for (let i = 0; i < workflow.subscriptions.length; i++) {
+            let s = workflow.subscriptions[i];
+            if (s['resource']['uuid'] === workflow.uuid) {
+              workflow.subscriptions.splice(i, 1);
+            }
+          }
+          return workflow;
+        }),
+        tap((data) => console.log('Workflow visibility changed to: ', data))
+      );
+  }
+
+  get_workflows(
+    filteredByUser: boolean = false,
+    includeSubScriptions: boolean = false
+  ): Observable<object> {
+    console.log(
+      'Loading workflows params',
+      filteredByUser,
+      includeSubScriptions
+    );
+    let url: string = !filteredByUser
+      ? this.apiBaseUrl + '/workflows'
+      : this.apiBaseUrl +
+        '/users/current/workflows?subscriptions=' +
+        includeSubScriptions.toString();
+    return this.http.get(url, this.get_http_options()).pipe(
+      tap((data) => console.log('Loaded workflows: ', data)),
+      catchError(this.handleError('get_workflows', []))
+    );
   }
 
   get_workflow(
