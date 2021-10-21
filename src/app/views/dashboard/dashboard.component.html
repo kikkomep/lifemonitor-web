@@ -1,4 +1,4 @@
-<app-loader [enabled]="isLoading|async"></app-loader>
+<app-loader [enabled]="!workflows || (isLoading|async)"></app-loader>
 
 <div *ngIf="workflows" class="content-header">
   <div class="container-fluid">
