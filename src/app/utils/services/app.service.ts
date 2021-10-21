@@ -278,7 +278,7 @@ export class AppService {
   }
 
   public isEditable(workflow: Workflow): boolean {
-    if (!this.currentUser || !workflow) {
+    if (!this.currentUser || !workflow || !workflow.submitter) {
       return false;
     }
     return this.currentUser.id === workflow.submitter['id'] ? true : false;
