@@ -27,6 +27,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   public statusFilter: string | null;
   public _workflowNameFilter: string = '';
   public workflowSortingOrder: string = 'desc';
+  public editModeEnabled: boolean = false;
 
   private statsFilter = new StatsFilterPipe();
 
@@ -86,6 +87,10 @@ export class DashboardComponent implements OnInit, OnChanges {
     return this.appService.isUserLogged();
   }
 
+  public editModeToggle() {
+    this.editModeEnabled = !this.editModeEnabled;
+    console.log('Edit mode enabled: ' + this.editModeEnabled);
+  }
 
   public get searchModeEnabled(): boolean {
     return this.workflowNameFilter && this.workflowNameFilter.length > 0;
