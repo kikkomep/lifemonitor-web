@@ -31,6 +31,7 @@ import { MenuSidebarComponent } from './pages/main/menu-sidebar/menu-sidebar.com
 import { RegisterComponent } from './pages/register/register.component';
 import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
+import { StatsFilterPipe } from './utils/filters/stats-filter.pipe';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
 import { AppConfigService } from './utils/services/config.service';
 import { BlankComponent } from './views/blank/blank.component';
@@ -69,6 +70,7 @@ export function initConfigService(appConfig: AppConfigService) {
     TestSuitesComponent,
     SuiteComponent,
     TestInstancesComponent,
+    StatsFilterPipe,
     ItemFilterPipe,
     SortingFilterPipe,
     SearchBarComponent,
