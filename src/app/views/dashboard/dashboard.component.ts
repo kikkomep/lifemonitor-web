@@ -25,14 +25,19 @@ export class DashboardComponent implements OnInit, OnChanges {
   private filteredWorkflows: AggregatedStatusStatsItem[] | null;
   //
   public statusFilter: string | null;
-  public workflowNameFilter: string = '';
+  public _workflowNameFilter: string = '';
   public workflowSortingOrder: string = 'desc';
+
+  private statsFilter = new StatsFilterPipe();
 
   constructor(private appService: AppService, private router: Router) {
     console.log('Dashboard Created!!');
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
-        this._workflowStats = data;
+        this._workflowStats = this.statsFilter.transform(
+          data,
+          this._workflowNameFilter
+        );
         this.filteredWorkflows = this._workflowStats.all;
         console.log('Stats', data);
       }
@@ -40,7 +45,12 @@ export class DashboardComponent implements OnInit, OnChanges {
     console.debug('Initializing workflow data!!');
     this._workflowStats = this.appService.workflowStats;
     if (this._workflowStats) this.filteredWorkflows = this._workflowStats.all;
-    else this.appService.loadWorkflows();
+    else
+      this.appService.loadWorkflows(
+        true,
+        this.isUserLogged(),
+        this.isUserLogged()
+      );
   }
 
   ngOnInit() {}
@@ -49,6 +59,28 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('Changes', changes);
+  }
+
+  public get workflowNameFilter(): string {
+    return this._workflowNameFilter;
+  }
+
+  public set workflowNameFilter(value: string) {
+    this._workflowNameFilter = value;
+    this.editModeEnabled = false;
+    if (value && value.length > 0)
+      this.appService.loadWorkflows(false, false, false);
+    else
+      this.appService.loadWorkflows(
+        false,
+        this.isUserLogged(),
+        this.isUserLogged()
+      );
+  }
+
+
+  public get searchModeEnabled(): boolean {
+    return this.workflowNameFilter && this.workflowNameFilter.length > 0;
   }
 
   public isEditable(w: Workflow) {
