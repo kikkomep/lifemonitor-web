@@ -38,7 +38,8 @@
           <div *ngIf="isLoading|async" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_passing'"
+            class="overlay dark"></div>
           <!-- end loading -->
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_passing.length : 0 }}</h3>
@@ -63,7 +64,8 @@
           <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'some_passing'"
+            class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.some_passing.length : 0 }}</h3>
             <p>Some passing</p>
@@ -87,7 +89,8 @@
           <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_failing'"
+            class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_failing.length : 0 }}</h3>
             <p>Failing</p>
@@ -112,7 +115,8 @@
           <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'unknown'"
+            class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.unknown.length : 0 }}</h3>
 
@@ -177,12 +181,12 @@
                     | sortingFilter: workflowSortingOrder;
                   index as i;
                   first as isFirst
-                ">
+                " style="height: 160px;">
                 <td [ngClass]="w.class">
                   <i class="{{ w.statusIcon }} fa-2x"></i>
                 </td>
-                <td class="align-middle">
-                  <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
+                <td class="align-top">
+                  <div class="font-weight-light text-lg mt-4" data-html="true" data-toggle="tooltip" data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                     <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]" style="color: black; font-size: larger">{{
                       w.name
@@ -197,29 +201,32 @@
                       }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
                     </a>
                   </div>
-                  <div *ngIf="isUserLogged() && w.subscriptions !== undefined">
-                    <a *ngIf="searchModeEnabled && !isEditable(w) && (!w.subscriptions || w.subscriptions.length == 0)"
-                      class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
-                      SUBSCRIBE
-                    </a>
-                    <div
-                      *ngIf="!editModeEnabled && searchModeEnabled && (isEditable(w) || w.subscriptions && w.subscriptions.length > 0)"
-                      class="badge badge-primary mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
-                      SUBSCRIBED
-                    </div>
-                    <a *ngIf="editModeEnabled && !isEditable(w) && w.subscriptions && w.subscriptions.length > 0"
-                      class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
-                      UNSUBSCRIBE
-                    </a>
+                  <div *ngIf="isUserLogged()">
+                    <span *ngIf="w.subscriptions !== undefined">
+                      <a *ngIf="searchModeEnabled && !isEditable(w) && (!w.subscriptions || w.subscriptions.length == 0)"
+                        class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
+                        SUBSCRIBE
+                      </a>
+                      <div
+                        *ngIf="!editModeEnabled && searchModeEnabled && (isEditable(w) || w.subscriptions && w.subscriptions.length > 0)"
+                        class="badge badge-primary mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
+                        SUBSCRIBED
+                      </div>
+                      <a *ngIf="editModeEnabled && !isEditable(w) && w.subscriptions && w.subscriptions.length > 0"
+                        class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
+                        UNSUBSCRIBE
+                      </a>
+                    </span>
+                    <span *ngIf="!editModeEnabled">&nbsp;</span>
                   </div>
+
                 </td>
                 <td class="text-center align-middle font-weight-light">
                   <div *ngIf="w.public === undefined">
                     <i class="fas fa-2x fa-sync-alt text-muted"></i>
                   </div>
-                  <div *ngIf="w.public !== undefined" style="height: 100%; margin: auto" data-html="true"
-                    data-toggle="tooltip" data-placement="top" class="workflow-visibility-{{w.uuid}}"
-                    title="{{ getWorkflowVisibilityTitle(w) }}">
+                  <div *ngIf="w.public !== undefined" data-html="true" data-toggle="tooltip" data-placement="top"
+                    class="mt-4 align-top workflow-visibility-{{w.uuid}}" title="{{ getWorkflowVisibilityTitle(w) }}">
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
@@ -227,6 +234,7 @@
                       (click)="changeVisibility(w)">
                       change
                     </div>
+                    <div *ngIf="!isEditable(w) || !editModeEnabled">&nbsp;</div>
                   </div>
                 </td>
 
