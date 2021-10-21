@@ -78,6 +78,14 @@ export class DashboardComponent implements OnInit, OnChanges {
       );
   }
 
+  public get isLoading(): Observable<boolean> {
+    return this.appService.isLoadingWorkflowsAsObservable;
+  }
+
+  public isUserLogged(): boolean {
+    return this.appService.isUserLogged();
+  }
+
 
   public get searchModeEnabled(): boolean {
     return this.workflowNameFilter && this.workflowNameFilter.length > 0;

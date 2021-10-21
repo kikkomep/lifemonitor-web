@@ -1,4 +1,4 @@
-<app-loader [enabled]="!workflows"></app-loader>
+<app-loader [enabled]="isLoading|async"></app-loader>
 
 <div *ngIf="workflows" class="content-header">
   <div class="container-fluid">
@@ -24,7 +24,7 @@
 
 <!-- Main content -->
 <section *ngIf="workflows" class="content mx-lg-4 mx-md-2 mt-md-3">
-  <h2 class="text-primary font-weight-light p-2">Workflows</h2>
+  <h2 class="text-primary font-weight-light p-2"><span *ngIf="isUserLogged()">My </span>Workflows</h2>
 
   <div class="container-fluid">
     <!-- Small boxes (Stat box) -->
@@ -35,10 +35,10 @@
           data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="isLoading|async" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
           <!-- end loading -->
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_passing.length : 0 }}</h3>
@@ -60,10 +60,10 @@
           data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows partially <b>passing</b></span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.some_passing.length : 0 }}</h3>
             <p>Some passing</p>
@@ -84,10 +84,10 @@
           data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_failing.length : 0 }}</h3>
             <p>Failing</p>
@@ -109,10 +109,10 @@
           data-toggle="tooltip" data-placement="bottom"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows in <b>unknown</b> state</span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.unknown.length : 0 }}</h3>
 
@@ -137,7 +137,7 @@
     <!-- Search Bar -->
     <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
-    <div class="card card-primary card-outline">
+    <div *ngIf="! (isLoading|async)" class="card card-primary card-outline">
       <!-- Loading (remove the following to stop the loading)-->
       <div *ngIf="!workflows" class="overlay dark">
         <i class="fas fa-3x fa-sync-alt"></i>
