@@ -159,7 +159,19 @@ export class AppService {
     return data;
   }
 
-  loadWorkflows(useCache = false): Observable<AggregatedStatusStats> {
+  public subscribeWorkflow(w: Workflow): Observable<Workflow> {
+    return this.api.subscribeWorkflow(w);
+  }
+
+  public unsubscribeWorkflow(w: Workflow): Observable<Workflow> {
+    return this.api.unsubscribeWorkflow(w);
+  }
+
+  loadWorkflows(
+    useCache = false,
+    filteredByUser: boolean = undefined,
+    includeSubScriptions: boolean = undefined
+  ): Observable<AggregatedStatusStats> {
     if (this.loadingWorkflows) return;
     if (useCache && this._workflowsStats) {
       console.log('Using cache', this._workflowsStats);
@@ -167,10 +179,13 @@ export class AppService {
       return;
     }
 
-    this.loadingWorkflows = true;
-    this.api.get_workflows().subscribe(
-      (data) => {
-        console.log('AppService Loaded workflows', data);
+    this.api
+      .get_workflows(
+        filteredByUser !== undefined ? filteredByUser : this.isUserLogged(),
+        includeSubScriptions !== undefined
+          ? includeSubScriptions
+          : this.isUserLogged()
+      )
 
         // Workflow items
         let items = data['items'];
