@@ -37,4 +37,11 @@ export class SearchBarComponent implements OnInit {
     this._sortingOrder = this._sortingOrder === 'asc' ? 'desc' : 'asc';
     this.sortingOrderChange.emit(this._sortingOrder);
   }
+
+  public reset() {
+    if (this._actualFilterValue && this._actualFilterValue.length > 0) {
+      this._actualFilterValue = null;
+      this.filterValueChange.emit(null);
+    }
+  }
 }
