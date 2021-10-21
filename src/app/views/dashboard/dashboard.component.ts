@@ -1,13 +1,14 @@
 import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import {
   AggregatedStatusStats,
-  AggregatedStatusStatsItem,
+  AggregatedStatusStatsItem
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow } from 'src/app/models/workflow.model';
 import { AppService } from 'src/app/utils/services/app.service';
+import { StatsFilterPipe } from './../../utils/filters/stats-filter.pipe';
 
 declare var $: any;
 
