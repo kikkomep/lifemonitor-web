@@ -155,6 +155,7 @@
               <tr>
                 <th style="width: 10px" scope="col"></th>
                 <th class="">Workflow</th>
+                <th class="text-center" scope="col">Visibility</th>
                 <th class="text-center" scope="col">Type</th>
                 <th class="text-center" scope="col">Version</th>
                 <th class="text-center" scope="col" style="width: 100px">
@@ -178,7 +179,8 @@
                 <td class="align-middle">
                   <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
-                    <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]" style="color: black; font-size: larger">{{ w.name
+                    <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]" style="color: black; font-size: larger">{{
+                      w.name
                       }}
                       <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
                     </a>
@@ -191,6 +193,22 @@
                     </a>
                   </div>
                 </td>
+                <td class="text-center align-middle font-weight-light">
+                  <div *ngIf="w.public === undefined">
+                    <i class="fas fa-2x fa-sync-alt text-muted"></i>
+                  </div>
+                  <div *ngIf="w.public !== undefined" style="height: 100%; margin: auto" data-html="true"
+                    data-toggle="tooltip" data-placement="top" class="workflow-visibility-{{w.uuid}}"
+                    title="{{ getWorkflowVisibilityTitle(w) }}">
+                    <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
+                    <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
+                    <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
+                    <div *ngIf="isEditable(w)" class="badge badge-primary" (click)="changeVisibility(w)">
+                      change
+                    </div>
+                  </div>
+                </td>
+
                 <td class="text-center align-middle">
                   <div style="height: 100%; margin: auto" data-html="true" data-toggle="tooltip" data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
@@ -207,7 +225,7 @@
                         class="fas fa-external-link-alt"></i>]</a>
                   </div>
                 </td>
-                <td class="text-center align-middle font-weight-light">
+                <td class="text-center align-middle font-weight-light" style="max-width: 150px;">
                   <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]">
                     <stats-pie-chart [stats]="w.suites"></stats-pie-chart>
                   </a>

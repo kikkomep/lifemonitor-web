@@ -1,13 +1,11 @@
-import {
-  HttpClient, HttpHeaders
-} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status
+  Status,
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -50,6 +48,26 @@ export class ApiService {
         map((data) => {
           return new User(data);
         })
+      );
+  }
+
+  changeWorkflowVisibility(workflow: Workflow): Observable<any> {
+    let body = {
+      public: !workflow.public,
+    };
+    return this.http
+      .put(
+        this.apiBaseUrl + '/workflows/' + workflow.uuid,
+        body,
+        this.get_http_options()
+      )
+      .pipe(
+        map((data) => {
+          workflow.public = !workflow.public;
+          console.log('Changed workflow visibility: public=' + workflow.public);
+        }),
+        tap((data) => console.log('Workflow visibility changed to: ', data)),
+        catchError(this.handleError('Updating workflow', []))
       );
   }
 

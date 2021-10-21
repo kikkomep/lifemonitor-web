@@ -1,12 +1,13 @@
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  Status
+  Status,
 } from './stats.model';
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';
 
 export class Workflow extends AggregatedStatusStatsItem {
+  public: boolean;
   registry: Object;
   version: Object;
   status: Status;
@@ -44,6 +45,10 @@ export class Workflow extends AggregatedStatusStatsItem {
   public get typeIcon(): string {
     // FIXME: set the right icon type
     return 'assets/img/logo/wf/GalaxyLogoSquare.png';
+  }
+
+  public get submitter(): object {
+    return this.version ? this.version['submitter'] : null;
   }
 
   public get externalLink(): string {
