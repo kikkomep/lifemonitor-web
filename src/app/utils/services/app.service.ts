@@ -96,6 +96,9 @@ export class AppService {
     }
   }
 
+  public isUserLogged(): boolean {
+    return this.auth.isUserLogged();
+  }
 
   private setLoadingWorkflows(value: boolean) {
     this.loadingWorkflows = value;
