@@ -230,10 +230,9 @@
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
-                    <div *ngIf="isEditable(w) && editModeEnabled" class="badge badge-primary"
-                      (click)="changeVisibility(w)">
+                    <a *ngIf="isEditable(w) && editModeEnabled" class="btn badge badge-primary" (click)="changeVisibility(w)">
                       change
-                    </div>
+                    </a>
                     <div *ngIf="!isEditable(w) || !editModeEnabled">&nbsp;</div>
                   </div>
                 </td>
