@@ -66,12 +66,12 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
 
   public get class(): string {
     if (this.aggregatedStatus == 'all_passing')
-      return 'text-primary align-middle';
+      return 'text-primary';
     if (this.aggregatedStatus == 'some_passing')
-      return 'text-warning align-middle';
+      return 'text-warning';
     if (this.aggregatedStatus == 'all_failing')
-      return 'text-danger align-middle';
-    return 'text-gray align-middle';
+      return 'text-danger';
+    return 'text-gray';
   }
 
   public get statusIcon(): string {
