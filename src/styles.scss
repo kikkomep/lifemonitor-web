@@ -5722,7 +5722,7 @@ a.badge:focus {
 a.badge-primary:hover,
 a.badge-primary:focus {
   color           : #fff;
-  background-color: #0062cc;
+  background-color: var(--eosc-green-dark);
 }
 
 a.badge-primary:focus,
