@@ -38,6 +38,7 @@ import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
+import { InputDialogComponent } from './components/input-dialog/input-dialog.component';
 
 
 registerLocaleData(localeEn, 'en-EN');
@@ -77,6 +78,7 @@ export function initConfigService(appConfig: AppConfigService) {
     LoaderComponent,
     RocrateLogoComponent,
     WorkflowHeaderComponent,
+    InputDialogComponent,
   ],
   imports: [
     FormsModule,
