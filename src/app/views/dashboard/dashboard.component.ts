@@ -8,6 +8,7 @@ import {
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow } from 'src/app/models/workflow.model';
 import { AppService } from 'src/app/utils/services/app.service';
+import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
 import { StatsFilterPipe } from './../../utils/filters/stats-filter.pipe';
 
 declare var $: any;
@@ -32,7 +33,11 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   private statsFilter = new StatsFilterPipe();
 
-  constructor(private appService: AppService, private router: Router) {
+  constructor(
+    private appService: AppService,
+    private router: Router,
+    private inputDialog: InputDialogService
+  ) {
     console.log('Dashboard Created!!');
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
@@ -129,11 +134,22 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public changeVisibility(w: Workflow) {
-    this.appService.changeWorkflowVisibility(w).subscribe(() => {
-      $('.workflow-visibility-' + w.uuid)
-        .tooltip('hide')
-        .attr('data-original-title', this.getWorkflowVisibilityTitle(w))
-        .tooltip('show');
+    this.inputDialog.show({
+      iconClass: !w.public
+        ? 'fas fa-lg fa-globe-americas'
+        : 'fas fa-lg fa-user-lock',
+      description:
+        'Change visibility to <b>' +
+        (!w.public ? 'public' : 'private') +
+        '</b>?',
+      onConfirm: () => {
+        this.appService.changeWorkflowVisibility(w).subscribe(() => {
+          $('.workflow-visibility-' + w.uuid)
+            .tooltip('hide')
+            .attr('data-original-title', this.getWorkflowVisibilityTitle(w))
+            .tooltip('show');
+        });
+      },
     });
   }
 

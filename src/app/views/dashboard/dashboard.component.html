@@ -1,5 +1,7 @@
 <app-loader [enabled]="!workflows || (isLoading|async)"></app-loader>
 
+<app-input-dialog></app-input-dialog>
+
 <div *ngIf="workflows" class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -186,7 +188,8 @@
                   <i class="{{ w.statusIcon }} fa-2x" style="margin-top: 28px;"></i>
                 </td>
                 <td class="align-top">
-                  <div class="font-weight-light text-lg mt-4" data-html="true" data-toggle="tooltip" data-placement="top"
+                  <div class="font-weight-light text-lg mt-4" data-html="true" data-toggle="tooltip"
+                    data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                     <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]" style="color: black; font-size: larger">{{
                       w.name
@@ -230,7 +233,8 @@
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
-                    <a *ngIf="isEditable(w) && editModeEnabled" class="btn badge badge-primary" (click)="changeVisibility(w)">
+                    <a *ngIf="isEditable(w) && editModeEnabled" class="btn badge badge-primary"
+                      (click)="changeVisibility(w)">
                       change
                     </a>
                     <div *ngIf="!isEditable(w) || !editModeEnabled">&nbsp;</div>
