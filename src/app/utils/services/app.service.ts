@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/utils/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -48,7 +49,11 @@ export class AppService {
   private TEST_INSTANCE_UUID = 'test_instance_uuid';
   private TEST_BUILD_ID = 'test_build_id';
 
-  constructor(private api: ApiService, private http: HttpClient) {
+  constructor(
+    private auth: AuthService,
+    private api: ApiService,
+    private http: HttpClient
+  ) {
     console.log('AppService created!');
 
     // subscribe for the current selected workflow
@@ -60,11 +65,45 @@ export class AppService {
 
     // subscribe to the current user
     this.subscriptions.push(
-      this.api.get_current_user().subscribe((data) => {
-        console.log('Current user', data);
-        this._currentUser = data;
+      this.auth.userLoggedAsObservable().subscribe((logged) => {
+        // get user data
+        if (logged === true) {
+          this.api.get_current_user().subscribe((data) => {
+            console.log('Current user from APP', data);
+            this._currentUser = data;
+          });
+        } else {
+          // reset the current list of workflows
+          this._workflowsStats.update([]);
+          this.subjectWorkflows.next(this._workflowsStats);
+          // reload workflows
+          this.loadWorkflows().subscribe((data) => {
+            // delete reference to the previous user
+            this._currentUser = null;
+          });
+        }
       })
     );
+
+    // get user data if already logged
+    if (this.auth.isUserLogged()) {
+      this.api.get_current_user().subscribe((data) => {
+        console.log('Current user from APP', data);
+        this._currentUser = data;
+      });
+    }
+  }
+
+  public login() {
+    return this.auth.login();
+  }
+
+  public authorize() {
+    return this.auth.authorize();
+  }
+
+  public logout() {
+    return this.auth.logout();
   }
 
   public get currentUser(): User {
@@ -120,14 +159,14 @@ export class AppService {
     return data;
   }
 
-  loadWorkflows(useCache = false): Observable<Workflow> {
+  loadWorkflows(useCache = false): Observable<AggregatedStatusStats> {
     if (this.loadingWorkflows) return;
     if (useCache && this._workflowsStats) {
       console.log('Using cache', this._workflowsStats);
       this.subjectWorkflows.next(this._workflowsStats);
       return;
     }
-    let workflow: Subject<Workflow> = new Subject<Workflow>();
+
     this.loadingWorkflows = true;
     this.api.get_workflows().subscribe(
       (data) => {
@@ -154,7 +193,7 @@ export class AppService {
       }
     );
 
-    return workflow.asObservable();
+    return this.subjectWorkflows.asObservable();
   }
 
   loadWorkflow(w: Workflow): Observable<Workflow> {

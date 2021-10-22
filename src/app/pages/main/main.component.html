@@ -1,6 +1,6 @@
 <app-loader [enabled]="!user || !user.picture"></app-loader>
 
-<div *ngIf="user && user.picture" class="wrapper">
+<div class="wrapper">
   <app-header (toggleMenuSidebar)="toggleMenuSidebar()"></app-header>
 
   <!--<app-menu-sidebar

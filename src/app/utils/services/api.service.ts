@@ -31,14 +31,18 @@ export class ApiService {
 
   private get_http_options(params = {}, skip: boolean = false) {
     let token = JSON.parse(localStorage.getItem('token'));
-    return {
-      headers: new HttpHeaders({
-        // 'Content-Type':  'application/json',
-        Authorization: 'Bearer ' + token['token']['value'],
-        skip: String(skip),
-      }),
+    let http_headers = {
+      // 'Content-Type':  'application/json',
+      skip: String(skip),
+    };
+    if (token) {
+      http_headers['Authorization'] = 'Bearer ' + token['token']['value'];
+    }
+    let http_options = {
+      headers: new HttpHeaders(http_headers),
       params: params,
     };
+    return http_options;
   }
 
   get_current_user(): Observable<User> {
