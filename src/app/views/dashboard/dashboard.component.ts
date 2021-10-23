@@ -179,7 +179,6 @@ export class DashboardComponent implements OnInit, OnChanges {
       if (status != this.statusFilter) {
         this.filteredWorkflows = this._workflowStats[status];
         this.statusFilter = status;
-        this.workflowNameFilter = '';
       } else {
         this.filteredWorkflows = this._workflowStats['all'];
         this.statusFilter = null;
