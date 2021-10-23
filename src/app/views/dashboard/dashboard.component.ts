@@ -60,9 +60,9 @@ export class DashboardComponent implements OnInit, OnChanges {
       );
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('Changes', changes);
