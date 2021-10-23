@@ -40,7 +40,7 @@ export interface StatsItem {
 export class AggregatedStatusStatsItem extends Model implements StatsItem {
   uuid: string;
   name: string;
-  status: any = AggregatedTestStatus[3];
+  status: any;
   latestBuilds: any;
 
   private static colorMapping: object = {
@@ -87,12 +87,12 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
     return !this.status
       ? 'unknown'
       : this.status instanceof String || typeof this.status === 'string'
-      ? this.status
-      : 'aggregated_test_status' in this.status
-      ? this.status['aggregated_test_status']
-      : 'aggregate_test_status' in this.status
-      ? this.status['aggregate_test_status']
-      : 'unknonw';
+        ? this.status
+        : 'aggregated_test_status' in this.status
+          ? this.status['aggregated_test_status']
+          : 'aggregate_test_status' in this.status
+            ? this.status['aggregate_test_status']
+            : 'unknonw';
   }
 }
 
@@ -130,6 +130,14 @@ export class AbstractStats extends Model {
       console.log('Initializing', s);
       this[s].push(...data.filter((item: StatsItem) => item.getStatus() === s));
       console.log('Configured', this[s]);
+    }
+
+    // map status 'not_available' to 'unknown'
+    if (this._statuses.indexOf('unknown') != -1) {
+      let s: string = 'not_available';
+      console.log('Initializing', s);
+      this['unknown'].push(...data.filter((item: StatsItem) => item.getStatus() === s));
+      console.log('Configured', this['unknown']);
     }
 
     // notify updates
