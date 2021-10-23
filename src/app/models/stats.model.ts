@@ -40,7 +40,7 @@ export interface StatsItem {
 export class AggregatedStatusStatsItem extends Model implements StatsItem {
   uuid: string;
   name: string;
-  status: any;
+  status: any = AggregatedTestStatus[3];
   latestBuilds: any;
 
   private static colorMapping: object = {
