@@ -178,18 +178,19 @@ export class ApiService {
     ).pipe(retry(3));
 
     let w = new Workflow({ uuid: uuid });
-    const suites = this.get_suites(w);
-
+    let suites = null;
     let queries: Array<object> = [workflow, status];
     if (load_suites) {
-      queries = [workflow, status, suites];
+      suites = this.get_suites(w);
+      if (suites)
+        queries = [workflow, status, suites];
     }
 
     return forkJoin(queries).pipe(
       map((result) => {
         w.update(result[0]);
         w.status = result[1];
-        w.suites = new AggregatedStatusStats(result[2]);
+        w.suites = new AggregatedStatusStats(suites ? result[2] : []);
         console.log('workflow', w);
         return w;
       }),
@@ -323,6 +324,7 @@ export class ApiService {
             }
           }
 
+          if (!queries || queries.length == 0) return of([]);
           return forkJoin(queries).pipe(
             retry(3),
             mergeMap((statuses) => {
