@@ -26,7 +26,7 @@
         <tbody *ngIf="suites">
           <tr *ngFor="let s of suites; index as i; first as isFirst">
             <td [ngClass]="s.class">
-              <i class="{{ s.statusIcon }} fa-2x"></i>
+              <i class="{{ s.statusIcon }} fa-2x" style="margin-top: 45px;"></i>
             </td>
             <td class="align-middle">
               <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
