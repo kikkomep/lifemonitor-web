@@ -20,14 +20,14 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private authService: AuthService,
     private router: Router,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   private isOAuthError(error: HttpErrorResponse): boolean {
-    console.error('Checking HTTP error: ', error);
+    console.debug('Checking HTTP error: ', error);
     return (
       error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl']) &&
       (error.status == 401 ||
-        error.status == 403 ||
+        (error.status == 403 && !('title' in error.error && error.error['title'] === 'RateLimitExceededException')) ||
         (error.status == 500 &&
           'extra_info' in error.error &&
           error.error['extra_info']['exception_type'] == 'OAuthError'))
@@ -54,7 +54,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           // force authentication process
           return next.handle(request).pipe(
             tap(
-              () => {},
+              () => { },
               (err: any) => {
                 if (err instanceof HttpErrorResponse) {
                   if (!this.isOAuthError(err)) {
@@ -71,7 +71,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           request.headers.get('skip') == 'false'
         ) {
           // Show the error message
-          this.toastr.error(`${error.status}: ${error.message}`);
+          //this.toastr.error(`${error.status}: ${error.message}`);
+          console.debug(`${error.status}: ${error.message}`, error);
         }
 
         // show dialog for error message

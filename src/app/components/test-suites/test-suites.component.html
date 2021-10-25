@@ -26,12 +26,13 @@
         <tbody *ngIf="suites">
           <tr *ngFor="let s of suites; index as i; first as isFirst">
             <td [ngClass]="s.class">
-              <i class="{{ s.statusIcon }} fa-2x"></i>
+              <i class="{{ s.statusIcon }} fa-2x" style="margin-top: 45px;"></i>
             </td>
             <td class="align-middle">
               <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
-                <a [routerLink]="['/suite', { s: s.asUrlParam() }]" style="color: black; font-size: larger">{{ s.roc_suite
+                <a [routerLink]="['/suite', { s: s.asUrlParam() }]" style="color: black; font-size: larger">{{
+                  s.roc_suite
                   }}</a>
                 <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
               </div>
@@ -55,6 +56,7 @@
           </tr>
         </tbody>
       </table>
+      <div *ngIf="!suites || suites.length == 0" class="p-4">&nbsp;</div>
     </div>
     <!-- /.card-body -->
   </div>

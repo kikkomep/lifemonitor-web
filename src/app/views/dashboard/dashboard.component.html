@@ -1,4 +1,6 @@
-<app-loader [enabled]="!workflows"></app-loader>
+<app-loader [enabled]="!workflows || (isLoading|async)"></app-loader>
+
+<app-input-dialog></app-input-dialog>
 
 <div *ngIf="workflows" class="content-header">
   <div class="container-fluid">
@@ -24,7 +26,7 @@
 
 <!-- Main content -->
 <section *ngIf="workflows" class="content mx-lg-4 mx-md-2 mt-md-3">
-  <h2 class="text-primary font-weight-light p-2">Workflows</h2>
+  <h2 class="text-primary font-weight-light p-2"><span *ngIf="isUserLogged()">My </span>Workflows</h2>
 
   <div class="container-fluid">
     <!-- Small boxes (Stat box) -->
@@ -35,10 +37,11 @@
           data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="isLoading|async" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_passing'"
+            class="overlay dark"></div>
           <!-- end loading -->
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_passing.length : 0 }}</h3>
@@ -60,10 +63,11 @@
           data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows partially <b>passing</b></span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'some_passing'"
+            class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.some_passing.length : 0 }}</h3>
             <p>Some passing</p>
@@ -84,10 +88,11 @@
           data-placement="bottom" data-html="true"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> workflows</span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_failing'"
+            class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.all_failing.length : 0 }}</h3>
             <p>Failing</p>
@@ -109,10 +114,11 @@
           data-toggle="tooltip" data-placement="bottom"
           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows in <b>unknown</b> state</span>">
           <!-- Loading (remove the following to stop the loading)-->
-          <div *ngIf="!workflows" class="overlay dark">
+          <div *ngIf="(isLoading|async)" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
-          <div *ngIf="workflows && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
+          <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'unknown'"
+            class="overlay dark"></div>
           <div class="inner">
             <h3>{{ workflows ? workflowStats.unknown.length : 0 }}</h3>
 
@@ -137,12 +143,22 @@
     <!-- Search Bar -->
     <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
-    <div class="card card-primary card-outline">
+    <div *ngIf="! (isLoading|async)" class="card card-primary card-outline">
       <!-- Loading (remove the following to stop the loading)-->
       <div *ngIf="!workflows" class="overlay dark">
         <i class="fas fa-3x fa-sync-alt"></i>
       </div>
       <div class="card-body box-profile">
+
+        <div *ngIf="isUserLogged()" class="float-right">
+          <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="editModeToggle()">
+            <i class="far fa-edit"></i> edit
+          </a>
+          <a *ngIf="editModeEnabled" class="btn btn-sm m-4 active" (click)="editModeToggle()">
+            <i class="far fa-window-close"></i> done
+          </a>
+        </div>
+
         <!-- /.card-header -->
         <div class="card-body mt-4 p-0">
           <table class="table table-striped">
@@ -167,12 +183,13 @@
                     | sortingFilter: workflowSortingOrder;
                   index as i;
                   first as isFirst
-                ">
+                " style="height: 160px;">
                 <td [ngClass]="w.class">
-                  <i class="{{ w.statusIcon }} fa-2x"></i>
+                  <i class="{{ w.statusIcon }} fa-2x" style="margin-top: 29px;"></i>
                 </td>
-                <td class="align-middle">
-                  <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
+                <td class="align-top">
+                  <div class="font-weight-light text-lg mt-4" data-html="true" data-toggle="tooltip"
+                    data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
                     <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]" style="color: black; font-size: larger">{{
                       w.name
@@ -187,20 +204,40 @@
                       }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
                     </a>
                   </div>
+                  <div *ngIf="isUserLogged()">
+                    <span *ngIf="w.subscriptions !== undefined">
+                      <a *ngIf="searchModeEnabled && !isEditable(w) && (!w.subscriptions || w.subscriptions.length == 0)"
+                        class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
+                        SUBSCRIBE
+                      </a>
+                      <div
+                        *ngIf="!editModeEnabled && searchModeEnabled && (isEditable(w) || w.subscriptions && w.subscriptions.length > 0)"
+                        class="badge badge-primary mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
+                        SUBSCRIBED
+                      </div>
+                      <a *ngIf="editModeEnabled && !isEditable(w) && w.subscriptions && w.subscriptions.length > 0"
+                        class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
+                        UNSUBSCRIBE
+                      </a>
+                    </span>
+                    <span *ngIf="!editModeEnabled">&nbsp;</span>
+                  </div>
+
                 </td>
                 <td class="text-center align-middle font-weight-light">
                   <div *ngIf="w.public === undefined">
                     <i class="fas fa-2x fa-sync-alt text-muted"></i>
                   </div>
-                  <div *ngIf="w.public !== undefined" style="height: 100%; margin: auto" data-html="true"
-                    data-toggle="tooltip" data-placement="top" class="workflow-visibility-{{w.uuid}}"
-                    title="{{ getWorkflowVisibilityTitle(w) }}">
+                  <div *ngIf="w.public !== undefined" data-html="true" data-toggle="tooltip" data-placement="top"
+                    class="mt-4 align-top workflow-visibility-{{w.uuid}}" title="{{ getWorkflowVisibilityTitle(w) }}">
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
-                    <div *ngIf="isEditable(w)" class="badge badge-primary" (click)="changeVisibility(w)">
+                    <a *ngIf="isEditable(w) && editModeEnabled" class="btn badge badge-primary"
+                      (click)="changeVisibility(w)">
                       change
-                    </div>
+                    </a>
+                    <div *ngIf="!isEditable(w) || !editModeEnabled">&nbsp;</div>
                   </div>
                 </td>
 
@@ -221,16 +258,34 @@
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light" style="max-width: 150px;">
-                  <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]">
+                  <div *ngIf="w.suites && w.suites.all.length == 0" data-toggle="tooltip" data-placement="top"
+                    data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                      no test suite available<br/> for this workflow version</span>">
+                    <i class="fas fa-ban fa-2x text-muted"></i>
+                  </div>
+                  <div *ngIf="w.suites === undefined" class="text-muted">
+                    <i class="fas fa-2x fa-sync-alt"></i>
+                  </div>
+                  <a *ngIf="w.suites && w.suites.all.length > 0" [routerLink]="['/workflow', { uuid: w.asUrlParam() }]">
                     <stats-pie-chart [stats]="w.suites"></stats-pie-chart>
                   </a>
                 </td>
                 <td class="text-center align-middle font-weight-light" width="50">
-                  <stats-bar-chart [stats]="w.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
+                  <div *ngIf="w.suites && w.suites.all.length == 0" data-toggle="tooltip" data-placement="top"
+                    data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                      no test build available<br/> for this workflow version</span>">
+                    <i class="fas fa-ban fa-2x text-muted"></i>
+                  </div>
+                  <div *ngIf="w.suites === undefined" class="text-muted">
+                    <i class="fas fa-2x fa-sync-alt"></i>
+                  </div>
+                  <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0" [stats]="w.getLatestBuilds()"
+                    (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
               </tr>
             </tbody>
+            <div *ngIf="!workflows || workflows.length == 0" class="p-4">&nbsp;</div>
           </table>
         </div>
         <!-- /.card-body -->

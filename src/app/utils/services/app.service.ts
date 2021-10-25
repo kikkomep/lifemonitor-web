@@ -2,7 +2,7 @@ import { AuthService } from 'src/app/utils/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, finalize } from 'rxjs/operators';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -32,6 +32,7 @@ export class AppService {
   private subjectTestSuite = new Subject<Suite>();
   private subjectTestInstance = new Subject<TestInstance>();
   private subjectTestBuild = new Subject<TestBuild>();
+  private subjectLoadingWorkflows = new Subject<boolean>();
 
   // initialize data observables
   private _observableWorkflows = this.subjectWorkflows.asObservable();
@@ -39,6 +40,7 @@ export class AppService {
   private _observableTestSuite = this.subjectTestSuite.asObservable();
   private _observableTestInstance = this.subjectTestInstance.asObservable();
   private _observableTestBuild = this.subjectTestBuild.asObservable();
+  private _observableLoadingWorkflows = this.subjectLoadingWorkflows.asObservable();
 
   // subscriptions
   private subscriptions: Subscription[] = [];
@@ -77,7 +79,7 @@ export class AppService {
           this._workflowsStats.update([]);
           this.subjectWorkflows.next(this._workflowsStats);
           // reload workflows
-          this.loadWorkflows().subscribe((data) => {
+          this.loadWorkflows(false, false).subscribe((data) => {
             // delete reference to the previous user
             this._currentUser = null;
           });
@@ -92,6 +94,23 @@ export class AppService {
         this._currentUser = data;
       });
     }
+  }
+
+  public isUserLogged(): boolean {
+    return this.auth.isUserLogged();
+  }
+
+  private setLoadingWorkflows(value: boolean) {
+    this.loadingWorkflows = value;
+    this.subjectLoadingWorkflows.next(value);
+  }
+
+  public isLoadingWorkflows(): boolean {
+    return this.loadingWorkflows;
+  }
+
+  public get isLoadingWorkflowsAsObservable(): Observable<boolean> {
+    return this._observableLoadingWorkflows;
   }
 
   public login() {
@@ -159,7 +178,19 @@ export class AppService {
     return data;
   }
 
-  loadWorkflows(useCache = false): Observable<AggregatedStatusStats> {
+  public subscribeWorkflow(w: Workflow): Observable<Workflow> {
+    return this.api.subscribeWorkflow(w);
+  }
+
+  public unsubscribeWorkflow(w: Workflow): Observable<Workflow> {
+    return this.api.unsubscribeWorkflow(w);
+  }
+
+  loadWorkflows(
+    useCache = false,
+    filteredByUser: boolean = undefined,
+    includeSubScriptions: boolean = undefined
+  ): Observable<AggregatedStatusStats> {
     if (this.loadingWorkflows) return;
     if (useCache && this._workflowsStats) {
       console.log('Using cache', this._workflowsStats);
@@ -167,31 +198,42 @@ export class AppService {
       return;
     }
 
-    this.loadingWorkflows = true;
-    this.api.get_workflows().subscribe(
-      (data) => {
-        console.log('AppService Loaded workflows', data);
+    this.setLoadingWorkflows(true);
+    this.api
+      .get_workflows(
+        filteredByUser !== undefined ? filteredByUser : this.isUserLogged(),
+        includeSubScriptions !== undefined
+          ? includeSubScriptions
+          : this.isUserLogged()
+      )
+      .pipe(
+        finalize(() => {
+          this.setLoadingWorkflows(false);
+        })
+      )
+      .subscribe(
+        (data) => {
+          console.log('AppService Loaded workflows', data);
 
-        // Workflow items
-        let items = data['items'];
-        let stats = new AggregatedStatusStats();
-        items = items.map((i: object) => new Workflow(i));
-        stats.update(items);
+          // Workflow items
+          let items = data['items'];
+          let stats = new AggregatedStatusStats();
+          items = items.map((i: object) => new Workflow(i));
+          stats.update(items);
 
-        this._workflows = items;
-        this._workflowsStats = stats;
-        this.loadingWorkflows = false;
+          this._workflows = items;
+          this._workflowsStats = stats;
 
-        for (let w of this._workflows) {
-          console.log('Loading data of workflow ', w);
-          this.loadWorkflow(w).subscribe((wf: Workflow) => {});
+          for (let w of this._workflows) {
+            console.log('Loading data of workflow ', w);
+            this.loadWorkflow(w).subscribe((wf: Workflow) => {});
+          }
+          this.subjectWorkflows.next(stats);
+        },
+        (error) => {
+          console.error(error);
         }
-        this.subjectWorkflows.next(stats);
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
+      );
 
     return this.subjectWorkflows.asObservable();
   }
@@ -236,7 +278,7 @@ export class AppService {
   }
 
   public isEditable(workflow: Workflow): boolean {
-    if (!this.currentUser || !workflow) {
+    if (!this.currentUser || !workflow || !workflow.submitter) {
       return false;
     }
     return this.currentUser.id === workflow.submitter['id'] ? true : false;

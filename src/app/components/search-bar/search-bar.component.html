@@ -2,22 +2,16 @@
   <div class="input-group-prepend">
     <span class="input-group-text"><i class="fas fa-search"></i></span>
   </div>
-  <input
-    type="text"
-    [(ngModel)]="actualFilterValue"
-    class="form-control font-weight-light"
-    placeholder="Search by UUID or name"
-    aria-label="Username"
-    aria-describedby="basic-addon1"
-  />
+  <input type="text" [(ngModel)]="actualFilterValue" class="form-control font-weight-light"
+    placeholder="Search by UUID or name" aria-label="Username" aria-describedby="basic-addon1" />
+
   <div class="input-group-append">
-    <button
-      class="btn btn-outline-secondary"
-      type="button"
-      (click)="changeSortingOrder()"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
+    <button *ngIf="actualFilterValue" class="btn btn-outline-secondary border-right-0" type="button" (click)="reset()"
+      aria-haspopup="true" aria-expanded="false">
+      <i class="fas fa-window-close"></i>
+    </button>
+    <button class="btn btn-outline-secondary border-left-0" type="button" (click)="changeSortingOrder()"
+      aria-haspopup="true" aria-expanded="false">
       <i *ngIf="actualSortingOrder == 'asc'" class="fas fa-sort-amount-up"></i>
       <i *ngIf="actualSortingOrder == 'desc'" class="fas fa-sort-amount-down"></i>
     </button>

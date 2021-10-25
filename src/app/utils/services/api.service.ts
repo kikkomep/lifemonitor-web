@@ -1,11 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, from, Observable, of } from 'rxjs';
-import { catchError, map, mergeMap, tap } from 'rxjs/operators';
+import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status,
+  Status
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -49,6 +49,7 @@ export class ApiService {
     return this.http
       .get(this.apiBaseUrl + '/users/current', this.get_http_options())
       .pipe(
+        retry(3),
         map((data) => {
           return new User(data);
         })
@@ -66,6 +67,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
+        retry(3),
         map((data) => {
           workflow.public = !workflow.public;
           console.log('Changed workflow visibility: public=' + workflow.public);
@@ -85,19 +87,74 @@ export class ApiService {
         responseType: 'blob',
       })
       .pipe(
+        retry(3),
         tap((data) => console.log('RO-Create downloaded')),
         catchError(this.handleError('download RO-Crate', []))
       );
   }
 
-  get_workflows(): Observable<object> {
-    console.log('Request login');
+  subscribeWorkflow(workflow: Workflow): Observable<Workflow> {
     return this.http
-      .get(this.apiBaseUrl + '/workflows', this.get_http_options())
+      .post(
+        this.apiBaseUrl + '/workflows/' + workflow.uuid + '/subscribe',
+        {},
+        this.get_http_options()
+      )
       .pipe(
-        tap((data) => console.log('Loaded workflows: ', data)),
-        catchError(this.handleError('get_workflows', []))
+        retry(3),
+        map((subscription) => {
+          console.log('Created new subscription', subscription);
+          if (subscription) {
+            workflow.subscriptions.push(subscription);
+          }
+          return workflow;
+        }),
+        tap((data) => console.log('Workflow visibility changed to: ', data))
       );
+  }
+
+  unsubscribeWorkflow(workflow: Workflow): Observable<Workflow> {
+    return this.http
+      .post(
+        this.apiBaseUrl + '/workflows/' + workflow.uuid + '/unsubscribe',
+        {},
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map(() => {
+          console.log('Subscription to workflow deleted');
+          for (let i = 0; i < workflow.subscriptions.length; i++) {
+            let s = workflow.subscriptions[i];
+            if (s['resource']['uuid'] === workflow.uuid) {
+              workflow.subscriptions.splice(i, 1);
+            }
+          }
+          return workflow;
+        }),
+        tap((data) => console.log('Workflow visibility changed to: ', data))
+      );
+  }
+
+  get_workflows(
+    filteredByUser: boolean = false,
+    includeSubScriptions: boolean = false
+  ): Observable<object> {
+    console.log(
+      'Loading workflows params',
+      filteredByUser,
+      includeSubScriptions
+    );
+    let url: string = !filteredByUser
+      ? this.apiBaseUrl + '/workflows?status=true'
+      : this.apiBaseUrl +
+      '/users/current/workflows?status=true&subscriptions=' +
+      includeSubScriptions.toString();
+    return this.http.get(url, this.get_http_options()).pipe(
+      retry(3),
+      tap((data) => console.log('Loaded workflows: ', data)),
+      catchError(this.handleError('get_workflows', []))
+    );
   }
 
   get_workflow(
@@ -118,25 +175,27 @@ export class ApiService {
     const status = this.http.get<Status>(
       this.apiBaseUrl + '/workflows/' + uuid + '/status',
       this.get_http_options()
-    );
+    ).pipe(retry(3));
 
     let w = new Workflow({ uuid: uuid });
-    const suites = this.get_suites(w);
-
+    let suites = null;
     let queries: Array<object> = [workflow, status];
     if (load_suites) {
-      queries = [workflow, status, suites];
+      suites = this.get_suites(w);
+      if (suites)
+        queries = [workflow, status, suites];
     }
 
     return forkJoin(queries).pipe(
       map((result) => {
         w.update(result[0]);
         w.status = result[1];
-        w.suites = new AggregatedStatusStats(result[2]);
+        w.suites = new AggregatedStatusStats(suites ? result[2] : []);
         console.log('workflow', w);
         return w;
       }),
-      tap((result) => console.log('Loaded workflow: ', result))
+      tap((result) => console.log('Loaded workflow: ', result)),
+      retry(3),
     );
   }
 
@@ -148,6 +207,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
+        retry(3),
         map((rawSuitesData) => {
           let suites: Suite[] = [];
           for (let suiteData of rawSuitesData['items']) {
@@ -167,6 +227,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
+        retry(3),
         mergeMap((status: Object) => {
           let suite: Suite = new Suite({} as Workflow, suiteData);
           suite.status = new Status({
@@ -181,12 +242,13 @@ export class ApiService {
               this.http
                 .get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
                 .pipe(
+                  retry(3),
                   map((instaceLatestBuildsData) => {
                     console.log(
                       'Latest builds result',
@@ -212,6 +274,7 @@ export class ApiService {
           }
 
           return forkJoin(instanceBuildsQueries).pipe(
+            retry(3),
             map((instanceLatestBuilds) => {
               return suite;
             })
@@ -228,6 +291,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
+        retry(3),
         map((rawSuitesData) => {
           return rawSuitesData['items'];
         }),
@@ -251,16 +315,18 @@ export class ApiService {
               queries.push(
                 this.http.get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
               );
             }
           }
 
+          if (!queries || queries.length == 0) return of([]);
           return forkJoin(queries).pipe(
+            retry(3),
             mergeMap((statuses) => {
               console.log(
                 'Suite statuses after forkjoin',
@@ -302,6 +368,7 @@ export class ApiService {
     return this.http
       .get(this.apiBaseUrl + '/suites/' + uuid, this.get_http_options())
       .pipe(
+        retry(3),
         mergeMap((data) => {
           //let s = new Suite({} as Workflow, data);
           console.log('Suite data:', data);
@@ -326,6 +393,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
+        retry(3),
         map((data) => {
           return data['items'];
         }),
@@ -342,6 +410,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
+        retry(3),
         map((data) => {
           return data['items'];
         }),
@@ -355,14 +424,15 @@ export class ApiService {
     return this.http
       .get(
         this.apiBaseUrl +
-          '/instances/' +
-          testInstanceUUID +
-          '/builds/' +
-          buildID +
-          '/logs',
+        '/instances/' +
+        testInstanceUUID +
+        '/builds/' +
+        buildID +
+        '/logs',
         this.get_http_options()
       )
       .pipe(
+        retry(3),
         map((data) => {
           return data;
         }),
@@ -376,6 +446,7 @@ export class ApiService {
     return this.http
       .head(workflow.downloadLink, this.get_http_options({}, true))
       .pipe(
+        retry(3),
         map((result) => {
           console.log('Result: ', result);
           return true;
