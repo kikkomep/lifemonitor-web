@@ -71,7 +71,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           request.headers.get('skip') == 'false'
         ) {
           // Show the error message
-          this.toastr.error(`${error.status}: ${error.message}`);
+          //this.toastr.error(`${error.status}: ${error.message}`);
+          console.debug(`${error.status}: ${error.message}`, error)
         }
 
         // show dialog for error message
