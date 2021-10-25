@@ -23,11 +23,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   ) {}
 
   private isOAuthError(error: HttpErrorResponse): boolean {
-    console.error('Checking HTTP error: ', error);
+    console.debug('Checking HTTP error: ', error);
     return (
       error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl']) &&
       (error.status == 401 ||
-        error.status == 403 ||
+        (error.status == 403 && !('title' in error.error && error.error['title'] === 'RateLimitExceededException')) ||
         (error.status == 500 &&
           'extra_info' in error.error &&
           error.error['extra_info']['exception_type'] == 'OAuthError'))
