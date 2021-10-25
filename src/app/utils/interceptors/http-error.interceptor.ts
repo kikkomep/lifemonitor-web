@@ -20,7 +20,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private authService: AuthService,
     private router: Router,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   private isOAuthError(error: HttpErrorResponse): boolean {
     console.debug('Checking HTTP error: ', error);
@@ -54,7 +54,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           // force authentication process
           return next.handle(request).pipe(
             tap(
-              () => {},
+              () => { },
               (err: any) => {
                 if (err instanceof HttpErrorResponse) {
                   if (!this.isOAuthError(err)) {
@@ -72,7 +72,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         ) {
           // Show the error message
           //this.toastr.error(`${error.status}: ${error.message}`);
-          console.debug(`${error.status}: ${error.message}`, error)
+          console.debug(`${error.status}: ${error.message}`, error);
         }
 
         // show dialog for error message
