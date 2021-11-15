@@ -27,7 +27,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     return (
       error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl']) &&
       (error.status == 401 ||
-        (error.status == 403 && !('title' in error.error && error.error['title'] === 'RateLimitExceededException')) ||
+        (error.status == 403 && !('title' in error.error && error.error['title'] === 'Rate Limit Exceeded')) ||
         (error.status == 500 &&
           'extra_info' in error.error &&
           error.error['extra_info']['exception_type'] == 'OAuthError'))
