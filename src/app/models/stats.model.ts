@@ -84,8 +84,8 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
   public get aggregatedStatus(): string {
     let status = 'unknown';
     if (this.status != null && this.status !== 'undefined') {
-      if ('aggregated_test_status' in this.status) {
-        status = this.status['aggregated_test_status'];
+      if ('aggregate_test_status' in this.status) {
+        status = this.status['aggregate_test_status'];
       } else if (this.status instanceof Status) {
         let x: Status = this.status as Status;
         status = x.aggregate_test_status;

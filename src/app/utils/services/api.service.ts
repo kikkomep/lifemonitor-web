@@ -145,8 +145,8 @@ export class ApiService {
     let url: string = !filteredByUser
       ? this.apiBaseUrl + '/workflows?status=true'
       : this.apiBaseUrl +
-        '/users/current/workflows?status=true&subscriptions=' +
-        includeSubScriptions.toString();
+      '/users/current/workflows?status=true&subscriptions=' +
+      includeSubScriptions.toString();
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
       tap((data) => console.log('Loaded workflows: ', data)),
@@ -235,7 +235,7 @@ export class ApiService {
         mergeMap((status: Object) => {
           let suite: Suite = new Suite({} as Workflow, suiteData);
           suite.status = new Status({
-            aggregated_test_status: status['status'],
+            aggregate_test_status: status['status'],
           });
           suite.latestBuilds = status['latest_builds'];
           suite.instances = new InstanceStats();
@@ -246,9 +246,9 @@ export class ApiService {
               this.http
                 .get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
                 .pipe(
@@ -323,9 +323,9 @@ export class ApiService {
               queries.push(
                 this.http.get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
               );
@@ -366,7 +366,7 @@ export class ApiService {
                 let suite: Suite = new Suite(workflow, suiteData);
                 let status = statuses[dataIndexMap[suiteData['uuid']]];
                 suite.status = new Status({
-                  aggregated_test_status: status['status'],
+                  aggregate_test_status: status['status'],
                 });
                 suite.latestBuilds = status['latest_builds'];
                 suite.instances = new InstanceStats();
@@ -456,11 +456,11 @@ export class ApiService {
     return this.http
       .get(
         this.apiBaseUrl +
-          '/instances/' +
-          testInstanceUUID +
-          '/builds/' +
-          buildID +
-          '/logs',
+        '/instances/' +
+        testInstanceUUID +
+        '/builds/' +
+        buildID +
+        '/logs',
         this.get_http_options()
       )
       .pipe(
