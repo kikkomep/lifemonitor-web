@@ -1,11 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, from, Observable, of } from 'rxjs';
+import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status
+  Status,
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -145,8 +145,8 @@ export class ApiService {
     let url: string = !filteredByUser
       ? this.apiBaseUrl + '/workflows?status=true'
       : this.apiBaseUrl +
-      '/users/current/workflows?status=true&subscriptions=' +
-      includeSubScriptions.toString();
+        '/users/current/workflows?status=true&subscriptions=' +
+        includeSubScriptions.toString();
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
       tap((data) => console.log('Loaded workflows: ', data)),
@@ -169,18 +169,25 @@ export class ApiService {
       })
     );
 
-    const status = this.http.get<Status>(
-      this.apiBaseUrl + '/workflows/' + uuid + '/status',
-      this.get_http_options()
-    ).pipe(retry(3));
+    const status = this.http
+      .get<Status>(
+        this.apiBaseUrl + '/workflows/' + uuid + '/status',
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        catchError((err) => {
+          console.debug('workflow status error', err);
+          return throwError(err);
+        })
+      );
 
     let w = new Workflow({ uuid: uuid });
     let suites = null;
     let queries: Array<object> = [workflow, status];
     if (load_suites) {
       suites = this.get_suites(w);
-      if (suites)
-        queries = [workflow, status, suites];
+      if (suites) queries = [workflow, status, suites];
     }
 
     return forkJoin(queries).pipe(
@@ -192,7 +199,7 @@ export class ApiService {
         return w;
       }),
       tap((result) => console.log('Loaded workflow: ', result)),
-      retry(3),
+      retry(3)
     );
   }
 
@@ -239,9 +246,9 @@ export class ApiService {
               this.http
                 .get(
                   this.apiBaseUrl +
-                  '/instances/' +
-                  instanceData['uuid'] +
-                  '/latest-builds',
+                    '/instances/' +
+                    instanceData['uuid'] +
+                    '/latest-builds',
                   this.get_http_options()
                 )
                 .pipe(
@@ -274,6 +281,10 @@ export class ApiService {
             retry(3),
             map((instanceLatestBuilds) => {
               return suite;
+            }),
+            catchError((err) => {
+              console.log('Catching error of latest builds of instance');
+              return [];
             })
           );
         })
@@ -281,7 +292,7 @@ export class ApiService {
   }
 
   get_suites(workflow: Workflow): Observable<Suite[]> {
-    console.log('Loading suites....');
+    console.log('Loading suites of workflow ....', workflow);
     return this.http
       .get<Suite[]>(
         this.apiBaseUrl + '/workflows/' + workflow.uuid + '/suites',
@@ -312,9 +323,9 @@ export class ApiService {
               queries.push(
                 this.http.get(
                   this.apiBaseUrl +
-                  '/instances/' +
-                  instanceData['uuid'] +
-                  '/latest-builds',
+                    '/instances/' +
+                    instanceData['uuid'] +
+                    '/latest-builds',
                   this.get_http_options()
                 )
               );
@@ -421,11 +432,11 @@ export class ApiService {
     return this.http
       .get(
         this.apiBaseUrl +
-        '/instances/' +
-        testInstanceUUID +
-        '/builds/' +
-        buildID +
-        '/logs',
+          '/instances/' +
+          testInstanceUUID +
+          '/builds/' +
+          buildID +
+          '/logs',
         this.get_http_options()
       )
       .pipe(
