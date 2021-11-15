@@ -15,6 +15,7 @@ export const TestStatus = [
   'aborted',
   'running',
   'waiting',
+  'unavailable',
 ];
 
 export class Status {
@@ -136,7 +137,9 @@ export class AbstractStats extends Model {
     if (this._statuses.indexOf('unknown') != -1) {
       let s: string = 'not_available';
       console.log('Initializing', s);
-      this['unknown'].push(...data.filter((item: StatsItem) => item.getStatus() === s));
+      this['unknown'].push(
+        ...data.filter((item: StatsItem) => item.getStatus() === s)
+      );
       console.log('Configured', this['unknown']);
     }
 
@@ -223,6 +226,7 @@ export class InstanceStats extends AbstractStats {
   aborted: StatusStatsItem[];
   running: StatusStatsItem[];
   waiting: StatusStatsItem[];
+  unavailable: StatusStatsItem[];
 
   constructor(private items?: StatusStatsItem[]) {
     super(TestStatus, items);

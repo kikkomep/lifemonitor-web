@@ -33,7 +33,7 @@ export class TestInstance extends StatusStatsItem {
     if (this.latestBuilds && this.latestBuilds.length > 0) {
       return this.latestBuilds[0]['status'];
     }
-    return 'unknown';
+    return 'unavailable';
   }
 
   public get platformIcon(): string {
