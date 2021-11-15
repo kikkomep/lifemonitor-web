@@ -99,7 +99,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
     return this.stats instanceof AggregatedStatusStats
       ? ['#1f8787', '#f9b233', '#dc3545', 'grey']
       : this.stats instanceof InstanceStats
-      ? ['#1f8787', '#dc3545', '#ffc107', '#6c757d', '#17a2b8', '#fd7e14']
+      ? ['#1f8787', '#dc3545', '#ffc107', '#6c757d', '#17a2b8', '#fd7e14', 'grey']
       : ['#D5D8DC'];
   }
 
