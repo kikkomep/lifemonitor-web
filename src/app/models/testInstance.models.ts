@@ -44,13 +44,18 @@ export class TestInstance extends StatusStatsItem {
 
   public getLatestBuilds(): StatusStatsItem[] {
     if (!this._latest) {
-      let latestBuilds: StatusStatsItem[] = [];
-      for (let b of this.latestBuilds) {
-        latestBuilds.push(new TestBuild(this, b));
+      try {
+        let latestBuilds: StatusStatsItem[] = [];
+        for (let b of this.latestBuilds) {
+          latestBuilds.push(new TestBuild(this, b));
+        }
+        this._latest = latestBuilds.sort((a, b) =>
+          a.timestamp >= b.timestamp ? 1 : -1
+        );
+      } catch (e) {
+        console.warn('Unable to load last builds');
+        this._latest = [];
       }
-      this._latest = latestBuilds.sort((a, b) =>
-        a.timestamp >= b.timestamp ? 1 : -1
-      );
     }
     return this._latest;
   }
