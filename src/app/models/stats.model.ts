@@ -82,15 +82,21 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
   }
 
   public get aggregatedStatus(): string {
-    return !this.status
-      ? 'unknown'
-      : this.status instanceof String || typeof this.status === 'string'
-        ? this.status
-        : 'aggregated_test_status' in this.status
-          ? this.status['aggregated_test_status']
-          : 'aggregate_test_status' in this.status
-            ? this.status['aggregate_test_status']
-            : 'unknonw';
+    let status = 'unknown';
+    if (this.status != null && this.status !== 'undefined') {
+      if ('aggregated_test_status' in this.status) {
+        status = this.status['aggregated_test_status'];
+      } else if (this.status instanceof Status) {
+        let x: Status = this.status as Status;
+        status = x.aggregate_test_status;
+      } else if (
+        this.status instanceof String ||
+        typeof this.status === 'string'
+      ) {
+        status = this.status as string;
+      }
+    }
+    return status == 'unavailable' ? 'unknown' : status;
   }
 }
 
