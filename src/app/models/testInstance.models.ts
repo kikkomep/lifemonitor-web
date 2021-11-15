@@ -1,13 +1,7 @@
 import { TestingService } from './service.modes';
-import {
-  InstanceStats, StatusStatsItem
-} from './stats.model';
+import { InstanceStats, StatusStatsItem } from './stats.model';
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';
-
-// export class TestInstanceStatus extends Status{
-//     latestBuilds: TestInstanceStats;
-// }
 
 export class TestInstance extends StatusStatsItem {
   public uuid: string;

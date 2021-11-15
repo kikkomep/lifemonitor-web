@@ -16,11 +16,7 @@ export class Workflow extends AggregatedStatusStatsItem {
   _suites: AggregatedStatusStats;
   private _latestBuilds: TestBuild[];
 
-  constructor(
-    data: Object,
-    status?: Object,
-    suites?: AggregatedStatusStats
-  ) {
+  constructor(data: Object, status?: Object, suites?: AggregatedStatusStats) {
     super(data);
     if (status) {
       this.status = new Status(status);
