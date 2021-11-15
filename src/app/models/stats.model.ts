@@ -21,7 +21,7 @@ export class Status {
   aggregate_test_status: string;
   latestBuilds: [];
 
-  constructor(private data: Object) {
+  constructor(data: Object) {
     Object.assign(this, data);
   }
 }

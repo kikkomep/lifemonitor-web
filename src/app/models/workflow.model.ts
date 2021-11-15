@@ -17,7 +17,7 @@ export class Workflow extends AggregatedStatusStatsItem {
   private _latestBuilds: TestBuild[];
 
   constructor(
-    private data: Object,
+    data: Object,
     status?: Object,
     suites?: AggregatedStatusStats
   ) {
