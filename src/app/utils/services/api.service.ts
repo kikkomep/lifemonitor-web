@@ -24,9 +24,6 @@ export class ApiService {
   constructor(private http: HttpClient, private config: AppConfigService) {
     this.apiBaseUrl = this.config.getConfig()['apiBaseUrl'];
     console.log('API Service created');
-    this.get_workflows().subscribe((data) => {
-      console.log('Loaded workflows', data);
-    });
   }
 
   private get_http_options(params = {}, skip: boolean = false) {
