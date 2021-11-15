@@ -82,11 +82,15 @@ export class Workflow extends AggregatedStatusStatsItem {
       let latestBuilds: TestBuild[] = [];
       for (let item of this.suites.all) {
         let suite: Suite = item as Suite;
-
-        for (let inst of suite.instances.all) {
-          for (let b of inst.latestBuilds) {
-            latestBuilds.push(b);
+        try {
+          for (let inst of suite.instances.all) {
+            for (let b of inst.latestBuilds) {
+              latestBuilds.push(b);
+            }
           }
+        } catch (e) {
+          console.warn('Unable to load last builds');
+          this._latestBuilds = [];
         }
       }
 

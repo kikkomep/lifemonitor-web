@@ -335,6 +335,25 @@ export class ApiService {
           if (!queries || queries.length == 0) return of([]);
           return forkJoin(queries).pipe(
             retry(3),
+            catchError((error) => {
+              let suites: Array<Suite> = [];
+              for (let suiteData of rawSuitesData) {
+                let data: {} = suiteData;
+                data['status'] = 'unavailable';
+                let suite: Suite = new Suite(workflow, suiteData);
+                suite.instances = new InstanceStats();
+
+                let listOfinstances: Array<any> = suiteData['instances'];
+                for (let instanceData of listOfinstances) {
+                  let instance = new TestInstance(suite, instanceData);
+                  instance.status = 'unavailable';
+                  instance.latestBuilds = [];
+                  suite.instances.add(instance);
+                }
+                suites.push(suite);
+              }
+              return [suites];
+            }),
             mergeMap((statuses) => {
               console.log(
                 'Suite statuses after forkjoin',
@@ -357,10 +376,15 @@ export class ApiService {
                   let instaceLatestBuildsData =
                     statuses[dataIndexMap[instanceData['uuid']]];
                   let instance = new TestInstance(suite, instanceData);
-                  instance.latestBuilds = instaceLatestBuildsData['items'].map(
-                    (x: object) => new TestBuild(instance, x)
-                  );
-                  suite.instances.add(instance);
+                  try {
+                    instance.latestBuilds = instaceLatestBuildsData[
+                      'items'
+                    ].map((x: object) => new TestBuild(instance, x));
+                  } catch (e) {
+                    console.warn('Unable to load last builds');
+                  } finally {
+                    suite.instances.add(instance);
+                  }
                 }
                 suites.push(suite);
               }
