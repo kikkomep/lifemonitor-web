@@ -114,6 +114,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
           ['Aborted'],
           ['Running'],
           ['Waiting'],
+          ['Unavailable'],
         ]
       : [['Unknown']];
   }
