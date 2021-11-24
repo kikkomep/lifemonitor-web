@@ -1,11 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, from, Observable, of } from 'rxjs';
+import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status
+  Status,
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -24,9 +24,6 @@ export class ApiService {
   constructor(private http: HttpClient, private config: AppConfigService) {
     this.apiBaseUrl = this.config.getConfig()['apiBaseUrl'];
     console.log('API Service created');
-    this.get_workflows().subscribe((data) => {
-      console.log('Loaded workflows', data);
-    });
   }
 
   private get_http_options(params = {}, skip: boolean = false) {
@@ -172,18 +169,25 @@ export class ApiService {
       })
     );
 
-    const status = this.http.get<Status>(
-      this.apiBaseUrl + '/workflows/' + uuid + '/status',
-      this.get_http_options()
-    ).pipe(retry(3));
+    const status = this.http
+      .get<Status>(
+        this.apiBaseUrl + '/workflows/' + uuid + '/status',
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        catchError((err) => {
+          console.debug('workflow status error', err);
+          return throwError(err);
+        })
+      );
 
     let w = new Workflow({ uuid: uuid });
     let suites = null;
     let queries: Array<object> = [workflow, status];
     if (load_suites) {
       suites = this.get_suites(w);
-      if (suites)
-        queries = [workflow, status, suites];
+      if (suites) queries = [workflow, status, suites];
     }
 
     return forkJoin(queries).pipe(
@@ -195,7 +199,7 @@ export class ApiService {
         return w;
       }),
       tap((result) => console.log('Loaded workflow: ', result)),
-      retry(3),
+      retry(3)
     );
   }
 
@@ -231,7 +235,7 @@ export class ApiService {
         mergeMap((status: Object) => {
           let suite: Suite = new Suite({} as Workflow, suiteData);
           suite.status = new Status({
-            aggregated_test_status: status['status'],
+            aggregate_test_status: status['status'],
           });
           suite.latestBuilds = status['latest_builds'];
           suite.instances = new InstanceStats();
@@ -277,6 +281,10 @@ export class ApiService {
             retry(3),
             map((instanceLatestBuilds) => {
               return suite;
+            }),
+            catchError((err) => {
+              console.log('Catching error of latest builds of instance');
+              return [];
             })
           );
         })
@@ -284,7 +292,7 @@ export class ApiService {
   }
 
   get_suites(workflow: Workflow): Observable<Suite[]> {
-    console.log('Loading suites....');
+    console.log('Loading suites of workflow ....', workflow);
     return this.http
       .get<Suite[]>(
         this.apiBaseUrl + '/workflows/' + workflow.uuid + '/suites',
@@ -327,6 +335,25 @@ export class ApiService {
           if (!queries || queries.length == 0) return of([]);
           return forkJoin(queries).pipe(
             retry(3),
+            catchError((error) => {
+              let suites: Array<Suite> = [];
+              for (let suiteData of rawSuitesData) {
+                let data: {} = suiteData;
+                data['status'] = 'unavailable';
+                let suite: Suite = new Suite(workflow, suiteData);
+                suite.instances = new InstanceStats();
+
+                let listOfinstances: Array<any> = suiteData['instances'];
+                for (let instanceData of listOfinstances) {
+                  let instance = new TestInstance(suite, instanceData);
+                  instance.status = 'unavailable';
+                  instance.latestBuilds = [];
+                  suite.instances.add(instance);
+                }
+                suites.push(suite);
+              }
+              return [suites];
+            }),
             mergeMap((statuses) => {
               console.log(
                 'Suite statuses after forkjoin',
@@ -339,7 +366,7 @@ export class ApiService {
                 let suite: Suite = new Suite(workflow, suiteData);
                 let status = statuses[dataIndexMap[suiteData['uuid']]];
                 suite.status = new Status({
-                  aggregated_test_status: status['status'],
+                  aggregate_test_status: status['status'],
                 });
                 suite.latestBuilds = status['latest_builds'];
                 suite.instances = new InstanceStats();
@@ -349,10 +376,15 @@ export class ApiService {
                   let instaceLatestBuildsData =
                     statuses[dataIndexMap[instanceData['uuid']]];
                   let instance = new TestInstance(suite, instanceData);
-                  instance.latestBuilds = instaceLatestBuildsData['items'].map(
-                    (x: object) => new TestBuild(instance, x)
-                  );
-                  suite.instances.add(instance);
+                  try {
+                    instance.latestBuilds = instaceLatestBuildsData[
+                      'items'
+                    ].map((x: object) => new TestBuild(instance, x));
+                  } catch (e) {
+                    console.warn('Unable to load last builds');
+                  } finally {
+                    suite.instances.add(instance);
+                  }
                 }
                 suites.push(suite);
               }

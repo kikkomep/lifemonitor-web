@@ -1,13 +1,7 @@
 import { TestingService } from './service.modes';
-import {
-  InstanceStats, StatusStatsItem
-} from './stats.model';
+import { InstanceStats, StatusStatsItem } from './stats.model';
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';
-
-// export class TestInstanceStatus extends Status{
-//     latestBuilds: TestInstanceStats;
-// }
 
 export class TestInstance extends StatusStatsItem {
   public uuid: string;
@@ -33,7 +27,7 @@ export class TestInstance extends StatusStatsItem {
     if (this.latestBuilds && this.latestBuilds.length > 0) {
       return this.latestBuilds[0]['status'];
     }
-    return 'unknown';
+    return 'unavailable';
   }
 
   public get platformIcon(): string {
@@ -50,13 +44,18 @@ export class TestInstance extends StatusStatsItem {
 
   public getLatestBuilds(): StatusStatsItem[] {
     if (!this._latest) {
-      let latestBuilds: StatusStatsItem[] = [];
-      for (let b of this.latestBuilds) {
-        latestBuilds.push(new TestBuild(this, b));
+      try {
+        let latestBuilds: StatusStatsItem[] = [];
+        for (let b of this.latestBuilds) {
+          latestBuilds.push(new TestBuild(this, b));
+        }
+        this._latest = latestBuilds.sort((a, b) =>
+          a.timestamp >= b.timestamp ? 1 : -1
+        );
+      } catch (e) {
+        console.warn('Unable to load last builds');
+        this._latest = [];
       }
-      this._latest = latestBuilds.sort((a, b) =>
-        a.timestamp >= b.timestamp ? 1 : -1
-      );
     }
     return this._latest;
   }

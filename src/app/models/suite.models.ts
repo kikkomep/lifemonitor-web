@@ -2,7 +2,7 @@ import {
   AggregatedStatusStatsItem,
   InstanceStats,
   Status,
-  StatusStatsItem
+  StatusStatsItem,
 } from './stats.model';
 import { Workflow } from './workflow.model';
 
@@ -36,15 +36,20 @@ export class Suite extends AggregatedStatusStatsItem {
 
   public getLatestBuilds(): StatusStatsItem[] {
     if (!this._latest) {
-      let latestBuilds: StatusStatsItem[] = [];
-      for (let inst of this.instances.all) {
-        for (let b of inst.latestBuilds) {
-          latestBuilds.push(b);
+      try {
+        let latestBuilds: StatusStatsItem[] = [];
+        for (let inst of this.instances.all) {
+          for (let b of inst.latestBuilds) {
+            latestBuilds.push(b);
+          }
         }
+        this._latest = latestBuilds.sort((a, b) =>
+          a.timestamp >= b.timestamp ? 1 : -1
+        );
+      } catch (e) {
+        console.warn('Unable to load last builds');
+        this._latest = [];
       }
-      this._latest = latestBuilds.sort((a, b) =>
-        a.timestamp >= b.timestamp ? 1 : -1
-      );
     }
     return this._latest;
   }

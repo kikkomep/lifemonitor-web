@@ -15,13 +15,14 @@ export const TestStatus = [
   'aborted',
   'running',
   'waiting',
+  'unavailable',
 ];
 
 export class Status {
   aggregate_test_status: string;
   latestBuilds: [];
 
-  constructor(private data: Object) {
+  constructor(data: Object) {
     Object.assign(this, data);
   }
 }
@@ -65,12 +66,9 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
   }
 
   public get class(): string {
-    if (this.aggregatedStatus == 'all_passing')
-      return 'text-primary';
-    if (this.aggregatedStatus == 'some_passing')
-      return 'text-warning';
-    if (this.aggregatedStatus == 'all_failing')
-      return 'text-danger';
+    if (this.aggregatedStatus == 'all_passing') return 'text-primary';
+    if (this.aggregatedStatus == 'some_passing') return 'text-warning';
+    if (this.aggregatedStatus == 'all_failing') return 'text-danger';
     return 'text-gray';
   }
 
@@ -84,15 +82,21 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
   }
 
   public get aggregatedStatus(): string {
-    return !this.status
-      ? 'unknown'
-      : this.status instanceof String || typeof this.status === 'string'
-        ? this.status
-        : 'aggregated_test_status' in this.status
-          ? this.status['aggregated_test_status']
-          : 'aggregate_test_status' in this.status
-            ? this.status['aggregate_test_status']
-            : 'unknonw';
+    let status = 'unknown';
+    if (this.status != null && this.status !== 'undefined') {
+      if ('aggregate_test_status' in this.status) {
+        status = this.status['aggregate_test_status'];
+      } else if (this.status instanceof Status) {
+        let x: Status = this.status as Status;
+        status = x.aggregate_test_status;
+      } else if (
+        this.status instanceof String ||
+        typeof this.status === 'string'
+      ) {
+        status = this.status as string;
+      }
+    }
+    return status == 'unavailable' ? 'unknown' : status;
   }
 }
 
@@ -136,7 +140,9 @@ export class AbstractStats extends Model {
     if (this._statuses.indexOf('unknown') != -1) {
       let s: string = 'not_available';
       console.log('Initializing', s);
-      this['unknown'].push(...data.filter((item: StatsItem) => item.getStatus() === s));
+      this['unknown'].push(
+        ...data.filter((item: StatsItem) => item.getStatus() === s)
+      );
       console.log('Configured', this['unknown']);
     }
 
@@ -223,6 +229,7 @@ export class InstanceStats extends AbstractStats {
   aborted: StatusStatsItem[];
   running: StatusStatsItem[];
   waiting: StatusStatsItem[];
+  unavailable: StatusStatsItem[];
 
   constructor(private items?: StatusStatsItem[]) {
     super(TestStatus, items);
