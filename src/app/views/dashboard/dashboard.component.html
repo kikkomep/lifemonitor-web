@@ -151,8 +151,10 @@
         <i class="fas fa-3x fa-sync-alt"></i>
       </div>
       <div class="card-body box-profile">
-
         <div *ngIf="isUserLogged()" class="float-right">
+          <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="openWorkflowUploader()">
+            <i class="fas fa-plus-circle"></i> add
+          </a>
           <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="editModeToggle()">
             <i class="far fa-edit"></i> edit
           </a>

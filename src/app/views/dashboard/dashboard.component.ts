@@ -9,6 +9,7 @@ import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow } from 'src/app/models/workflow.model';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
+import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
 import { StatsFilterPipe } from './../../utils/filters/stats-filter.pipe';
 
 declare var $: any;
@@ -36,7 +37,8 @@ export class DashboardComponent implements OnInit, OnChanges {
   constructor(
     private appService: AppService,
     private router: Router,
-    private inputDialog: InputDialogService
+    private inputDialog: InputDialogService,
+    private uploaderService: WorkflowUploaderService
   ) {
     console.log('Dashboard Created!!');
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
@@ -91,6 +93,10 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   public isUserLogged(): boolean {
     return this.appService.isUserLogged();
+  }
+
+  public openWorkflowUploader() {
+    this.uploaderService.show({});
   }
 
   public editModeToggle() {
