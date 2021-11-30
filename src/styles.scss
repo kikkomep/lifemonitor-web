@@ -2946,8 +2946,8 @@ fieldset:disabled a.btn {
 .btn-primary.disabled,
 .btn-primary:disabled {
   color           : #fff;
-  background-color: #007bff;
-  border-color    : #007bff;
+  background-color: #1a7676;
+  border-color    : #1a7699;
 }
 
 .btn-primary:not(:disabled):not(.disabled):active,
@@ -4347,7 +4347,7 @@ input[type="button"].btn-block {
 }
 
 .custom-radio .custom-control-input:disabled:checked~.custom-control-label::before {
-  background-color: rgba(0, 123, 255, 0.5);
+  background-color: #1a7676;
 }
 
 .custom-switch {
@@ -26155,7 +26155,7 @@ select.form-control-sm~.select2-container--default .select2-selection--multiple 
 
 .icheck-primary>input:first-child:checked+label::before,
 .icheck-primary>input:first-child:checked+input[type="hidden"]+label::before {
-  background-color: #007bff;
+  background-color: var(--eosc-green);
   border-color    : #007bff;
 }
 
