@@ -2,7 +2,7 @@ import { AuthService } from 'src/app/utils/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { map, finalize } from 'rxjs/operators';
+import { map, finalize, catchError } from 'rxjs/operators';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -226,7 +226,7 @@ export class AppService {
 
           for (let w of this._workflows) {
             console.log('Loading data of workflow ', w);
-            this.loadWorkflow(w).subscribe((wf: Workflow) => {});
+            this.loadWorkflow(w).subscribe((wf: Workflow) => { });
           }
           this.subjectWorkflows.next(stats);
         },
@@ -271,6 +271,42 @@ export class AppService {
         this._selectWorkflow(w);
       }
     }
+  }
+
+  public registerWorkflowByUrl(
+    url: string,
+    uuid: string,
+    version: string,
+    name: string = null,
+    is_public: boolean = false,
+    authorization: string = null
+  ): Observable<object> {
+    this.setLoadingWorkflows(true);
+    return this.api
+      .registerWorkflowByUrl(url, uuid, version, name, is_public, authorization)
+      .pipe(
+        map((data) => {
+          console.log('Data of registered workflow', data);
+          this.api.get_workflow(data['uuid']).subscribe((w: Workflow) => {
+            console.log('Loaded data:', w);
+            // TODO: atomic add
+            this._workflows.push(w);
+            this._workflowsStats.add(w);
+            console.log('Workflow data loaded!');
+            this.subjectWorkflows.next(this._workflowsStats);
+            this.setLoadingWorkflows(false);
+          });
+          return data;
+        }),
+        catchError((err) => {
+          console.log("Error when registering workflow", err);
+          this.setLoadingWorkflows(false);
+          throw (err);
+        }),
+        finalize(() => {
+          // this.setLoadingWorkflows(false);
+        })
+      );
   }
 
   public changeWorkflowVisibility(w: Workflow): Observable<any> {
