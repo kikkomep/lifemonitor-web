@@ -80,6 +80,7 @@ export function initConfigService(appConfig: AppConfigService) {
     RocrateLogoComponent,
     WorkflowHeaderComponent,
     InputDialogComponent,
+    WorkflowUploaderComponent,
   ],
   imports: [
     FormsModule,
