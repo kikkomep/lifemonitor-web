@@ -145,17 +145,17 @@
     <!-- Search Bar -->
     <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
-    <div *ngIf="! (isLoading|async)" class="card card-primary card-outline">
+    <div class="card card-primary card-outline">
       <!-- Loading (remove the following to stop the loading)-->
       <div *ngIf="!workflows" class="overlay dark">
         <i class="fas fa-3x fa-sync-alt"></i>
       </div>
       <div class="card-body box-profile">
-        <div *ngIf="isUserLogged()" class="float-right">
-          <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="openWorkflowUploader()">
+        <div *ngIf="isUserLogged()" class="float-right m-4">
+          <a *ngIf="!editModeEnabled" class="btn btn-sm m-2" (click)="openWorkflowUploader()">
             <i class="fas fa-plus-circle"></i> add
           </a>
-          <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="editModeToggle()">
+          <a *ngIf="!editModeEnabled" class="btn btn-sm m-2" (click)="editModeToggle()">
             <i class="far fa-edit"></i> edit
           </a>
           <a *ngIf="editModeEnabled" class="btn btn-sm m-4 active" (click)="editModeToggle()">
