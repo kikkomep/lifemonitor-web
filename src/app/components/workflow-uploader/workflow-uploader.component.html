@@ -14,23 +14,7 @@
         <h4 class="modal-title text-weight-bold">{{ title }}</h4>
       </div>
       <div class="modal-body">
-        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-
-        <div class="text-center p-5 text-primary">
-          <i class="{{iconClass}} {{iconClassSize}}"></i>
-        </div>
-
-        <div class="text-center">
-          <h2 clas="font-weight-light" [innerHTML]="question"></h2>
-          <h6 class="text-muted" [innerHTML]="description"></h6>
-        </div> -->
-
         <div class="card card-default">
-          <!-- <div class="card-header">
-            <h3 class="card-title">bs-stepper</h3>
-          </div> -->
           <div class="card-body p-0">
             <div class="bs-stepper" id="uploaderStepper">
               <div class="bs-stepper-header" role="tablist">
@@ -130,9 +114,6 @@
                             {{ roCrateFile ? roCrateFile['name'] : 'Choose a file'}}
                           </label>
                         </div>
-                        <!-- <div class="input-group-append">
-                          <span class="input-group-text">Upload</span>
-                        </div> -->
                       </div>
                     </div>
 
@@ -140,10 +121,6 @@
 
                     <!-- (1d) Select workflow from github repository -->
                   </div>
-
-                  <!-- <div class="float-right pb-5 pr-4">
-                    <button class="btn btn-primary" (click)="next()" style="width: 100px;">Next</button>
-                  </div> -->
                 </div>
 
                 <!-- PART 2: Workflow details -->
@@ -185,10 +162,6 @@
                       aria-describedby="workflow-name-error" aria-invalid="true">
                     <span id="workflow-name-error" class="error invalid-feedback">{{ errors['name'] }}</span>
                   </div>
-
-                  <!-- <div class="float-right pb-5 pr-4">
-                    <button class="btn btn-warning mr-2" (click)="previous()" style="width: 100px;">Previous</button>
-                  </div> -->
                 </div>
               </div>
             </div>
