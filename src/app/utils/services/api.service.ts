@@ -74,6 +74,37 @@ export class ApiService {
       );
   }
 
+  registerWorkflowByUrl(
+    url: string,
+    uuid: string,
+    version: string,
+    name: string = null,
+    is_public: boolean = false,
+    authorization: string = null
+  ): Observable<object> {
+    let data = {
+      roc_link: url,
+      uuid: uuid,
+      version: version,
+    };
+    if (name) data['name'] = name;
+    if (is_public) data['public'] = is_public;
+    if (authorization) data['aithorization'] = authorization;
+    return this.http
+      .post(
+        this.apiBaseUrl + '/users/current/workflows',
+        data,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((wf_data) => {
+          console.log('Workflow registered', wf_data);
+          return wf_data;
+        })
+      );
+  }
+
   downloadROCrate(workflow: Workflow): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
     return this.http
