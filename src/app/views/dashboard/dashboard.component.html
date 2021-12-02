@@ -254,7 +254,7 @@
                 <td class="text-center align-middle font-weight-light">
                   <div data-toggle="tooltip" data-placement="top" data-html="true"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
-                    {{ w.latest_version }}
+                    {{ w.version ? w.version.version : ''}}
                   </div>
                   <div *ngIf="w.registry" class="text-sm" title="{{ w.externalLink }}">
                     <a href="{{ w.externalLink }}" target="_blank">[details <i
