@@ -201,29 +201,43 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   public confirm() {
     try {
       console.log('Workflow source: ', this.source);
+      let request = null;
       if (this.source === 'remoteRoCrate') {
+        request = this.appService.registerWorkflowRoCrate(
+          this.workflowUUID,
+          this.workflowVersion,
+          this.roCrateURL.url,
+          null,
+          this.workflowName,
+          false,
+          this.authorizationHeader
+        );
+      } else if (this.source === 'localRoCrate') {
+        request = this.appService.registerWorkflowRoCrate(
+          this.workflowUUID,
+          this.workflowVersion,
+          null,
+          this.workflowROCrate,
+          this.workflowName,
+          false,
+          this.authorizationHeader
+        );
+      }
+
+      if (request) {
         this._processing = true;
-        this.appService
-          .registerWorkflowByUrl(
-            this.roCrateURL.url,
-            this.workflowUUID,
-            this.workflowVersion,
-            this.workflowName,
-            false,
-            this.authorizationHeader
-          )
-          .subscribe(
-            (data) => {
-              console.log('Workflow registered (from uploader)', data);
-              this.hide();
-              this._processing = false;
-            },
-            (err) => {
-              console.log('Error', err);
-              this._handleError(err);
-              this._processing = false;
-            }
-          );
+        request.subscribe(
+          (data: any) => {
+            console.log('Workflow registered (from uploader)', data);
+            this.hide();
+            this._processing = false;
+          },
+          (err: HttpErrorResponse) => {
+            console.log('Error', err);
+            this._handleError(err);
+            this._processing = false;
+          }
+        );
       }
       if (this.onConfirm) {
         this.onConfirm();
