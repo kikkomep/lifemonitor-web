@@ -109,7 +109,7 @@
                       <div class="input-group">
                         <div class="custom-file">
                           <input type="file" class="custom-file-input" id="roCrateInputFile" name="roCrateInputFile"
-                            accept="*" (change)="setRoCrateFile()">
+                          accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed" (change)="setRoCrateFile()">
                           <label class="custom-file-label" for="roCrateInputFile">
                             {{ roCrateFile ? roCrateFile['name'] : 'Choose a file'}}
                           </label>
