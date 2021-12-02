@@ -227,16 +227,14 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   }
 
   public validateWorkflowSource(): boolean {
-    if (
-      ((this.source === 'localRoCrate' && this.roCrateFile) ||
-        (this.source === 'remoteRoCrate' &&
-          this.roCrateURL &&
-          this.roCrateURL.isValid))
-    ) {
+    if (this.source === 'localRoCrate' && this._workflowROCrate) return true;
+    else if (
+      this.source === 'remoteRoCrate' &&
+      this.roCrateURL &&
+      this.roCrateURL.isValid
+    )
       return true;
-    } else {
-      return false;
-    }
+    return false;
   }
 
   public validateWorkflowDetails(): boolean {
