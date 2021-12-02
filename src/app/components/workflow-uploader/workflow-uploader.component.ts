@@ -279,11 +279,21 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   }
 
   public _reset() {
+    this.stepper.reset();
     this.errors = [];
+    this.source = 'localRoCrate';
     this.workflowName = null;
     this.workflowUUID = uuidv4();
     this.workflowVersion = '1.0';
+    this.roCrateFile = null;
+    this._workflowROCrate = null;
     this.roCrateURL = new UrlValue(this.httpClient);
+    this._registrationError = null;
+    // reset file selector
+    let input = document.getElementById('roCrateUrl');
+    if (input) {
+      input['value'] = null;
+    }
   }
 
   private _handleError(err: HttpErrorResponse) {
