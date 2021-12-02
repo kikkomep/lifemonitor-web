@@ -42,6 +42,7 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   _workflowName: string = null;
   _workflowVersion: string = null;
   _authorizationHeader: string = null;
+  _workflowROCrate: string = null;
 
   errors: [] = [];
 
@@ -125,7 +126,9 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
 
   public set authorizationHeader(value: string) {
     this._authorizationHeader = value;
-    console.log("Setting auth header: " + this.authorizationHeader);
+
+  public get workflowROCrate(): string {
+    return this._workflowROCrate;
   }
 
   public show() {
@@ -151,9 +154,10 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
     console.log(this.roCrateFile);
     var fReader = new FileReader();
     fReader.readAsDataURL(input['files'][0]);
-    fReader.onloadend = function (event) {
-      var img: object = document.getElementById('filePreview');
-      img['innerHTML'] = event.target.result;
+    fReader.onloadend = (event) => {
+      let data: string = event.target.result as string;
+      this._workflowROCrate = data.split(',')[1];
+      console.log('Loaded RO-Crate', this._workflowROCrate);
     };
   }
 
