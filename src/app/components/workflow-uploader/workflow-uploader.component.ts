@@ -1,6 +1,12 @@
 import { AppService } from 'src/app/utils/services/app.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { AfterViewChecked, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import {
+  AfterViewChecked,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
 import Stepper from 'bs-stepper';
 import { UrlValue } from 'src/app/models/common.models';
 import { InputDialogConfig } from 'src/app/utils/services/input-dialog.service';
@@ -53,7 +59,7 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
     private appService: AppService,
     private service: WorkflowUploaderService,
     private cdref: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     $('#' + this.name).on('hide.bs.modal', () => {
@@ -97,7 +103,7 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
     this._workflowUUID = value;
     let valid = this.checkIfValidUUID(value);
     console.log('Setting workflow UUID: ' + value + ' (valid: ' + valid + ')');
-    this._setError('uuid', valid ? null : "Not valid UUID");
+    this._setError('uuid', valid ? null : 'Not valid UUID');
   }
 
   public get workflowName(): string {
@@ -116,8 +122,10 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   public set workflowVersion(value: string) {
     this._workflowVersion = value;
     let valid = this.checkIfValidVersion(value);
-    console.log('Setting workflow version: ' + value + ' (valid: ' + valid + ')');
-    this._setError('version', valid ? null : "Not valid version");
+    console.log(
+      'Setting workflow version: ' + value + ' (valid: ' + valid + ')'
+    );
+    this._setError('version', valid ? null : 'Not valid version');
   }
 
   public get authorizationHeader(): string {
@@ -126,6 +134,7 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
 
   public set authorizationHeader(value: string) {
     this._authorizationHeader = value;
+  }
 
   public get workflowROCrate(): string {
     return this._workflowROCrate;
