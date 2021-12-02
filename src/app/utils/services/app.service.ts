@@ -226,7 +226,7 @@ export class AppService {
 
           for (let w of this._workflows) {
             console.log('Loading data of workflow ', w);
-            this.loadWorkflow(w).subscribe((wf: Workflow) => { });
+            this.loadWorkflow(w).subscribe((wf: Workflow) => {});
           }
           this.subjectWorkflows.next(stats);
         },
@@ -273,17 +273,26 @@ export class AppService {
     }
   }
 
-  public registerWorkflowByUrl(
-    url: string,
+  public registerWorkflowRoCrate(
     uuid: string,
     version: string,
+    url: string = null,
+    rocrate: string = null,
     name: string = null,
     is_public: boolean = false,
     authorization: string = null
   ): Observable<object> {
     this.setLoadingWorkflows(true);
     return this.api
-      .registerWorkflowByUrl(url, uuid, version, name, is_public, authorization)
+      .registerWorkflowRoCrate(
+        uuid,
+        version,
+        url,
+        rocrate,
+        name,
+        is_public,
+        authorization
+      )
       .pipe(
         map((data) => {
           console.log('Data of registered workflow', data);
@@ -299,9 +308,9 @@ export class AppService {
           return data;
         }),
         catchError((err) => {
-          console.log("Error when registering workflow", err);
+          console.log('Error when registering workflow', err);
           this.setLoadingWorkflows(false);
-          throw (err);
+          throw err;
         }),
         finalize(() => {
           // this.setLoadingWorkflows(false);

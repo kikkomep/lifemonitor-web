@@ -74,19 +74,24 @@ export class ApiService {
       );
   }
 
-  registerWorkflowByUrl(
-    url: string,
+  registerWorkflowRoCrate(
     uuid: string,
     version: string,
+    url: string = null,
+    rocrate: string = null,
     name: string = null,
     is_public: boolean = false,
     authorization: string = null
   ): Observable<object> {
     let data = {
-      roc_link: url,
       uuid: uuid,
       version: version,
     };
+    if (url && rocrate) {
+      throw Error('Only one of [url,rocrate] can be specified');
+    }
+    if (url) data['roc_link'] = url;
+    if (rocrate) data['rocrate'] = rocrate;
     if (name) data['name'] = name;
     if (is_public) data['public'] = is_public;
     if (authorization) data['aithorization'] = authorization;
