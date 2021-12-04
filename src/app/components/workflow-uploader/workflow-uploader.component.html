@@ -158,7 +158,7 @@
                     </div>
                     <input type="text" name="wf-name"
                       [ngClass]="!errors['name'] ? 'form-control': 'form-control is-invalid'" id="workflow-name"
-                      [(ngModel)]="workflowName" [(value)]="workflowName" placeholder="Enter workflow UUID"
+                      [(ngModel)]="workflowName" [(value)]="workflowName" placeholder="Enter workflow name"
                       aria-describedby="workflow-name-error" aria-invalid="true">
                     <span id="workflow-name-error" class="error invalid-feedback">{{ errors['name'] }}</span>
                   </div>
