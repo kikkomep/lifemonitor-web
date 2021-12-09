@@ -94,7 +94,7 @@ export class ApiService {
     if (rocrate) data['rocrate'] = rocrate;
     if (name) data['name'] = name;
     if (is_public) data['public'] = is_public;
-    if (authorization) data['aithorization'] = authorization;
+    if (authorization) data['authorization'] = authorization;
     return this.http
       .post(
         this.apiBaseUrl + '/users/current/workflows',
