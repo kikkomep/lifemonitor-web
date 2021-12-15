@@ -2,6 +2,7 @@ import { AppService } from 'src/app/utils/services/app.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {
   AfterViewChecked,
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   Input,
@@ -12,6 +13,8 @@ import { UrlValue } from 'src/app/models/common.models';
 import { InputDialogConfig } from 'src/app/utils/services/input-dialog.service';
 import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
+import { Subscription } from 'rxjs';
 
 declare var $: any;
 
@@ -26,7 +29,8 @@ interface RegistrationError {
   templateUrl: './workflow-uploader.component.html',
   styleUrls: ['./workflow-uploader.component.scss'],
 })
-export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
+export class WorkflowUploaderComponent
+  implements OnInit, AfterViewChecked, AfterViewInit {
   @Input() title = 'Register Workflow';
   @Input() iconClass = 'far fa-question-circle';
   @Input() iconClassSize = 'fa-7x';
@@ -68,14 +72,14 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
     private appService: AppService,
     private service: WorkflowUploaderService,
     private cdref: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     $('#' + this.name).on('hide.bs.modal', () => {
       console.log('hidden');
     });
 
-    $('#' + this.name).on('show.bs.modal', () => {
+    let s = $('#' + this.name).on('show.bs.modal', () => {
       let config: InputDialogConfig = this.service.getConfig();
       this.title = config.title || this.title;
       this.iconClass = config.iconClass || this.iconClass;
@@ -129,9 +133,14 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
         }
       )
     );
+
+    let modal = $('#' + this.name);
+    modal.on('shown.bs.modal', () => {
       console.log('shown');
     });
   }
+
+  ngAfterViewInit(): void { }
 
   ngAfterViewChecked() {
     this.cdref.detectChanges();
@@ -479,6 +488,10 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
       input['value'] = null;
     }
   }
+
+  // FIXME: remote this line... just for testing
+  // this.roCrateURL.url =
+  //   'https://www.dropbox.com/s/2p9dpf6s5sio877/ro-crate-galaxy-sortchangecase.crate.zip?dl=1';
 
   private _handleError(err: HttpErrorResponse) {
     console.log('Processing error', err);
