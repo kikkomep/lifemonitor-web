@@ -2,10 +2,9 @@
 <div class="modal fade" id="uploaderDialog" tabindex="-1" role="dialog" aria-labelledby="uploaderDialog"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-
     <div class="modal-content">
       <div *ngIf="processing()" class="overlay m-auto p-0 text-center bg-gradient-white">
-        <div style="display: table; width: 100%; height: 100%;">
+        <div style="display: table; width: 100%; height: 100%">
           <app-loader [enabled]="processing"></app-loader>
         </div>
       </div>
@@ -18,7 +17,6 @@
           <div class="card-body p-0">
             <div class="bs-stepper" id="uploaderStepper">
               <div class="bs-stepper-header" role="tablist">
-
                 <!-- (1) Select Workflow Source -->
                 <div class="step" data-target="#source-part">
                   <button type="btn btn-primary" class="step-trigger" role="tab" aria-controls="source-part"
@@ -41,23 +39,23 @@
 
               <!-- Content of steps -->
               <div class="bs-stepper-content">
-
                 <!-- PART 1: Workflow source -->
-                <div id="source-part" class="content px-2" style="width: 100%;" role="tabpanel"
+                <div id="source-part" class="content px-2" style="width: 100%" role="tabpanel"
                   aria-labelledby="source-part-trigger">
                   <div class="font-weight-light text-muted">
                     Select the source of the workflow to be registered
                   </div>
                   <div class="form-group">
                     <div class="icheck-primary">
-                      <input type="radio" id="radioPrimary1" name="workflowSource" (change)="setSource('localRoCrate')" checked>
+                      <input type="radio" id="radioPrimary1" name="workflowSource" (change)="setSource('localRoCrate')"
+                        checked />
                       <label for="radioPrimary1">
                         Local RO-Crate Archive
                       </label>
                     </div>
                     <div class="icheck-primary">
                       <input type="radio" id="radioPrimary2" name="workflowSource"
-                        (change)="setSource('remoteRoCrate')">
+                        (change)="setSource('remoteRoCrate')" />
                       <label for="radioPrimary2">
                         Remote RO-Crate Archive
                       </label>
@@ -65,8 +63,9 @@
                     <div class="icheck-primary">
                       <input type="radio" id="radioPrimary3" name="workflowSource" (change)="setSource('registry')" />
                       <label for="radioPrimary3">
-                        Registry Workflow <span class="text-muted" style="font-weight: normal;">(e.g. workflow
-                          registered on <b>WorkflowHub</b>)</span>
+                        Registry Workflow
+                        <span class="text-muted" style="font-weight: normal">(e.g. workflow registered on
+                          <b>WorkflowHub</b>)</span>
                       </label>
                     </div>
                   </div>
@@ -84,22 +83,27 @@
                         </div>
                         <input type="text" name="roCrateUrl" class="form-control" id="roCrateUrl"
                           (change)="updateRoCrateUrl($event)" placeholder="https://myrepo.org/wf1.zip"
-                          aria-describedby="roCrateUrl-error">
-                        <span id="roCrateUrl-error" *ngIf="this.roCrateURL"
-                          class="error invalid-feedback">{{this.roCrateURL.error}}</span>
+                          aria-describedby="roCrateUrl-error" />
+                        <span id="roCrateUrl-error" *ngIf="this.roCrateURL" class="error invalid-feedback">{{
+                          this.roCrateURL.error }}</span>
                       </div>
 
                       <!-- RO-Crate authorization header -->
                       <div class="form-group mt-4">
                         <label for="workflow-auth" class="m-0">Authorization Header</label>
                         <div class="text-muted font-weight-light">
-                          Enter the optional authorization header if required to download the RO-Crate
+                          Enter the optional authorization header if required to
+                          download the RO-Crate
                         </div>
-                        <input id="workflow-auth" type="text" name="wf-auth"
-                          [(ngModel)]="authorizationHeader"
-                          [ngClass]="!errors['authorization'] ? 'form-control': 'form-control is-invalid'"
-                          placeholder="Bearer xxx__ZRBhqf9eeRasjqMw90pgEeMpTZ7__" aria-describedby="workflow-auth-error" aria-invalid="true">
-                        <span id="workflow-auth-error" class="error invalid-feedback">{{ errors['authorization'] }}</span>
+                        <input id="workflow-auth" type="text" name="wf-auth" [(ngModel)]="authorizationHeader"
+                          [ngClass]="
+                            !errors['authorization']
+                              ? 'form-control'
+                              : 'form-control is-invalid'
+                          " placeholder="Bearer xxx__ZRBhqf9eeRasjqMw90pgEeMpTZ7__"
+                          aria-describedby="workflow-auth-error" aria-invalid="true" />
+                        <span id="workflow-auth-error" class="error invalid-feedback">{{ errors['authorization']
+                          }}</span>
                       </div>
                     </div>
 
@@ -109,9 +113,14 @@
                       <div class="input-group">
                         <div class="custom-file">
                           <input type="file" class="custom-file-input" id="roCrateInputFile" name="roCrateInputFile"
-                          accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed" (change)="setRoCrateFile()">
+                            accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"
+                            (change)="setRoCrateFile()" />
                           <label class="custom-file-label" for="roCrateInputFile">
-                            {{ roCrateFile && roCrateFile['files'] ? roCrateFile['files']['0'].name : 'Choose a file'}}
+                            {{
+                            roCrateFile && roCrateFile['files']
+                            ? roCrateFile['files']['0'].name
+                            : 'Choose a file'
+                            }}
                           </label>
                         </div>
                       </div>
@@ -166,35 +175,35 @@
               </div>
             </div>
           </div>
-          <div class="card-footer text-muted" style="text-align: center;">
+          <div class="card-footer text-muted" style="text-align: center">
             (<i class="fas fa-star-of-life fa-xs"></i>) required fields
           </div>
           <!-- /.card-body -->
           <div *ngIf="registrationError" class="card-footer"
-            style="background: #ffe6e6; color: red; text-align: center;">
+            style="background: #ffe6e6; color: red; text-align: center">
             <div class="text-bold">
               <i class="fas fa-exclamation-circle mr-1"></i>
               {{ registrationError.title }} (code: {{ registrationError.code }})
             </div>
-            <div>{{ registrationError.message }} </div>
+            <div>{{ registrationError.message }}</div>
           </div>
-
-
         </div>
       </div>
       <div class="modal-footer">
         <div class="col-md-12 text-center p-2">
-          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal" style="width: 120px;"
-            [innerHTML]="cancelText">
-          </button>
+          <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal" style="width: 120px"
+            [innerHTML]="cancelText"></button>
           <button *ngIf="currentStepIndex > 0" class="btn btn-lg btn-warning m-1" (click)="previous()"
-            style="width: 120px;">Previous</button>
-          <button *ngIf="currentStepIndex != 1" class="btn btn-lg btn-primary m-1" (click)="next()"
-            style="width: 120px;" [attr.disabled]="!validateWorkflowSource() ? '' : null">Next</button>
-          <button *ngIf="currentStepIndex == 1" id="registerWorkflow" type="button" class="btn btn-primary btn-lg"
-            style="width: 120px;" (click)="confirm()" [innerHTML]="confirmText"
-            [attr.disabled]="!validateWorkflowDetails() ? '' : null">
+            style="width: 120px">
+            Previous
           </button>
+          <button *ngIf="currentStepIndex != 1" class="btn btn-lg btn-primary m-1" (click)="next()" style="width: 120px"
+            [attr.disabled]="!validateWorkflowSource() ? '' : null">
+            Next
+          </button>
+          <button *ngIf="currentStepIndex == 1" id="registerWorkflow" type="button" class="btn btn-primary btn-lg"
+            style="width: 120px" (click)="confirm()" [innerHTML]="confirmText"
+            [attr.disabled]="!validateWorkflowDetails() ? '' : null"></button>
         </div>
       </div>
     </div>
