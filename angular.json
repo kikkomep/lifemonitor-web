@@ -30,12 +30,14 @@
             "styles": [
               "./node_modules/chart.js/dist/Chart.min.css",
               "./node_modules/bs-stepper/dist/css/bs-stepper.min.css",
+              "./node_modules/bootstrap-select/dist/css/bootstrap-select.min.css",
               "src/styles.scss"
             ],
             "scripts": [
               "./node_modules/jquery/dist/jquery.min.js",
               "./node_modules/popper.js/dist/umd/popper.min.js",
-              "./node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
+              "./node_modules/bootstrap-select/dist/js/bootstrap-select.min.js"
             ]
           },
           "configurations": {
