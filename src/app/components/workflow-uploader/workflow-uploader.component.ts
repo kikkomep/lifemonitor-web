@@ -402,23 +402,29 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
       this.roCrateURL.isValid
     )
       return true;
-    return false;
+    else if (
+      this.source === 'registry' &&
+      this.selectedRegistry &&
+      this.selectedRegistryWorkflow
+    )
+      return true;
+    else
+      return false;
   }
 
   public validateWorkflowDetails(): boolean {
-    if (
-      this.errors.length == 0 &&
-      this.workflowUUID &&
-      this.workflowVersion &&
-      ((this.source === 'localRoCrate' && this.roCrateFile) ||
-        (this.source === 'remoteRoCrate' &&
-          this.roCrateURL &&
-          this.roCrateURL.isValid))
-    ) {
-      return true;
-    } else {
+    if (this.errors.length != 0 || !this.workflowVersion) return false;
+    if (this.source === 'localRoCrate' && !this.roCrateFile) return false;
+    if (this.source === 'remoteRoCrate'
+      && (!this.roCrateURL || !this.roCrateURL.isValid)) return false;
+    if (!this.workflowUUID
+      && (this.source === 'localRoCrate' || this.source === 'remoteRoCrate')) {
       return false;
     }
+    if (this.source === 'registry'
+      && (this.selectedRegistry === null || this.selectedRegistryWorkflow === null))
+      return false;
+    return true;
   }
 
   public get registrationError(): RegistrationError {
