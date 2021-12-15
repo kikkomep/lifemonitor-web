@@ -330,7 +330,7 @@ export class AppService {
 
           for (let w of this._workflows) {
             console.log('Loading data of workflow ', w);
-            this.loadWorkflow(w).subscribe((wf: Workflow) => {});
+            this.loadWorkflow(w).subscribe((wf: Workflow) => { });
           }
           this.subjectWorkflows.next(stats);
         },
