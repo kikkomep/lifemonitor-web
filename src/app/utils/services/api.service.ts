@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
+import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import {
   AggregatedStatusStats,
   InstanceStats,
@@ -49,6 +50,56 @@ export class ApiService {
         retry(3),
         map((data) => {
           return new User(data);
+        })
+      );
+  }
+
+  getRegistries(): Observable<object> {
+    return this.http
+      .get(this.apiBaseUrl + '/registries', this.get_http_options())
+      .pipe(
+        retry(3),
+        map((data) => {
+          console.log('Data registries', data);
+          let result = [];
+          for (let r of data['items']) {
+            result.push(new Registry(r));
+          }
+          return result;
+        })
+      );
+  }
+
+  getRegistryWorkflows(registry_uuid: string): Observable<object> {
+    return this.http
+      .get(
+        this.apiBaseUrl + '/registries/' + registry_uuid + '/index',
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((data) => {
+          console.log('Data registries', data);
+          let result = [];
+          for (let w of data['items']) {
+            result.push(new RegistryWorkflow(w));
+          }
+          return result;
+        })
+      );
+  }
+
+  getRegistryWorkflow(registry_uuid: string, workflow_identifier: string): Observable<RegistryWorkflow> {
+    return this.http
+      .get(
+        this.apiBaseUrl + '/registries/' + registry_uuid + '/index/' + workflow_identifier,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((data) => {
+          console.log('Data registries', data);
+          return new RegistryWorkflow(data);
         })
       );
   }
