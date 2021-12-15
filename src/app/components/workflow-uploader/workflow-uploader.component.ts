@@ -50,6 +50,10 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   _authorizationHeader: string = null;
   _workflowROCrate: string = null;
 
+
+  // subscriptions
+  private _subscriptions: Subscription[] = [];
+
   errors: [] = [];
 
   source: string = 'remoteRoCrate';
@@ -326,5 +330,11 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
       title: err.error.title,
       message: err.error.detail,
     } as RegistrationError;
+  }
+
+  public ngOnDestroy() {
+    for (let s of this._subscriptions) {
+      s.unsubscribe();
+    }
   }
 }
