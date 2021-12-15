@@ -367,6 +367,13 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
           false,
           this.authorizationHeader
         );
+      } else if (this.source === 'registry') {
+        request = this.appService.registerRegistryWorkflow(
+          this.selectedRegistryWorkflow,
+          this.workflowVersion,
+          this.workflowName,
+          false
+        );
       }
 
       if (request) {
