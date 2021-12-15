@@ -50,6 +50,11 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   _authorizationHeader: string = null;
   _workflowROCrate: string = null;
 
+  _registries: Registry[];
+
+  private _registryWorkflows: RegistryWorkflow[] = [];
+  private _selectedRegistry: Registry = null;
+  private _selectedRegistryWorkflow: RegistryWorkflow = null;
 
   // subscriptions
   private _subscriptions: Subscription[] = [];
@@ -91,6 +96,39 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
       this._reset();
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    });
+
+    this._subscriptions.push(
+      this.appService.loadRegistries().subscribe((data: Registry[]) => {
+        this._registries = data;
+        console.log('Loaded registries: ', this._registries);
+      })
+    );
+
+    this._subscriptions.push(
+      this.appService.observableRegistry.subscribe((registry: Registry) => {
+        this._selectedRegistry = registry;
+        console.log('Loaded registry', this.selectedRegistry);
+      })
+    );
+
+    this._subscriptions.push(
+      this.appService.observableRegistryWorkflow.subscribe((w: RegistryWorkflow) => {
+        this._selectedRegistryWorkflow = w;
+        console.log('Loaded registry workflow', w);
+        // Set defauls
+        this._workflowName = w.name;
+        this._workflowVersion = w.latest_version;
+      })
+    );
+
+    this._subscriptions.push(
+      this.appService.observableRegistryWorkflows.subscribe(
+        (workflows: RegistryWorkflow[]) => {
+          this.updateRegistryWorkflows(workflows);
+        }
+      )
+    );
       console.log('shown');
     });
   }
@@ -145,7 +183,9 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   }
 
   public show() {
-    $('#' + this.name).modal('show');
+    this.appService.loadRegistries().subscribe((registries: Registry[]) => {
+      $('#' + this.name).modal('show');
+    });
   }
 
   public hide() {
@@ -210,6 +250,22 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
     return this._processing;
   }
 
+  public get registries(): Registry[] {
+    return this._registries;
+  }
+
+  public get registryWorkflows(): RegistryWorkflow[] {
+    return this._registryWorkflows;
+  }
+
+  public get selectedRegistry(): Registry {
+    return this._selectedRegistry;
+  }
+
+  public get selectedRegistryWorkflow(): RegistryWorkflow {
+    return this._selectedRegistryWorkflow;
+  }
+
   public patchRegistryName(name: string): string {
     // TODO: remove this when the back-end will support
     // the name/title attribute for registries
@@ -233,6 +289,25 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
     }
     this.cdref.detectChanges();
     $('#registryWorkflowSelector').selectpicker('refresh');
+  }
+
+
+  public selectRegistry(value: any) {
+    console.log('Selecting registry....', value);
+    if (value && value.length > 0) {
+      this.appService.selectRegistry(value);
+    } else {
+      this.updateRegistryWorkflows([]);
+    }
+  }
+
+  public selectRegistryWorkflow(workflow_identifier: string) {
+    console.log("Selecting RegistryWorkflow", workflow_identifier);
+    if (workflow_identifier && workflow_identifier.length > 0) {
+      this.appService.selectRegistryWorkflow(workflow_identifier);
+    } else {
+      this._selectedRegistryWorkflow = null;
+    }
   }
 
   private updateRegistryWorkflows(data: RegistryWorkflow[]) {
