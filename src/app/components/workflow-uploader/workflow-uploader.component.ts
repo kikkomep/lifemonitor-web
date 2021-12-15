@@ -155,6 +155,14 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   public setSource(value: string) {
     this.source = value;
     console.log('Selected Source: ', this.source);
+    if (this.source === 'registry') {
+      this.cdref.detectChanges();
+      this.updateRegistries();
+      $('#registrySelector').selectpicker();
+      $('#registryWorkflowSelector').prop('disabled', true);
+      $('#registryWorkflowSelector').selectpicker();
+      $('#registryWorkflowSelector').selectpicker('refresh');
+    }
     this.validateWorkflowSource();
     // this.stepper.next();
     console.log('Current step', this.currentStepIndex);
@@ -201,6 +209,64 @@ export class WorkflowUploaderComponent implements OnInit, AfterViewChecked {
   public processing(): boolean {
     return this._processing;
   }
+
+  public patchRegistryName(name: string): string {
+    // TODO: remove this when the back-end will support
+    // the name/title attribute for registries
+    if (name === 'wfhubdev') return "WorkflowHub (dev)";
+    if (name === 'wfhub') return "WorkflowHub";
+    return name;
+  }
+
+  private updateRegistries() {
+    $('#registrySelector').append('<option value="">');
+    for (let r of this.registries) {
+      $('#registrySelector').append('<option value="' + r.uuid + '" '
+        + 'data-content="'
+        + '<span class=\'larger\'>' + this.patchRegistryName(r.name) + '</span>'
+        + '<span class=\'ml-1 text-muted small\'><a href=\'' + r.uri + '\'>' + r.uri + '</a></span>'
+        + '<div class=\'mr-4 text-muted\'>'
+        + '<span class=\'badge badge-primary mr-1\'>LifeMonitor ID</span>'
+        + '<span class=\'small\'>' + r.uuid + '</span>'
+        + '</div>">'
+        + '</option>');
+    }
+    this.cdref.detectChanges();
+    $('#registryWorkflowSelector').selectpicker('refresh');
+  }
+
+  private updateRegistryWorkflows(data: RegistryWorkflow[]) {
+    this._registryWorkflows = data;
+    if (!this.registryWorkflows || this.registryWorkflows.length === 0) {
+      $('#registryWorkflowSelector').prop('disabled', true);
+    } else {
+      $('#registryWorkflowSelector').append('<option value=\'\'></option>');
+      for (let w of this.registryWorkflows) {
+        $('#registryWorkflowSelector').append(
+          '<option value="' + w.identifier
+          + '" data-content="'
+          + w.name
+          + '<div>'
+          + '<span class=\'badge badge-primary mr-1\'>'
+          + w.registry.type + ' ID' + '</span>'
+          + '<span class=\'small text-muted\'><a href=\'' + w.links['origin'] + '\'>'
+          + w.links['origin'] + '</a></span>'
+          + '</div>'
+          + '"></option>'
+        );
+      }
+      this._selectedRegistryWorkflow = null;
+      $('#registryWorkflowSelector').prop('disabled', false);
+      // auto select first option
+      setTimeout(() => {
+        $("#registryWorkflowSelector").val($("#registryWorkflowSelector option:first").val());
+        console.log(this.selectedRegistryWorkflow);
+      }, 4000);
+    }
+    this.cdref.detectChanges();
+    $('#registryWorkflowSelector').selectpicker('refresh');
+  }
+
 
   public confirm() {
     try {
