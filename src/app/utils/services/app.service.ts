@@ -422,6 +422,46 @@ export class AppService {
       );
   }
 
+
+  public registerRegistryWorkflow(
+    workflow: RegistryWorkflow,
+    version: string,
+    name: string = null,
+    is_public: boolean = false
+  ): Observable<object> {
+    this.setLoadingWorkflows(true);
+    return this.api
+      .registerRegistryWorkflow(
+        workflow,
+        version,
+        name,
+        is_public
+      )
+      .pipe(
+        map((data) => {
+          console.log('Data of registered workflow', data);
+          this.api.get_workflow(data['uuid']).subscribe((w: Workflow) => {
+            console.log('Loaded data:', w);
+            // TODO: atomic add
+            this._workflows.push(w);
+            this._workflowsStats.add(w);
+            console.log('Workflow data loaded!');
+            this.subjectWorkflows.next(this._workflowsStats);
+            this.setLoadingWorkflows(false);
+          });
+          return data;
+        }),
+        catchError((err) => {
+          console.log('Error when registering workflow', err);
+          this.setLoadingWorkflows(false);
+          throw err;
+        }),
+        finalize(() => {
+          // this.setLoadingWorkflows(false);
+        })
+      );
+  }
+
   public changeWorkflowVisibility(w: Workflow): Observable<any> {
     return this.api.changeWorkflowVisibility(w);
   }

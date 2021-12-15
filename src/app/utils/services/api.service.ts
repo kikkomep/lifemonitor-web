@@ -125,6 +125,32 @@ export class ApiService {
       );
   }
 
+  registerRegistryWorkflow(
+    workflow: RegistryWorkflow,
+    version: string = null,
+    name: string = null,
+    is_public: boolean = false): Observable<object> {
+    let data = {
+      "identifier": workflow.identifier,
+      "name": name,
+      "version": version,
+      "public": is_public
+    }
+    return this.http
+      .post(
+        this.apiBaseUrl + '/registries/' + workflow.registry.uuid + '/workflows',
+        data,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((wf_data) => {
+          console.log('Workflow registered', wf_data);
+          return wf_data;
+        })
+      );
+  }
+
   registerWorkflowRoCrate(
     uuid: string,
     version: string,
@@ -232,8 +258,8 @@ export class ApiService {
     let url: string = !filteredByUser
       ? this.apiBaseUrl + '/workflows?status=true'
       : this.apiBaseUrl +
-        '/users/current/workflows?status=true&subscriptions=' +
-        includeSubScriptions.toString();
+      '/users/current/workflows?status=true&subscriptions=' +
+      includeSubScriptions.toString();
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
       tap((data) => console.log('Loaded workflows: ', data)),
@@ -333,9 +359,9 @@ export class ApiService {
               this.http
                 .get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
                 .pipe(
@@ -410,9 +436,9 @@ export class ApiService {
               queries.push(
                 this.http.get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
               );
@@ -543,11 +569,11 @@ export class ApiService {
     return this.http
       .get(
         this.apiBaseUrl +
-          '/instances/' +
-          testInstanceUUID +
-          '/builds/' +
-          buildID +
-          '/logs',
+        '/instances/' +
+        testInstanceUUID +
+        '/builds/' +
+        buildID +
+        '/logs',
         this.get_http_options()
       )
       .pipe(
