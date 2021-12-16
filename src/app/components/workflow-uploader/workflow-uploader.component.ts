@@ -286,7 +286,6 @@ export class WorkflowUploaderComponent
 
   private updateRegistries(registries: Registry[]) {
     this._registries = registries;
-    $('#registrySelector').append('<option value=\'\'></option>')
     $('#registrySelector')
       .find('option')
       .remove()
@@ -501,9 +500,6 @@ export class WorkflowUploaderComponent
     }
   }
 
-  // FIXME: remote this line... just for testing
-  // this.roCrateURL.url =
-  //   'https://www.dropbox.com/s/2p9dpf6s5sio877/ro-crate-galaxy-sortchangecase.crate.zip?dl=1';
 
   private _handleError(err: HttpErrorResponse) {
     console.log('Processing error', err);
