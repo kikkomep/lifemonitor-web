@@ -103,9 +103,9 @@ export class WorkflowUploaderComponent
     });
 
     this._subscriptions.push(
-      this.appService.loadRegistries().subscribe((data: Registry[]) => {
-        this._registries = data;
-        console.log('Loaded registries: ', this._registries);
+      this.appService.observableRegistries.subscribe((data: Registry[]) => {
+        this.updateRegistries(data);
+        console.log('Loaded registries: ', this.registries);
       })
     );
 
@@ -137,6 +137,9 @@ export class WorkflowUploaderComponent
     let modal = $('#' + this.name);
     modal.on('shown.bs.modal', () => {
       console.log('shown');
+      this.appService.loadRegistries().subscribe((registries: Registry[]) => {
+        console.log("data registries....", registries);
+      });
     });
   }
 
@@ -192,9 +195,7 @@ export class WorkflowUploaderComponent
   }
 
   public show() {
-    this.appService.loadRegistries().subscribe((registries: Registry[]) => {
-      $('#' + this.name).modal('show');
-    });
+    $('#' + this.name).modal('show');
   }
 
   public hide() {
@@ -206,7 +207,7 @@ export class WorkflowUploaderComponent
     console.log('Selected Source: ', this.source);
     if (this.source === 'registry') {
       this.cdref.detectChanges();
-      this.updateRegistries();
+      this.updateRegistries(this.registries);
       $('#registrySelector').selectpicker();
       $('#registryWorkflowSelector').prop('disabled', true);
       $('#registryWorkflowSelector').selectpicker();
@@ -283,18 +284,27 @@ export class WorkflowUploaderComponent
     return name;
   }
 
-  private updateRegistries() {
-    $('#registrySelector').append('<option value="">');
-    for (let r of this.registries) {
-      $('#registrySelector').append('<option value="' + r.uuid + '" '
-        + 'data-content="'
-        + '<span class=\'larger\'>' + this.patchRegistryName(r.name) + '</span>'
-        + '<span class=\'ml-1 text-muted small\'><a href=\'' + r.uri + '\'>' + r.uri + '</a></span>'
-        + '<div class=\'mr-4 text-muted\'>'
-        + '<span class=\'badge badge-primary mr-1\'>LifeMonitor ID</span>'
-        + '<span class=\'small\'>' + r.uuid + '</span>'
-        + '</div>">'
-        + '</option>');
+  private updateRegistries(registries: Registry[]) {
+    this._registries = registries;
+    $('#registrySelector').append('<option value=\'\'></option>')
+    $('#registrySelector')
+      .find('option')
+      .remove()
+      .end()
+      .append('<option value=\'\'></option>')
+      .val('');
+    if (registries) {
+      for (let r of registries) {
+        $('#registrySelector').append('<option value="' + r.uuid + '" '
+          + 'data-content="'
+          + '<span class=\'larger\'>' + this.patchRegistryName(r.name) + '</span>'
+          + '<span class=\'ml-1 text-muted small\'><a href=\'' + r.uri + '\'>' + r.uri + '</a></span>'
+          + '<div class=\'mr-4 text-muted\'>'
+          + '<span class=\'badge badge-primary mr-1\'>LifeMonitor ID</span>'
+          + '<span class=\'small\'>' + r.uuid + '</span>'
+          + '</div>">'
+          + '</option>');
+      }
     }
     this.cdref.detectChanges();
     $('#registryWorkflowSelector').selectpicker('refresh');
