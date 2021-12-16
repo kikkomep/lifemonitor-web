@@ -242,13 +242,13 @@ export class AppService {
   }
 
   public loadRegistries(): Observable<Registry[]> {
-    if (!this._registries) {
-      this.api.getRegistries().subscribe((data: Registry[]) => {
+    return this.api.getRegistries().pipe(
+      map((data: Registry[]) => {
         this._registries = data;
         this.subjectRegistries.next(this._registries);
-      });
-    }
-    return this._observableRegistries;
+        return this._registries;
+      })
+    );
   }
 
   private findRegistryByUuid(uuid: string): Registry {
