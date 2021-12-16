@@ -1,6 +1,6 @@
 {
   "name": "lifemonitor",
-  "version": "0.1.0-alpha4",
+  "version": "0.1.0-alpha5",
   "scripts": {
     "start": "node server.js",
     "dev:start": "ng serve",
@@ -36,6 +36,7 @@
     "@ng-bootstrap/ng-bootstrap": "9.0.2",
     "ansi-html": "~0.0.7",
     "bootstrap": "4.6.0",
+    "bs-stepper": "~1.7.0",
     "chalk": "~4.1.1",
     "chart.js": "^2.9.4",
     "core-js": "3.9.1",

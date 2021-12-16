@@ -74,6 +74,42 @@ export class ApiService {
       );
   }
 
+  registerWorkflowRoCrate(
+    uuid: string,
+    version: string,
+    url: string = null,
+    rocrate: string = null,
+    name: string = null,
+    is_public: boolean = false,
+    authorization: string = null
+  ): Observable<object> {
+    let data = {
+      uuid: uuid,
+      version: version,
+    };
+    if (url && rocrate) {
+      throw Error('Only one of [url,rocrate] can be specified');
+    }
+    if (url) data['roc_link'] = url;
+    if (rocrate) data['rocrate'] = rocrate;
+    if (name) data['name'] = name;
+    if (is_public) data['public'] = is_public;
+    if (authorization) data['authorization'] = authorization;
+    return this.http
+      .post(
+        this.apiBaseUrl + '/users/current/workflows',
+        data,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((wf_data) => {
+          console.log('Workflow registered', wf_data);
+          return wf_data;
+        })
+      );
+  }
+
   downloadROCrate(workflow: Workflow): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
     return this.http
@@ -145,8 +181,8 @@ export class ApiService {
     let url: string = !filteredByUser
       ? this.apiBaseUrl + '/workflows?status=true'
       : this.apiBaseUrl +
-      '/users/current/workflows?status=true&subscriptions=' +
-      includeSubScriptions.toString();
+        '/users/current/workflows?status=true&subscriptions=' +
+        includeSubScriptions.toString();
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
       tap((data) => console.log('Loaded workflows: ', data)),
@@ -246,9 +282,9 @@ export class ApiService {
               this.http
                 .get(
                   this.apiBaseUrl +
-                  '/instances/' +
-                  instanceData['uuid'] +
-                  '/latest-builds',
+                    '/instances/' +
+                    instanceData['uuid'] +
+                    '/latest-builds',
                   this.get_http_options()
                 )
                 .pipe(
@@ -323,9 +359,9 @@ export class ApiService {
               queries.push(
                 this.http.get(
                   this.apiBaseUrl +
-                  '/instances/' +
-                  instanceData['uuid'] +
-                  '/latest-builds',
+                    '/instances/' +
+                    instanceData['uuid'] +
+                    '/latest-builds',
                   this.get_http_options()
                 )
               );
@@ -456,11 +492,11 @@ export class ApiService {
     return this.http
       .get(
         this.apiBaseUrl +
-        '/instances/' +
-        testInstanceUUID +
-        '/builds/' +
-        buildID +
-        '/logs',
+          '/instances/' +
+          testInstanceUUID +
+          '/builds/' +
+          buildID +
+          '/logs',
         this.get_http_options()
       )
       .pipe(

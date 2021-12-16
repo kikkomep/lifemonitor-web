@@ -2,6 +2,8 @@
 
 <app-input-dialog></app-input-dialog>
 
+<app-workflow-uploader></app-workflow-uploader>
+
 <div *ngIf="workflows" class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -143,15 +145,17 @@
     <!-- Search Bar -->
     <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
-    <div *ngIf="! (isLoading|async)" class="card card-primary card-outline">
+    <div class="card card-primary card-outline">
       <!-- Loading (remove the following to stop the loading)-->
       <div *ngIf="!workflows" class="overlay dark">
         <i class="fas fa-3x fa-sync-alt"></i>
       </div>
       <div class="card-body box-profile">
-
-        <div *ngIf="isUserLogged()" class="float-right">
-          <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="editModeToggle()">
+        <div *ngIf="isUserLogged()" class="float-right m-4">
+          <a *ngIf="!editModeEnabled" class="btn btn-sm m-2" (click)="openWorkflowUploader()">
+            <i class="fas fa-plus-circle"></i> add
+          </a>
+          <a *ngIf="!editModeEnabled" class="btn btn-sm m-2" (click)="editModeToggle()">
             <i class="far fa-edit"></i> edit
           </a>
           <a *ngIf="editModeEnabled" class="btn btn-sm m-4 active" (click)="editModeToggle()">
@@ -250,7 +254,7 @@
                 <td class="text-center align-middle font-weight-light">
                   <div data-toggle="tooltip" data-placement="top" data-html="true"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
-                    {{ w.latest_version }}
+                    {{ w.version ? w.version.version : ''}}
                   </div>
                   <div *ngIf="w.registry" class="text-sm" title="{{ w.externalLink }}">
                     <a href="{{ w.externalLink }}" target="_blank">[details <i

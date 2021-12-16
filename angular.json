@@ -29,6 +29,7 @@
             ],
             "styles": [
               "./node_modules/chart.js/dist/Chart.min.css",
+              "./node_modules/bs-stepper/dist/css/bs-stepper.min.css",
               "src/styles.scss"
             ],
             "scripts": [
