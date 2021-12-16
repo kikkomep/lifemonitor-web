@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
+import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import {
   AggregatedStatusStats,
   InstanceStats,
@@ -53,6 +54,56 @@ export class ApiService {
       );
   }
 
+  getRegistries(): Observable<object> {
+    return this.http
+      .get(this.apiBaseUrl + '/registries', this.get_http_options())
+      .pipe(
+        retry(3),
+        map((data) => {
+          console.log('Data registries', data);
+          let result = [];
+          for (let r of data['items']) {
+            result.push(new Registry(r));
+          }
+          return result;
+        })
+      );
+  }
+
+  getRegistryWorkflows(registry_uuid: string): Observable<object> {
+    return this.http
+      .get(
+        this.apiBaseUrl + '/registries/' + registry_uuid + '/index',
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((data) => {
+          console.log('Data registries', data);
+          let result = [];
+          for (let w of data['items']) {
+            result.push(new RegistryWorkflow(w));
+          }
+          return result;
+        })
+      );
+  }
+
+  getRegistryWorkflow(registry_uuid: string, workflow_identifier: string): Observable<RegistryWorkflow> {
+    return this.http
+      .get(
+        this.apiBaseUrl + '/registries/' + registry_uuid + '/index/' + workflow_identifier,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((data) => {
+          console.log('Data registries', data);
+          return new RegistryWorkflow(data);
+        })
+      );
+  }
+
   changeWorkflowVisibility(workflow: Workflow): Observable<any> {
     let body = {
       public: !workflow.public,
@@ -71,6 +122,32 @@ export class ApiService {
         }),
         tap((data) => console.log('Workflow visibility changed to: ', data)),
         catchError(this.handleError('Updating workflow', []))
+      );
+  }
+
+  registerRegistryWorkflow(
+    workflow: RegistryWorkflow,
+    version: string = null,
+    name: string = null,
+    is_public: boolean = false): Observable<object> {
+    let data = {
+      "identifier": workflow.identifier,
+      "name": name,
+      "version": version,
+      "public": is_public
+    }
+    return this.http
+      .post(
+        this.apiBaseUrl + '/registries/' + workflow.registry.uuid + '/workflows',
+        data,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((wf_data) => {
+          console.log('Workflow registered', wf_data);
+          return wf_data;
+        })
       );
   }
 
@@ -181,8 +258,8 @@ export class ApiService {
     let url: string = !filteredByUser
       ? this.apiBaseUrl + '/workflows?status=true'
       : this.apiBaseUrl +
-        '/users/current/workflows?status=true&subscriptions=' +
-        includeSubScriptions.toString();
+      '/users/current/workflows?status=true&subscriptions=' +
+      includeSubScriptions.toString();
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
       tap((data) => console.log('Loaded workflows: ', data)),
@@ -282,9 +359,9 @@ export class ApiService {
               this.http
                 .get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
                 .pipe(
@@ -359,9 +436,9 @@ export class ApiService {
               queries.push(
                 this.http.get(
                   this.apiBaseUrl +
-                    '/instances/' +
-                    instanceData['uuid'] +
-                    '/latest-builds',
+                  '/instances/' +
+                  instanceData['uuid'] +
+                  '/latest-builds',
                   this.get_http_options()
                 )
               );
@@ -492,11 +569,11 @@ export class ApiService {
     return this.http
       .get(
         this.apiBaseUrl +
-          '/instances/' +
-          testInstanceUUID +
-          '/builds/' +
-          buildID +
-          '/logs',
+        '/instances/' +
+        testInstanceUUID +
+        '/builds/' +
+        buildID +
+        '/logs',
         this.get_http_options()
       )
       .pipe(

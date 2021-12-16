@@ -35147,6 +35147,11 @@ a.text-muted:hover {
   color: gray;
 }
 
+.dropdown-item.active,
+.dropdown-item:active > a {
+  background-color: var(--eosc-green-dark);
+  color: white;
+}
 
 
 

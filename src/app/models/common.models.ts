@@ -41,7 +41,6 @@ export class UrlValue {
       console.log(u);
       return true;
     } catch (ex) {
-      console.log(ex);
       return false;
     }
   }
