@@ -303,10 +303,9 @@ export class WorkflowUploaderComponent
 
   public selectRegistry(value: any) {
     console.log('Selecting registry....', value);
+    this.updateRegistryWorkflows([]);
     if (value && value.length > 0) {
       this.appService.selectRegistry(value);
-    } else {
-      this.updateRegistryWorkflows([]);
     }
   }
 
@@ -321,10 +320,18 @@ export class WorkflowUploaderComponent
 
   private updateRegistryWorkflows(data: RegistryWorkflow[]) {
     this._registryWorkflows = data;
+    this._selectedRegistryWorkflow = null;
+    // clean up options
+    $('#registryWorkflowSelector')
+      .find('option')
+      .remove()
+      .end()
+      .append('<option value=\'\'></option>')
+      .val('');
+    // append new options
     if (!this.registryWorkflows || this.registryWorkflows.length === 0) {
       $('#registryWorkflowSelector').prop('disabled', true);
     } else {
-      $('#registryWorkflowSelector').append('<option value=\'\'></option>');
       for (let w of this.registryWorkflows) {
         $('#registryWorkflowSelector').append(
           '<option value="' + w.identifier
@@ -339,14 +346,9 @@ export class WorkflowUploaderComponent
           + '"></option>'
         );
       }
-      this._selectedRegistryWorkflow = null;
       $('#registryWorkflowSelector').prop('disabled', false);
-      // auto select first option
-      setTimeout(() => {
-        $("#registryWorkflowSelector").val($("#registryWorkflowSelector option:first").val());
-        console.log(this.selectedRegistryWorkflow);
-      }, 4000);
     }
+    // force view refresh
     this.cdref.detectChanges();
     $('#registryWorkflowSelector').selectpicker('refresh');
   }
