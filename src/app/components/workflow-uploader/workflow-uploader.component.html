@@ -166,18 +166,39 @@
                 <div id="workflow-part" class="content px-5" role="tabpanel" aria-labelledby="workflow-part-trigger">
                   <!-- workflow UUID -->
                   <div *ngIf="source !== 'registry'" class="form-group mt-4">
-                    <label for="workflow-uuid" class="m-0">UUID (<i
-                        class="fas fa-star-of-life fa-xs text-muted"></i>)</label>
-                    <div class="text-muted font-weight-light">
-                      Enter a UUID for the workflow
+                    <div *ngIf="!isEditingUUID">
+                      <label for="workflow-uuid" class="m-0">UUID</label>
+                      <div class="text-muted font-weight-light small">
+                        The following identifier will be assigned to the workflow
+                        <div class="float-right">
+                          <a class="btn btn-sm m-2" (click)="enableEditingUUID()" title="Click to change the identifier">
+                            <i class="far fa-edit"></i> edit
+                          </a>
+                        </div>
+                      </div>
+                      <div class='mr-4 text-muted'>
+                        <div class='badge badge-primary mr-1 d-inline'>LifeMonitor ID</div>
+                        <div class="d-inline mt-3" style="font-size: large; font-weight: 100;">
+                          {{ workflowUUID }}
+                        </div>
+                      </div>
+
                     </div>
-                    <input type="text" name="wf-uuid" [ngClass]="
-                        !errors['uuid']
-                          ? 'form-control'
-                          : 'form-control is-invalid'
-                      " id="workflow-uuid" [(ngModel)]="workflowUUID" placeholder="Enter workflow UUID"
-                      aria-describedby="workflow-uuid-error" aria-invalid="true" />
-                    <span id="workflow-uuid-error" class="error invalid-feedback">{{ errors['uuid'] }}</span>
+                    <div *ngIf="isEditingUUID">
+                      <label for="workflow-uuid" class="m-0">UUID (<i
+                        class="fas fa-star-of-life fa-xs text-muted"></i>)
+                      </label>
+                      <div class="text-muted font-weight-light">
+                        Enter a UUID for the workflow
+                      </div>
+                      <input type="text" name="wf-uuid" [ngClass]="
+                          !errors['uuid']
+                            ? 'form-control'
+                            : 'form-control is-invalid'
+                        " id="workflow-uuid" [(ngModel)]="workflowUUID" placeholder="Enter workflow UUID"
+                        aria-describedby="workflow-uuid-error" aria-invalid="true" />
+                      <span id="workflow-uuid-error" class="error invalid-feedback">{{ errors['uuid'] }}</span>
+                    </div>
                   </div>
 
                   <div *ngIf="source === 'registry' && selectedRegistry" class="form-group mt-4">

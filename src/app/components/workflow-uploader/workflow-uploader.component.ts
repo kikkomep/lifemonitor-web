@@ -56,6 +56,7 @@ export class WorkflowUploaderComponent
 
   _registries: Registry[];
 
+  private _editUUID: boolean = false;
   private _registryWorkflows: RegistryWorkflow[] = [];
   private _selectedRegistry: Registry = null;
   private _selectedRegistryWorkflow: RegistryWorkflow = null;
@@ -158,6 +159,14 @@ export class WorkflowUploaderComponent
     let valid = this.checkIfValidUUID(value);
     console.log('Setting workflow UUID: ' + value + ' (valid: ' + valid + ')');
     this._setError('uuid', valid ? null : 'Not valid UUID');
+  }
+
+  public enableEditingUUID(){
+    this._editUUID = true;
+  }
+
+  public get isEditingUUID(): boolean {
+    return this._editUUID;
   }
 
   public get workflowName(): string {
@@ -487,6 +496,7 @@ export class WorkflowUploaderComponent
     this.workflowUUID = uuidv4();
     this.workflowVersion = '1.0';
     this.roCrateFile = null;
+    this._editUUID = false;
     this._workflowROCrate = null;
     this.roCrateURL = new UrlValue(this.httpClient);
     this._registrationError = null;
