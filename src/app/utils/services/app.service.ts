@@ -434,7 +434,7 @@ export class AppService {
       .registerRegistryWorkflow(
         workflow,
         version,
-        name,
+        name && name.length > 0 ? name : workflow.name,
         is_public
       )
       .pipe(
