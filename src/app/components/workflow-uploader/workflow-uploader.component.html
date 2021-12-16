@@ -188,12 +188,9 @@
                   <div *ngIf="source === 'registry' && selectedRegistryWorkflow" class="form-group mt-4">
                     <label for="workflow-registry-selected" class="m-0">Workflow: </label>
                     <span class='larger'> {{ selectedRegistryWorkflow.name }} </span>
-                    <span class='ml-1 text-muted small'>
-                      <a [href]='selectedRegistry.uri'>{{ selectedRegistryWorkflow.links['origin'] }}</a>
-                    </span>
                     <div class='mr-4 text-muted'>
                       <span class='badge badge-primary mr-1'>{{selectedRegistry.type}} ID</span>
-                      <span class='small'>{{ selectedRegistryWorkflow.identifier }}</span>
+                      <span class='small'><a [href]='selectedRegistry.uri'>{{ selectedRegistryWorkflow.links['origin'] }}</a></span>
                     </div>
                   </div>
 
