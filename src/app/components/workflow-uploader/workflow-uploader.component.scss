@@ -1,3 +1,19 @@
 .active .bs-stepper-circle {
   background-color: var(--primary);
 }
+
+[data-toggle='collapse']:after {
+  display: inline-block;
+  font-family: "Font Awesome 5 Free";
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: '\f0d7';
+  transform: rotate(0deg);
+  transition: all linear 0.25s;
+}
+
+[data-toggle='collapse'].collapsed:after {
+  transform: rotate(90deg);
+}
