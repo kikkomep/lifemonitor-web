@@ -8,6 +8,14 @@
   </div>
 </a>
 
+  <div class="row d-lg-none mt-5" style="font-size: 1.0rem; float: right;">
+    <a [routerLink]="" (click)="downloadROCrate()">
+      <i class="fas fa-cloud-download-alt mx-1"></i>
+      download as
+      RO-Crate <img class="mx-0" src="/assets/img/logo/crates/ro-crate-w-text.png" height="25" />
+    </a>
+  </div>
+
 <div *ngIf="availableForDownload === false" class="text-muted text-center disabled" data-toggle="tooltip"
   data-html="true" data-placement="left" title="Download not available" style="min-width: 175px; max-width: 175px;">
   <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50"
