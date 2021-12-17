@@ -54,7 +54,7 @@
     <div class="col-lg-2 d-none d-sm-none d-md-none d-lg-block mt-n4 text-center">
         <a *ngIf="workflow.registry" class="hvr-float-shadow" data-html="true" data-toggle="tooltip" target="_blank"
             data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
-                click to see the workflow on <b>{{workflow.registry['name']}}</b> registry 
+                click to see the workflow on <b>{{workflow.registry['name']}}</b> registry
                 <i class='fas fa-sm fa-external-link-alt mx-1'></i>" href="{{workflow.externalLink}}">
             <img src="/assets/img/logo/registries/workflowhub.svg" class="p-0 m-0" height="150" />
             <div class="text-center mt-n3" style="font-size: 0.9rem;">
@@ -65,22 +65,11 @@
     </div>
     <!-- /.col -->
 
-    <div class="col-lg-3 d-none d-sm-none d-md-none d-lg-block mt-3 px-5">
+    <div class="col-lg-3 mt-3"><!-- px-5 -->
         <rocrate-logo [workflow]="workflow"></rocrate-logo>
     </div>
     <!-- /.col -->
 
-    <!-- <div class="col-lg-1" style="max-width: 25px;"></div> -->
-    <!-- /.col -->
-
 </div>
 <!-- /.row -->
 
-<div class="row d-lg-none mt-5 mb-5" style="font-size: 1.0rem; float: right;">
-    <a href="{{ workflow.externalLink }}" target="_blank">
-        <i class="fas fa-cloud-download-alt mx-1"></i>
-        download as
-        RO-Crate <img class="mx-0" src="/assets/img/logo/crates/ro-crate-w-text.png" height="25" />
-    </a>
-</div>
-<!-- /.row -->
