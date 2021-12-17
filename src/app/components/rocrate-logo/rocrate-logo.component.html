@@ -1,12 +1,15 @@
-<a *ngIf="availableForDownload === true" [routerLink]="" (click)="downloadROCrate()" class="hvr-float-shadow"
-  data-toggle="tooltip" data-placement="left" data-html="true"
-  title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>click to download workflow <b>RO-Crate </b></span>">
-  <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50" />
-  <div style="margin-left: 60px; font-size: 0.9rem;">
-    <span>Download</span>
-    <i class="fas fa-cloud-download-alt m-1"></i>
+<div *ngIf="availableForDownload === true">
+  <div class="d-none d-sm-none d-md-none d-lg-block">
+    <a [routerLink]="" (click)="downloadROCrate()" class="hvr-float-shadow" data-toggle="tooltip" data-placement="left"
+      data-html="true"
+      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>click to download workflow <b>RO-Crate </b></span>">
+      <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50" />
+      <div style="margin-left: 60px; font-size: 0.9rem;">
+        <span>Download</span>
+        <i class="fas fa-cloud-download-alt m-1"></i>
+      </div>
+    </a>
   </div>
-</a>
 
   <div class="row d-lg-none mt-5" style="font-size: 1.0rem; float: right;">
     <a [routerLink]="" (click)="downloadROCrate()">
@@ -15,13 +18,18 @@
       RO-Crate <img class="mx-0" src="/assets/img/logo/crates/ro-crate-w-text.png" height="25" />
     </a>
   </div>
+</div>
 
-<div *ngIf="availableForDownload === false" class="text-muted text-center disabled" data-toggle="tooltip"
-  data-html="true" data-placement="left" title="Download not available" style="min-width: 175px; max-width: 175px;">
-  <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50"
-    style="filter: brightness(1) sepia(0) hue-rotate(10deg) saturate(0)" />
-  <div class="text-right" style="font-size: 0.9rem;">
-    <span>Download unavailable</span>
-    <i class="fas fa-md fa-ban mx-1"></i>
+<div *ngIf="availableForDownload === false">
+  <div class="d-none d-sm-none d-md-none d-lg-block">
+    <div class="text-muted text-center disabled" data-toggle="tooltip" data-html="true" data-placement="left"
+      title="Download not available" style="min-width: 175px; max-width: 175px;">
+      <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50"
+        style="filter: brightness(1) sepia(0) hue-rotate(10deg) saturate(0)" />
+      <div class="text-right" style="font-size: 0.9rem;">
+        <span>Download unavailable</span>
+        <i class="fas fa-md fa-ban mx-1"></i>
+      </div>
+    </div>
   </div>
 </div>
