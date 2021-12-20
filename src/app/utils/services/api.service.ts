@@ -196,8 +196,8 @@ export class ApiService {
       )
       .pipe(
         retry(3),
-        map((wf_data) => {
-          console.log('Workflow deleted', wf_data);
+        map(() => {
+          console.log('Workflow deleted');
           return { uuid: uuid, version: version };
         })
       );
