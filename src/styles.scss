@@ -35153,5 +35153,16 @@ a.text-muted:hover {
   color: white;
 }
 
+.page-item.active .page-link {
+  background-color: var(--eosc-green-dark);
+  border-color: var(--eosc-green-dark);
+}
 
+.dataTables_length {
+  margin: 0 20px;
+}
+
+a.page-link {
+  color: var(--eosc-green-dark);
+}
 
