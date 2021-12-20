@@ -112,6 +112,14 @@ export class DashboardComponent implements OnInit, OnChanges {
     return this.appService.isEditable(w);
   }
 
+  public deleteWorkflowVersion(w: Workflow) {
+    console.log("Deleting workflow version....", w);
+    this.appService.deleteWorkflowVersion(w, w.version['version'])
+      .subscribe((wd: { uuid: string; version: string }) => {
+        console.log("Workflow deleted", wd);
+      });
+  }
+
   public subscribeWorkflow(w: Workflow) {
     console.log('Subscribing to workflow: ', w);
     this.appService.subscribeWorkflow(w).subscribe((w) => {
