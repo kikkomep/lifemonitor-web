@@ -118,7 +118,7 @@ export class DashboardComponent implements OnInit, OnChanges {
       iconClass: 'fas fa-trash-alt',
       description:
         'Delete workflow <b>' +
-        w.name + '</b>(ver. <b>' + w.version['version'] + '</b>)?',
+        w.name + '</b> (version ' + w.version['version'] + ')?',
       onConfirm: () => {
         this.appService.deleteWorkflowVersion(w, w.version['version'])
           .subscribe((wd: { uuid: string; version: string }) => {
