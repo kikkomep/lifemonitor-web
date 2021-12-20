@@ -289,7 +289,7 @@
                   </stats-bar-chart>
                 </td>
                 <td class="text-center align-middle font-weight-light">
-                  <div *ngIf="editModeEnabled">
+                  <div *ngIf="editModeEnabled && isEditable(w)">
                     <a [routerLink]="" (click)="deleteWorkflowVersion(w)">
                       <i class="fas fa-trash-alt" style="color: black;"></i>
                     </a>
