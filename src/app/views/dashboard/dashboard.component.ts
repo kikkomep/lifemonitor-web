@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import {
@@ -34,7 +34,12 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   private statsFilter = new StatsFilterPipe();
 
+  private workflowsDashboard: any;
+  private dataTableInitialized: boolean = false;
+  @ViewChild('workflowsDashboard') workflowsDashboardElement: ElementRef;
+
   constructor(
+    private cdref: ChangeDetectorRef,
     private appService: AppService,
     private router: Router,
     private inputDialog: InputDialogService,
@@ -62,9 +67,29 @@ export class DashboardComponent implements OnInit, OnChanges {
       );
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+  }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+  }
+
+  ngAfterViewChecked() {
+    if (!this.dataTableInitialized) {
+      this.workflowsDashboard = $(this.workflowsDashboardElement.nativeElement);
+      this.workflowsDashboard.dataTable({
+        "paging": true,
+        "lengthChange": true,
+        "lengthMenu": [5, 10, 20, 50, 75, 100],
+        "searching": false,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+      });
+      this.dataTableInitialized = true;
+    }
+    this.cdref.detectChanges();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('Changes', changes);
