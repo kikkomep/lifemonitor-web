@@ -114,10 +114,18 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   public deleteWorkflowVersion(w: Workflow) {
     console.log("Deleting workflow version....", w);
-    this.appService.deleteWorkflowVersion(w, w.version['version'])
-      .subscribe((wd: { uuid: string; version: string }) => {
-        console.log("Workflow deleted", wd);
-      });
+    this.inputDialog.show({
+      iconClass: 'fas fa-trash-alt',
+      description:
+        'Delete workflow <b>' +
+        w.name + '</b>(ver. <b>' + w.version['version'] + '</b>)?',
+      onConfirm: () => {
+        this.appService.deleteWorkflowVersion(w, w.version['version'])
+          .subscribe((wd: { uuid: string; version: string }) => {
+            console.log("Workflow deleted", wd);
+          });
+      },
+    });
   }
 
   public subscribeWorkflow(w: Workflow) {
