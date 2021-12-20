@@ -467,7 +467,7 @@ export class AppService {
     this.setLoadingWorkflows(true);
     return this.api.deleteWorkflowVersion(w.uuid, version).pipe(
       map((wd: { uuid: string; version: string }) => {
-        const index = this._workflows.findIndex(obj => obj.uuid === w.uuid && obj.version === version);
+        const index = this._workflows.findIndex(obj => obj.uuid === w.uuid && obj.version['version'] === version);
         if (index > -1) {
           this._workflows.splice(index, 1);
           this._workflowsStats.remove(w);
