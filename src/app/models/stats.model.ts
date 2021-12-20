@@ -131,10 +131,12 @@ export class AbstractStats extends Model {
     if (index !== -1) {
       this['all'].splice(index, 1);
     }
-    index = this[item.getStatus()].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
-    console.log("Delete item from " + item.getStatus() + " @index", index);
-    if (index !== -1) {
-      this[item.getStatus()].splice(index, 1);
+    if (this[item.getStatus()]) {
+      index = this[item.getStatus()].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
+      console.log("Delete item from " + item.getStatus() + " @index", index);
+      if (index !== -1) {
+        this[item.getStatus()].splice(index, 1);
+      }
     }
   }
 
