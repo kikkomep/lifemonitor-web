@@ -90,6 +90,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value;
     this.editModeEnabled = false;
+    this.destroyDataTable();
     if (value && value.length > 0)
       this.appService.loadWorkflows(false, false, false);
     else
