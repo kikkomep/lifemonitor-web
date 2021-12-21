@@ -462,6 +462,32 @@ export class AppService {
       );
   }
 
+  public deleteWorkflowVersion(w: Workflow, version: string):
+    Observable<{ uuid: string; version: string }> {
+    this.setLoadingWorkflows(true);
+    return this.api.deleteWorkflowVersion(w.uuid, version).pipe(
+      map((wd: { uuid: string; version: string }) => {
+        const index = this._workflows.findIndex(obj => obj.uuid === w.uuid && obj.version['version'] === version);
+        if (index > -1) {
+          this._workflows.splice(index, 1);
+          this._workflowsStats.remove(w);
+          this.subjectWorkflows.next(this._workflowsStats);
+          this.setLoadingWorkflows(false);
+        }
+        console.log("Workflow removed");
+        return wd;
+      }),
+      catchError((err) => {
+        console.log('Error when deleting workflow', err);
+        this.setLoadingWorkflows(false);
+        throw err;
+      }),
+      finalize(() => {
+        // this.setLoadingWorkflows(false);
+      })
+    )
+  }
+
   public changeWorkflowVisibility(w: Workflow): Observable<any> {
     return this.api.changeWorkflowVisibility(w);
   }

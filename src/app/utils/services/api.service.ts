@@ -187,6 +187,22 @@ export class ApiService {
       );
   }
 
+  deleteWorkflowVersion(uuid: string, version: string):
+    Observable<{ uuid: string; version: string }> {
+    return this.http
+      .delete(
+        this.apiBaseUrl + '/workflows/' + uuid + '/versions/' + version,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map(() => {
+          console.log('Workflow deleted');
+          return { uuid: uuid, version: version };
+        })
+      );
+  }
+
   downloadROCrate(workflow: Workflow): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
     return this.http

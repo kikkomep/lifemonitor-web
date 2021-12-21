@@ -155,7 +155,7 @@
           <a *ngIf="!editModeEnabled" class="btn btn-sm m-2" (click)="openWorkflowUploader()">
             <i class="fas fa-plus-circle"></i> add
           </a>
-          <a *ngIf="!editModeEnabled" class="btn btn-sm m-2" (click)="editModeToggle()">
+          <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="editModeToggle()">
             <i class="far fa-edit"></i> edit
           </a>
           <a *ngIf="editModeEnabled" class="btn btn-sm m-4 active" (click)="editModeToggle()">
@@ -177,6 +177,7 @@
                   Suites
                 </th>
                 <th class="text-center" scope="col">Latest Builds</th>
+                <th class="p-4" style="width: 50px"></th>
               </tr>
             </thead>
             <tbody *ngIf="workflows">
@@ -286,6 +287,13 @@
                   <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0" [stats]="w.getLatestBuilds()"
                     (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
+                </td>
+                <td class="text-center align-middle font-weight-light">
+                  <div *ngIf="editModeEnabled && isEditable(w)">
+                    <a [routerLink]="" (click)="deleteWorkflowVersion(w)">
+                      <i class="fas fa-trash-alt" style="color: black;"></i>
+                    </a>
+                  </div>
                 </td>
               </tr>
             </tbody>

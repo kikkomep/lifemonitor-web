@@ -124,6 +124,22 @@ export class AbstractStats extends Model {
     }
   }
 
+  public remove(item: StatsItem) {
+    if (!item) return;
+    let index = this['all'].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
+    console.log("Delete item from all @index", index);
+    if (index !== -1) {
+      this['all'].splice(index, 1);
+    }
+    if (this[item.getStatus()]) {
+      index = this[item.getStatus()].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
+      console.log("Delete item from " + item.getStatus() + " @index", index);
+      if (index !== -1) {
+        this[item.getStatus()].splice(index, 1);
+      }
+    }
+  }
+
   public update(data: Array<StatsItem>, removeExisting: boolean = false) {
     if (!data) return;
     if (removeExisting) this.clear();
