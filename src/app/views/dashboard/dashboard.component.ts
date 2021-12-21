@@ -236,7 +236,7 @@ export class DashboardComponent implements OnInit, OnChanges {
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [5, 10, 20, 50, 75, 100],
-      "searching": false,
+      "searching": true,
       "ordering": true,
       "order": [[1, 'asc']],
       "columnDefs": [{
