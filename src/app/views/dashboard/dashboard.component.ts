@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import {
@@ -34,7 +34,11 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   private statsFilter = new StatsFilterPipe();
 
+  // Reference to the dataTable instance
+  private workflowDataTable: any;
+
   constructor(
+    private cdref: ChangeDetectorRef,
     private appService: AppService,
     private router: Router,
     private inputDialog: InputDialogService,
@@ -47,8 +51,11 @@ export class DashboardComponent implements OnInit, OnChanges {
           data,
           this._workflowNameFilter
         );
+        this.destroyDataTable();
         this.filteredWorkflows = this._workflowStats.all;
         console.log('Stats', data);
+        this.cdref.detectChanges();
+        this.initDataTable();
       }
     );
     console.debug('Initializing workflow data!!');
@@ -62,9 +69,15 @@ export class DashboardComponent implements OnInit, OnChanges {
       );
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+  }
 
-  ngAfterViewInit() { }
+  ngAfterViewInit() {
+    this.initDataTable();
+  }
+
+  ngAfterViewChecked() {
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     console.log('Changes', changes);
@@ -77,6 +90,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value;
     this.editModeEnabled = false;
+    this.destroyDataTable();
     if (value && value.length > 0)
       this.appService.loadWorkflows(false, false, false);
     else
@@ -123,6 +137,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.appService.deleteWorkflowVersion(w, w.version['version'])
           .subscribe((wd: { uuid: string; version: string }) => {
             console.log("Workflow deleted", wd);
+            this.refreshDataTable();
           });
       },
     });
@@ -207,6 +222,39 @@ export class DashboardComponent implements OnInit, OnChanges {
       }
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  private refreshDataTable() {
+    this.destroyDataTable();
+    this.initDataTable();
+  }
+
+  private initDataTable() {
+    if (this.workflowDataTable) return;
+    this.workflowDataTable = $("#workflowsDashboard").DataTable({
+      "paging": true,
+      "lengthChange": true,
+      "lengthMenu": [5, 10, 20, 50, 75, 100],
+      "searching": true,
+      "ordering": true,
+      "order": [[1, 'asc']],
+      "columnDefs": [{
+        "targets": [0, 5, 6, 7],
+        "orderable": false
+      }],
+      "info": true,
+      "autoWidth": true,
+      "responsive": true,
+      "deferRender": true,
+      stateSave: true
+    });
+  }
+
+  private destroyDataTable() {
+    if (this.workflowDataTable) {
+      this.workflowDataTable.destroy();
+      this.workflowDataTable = null;
     }
   }
 
