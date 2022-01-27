@@ -1,34 +1,78 @@
-<li class="nav-item dropdown">
-  <a class="nav-link" data-html="true" data-toggle="dropdown" (click)="toggleDropdownMenu()">
+<li class="nav-item dropdown" *ngIf="notifications && notifications.length > 0">
+  <a
+    class="nav-link"
+    data-html="true"
+    data-toggle="dropdown"
+    (click)="toggleDropdownMenu()"
+  >
     <i class="far fa-bell"></i>
-    <span class="badge badge-warning navbar-badge">0</span>
+    <span
+      *ngIf="notificationsToRead.length > 0"
+      class="badge badge-warning navbar-badge text-bold"
+    >
+      {{ notificationsToRead.length }}
+    </span>
   </a>
   <div #dropdownMenu class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-    <span class="dropdown-item dropdown-header">0 Notifications</span>
-    <div class="dropdown-divider"></div>
-    <!-- <a href="#" class="dropdown-item">
-      <i class="fas fa-envelope mr-2"></i> 4 new messages
-      <span class="float-right text-muted text-sm">3 mins</span>
-    </a>
-    <div class="dropdown-divider"></div>
-    <a href="#" class="dropdown-item">
-      <i class="fas fa-users mr-2"></i> 8 friend requests
-      <span class="float-right text-muted text-sm">12 hours</span>
-    </a>
-    <div class="dropdown-divider"></div>
+    <div style="max-height: 200px; overflow-y: scroll">
+      <ng-container *ngFor="let nd of notificationDates">
+        <div class="text-center text-muted mt-2" style="font-size: 9pt">
+          <span class="text-bold">{{ nd | date: 'fullDate' }}</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <ng-container
+          *ngFor="
+            let n of getNotificationOfDay(nd)
+              | sortingNotificationFilter: 'desc';
+            index as i;
+            first as isFirst
+          "
+          class="w-100"
+        >
+          <a
+            [routerLink]="['/suite', { s: n.asUrlParam() }]"
+            class="dropdown-item {{ n.read ? 'text-muted' : '' }}"
+            style="{{ n.read ? 'opacity: 60%;' : '' }}"
+            (click)="setNotificationAsRead(n)"
+          >
+            <div
+              *ngIf="n.event === 'BUILD_FAILED'"
+              class="w-100 mt-2 {{ n.read ? 'text-muted' : 'text-red' }}"
+            >
+              <i class="{{ n.icon }} mr-1"></i>
+              Build
+              <span class="text-bold">{{ n.data.build.build_id }}</span> of
+              instance
+              <span class="text-bold">{{ n.data.build.instance.name }}</span>
+              failed
+            </div>
+            <div class="text-small mx-4" style="font-size: 9pt">
+              <div>
+                <span class="text-bold mt-n2">workflow: </span>
+                {{ n.data.build.workflow.name }}
+              </div>
+              <div>
+                <span class="text-bold mt-n2">suite: </span>
+                {{ n.data.build.suite.name }}
+              </div>
+            </div>
+          </a>
+        </ng-container>
+      </ng-container>
+    </div>
+    <!--<div class="dropdown-divider"></div>
     <a href="#" class="dropdown-item">
       <i class="fas fa-file mr-2"></i> 3 new reports
       <span class="float-right text-muted text-sm">2 days</span>
+    </a>-->
+    <!--<div class="dropdown-divider"></div>
+    <a href="#" class="dropdown-item dropdown-footer">
+      Mark as read all {{ !notifications ? 0 : notifications.length }} notifications
+    </a>-->
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item dropdown-footer" (click)="deleteAllNotifications()">
+      <i class="fas fa-trash-alt mr-1"></i>
+      Clear all notifications ({{ !notifications ? 0 : notifications.length }})
     </a>
-    <div class="dropdown-divider"></div> -->
-    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
   </div>
 </li>
-
-<ng-template #notification>
-  <a href="#" class="dropdown-item">
-    <i class="fas fa-envelope mr-2"></i> 4 new messages
-    <span class="float-right text-muted text-sm">3 mins</span>
-  </a>
-  <div class="dropdown-divider"></div>
-</ng-template>
