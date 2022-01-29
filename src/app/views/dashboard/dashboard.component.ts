@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, timer } from 'rxjs';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem
@@ -45,36 +45,51 @@ export class DashboardComponent implements OnInit, OnChanges {
     private router: Router,
     private inputDialog: InputDialogService,
     private uploaderService: WorkflowUploaderService
-  ) {
+  ) { }
+
+  ngOnInit() {
     console.log('Dashboard Created!!');
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
-        this._workflowStats = this.statsFilter.transform(
-          data,
-          this._workflowNameFilter
-        );
-        this.destroyDataTable();
-        this.filteredWorkflows = this.searchModeEnabled ? this._workflowStats.all : this._workflowStats.all.filter((v) => v.subscriptions && v.subscriptions.length > 0);
-        console.log('Stats', data);
-        this.cdref.detectChanges();
-        this.initDataTable();
+        timer(1000).subscribe(x => {
+          console.log("Loaded workflows: ", data);
+          this._workflowStats = this.statsFilter.transform(
+            data,
+            this._workflowNameFilter
+          );
+          this.filteredWorkflows =
+            this.searchModeEnabled || !this.isUserLogged()
+              ? this._workflowStats.all
+              : this._workflowStats.all.filter(
+                (v) => v.subscriptions && v.subscriptions.length > 0);
+          console.log('Stats', data);
+          this.refreshDataTable();
+        });
       }
     );
+  }
+
+  ngAfterViewInit() {
     console.debug('Initializing workflow data!!');
     this._workflowStats = this.appService.workflowStats;
     this.updatingDataTable = true;
+    if (this._workflowStats) {
+      this.filteredWorkflows = this.searchModeEnabled || !this.isUserLogged()
+        ? this._workflowStats.all
+        : this._workflowStats.all.filter(
+          (v) => v.subscriptions && v.subscriptions.length > 0);
+      this.refreshDataTable();
+    } else {
       this.appService.loadWorkflows(
         true,
         this.isUserLogged(),
         this.isUserLogged()
+      ).subscribe(
+        (data) => {
+          console.log("Loaded workflows ", data);
+        }
       );
-  }
-
-  ngOnInit() {
-  }
-
-  ngAfterViewInit() {
-    this.initDataTable();
+    }
   }
 
   ngAfterViewChecked() {
@@ -270,7 +285,8 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   ngOnDestroy() {
     // prevent memory leak when component destroyed
-    this.workflowsStatsSubscription.unsubscribe();
+    if (this.workflowsStatsSubscription)
+      this.workflowsStatsSubscription.unsubscribe();
     console.log('Destroying dashboard component');
   }
 }
