@@ -251,6 +251,7 @@
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
                     <img *ngIf="w.typeIcon" src="{{ w.typeIcon }}" width="{{ w.typeIconSize }}" />
                     <i *ngIf="!w.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
+                    <div class="text-muted mt-1" style="font-size: 8pt;">{{ w.type }}</div>
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
