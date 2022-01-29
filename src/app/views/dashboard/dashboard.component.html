@@ -234,7 +234,7 @@
                     <i class="fas fa-2x fa-sync-alt text-muted"></i>
                   </div>
                   <div *ngIf="w.public !== undefined" data-html="true" data-toggle="tooltip" data-placement="top"
-                    class="mt-4 align-top workflow-visibility-{{w.uuid}}" title="{{ getWorkflowVisibilityTitle(w) }}">
+                    class="mt-4 mr-3 align-top workflow-visibility-{{w.uuid}}" title="{{ getWorkflowVisibilityTitle(w) }}">
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
@@ -247,7 +247,7 @@
                 </td>
 
                 <td class="text-center align-middle">
-                  <div style="height: 100%; margin: auto" data-html="true" data-toggle="tooltip" data-placement="top"
+                  <div style="height: 100%; margin: 10% auto 0" data-html="true" data-toggle="tooltip" data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
                     <img src="{{ w.typeIcon }}" width="45" />
                   </div>
