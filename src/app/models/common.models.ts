@@ -62,3 +62,43 @@ export class UrlValue {
     return result;
   }
 }
+
+
+
+export class RoCrate {
+
+  private data: object;
+
+  constructor(jsonLD: object) {
+    this.data = jsonLD;
+  }
+
+  public get jsonLD(): object {
+    return this.data;
+  }
+
+  public get rootDataSet(): object {
+    return this.findGraphEntity('./', 'Dataset');
+  }
+
+  public get mainEntity(): object {
+    let root = this.rootDataSet;
+    return root ? this.findGraphEntity(root['mainEntity']['@id']) : null;
+  }
+
+  public get graphEntities(): [] {
+    return this.data ? this.data['@graph'] : null;
+  }
+
+  public listGraphEntityIdentifiers(): any[] {
+    let entities: [] = this.graphEntities;
+    return entities ? entities.map(function (e) { return e['@id']; }) : [];
+  }
+
+  public findGraphEntity(id: string, type: string = null) {
+    return this.data['@graph'].find(
+      (e: any) => e['@id'] === id && (!type || e['@type'] === type)
+    );
+  }
+
+}
