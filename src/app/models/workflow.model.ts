@@ -1,3 +1,4 @@
+import { RoCrate } from './common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
@@ -12,6 +13,7 @@ export class Workflow extends AggregatedStatusStatsItem {
   version: Object;
   status: Status;
   type: string = 'galaxy'; // FIXME
+  _rocrate: RoCrate;
   _suites: AggregatedStatusStats;
   private _latestBuilds: TestBuild[];
 
@@ -23,6 +25,13 @@ export class Workflow extends AggregatedStatusStatsItem {
     if (suites) {
       this._suites = suites;
     }
+  }
+
+
+  public get roCrateMetadata(): RoCrate {
+    if (!this._rocrate && this.version && 'ro_crate' in this.version)
+      this._rocrate = new RoCrate(this.version['ro_crate']['metadata']);
+    return this._rocrate;
   }
 
   public get suites(): AggregatedStatusStats {
