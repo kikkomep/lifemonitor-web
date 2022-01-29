@@ -312,11 +312,11 @@ export class AppService {
     includeSubScriptions: boolean = undefined
   ): Observable<AggregatedStatusStats> {
     if (this.loadingWorkflows) return;
-    if (useCache && this._workflowsStats) {
-      console.log('Using cache', this._workflowsStats);
-      this.subjectWorkflows.next(this._workflowsStats);
-      return;
-    }
+    // if (useCache && this._workflowsStats) {
+    //   console.log('Using cache', this._workflowsStats);
+    //   this.subjectWorkflows.next(this._workflowsStats);
+    //   return;
+    // }
 
     this.setLoadingWorkflows(true);
     return this.api
@@ -330,19 +330,34 @@ export class AppService {
         map((data) => {
           console.log('AppService Loaded workflows', data);
 
-          // Workflow items
-          let items = data['items'];
+          // Process workflow items
           let stats = new AggregatedStatusStats();
-          items = items.map((i: object) => new Workflow(i));
-          stats.update(items);
-
-          this._workflows = items;
-          this._workflowsStats = stats;
-
-          for (let w of this._workflows) {
-            console.log('Loading data of workflow ', w);
-            this.loadWorkflow(w).subscribe((wf: Workflow) => { });
+          let workflows: Workflow[] = [];
+          for (let wdata of data['items']) {
+            let w: Workflow = null;
+            // Try to get workflow data from cache if it is enabled
+            if (useCache && this._workflows) {
+              w = this._workflows.find(e => e['uuid'] === wdata['uuid']);
+              console.log("Using data from cache for worklow: ", w);
+            }
+            // Load workflow data from the back-end
+            // if cache is disabled or it has not been found
+            if (!w) {
+              w = new Workflow(wdata);
+              console.log('Loading data of workflow ', w);
+              this.loadWorkflow(w).subscribe((wf: Workflow) => {
+                console.log("Data loaded for workflow", w.uuid)
+              });
+            }
+            // Add workflow to the list of loaded workflows
+            if (w)
+              workflows.push(w);
           }
+
+          // Update list of workflows and notify observers
+          stats.update(workflows);
+          this._workflows = workflows;
+          this._workflowsStats = stats;
           this.subjectWorkflows.next(stats);
           return stats;
         }),
