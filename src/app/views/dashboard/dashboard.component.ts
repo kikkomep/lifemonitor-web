@@ -107,14 +107,19 @@ export class DashboardComponent implements OnInit, OnChanges {
     this._workflowNameFilter = value;
     this.editModeEnabled = false;
     this.updatingDataTable = true;
+    this._workflowStats.clear();
+    this.filteredWorkflows = [];
+    this.cdref.detectChanges();
     if (value && value.length > 0)
-      this.appService.loadWorkflows(false, false, false);
+      this.appService.loadWorkflows(
+        false, false, this.isUserLogged()
+      ).subscribe();
     else
       this.appService.loadWorkflows(
         false,
         this.isUserLogged(),
         this.isUserLogged()
-      );
+      ).subscribe();
   }
 
   public get isLoading(): Observable<boolean> {
