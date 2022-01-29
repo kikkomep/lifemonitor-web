@@ -69,7 +69,6 @@ export class Suite extends AggregatedStatusStatsItem {
     if (this.engineType === 'planemo') {
       return engine_logo_base_path + 'planemo.png';
     }
-    console.log(this.definition, this);
     return '';
   }
 }
