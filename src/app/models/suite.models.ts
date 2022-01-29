@@ -59,12 +59,14 @@ export class Suite extends AggregatedStatusStatsItem {
   }
 
   public get engineType(): string {
-    return this.definition.test_engine.type;
+    if (this.definition && 'test_engine' in this.definition)
+      return this.definition.test_engine.type;
+    return 'unknown';
   }
 
   public get engineIcon(): string {
     let engine_logo_base_path = '/assets/img/logo/engines/';
-    if (this.definition.test_engine.type === 'planemo') {
+    if (this.engineType === 'planemo') {
       return engine_logo_base_path + 'planemo.png';
     }
     console.log(this.definition, this);
