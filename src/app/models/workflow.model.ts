@@ -81,8 +81,23 @@ export class Workflow extends AggregatedStatusStatsItem {
   }
 
   public get typeIcon(): string {
-    // FIXME: set the right icon type
-    return 'assets/img/logo/wf/GalaxyLogoSquare.png';
+    if (this.type === 'galaxy')
+      return 'assets/img/logo/wf/GalaxyLogo.png';
+    else if (this.type === 'snakemake')
+      return 'assets/img/logo/wf/SnakeMakeLogo.png';
+    else if (this.type === 'cwl')
+      return 'assets/img/logo/wf/CwlLogo.png';
+    else if (this.type === 'nextflow')
+      return 'assets/img/logo/wf/NextFlowLogo.png';
+    else if (this.type === 'jupyter')
+      return 'assets/img/logo/wf/JupyterLogo.png';
+    else if (this.type === 'knime')
+      return 'assets/img/logo/wf/KnimeLogo.png';
+    else if (this.type === 'shell script')
+      return 'assets/img/logo/wf/ShellLogo.png';
+    return 'assets/img/logo/wf/GenericWorkflowLogo.png';;
+  }
+
   }
 
   public get submitter(): object {
