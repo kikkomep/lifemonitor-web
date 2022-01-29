@@ -168,6 +168,7 @@ export class DashboardComponent implements OnInit, OnChanges {
     console.log('Subscribing to workflow: ', w);
     this.appService.subscribeWorkflow(w).subscribe((w) => {
       console.log('Workflow subscription created!');
+      this.refreshDataTable();
     });
   }
 
@@ -175,7 +176,6 @@ export class DashboardComponent implements OnInit, OnChanges {
     console.log('Unsubscribing from workflow: ', w);
     this.appService.unsubscribeWorkflow(w).subscribe((w) => {
       console.log('Workflow subscription deleted!');
-      this.destroyDataTable();
       this.filteredWorkflows = this.searchModeEnabled
         ? this._workflowStats.all
         : this._workflowStats.all.filter(
