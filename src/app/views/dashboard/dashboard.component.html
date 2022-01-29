@@ -180,7 +180,7 @@
                 <th class="p-4" style="width: 50px"></th>
               </tr>
             </thead>
-            <tbody *ngIf="workflows">
+            <tbody *ngIf="workflows && !(isLoading | async)">
               <!-- end loading -->
               <tr *ngFor="
                   let w of workflows
