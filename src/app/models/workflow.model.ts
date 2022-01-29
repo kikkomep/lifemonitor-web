@@ -98,6 +98,16 @@ export class Workflow extends AggregatedStatusStatsItem {
     return 'assets/img/logo/wf/GenericWorkflowLogo.png';;
   }
 
+  public get typeIconSize(): number {
+    if (this.type === 'galaxy')
+      return 50;
+    if (this.type === 'nextflow')
+      return 40;
+    else if (this.type === 'cwl')
+      return 55;
+    else if (this.typeIcon.endsWith('GenericWorkflowLogo.png'))
+      return 48;
+    return 45;
   }
 
   public get submitter(): object {
