@@ -249,7 +249,7 @@
                 <td class="text-center align-middle">
                   <div style="height: 100%; margin: 10% auto 0" data-html="true" data-toggle="tooltip" data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
-                    <img src="{{ w.typeIcon }}" width="45" />
+                    <i *ngIf="!w.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light">
