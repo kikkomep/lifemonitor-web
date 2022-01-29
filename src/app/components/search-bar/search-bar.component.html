@@ -2,7 +2,8 @@
   <div class="input-group-prepend">
     <span class="input-group-text"><i class="fas fa-search"></i></span>
   </div>
-  <input type="text" [(ngModel)]="actualFilterValue" class="form-control font-weight-light"
+  <input #searchInputText
+    type="text" [(ngModel)]="actualFilterValue" class="form-control font-weight-light"
     placeholder="Search by UUID or name" aria-label="Username" aria-describedby="basic-addon1" />
 
   <div class="input-group-append">

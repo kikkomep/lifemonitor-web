@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { fromEvent } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 @Component({
   selector: 'item-search-bar',
@@ -13,15 +15,25 @@ export class SearchBarComponent implements OnInit {
   @Input() sortingOrder: string;
   @Output() filterValueChange = new EventEmitter<string>();
   @Output() sortingOrderChange = new EventEmitter<string>();
+  @ViewChild('searchInputText') searchInputText: ElementRef;
 
-  constructor() {}
+  constructor() { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
+
+  ngAfterViewInit() {
+    fromEvent(this.searchInputText.nativeElement, 'input')
+      .pipe(map((event: Event) => (event.target as HTMLInputElement).value))
+      .pipe(debounceTime(1500))
+      .pipe(distinctUntilChanged())
+      .subscribe(data => {
+        this.filterValueChange.emit(data);
+        console.log('Current filter value: ', this._actualFilterValue);
+      });
+  }
 
   public set actualFilterValue(value: string) {
     this._actualFilterValue = value;
-    console.log('Current filter value: ', this._actualFilterValue);
-    this.filterValueChange.emit(value);
     console.log('Current filter value: ', this._actualFilterValue);
   }
 
