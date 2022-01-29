@@ -258,6 +258,9 @@ export class DashboardComponent implements OnInit, OnChanges {
     }
   }
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.refreshDataTable();
   }
 
   private initDataTable() {
