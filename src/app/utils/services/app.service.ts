@@ -319,7 +319,7 @@ export class AppService {
     }
 
     this.setLoadingWorkflows(true);
-    this.api
+    return this.api
       .get_workflows(
         filteredByUser !== undefined ? filteredByUser : this.isUserLogged(),
         includeSubScriptions !== undefined
@@ -327,12 +327,7 @@ export class AppService {
           : this.isUserLogged()
       )
       .pipe(
-        finalize(() => {
-          this.setLoadingWorkflows(false);
-        })
-      )
-      .subscribe(
-        (data) => {
+        map((data) => {
           console.log('AppService Loaded workflows', data);
 
           // Workflow items
@@ -349,13 +344,12 @@ export class AppService {
             this.loadWorkflow(w).subscribe((wf: Workflow) => { });
           }
           this.subjectWorkflows.next(stats);
-        },
-        (error) => {
-          console.error(error);
-        }
+          return stats;
+        }),
+        finalize(() => {
+          this.setLoadingWorkflows(false);
+        })
       );
-
-    return this.subjectWorkflows.asObservable();
   }
 
   loadWorkflow(w: Workflow): Observable<Workflow> {
@@ -416,7 +410,7 @@ export class AppService {
       .pipe(
         map((data) => {
           console.log('Data of registered workflow', data);
-          this.api.get_workflow(data['uuid']).subscribe((w: Workflow) => {
+          this.api.get_workflow(data['uuid'], false, true).subscribe((w: Workflow) => {
             console.log('Loaded data:', w);
             // TODO: atomic add
             this._workflows.push(w);
@@ -456,7 +450,7 @@ export class AppService {
       .pipe(
         map((data) => {
           console.log('Data of registered workflow', data);
-          this.api.get_workflow(data['uuid']).subscribe((w: Workflow) => {
+          this.api.get_workflow(data['uuid'], false, true).subscribe((w: Workflow) => {
             console.log('Loaded data:', w);
             // TODO: atomic add
             this._workflows.push(w);
