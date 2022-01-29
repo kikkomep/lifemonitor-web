@@ -37,6 +37,8 @@ export class DashboardComponent implements OnInit, OnChanges {
   // Reference to the dataTable instance
   private workflowDataTable: any;
 
+  public updatingDataTable: boolean = false;
+
   constructor(
     private cdref: ChangeDetectorRef,
     private appService: AppService,
@@ -60,8 +62,7 @@ export class DashboardComponent implements OnInit, OnChanges {
     );
     console.debug('Initializing workflow data!!');
     this._workflowStats = this.appService.workflowStats;
-    if (this._workflowStats) this.filteredWorkflows = this._workflowStats.all;
-    else
+    this.updatingDataTable = true;
       this.appService.loadWorkflows(
         true,
         this.isUserLogged(),
@@ -90,7 +91,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value;
     this.editModeEnabled = false;
-    this.destroyDataTable();
+    this.updatingDataTable = true;
     if (value && value.length > 0)
       this.appService.loadWorkflows(false, false, false);
     else
@@ -227,8 +228,16 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   private refreshDataTable() {
-    this.destroyDataTable();
-    this.initDataTable();
+    this.updatingDataTable = true;
+    try {
+      this.destroyDataTable();
+      this.cdref.detectChanges();
+      this.initDataTable();
+    } finally {
+      this.updatingDataTable = false;
+    }
+  }
+
   }
 
   private initDataTable() {
