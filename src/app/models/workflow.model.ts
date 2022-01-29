@@ -12,7 +12,7 @@ export class Workflow extends AggregatedStatusStatsItem {
   registry: Object;
   version: Object;
   status: Status;
-  type: string = 'galaxy'; // FIXME
+  _type: string;
   _rocrate: RoCrate;
   _suites: AggregatedStatusStats;
   private _latestBuilds: TestBuild[];
@@ -27,6 +27,39 @@ export class Workflow extends AggregatedStatusStatsItem {
     }
   }
 
+  public get type(): string {
+    if (!this._type) {
+      if (this._rawData && 'type' in this._rawData) {
+        this._type = this._rawData["type"];
+      } else {
+        let crate: RoCrate = this.roCrateMetadata;
+        if (crate) {
+          let mainEntity: object = crate.mainEntity;
+          if (mainEntity) {
+            let programminLanguage = crate.findGraphEntity(mainEntity['programmingLanguage']['@id']);
+            if (programminLanguage) {
+              this._type = this.normalizeWorkflowTypeName(
+                ("" + programminLanguage['name']).toLowerCase());
+              console.log("Workflow type detected: ", this._type);
+              return this._type;
+            }
+          }
+        } else if (this.version) {
+          this._type = 'unknown';
+          console.log("Workflow type detected: ", this._type);
+        }
+      }
+    }
+    return this._type;
+  }
+
+  private normalizeWorkflowTypeName(type: string): string {
+    if (type === 'common workflow language')
+      return 'cwl';
+    if (type === 'unrecognized workflow type')
+      return 'unknown'
+    return type;
+  }
 
   public get roCrateMetadata(): RoCrate {
     if (!this._rocrate && this.version && 'ro_crate' in this.version)
