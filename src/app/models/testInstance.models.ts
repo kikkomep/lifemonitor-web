@@ -17,6 +17,7 @@ export class TestInstance extends StatusStatsItem {
 
   public set service(data: TestingService) {
     this._service = new TestingService(data);
+    this._service.url = this.links['origin'];
   }
 
   public get service(): TestingService {
