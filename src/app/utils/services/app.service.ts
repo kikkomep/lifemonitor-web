@@ -359,7 +359,7 @@ export class AppService {
   }
 
   loadWorkflow(w: Workflow): Observable<Workflow> {
-    return this.api.get_workflow(w.uuid).pipe(
+    return this.api.get_workflow(w.uuid, false, true).pipe(
       map((wdata: Workflow) => {
         console.log('Loaded data:', w);
         w.update(wdata);
