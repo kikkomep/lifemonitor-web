@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Logger, LoggerManager } from '../logging';
+import { Config, Logger, LoggerManager } from '../logging';
 
 @Injectable({
   providedIn: 'root',
@@ -15,21 +17,28 @@ export class AppConfigService {
 
   constructor(private http: HttpClient) { }
 
-  public async loadConfig() {
-    if ('configFile' in environment) {
-      const data = await this.http
-        .get(environment['configFile'])
-        .toPromise()
-        .then((config) => {
-          this.config = Object.assign({}, environment, config);
-          this.logger.debug(
-            'Configuration updated from ' + environment['configFile']
-          );
-        })
-        .catch((reason) => {
-          this.logger.warn('Unable to load configuration from server', reason);
-        });
+  public loadConfig(): Observable<object> {
+    if (!('configFile' in environment)) {
+      return of(this.config);
     }
+    return this.http
+      .get(environment['configFile'])
+      .pipe(
+        map((data) => {
+          this.config = Object.assign({}, environment, data);
+          Config.init(this.config);
+          this.logger.debug(
+            'Configuration updated from ' + environment['configFile'],
+            this.config
+          );
+          return data;
+        }),
+        tap((data) => { }),
+        catchError((error) => {
+          this.logger.error('Unable to load configuration from server', error);
+          return of({});
+        })
+      );
   }
 
   public getConfig() {
