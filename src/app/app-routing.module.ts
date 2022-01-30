@@ -6,6 +6,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { MainComponent } from './pages/main/main.component';
 import { AuthGuard } from './utils/guards/auth.guard';
+import { Logger, LoggerManager } from './utils/logging';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
@@ -61,28 +62,30 @@ const routes: Routes = [
 export class AppRoutingModule {
   userLoggedSubscription: Subscription;
 
+  private logger: Logger = LoggerManager.create('AppRoutingModule');
+
   constructor(private authService: AuthService, private router: Router) {
     this.userLoggedSubscription = this.authService
       .userLoggedAsObservable()
       .subscribe((userLogged) => {
         if (userLogged) {
-          console.info('User logged... redirecting');
+          this.logger.debug('User logged... redirecting');
           this.handleRedirect('/dashboard');
         } else {
-          console.info('User logged out...');
+          this.logger.debug('User logged out...');
         }
       });
   }
 
   handleRedirect(redirectTo: string = null) {
-    console.log('RedirectTO: ', redirectTo);
-    console.info('Current router state', this.router.routerState);
+    this.logger.debug('RedirectTO: ', redirectTo);
+    this.logger.debug('Current router state', this.router.routerState);
     // get return url from route parameters or default to '/'
     let returnUrl =
       this.router.routerState.snapshot.root.queryParams['returnUrl'] ||
       redirectTo ||
       '/';
-    console.log('ReturnURL: ', returnUrl);
+    this.logger.debug('ReturnURL: ', returnUrl);
     if (returnUrl) {
       this.router.navigateByUrl(returnUrl);
     }

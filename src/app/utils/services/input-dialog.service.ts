@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Logger, LoggerManager } from '../logging';
 declare var $: any;
 
 export interface InputDialogConfig {
@@ -28,7 +29,10 @@ export class InputDialogService {
 
   private _config: InputDialogConfig;
 
-  constructor() {}
+  // initialize logger
+  private logger: Logger = LoggerManager.create('InputDialogService');
+
+  constructor() { }
 
   public show(options: InputDialogConfig) {
     this._config = options;

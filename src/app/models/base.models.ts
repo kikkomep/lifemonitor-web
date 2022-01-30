@@ -1,4 +1,5 @@
 import { Observable, Subject } from 'rxjs';
+import { Logger, LoggerManager } from '../utils/logging';
 
 export class Property {
   private _name: string;
@@ -28,8 +29,12 @@ export class Model {
   // initialize data observables
   private _asObservable = this.subject.asObservable();
 
+  // initialize logger
+  protected logger: Logger = LoggerManager.create("model");
+
   constructor(private rawData?: Object, skip?: []) {
     this.update(rawData);
+    this.logger = LoggerManager.create(this.constructor.name);
   }
 
   public update(rawData: Object) {
@@ -56,6 +61,6 @@ export class Model {
     } else {
       this.subject.next(this);
     }
-    console.log('Change notified', this);
+    this.logger.debug('Change notified', this);
   }
 }

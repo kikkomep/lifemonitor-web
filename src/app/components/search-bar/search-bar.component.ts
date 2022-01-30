@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { fromEvent } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 @Component({
   selector: 'item-search-bar',
@@ -17,6 +18,9 @@ export class SearchBarComponent implements OnInit {
   @Output() sortingOrderChange = new EventEmitter<string>();
   @ViewChild('searchInputText') searchInputText: ElementRef;
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('SearchBarComponent');
+
   constructor() { }
 
   ngOnInit(): void { }
@@ -28,13 +32,13 @@ export class SearchBarComponent implements OnInit {
       .pipe(distinctUntilChanged())
       .subscribe(data => {
         this.filterValueChange.emit(data);
-        console.log('Current filter value: ', this._actualFilterValue);
+        this.logger.debug('Current filter value: ', this._actualFilterValue);
       });
   }
 
   public set actualFilterValue(value: string) {
     this._actualFilterValue = value;
-    console.log('Current filter value: ', this._actualFilterValue);
+    this.logger.debug('Current filter value: ', this._actualFilterValue);
   }
 
   public get actualFilterValue(): string {

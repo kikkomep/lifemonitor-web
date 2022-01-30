@@ -40,13 +40,13 @@ export class Workflow extends AggregatedStatusStatsItem {
             if (programminLanguage) {
               this._type = this.normalizeWorkflowTypeName(
                 ("" + programminLanguage['name']).toLowerCase());
-              console.log("Workflow type detected: ", this._type);
+              this.logger.debug("Workflow type detected: ", this._type);
               return this._type;
             }
           }
         } else if (this.version) {
           this._type = 'unknown';
-          console.log("Workflow type detected: ", this._type);
+          this.logger.debug("Workflow type detected: ", this._type);
         }
       }
     }
@@ -155,7 +155,7 @@ export class Workflow extends AggregatedStatusStatsItem {
             }
           }
         } catch (e) {
-          console.warn('Unable to load last builds');
+          this.logger.debug('Unable to load last builds');
           this._latestBuilds = [];
         }
       }

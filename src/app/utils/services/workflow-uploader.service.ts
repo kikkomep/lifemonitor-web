@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Logger, LoggerManager } from '../logging';
 declare var $: any;
 
 export interface Config {
@@ -29,6 +30,9 @@ export class WorkflowUploaderService {
 
   private _config: Config;
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('WorkflowUploaderService');
+
   constructor(
     private httpClient: HttpClient) {}
 
@@ -49,11 +53,11 @@ export class WorkflowUploaderService {
     if (!url) return false;
     this.httpClient.head(url).subscribe(
       (data) => {
-        console.log('Data', data);
+        this.logger.log('Data', data);
         return true;
       },
       (err) => {
-        console.log('Error', err);
+        this.logger.log('Error', err);
         return false;
       }
     );

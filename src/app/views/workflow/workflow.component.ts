@@ -13,6 +13,7 @@ import {
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow } from 'src/app/models/workflow.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 
@@ -37,6 +38,9 @@ export class WorkflowComponent implements OnInit, OnChanges {
   public suiteNameFilter: string = '';
   public suiteSortingOrder: string = 'desc';
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('WorkflowComponent');
+
   constructor(
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
@@ -46,19 +50,19 @@ export class WorkflowComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
-    console.log('Created component Workflow');
+    this.logger.debug('Created component Workflow');
 
     // subscribe for the current selected workflow
     this.workflowSubscription = this.appService.observableWorkflow.subscribe(
       (w: Workflow) => {
-        console.log('Changed workflow', w, w.suites);
+        this.logger.debug('Changed workflow', w, w.suites);
         this.workflow = w;
         this.workflowChangesSubscription = this.workflow
           .asObservable()
           .subscribe((change) => {
             this.suites = this.workflow.suites.all;
             this.cdr.detectChanges();
-            console.log('Handle change', change);
+            this.logger.debug('Handle change', change);
           });
         if (this.workflow.suites) this.suites = this.workflow.suites.all;
       }
@@ -71,7 +75,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('Change detected');
+    this.logger.debug('Change detected');
     this.cdr.detectChanges();
   }
 
@@ -88,12 +92,12 @@ export class WorkflowComponent implements OnInit, OnChanges {
         this.statusFilter = null;
       }
     } catch (e) {
-      console.log(e);
+      this.logger.debug(e);
     }
   }
 
   public selectTestBuild(testBuild: TestBuild) {
-    console.log('Test Build selected', testBuild);
+    this.logger.debug('Test Build selected', testBuild);
   }
 
   ngOnDestroy() {

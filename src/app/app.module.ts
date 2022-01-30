@@ -117,4 +117,4 @@ export function initConfigService(appConfig: AppConfigService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

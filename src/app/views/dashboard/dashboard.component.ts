@@ -7,6 +7,7 @@ import {
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow } from 'src/app/models/workflow.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
 import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
@@ -39,6 +40,9 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   public updatingDataTable: boolean = false;
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('DashboardComponent');
+
   constructor(
     private cdref: ChangeDetectorRef,
     private appService: AppService,
@@ -48,11 +52,11 @@ export class DashboardComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit() {
-    console.log('Dashboard Created!!');
+    this.logger.debug('Dashboard Created!!');
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
         timer(1000).subscribe(x => {
-          console.log("Loaded workflows: ", data);
+          this.logger.debug("Loaded workflows: ", data);
           this._workflowStats = this.statsFilter.transform(
             data,
             this._workflowNameFilter
@@ -62,7 +66,7 @@ export class DashboardComponent implements OnInit, OnChanges {
               ? this._workflowStats.all
               : this._workflowStats.all.filter(
                 (v) => v.subscriptions && v.subscriptions.length > 0);
-          console.log('Stats', data);
+          this.logger.debug('Stats', data);
           this.refreshDataTable();
         });
       }
@@ -70,7 +74,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   ngAfterViewInit() {
-    console.debug('Initializing workflow data!!');
+    this.logger.debug('Initializing workflow data!!');
     this._workflowStats = this.appService.workflowStats;
     this.updatingDataTable = true;
     if (this._workflowStats) {
@@ -86,7 +90,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.isUserLogged()
       ).subscribe(
         (data) => {
-          console.log("Loaded workflows ", data);
+          this.logger.debug("Loaded workflows ", data);
         }
       );
     }
@@ -96,7 +100,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('Changes', changes);
+    this.logger.debug('Changes', changes);
   }
 
   public get workflowNameFilter(): string {
@@ -136,7 +140,7 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   public editModeToggle() {
     this.editModeEnabled = !this.editModeEnabled;
-    console.log('Edit mode enabled: ' + this.editModeEnabled);
+    this.logger.debug('Edit mode enabled: ' + this.editModeEnabled);
   }
 
   public get searchModeEnabled(): boolean {
@@ -148,7 +152,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public deleteWorkflowVersion(w: Workflow) {
-    console.log("Deleting workflow version....", w);
+    this.logger.debug("Deleting workflow version....", w);
     this.inputDialog.show({
       iconClass: 'fas fa-trash-alt',
       description:
@@ -157,7 +161,7 @@ export class DashboardComponent implements OnInit, OnChanges {
       onConfirm: () => {
         this.appService.deleteWorkflowVersion(w, w.version['version'])
           .subscribe((wd: { uuid: string; version: string }) => {
-            console.log("Workflow deleted", wd);
+            this.logger.debug("Workflow deleted", wd);
             this.refreshDataTable();
           });
       },
@@ -165,17 +169,17 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public subscribeWorkflow(w: Workflow) {
-    console.log('Subscribing to workflow: ', w);
+    this.logger.debug('Subscribing to workflow: ', w);
     this.appService.subscribeWorkflow(w).subscribe((w) => {
-      console.log('Workflow subscription created!');
+      this.logger.debug('Workflow subscription created!');
       this.refreshDataTable();
     });
   }
 
   public unsubscribeWorkflow(w: Workflow) {
-    console.log('Unsubscribing from workflow: ', w);
+    this.logger.debug('Unsubscribing from workflow: ', w);
     this.appService.unsubscribeWorkflow(w).subscribe((w) => {
-      console.log('Workflow subscription deleted!');
+      this.logger.debug('Workflow subscription deleted!');
       this.filteredWorkflows = this.searchModeEnabled
         ? this._workflowStats.all
         : this._workflowStats.all.filter(
@@ -213,7 +217,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public selectTestBuild(testBuild: TestBuild) {
-    console.log('Test Build selected', testBuild);
+    this.logger.debug('Test Build selected', testBuild);
     window.open(testBuild.externalLink, '_blank');
   }
 
@@ -226,12 +230,12 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public filterWorkflows($event: any, workflows: AggregatedStatusStatsItem[]) {
-    console.log($event);
+    this.logger.debug($event);
     this.filteredWorkflows = workflows;
   }
 
   public filterByStatus(status: string) {
-    console.log('Filter by status', status);
+    this.logger.debug('Filter by status', status);
     if (!this._workflowStats) return;
     try {
       status = status == 'any' ? 'all' : status;
@@ -243,7 +247,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.statusFilter = null;
       }
     } catch (e) {
-      console.log(e);
+      this.logger.debug(e);
     }
   }
 
@@ -295,6 +299,6 @@ export class DashboardComponent implements OnInit, OnChanges {
     // prevent memory leak when component destroyed
     if (this.workflowsStatsSubscription)
       this.workflowsStatsSubscription.unsubscribe();
-    console.log('Destroying dashboard component');
+    this.logger.debug('Destroying dashboard component');
   }
 }

@@ -14,6 +14,7 @@ import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
 import { Workflow } from 'src/app/models/workflow.model';
+import { Logger, LoggerManager } from '../logging';
 import { AppConfigService } from './config.service';
 
 @Injectable({
@@ -23,9 +24,12 @@ export class ApiService {
   private apiBaseUrl: string = null;
   private httpOptions: object = null;
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('ApiService');
+
   constructor(private http: HttpClient, private config: AppConfigService) {
     this.apiBaseUrl = this.config.getConfig()['apiBaseUrl'];
-    console.log('API Service created');
+    this.logger.debug('API Service created');
   }
 
   private get_http_options(params = {}, skip: boolean = false) {
@@ -92,11 +96,11 @@ export class ApiService {
           for (let n of notifications) {
             n.read = readTime;
           }
-          console.log('Notifications updated');
+          this.logger.debug('Notifications updated');
           return notifications;
         }),
         tap(() => {
-          console.log('Notifications updated');
+          this.logger.debug('Notifications updated');
         }),
         catchError(this.handleError('Updating notifications', []))
       );
@@ -113,7 +117,7 @@ export class ApiService {
       .pipe(
         retry(3),
         tap(() => {
-          console.log('Notifications deleted');
+          this.logger.debug('Notifications deleted');
         }),
         catchError(this.handleError('Deleting notifications', []))
       );
@@ -125,7 +129,7 @@ export class ApiService {
       .pipe(
         retry(3),
         map((data) => {
-          console.log('Data registries', data);
+          this.logger.debug('Data registries', data);
           let result = [];
           for (let r of data['items']) {
             result.push(new Registry(r));
@@ -144,7 +148,7 @@ export class ApiService {
       .pipe(
         retry(3),
         map((data) => {
-          console.log('Data registries', data);
+          this.logger.debug('Data registries', data);
           let result = [];
           for (let w of data['items']) {
             result.push(new RegistryWorkflow(w));
@@ -163,7 +167,7 @@ export class ApiService {
       .pipe(
         retry(3),
         map((data) => {
-          console.log('Data registries', data);
+          this.logger.debug('Data registries', data);
           return new RegistryWorkflow(data);
         })
       );
@@ -183,9 +187,9 @@ export class ApiService {
         retry(3),
         map((data) => {
           workflow.public = !workflow.public;
-          console.log('Changed workflow visibility: public=' + workflow.public);
+          this.logger.debug('Changed workflow visibility: public=' + workflow.public);
         }),
-        tap((data) => console.log('Workflow visibility changed to: ', data)),
+        tap((data) => this.logger.debug('Workflow visibility changed to: ', data)),
         catchError(this.handleError('Updating workflow', []))
       );
   }
@@ -210,7 +214,7 @@ export class ApiService {
       .pipe(
         retry(3),
         map((wf_data) => {
-          console.log('Workflow registered', wf_data);
+          this.logger.debug('Workflow registered', wf_data);
           return wf_data;
         })
       );
@@ -246,7 +250,7 @@ export class ApiService {
       .pipe(
         retry(3),
         map((wf_data) => {
-          console.log('Workflow registered', wf_data);
+          this.logger.debug('Workflow registered', wf_data);
           return wf_data;
         })
       );
@@ -262,7 +266,7 @@ export class ApiService {
       .pipe(
         retry(3),
         map(() => {
-          console.log('Workflow deleted');
+          this.logger.debug('Workflow deleted');
           return { uuid: uuid, version: version };
         })
       );
@@ -279,7 +283,7 @@ export class ApiService {
       })
       .pipe(
         retry(3),
-        tap((data) => console.log('RO-Create downloaded')),
+        tap((data) => this.logger.debug('RO-Create downloaded')),
         catchError(this.handleError('download RO-Crate', []))
       );
   }
@@ -294,13 +298,13 @@ export class ApiService {
       .pipe(
         retry(3),
         map((subscription) => {
-          console.log('Created new subscription', subscription);
+          this.logger.debug('Created new subscription', subscription);
           if (subscription) {
             workflow.subscriptions.push(subscription);
           }
           return workflow;
         }),
-        tap((data) => console.log('Workflow visibility changed to: ', data))
+        tap((data) => this.logger.debug('Workflow visibility changed to: ', data))
       );
   }
 
@@ -314,7 +318,7 @@ export class ApiService {
       .pipe(
         retry(3),
         map(() => {
-          console.log('Subscription to workflow deleted');
+          this.logger.debug('Subscription to workflow deleted');
           for (let i = 0; i < workflow.subscriptions.length; i++) {
             let s = workflow.subscriptions[i];
             if (s['resource']['uuid'] === workflow.uuid) {
@@ -323,7 +327,7 @@ export class ApiService {
           }
           return workflow;
         }),
-        tap((data) => console.log('Workflow visibility changed to: ', data))
+        tap((data) => this.logger.debug('Workflow visibility changed to: ', data))
       );
   }
 
@@ -331,7 +335,7 @@ export class ApiService {
     filteredByUser: boolean = false,
     includeSubScriptions: boolean = false
   ): Observable<object> {
-    console.log(
+    this.logger.debug(
       'Loading workflows params',
       filteredByUser,
       includeSubScriptions
@@ -343,7 +347,7 @@ export class ApiService {
       includeSubScriptions.toString();
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
-      tap((data) => console.log('Loaded workflows: ', data)),
+      tap((data) => this.logger.debug('Loaded workflows: ', data)),
       catchError(this.handleError('get_workflows', []))
     );
   }
@@ -354,7 +358,7 @@ export class ApiService {
     ro_crate = false,
     load_suites = true
   ): Observable<Workflow> {
-    console.log('Request login');
+    this.logger.debug('Request login');
     const workflow = this.http.get<Workflow>(
       this.apiBaseUrl + '/workflows/' + uuid,
       this.get_http_options({
@@ -371,7 +375,7 @@ export class ApiService {
       .pipe(
         retry(3),
         catchError((err) => {
-          console.debug('workflow status error', err);
+          this.logger.debug('workflow status error', err);
           return throwError(err);
         })
       );
@@ -389,16 +393,16 @@ export class ApiService {
         w.update(result[0]);
         w.status = result[1];
         w.suites = new AggregatedStatusStats(suites ? result[2] : []);
-        console.log('workflow', w);
+        this.logger.debug('workflow', w);
         return w;
       }),
-      tap((result) => console.log('Loaded workflow: ', result)),
+      tap((result) => this.logger.debug('Loaded workflow: ', result)),
       retry(3)
     );
   }
 
   get_suites_parallel(uuid: string): Observable<Suite[]> {
-    console.log('Loading suites....');
+    this.logger.debug('Loading suites....');
     return this.http
       .get<Suite[]>(
         this.apiBaseUrl + '/workflows/' + uuid + '/suites',
@@ -448,13 +452,13 @@ export class ApiService {
                 .pipe(
                   retry(3),
                   map((instaceLatestBuildsData) => {
-                    console.log(
+                    this.logger.debug(
                       'Latest builds result',
                       instaceLatestBuildsData,
                       suite,
                       instanceData
                     );
-                    console.log('Instance Data', instanceData);
+                    this.logger.debug('Instance Data', instanceData);
                     let instance = new TestInstance(suite, instanceData);
                     instance.latestBuilds = instaceLatestBuildsData[
                       'items'
@@ -465,7 +469,7 @@ export class ApiService {
                     return instance;
                   }),
                   tap((result) => {
-                    console.debug('Loaded latest test instance builds', result);
+                    this.logger.debug('Loaded latest test instance builds', result);
                   })
                 )
             );
@@ -477,7 +481,7 @@ export class ApiService {
               return suite;
             }),
             catchError((err) => {
-              console.log('Catching error of latest builds of instance');
+              this.logger.debug('Catching error of latest builds of instance');
               return [];
             })
           );
@@ -486,7 +490,7 @@ export class ApiService {
   }
 
   get_suites(workflow: Workflow): Observable<Suite[]> {
-    console.log('Loading suites of workflow ....', workflow);
+    this.logger.debug('Loading suites of workflow ....', workflow);
     return this.http
       .get<Suite[]>(
         this.apiBaseUrl + '/workflows/' + workflow.uuid + '/suites',
@@ -498,7 +502,7 @@ export class ApiService {
           return rawSuitesData['items'];
         }),
         mergeMap((rawSuitesData: []) => {
-          console.log('Suites', rawSuitesData);
+          this.logger.debug('Suites', rawSuitesData);
 
           let dataIndexMap: { [key: string]: number } = {};
           let queries = [];
@@ -549,7 +553,7 @@ export class ApiService {
               return [suites];
             }),
             mergeMap((statuses) => {
-              console.log(
+              this.logger.debug(
                 'Suite statuses after forkjoin',
                 statuses,
                 rawSuitesData
@@ -575,7 +579,7 @@ export class ApiService {
                       'items'
                     ].map((x: object) => new TestBuild(instance, x));
                   } catch (e) {
-                    console.warn('Unable to load last builds');
+                    this.logger.warn('Unable to load last builds');
                   } finally {
                     suite.instances.add(instance);
                   }
@@ -597,7 +601,7 @@ export class ApiService {
         retry(3),
         mergeMap((data) => {
           //let s = new Suite({} as Workflow, data);
-          console.log('Suite data:', data);
+          this.logger.debug('Suite data:', data);
           //return of(new Suite({} as Workflow, data));
           return this.loadSuite(data).pipe(
             map((suite: Suite) => {
@@ -607,7 +611,7 @@ export class ApiService {
           //return s;
         }),
         tap((result) => {
-          console.debug('Loaded suite', result);
+          this.logger.debug('Loaded suite', result);
         })
       );
   }
@@ -624,7 +628,7 @@ export class ApiService {
           return data['items'];
         }),
         tap((result) => {
-          console.debug('Loaded suite test instances', result);
+          this.logger.debug('Loaded suite test instances', result);
         })
       );
   }
@@ -641,7 +645,7 @@ export class ApiService {
           return data['items'];
         }),
         tap((result) => {
-          console.debug('Loaded latest test instance builds', result);
+          this.logger.debug('Loaded latest test instance builds', result);
         })
       );
   }
@@ -663,7 +667,7 @@ export class ApiService {
           return data;
         }),
         tap((result) => {
-          console.debug('Loaded logs of test instance build', buildID, result);
+          this.logger.debug('Loaded logs of test instance build', buildID, result);
         })
       );
   }
@@ -674,11 +678,11 @@ export class ApiService {
       .pipe(
         retry(3),
         map((result) => {
-          console.log('Result: ', result);
+          this.logger.debug('Result: ', result);
           return true;
         }),
         catchError((err) => {
-          console.log('Error', err);
+          this.logger.error('Error', err);
           return of(false);
         })
       );
@@ -693,10 +697,10 @@ export class ApiService {
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
+      this.logger.error(error); // log to console instead
 
       // TODO: better job of transforming error for user consumption
-      console.log(`${operation} failed: ${error.message}`);
+      this.logger.debug(`${operation} failed: ${error.message}`);
 
       // Let the app keep running by returning an empty result.
       return of(result as T);

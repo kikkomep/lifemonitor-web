@@ -51,7 +51,7 @@ export class Suite extends AggregatedStatusStatsItem {
           a.timestamp >= b.timestamp ? 1 : -1
         );
       } catch (e) {
-        console.warn('Unable to load last builds');
+        this.logger.warn('Unable to load last builds');
         this._latest = [];
       }
     }

@@ -1,8 +1,12 @@
 import { HttpClient } from '@angular/common/http';
+import { Logger, LoggerManager } from '../utils/logging';
 
 export class UrlValue {
   _url: string;
   _error: string;
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('UrlValue');
 
   constructor(private httpClient: HttpClient) { }
 
@@ -37,10 +41,12 @@ export class UrlValue {
 
   public checkIsValid(url: string): boolean {
     try {
+      this.logger.debug("Checking URL", url);
       let u = new URL(url);
-      console.log(u);
+      this.logger.debug("Checking URL " + url + " OK", u);
       return true;
     } catch (ex) {
+      this.logger.debug("URL not valid", url);
       return false;
     }
   }
@@ -51,14 +57,14 @@ export class UrlValue {
       .head(url)
       .toPromise()
       .then((data) => {
-        console.log(data);
+        this.logger.debug("URL exists", data);
         return true;
       })
       .catch((reason) => {
-        console.log('Error', reason);
+        this.logger.debug("Unable to get URL", url);
         return false;
       });
-    console.log('Result', result);
+    this.logger.debug('Result', result);
     return result;
   }
 }

@@ -12,6 +12,7 @@ import { ChartData, ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 @Component({
   selector: 'stats-bar-chart',
@@ -21,6 +22,9 @@ import { TestBuild } from 'src/app/models/testBuild.models';
 export class StatsBarChartComponent implements OnInit, OnChanges {
   @Input() stats!: StatusStatsItem[];
   @Output() selectedItem = new EventEmitter<StatusStatsItem>();
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('SortingFilterPipe');
 
   public barChartOptions: ChartOptions = {
     responsive: true,
@@ -96,7 +100,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
 
   public selectedObject: StatusStatsItem;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   private getColor(label: string) {
     return {
@@ -113,10 +117,10 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
 
   public barChartData: ChartDataSets[] = [];
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // console.log('Stats ', this.stats);
+    // this.logger.debug('Stats ', this.stats);
     this.barChartData = [];
     this.barColors = [];
     for (let i in this.stats) {
@@ -137,7 +141,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
     event: MouseEvent;
     active: { _chart: any }[];
   }): void {
-    console.log(event, active);
+    this.logger.debug("Chart click event", event, active);
     if (!active || active.length == 0) return;
     let chart: Chart = active[0]._chart;
     let selectedElements: [{}] = chart.getElementAtEvent(event);
@@ -146,7 +150,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
       let dataIndex: number = element['_datasetIndex'];
       let data = this.barChartData[dataIndex];
       this.selectedObject = this.stats[dataIndex];
-      console.log('Data selected', chart, data, this.selectedObject);
+      this.logger.debug('Data selected', chart, data, this.selectedObject);
       this.selectedItem.emit(this.selectedObject);
     } else {
       this.selectedObject = null;
@@ -160,6 +164,6 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
     event: MouseEvent;
     active: {}[];
   }): void {
-    console.log(event, active);
+    this.logger.debug("chartHovered Event", event, active);
   }
 }

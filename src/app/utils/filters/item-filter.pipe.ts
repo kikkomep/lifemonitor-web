@@ -1,16 +1,21 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { AggregatedStatusStatsItem, StatsItem } from 'src/app/models/stats.model';
+import { Logger, LoggerManager } from 'typescript-logger';
 
 @Pipe({
   name: 'itemFilterPipe',
 })
 export class ItemFilterPipe implements PipeTransform {
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('ItemFilterPipe');
+
   transform(
     value: StatsItem[],
     input: string,
     cryteria: string[] = undefined
   ): StatsItem[] {
-    console.log('Filter Input: ', input);
+    this.logger.debug('Filter Input: ', input);
     if (input) {
       let data = value;
       return data.filter(

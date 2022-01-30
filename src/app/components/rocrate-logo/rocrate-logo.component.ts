@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Workflow } from 'src/app/models/workflow.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
@@ -13,6 +14,9 @@ export class RocrateLogoComponent implements OnInit {
   @Input() workflow: Workflow;
 
   private _availableForDownload: boolean;
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('RocrateLogoComponent');
 
   constructor(private appService: AppService) {}
 
@@ -31,7 +35,7 @@ export class RocrateLogoComponent implements OnInit {
 
   public downloadROCrate() {
     if (this.workflow) {
-      console.log('Downloading RO-Crate of workflow ', this.workflow);
+      this.logger.debug('Downloading RO-Crate of workflow ', this.workflow);
       this.appService.downloadROCrate(this.workflow);
     }
   }

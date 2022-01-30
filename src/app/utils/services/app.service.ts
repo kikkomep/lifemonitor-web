@@ -12,6 +12,7 @@ import { Workflow } from 'src/app/models/workflow.model';
 import { ApiService } from './api.service';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { UserNotification } from 'src/app/models/notification.model';
+import { Logger, LoggerManager } from '../logging';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +60,9 @@ export class AppService {
   private _observableTestBuild = this.subjectTestBuild.asObservable();
   private _observableLoadingWorkflows = this.subjectLoadingWorkflows.asObservable();
 
+  // Initialize logger
+  private logger: Logger = LoggerManager.create('AppService');
+
   // subscriptions
   private subscriptions: Subscription[] = [];
 
@@ -73,7 +77,7 @@ export class AppService {
     private api: ApiService,
     private http: HttpClient
   ) {
-    console.log('AppService created!');
+    this.logger.debug('AppService created!');
 
     // subscribe for the current selected workflow
     this.subscriptions.push(
@@ -88,7 +92,7 @@ export class AppService {
         // get user data
         if (logged === true) {
           this.api.get_current_user().subscribe((data) => {
-            console.log('Current user from APP', data);
+            this.logger.debug('Current user from APP', data);
             this._currentUser = data;
           });
         } else {
@@ -107,7 +111,7 @@ export class AppService {
     // get user data if already logged
     if (this.auth.isUserLogged()) {
       this.api.get_current_user().subscribe((data) => {
-        console.log('Current user from APP', data);
+        this.logger.debug('Current user from APP', data);
         this._currentUser = data;
       });
     }
@@ -244,7 +248,7 @@ export class AppService {
   public subscribeWorkflow(w: Workflow): Observable<Workflow> {
     return this.api.subscribeWorkflow(w).pipe(
       tap((wd: Workflow) => {
-        console.log("Added subscription to workflow: ", wd);
+        this.logger.debug("Added subscription to workflow: ", wd);
       })
     );
   }
@@ -252,7 +256,7 @@ export class AppService {
   public unsubscribeWorkflow(w: Workflow): Observable<Workflow> {
     return this.api.unsubscribeWorkflow(w).pipe(
       tap((wd: Workflow) => {
-        console.log("Removed subscription to workflow: ", wd);
+        this.logger.debug("Removed subscription to workflow: ", wd);
       })
     );
   }
@@ -273,16 +277,16 @@ export class AppService {
   }
 
   public selectRegistry(uuid: string, useCache: boolean = true) {
-    console.log('Selecting registry ', uuid);
+    this.logger.debug('Selecting registry ', uuid);
     this._registry = this.findRegistryByUuid(uuid);
     this.subjectRegistry.next(this._registry);
     if (this._registry) {
       if (uuid in this._registryWorkflows && useCache) {
-        console.log('Using cached workflows');
+        this.logger.debug('Using cached workflows');
         this.subjectRegistryWorkflows.next(this._registryWorkflows[uuid]);
       } else {
         this.api.getRegistryWorkflows(uuid).subscribe((data: RegistryWorkflow[]) => {
-          console.log('Loaded registry workflows...', data);
+          this.logger.debug('Loaded registry workflows...', data);
           let sorted = data.sort((a, b) => {
             return a.identifier.localeCompare(b.identifier, undefined, {
               numeric: true,
@@ -300,7 +304,7 @@ export class AppService {
     // TODO: enable caching
     this.api.getRegistryWorkflow(this.registry.uuid, workflow_identifier)
       .subscribe((w: RegistryWorkflow) => {
-        console.log("Loaded registry workflow data", w);
+        this.logger.debug("Loaded registry workflow data", w);
         this._registryWorkflow = w;
         this.subjectRegistryWorkflow.next(w);
       });
@@ -313,7 +317,7 @@ export class AppService {
   ): Observable<AggregatedStatusStats> {
     if (this.loadingWorkflows) return;
     // if (useCache && this._workflowsStats) {
-    //   console.log('Using cache', this._workflowsStats);
+    //   this.logger.debug('Using cache', this._workflowsStats);
     //   this.subjectWorkflows.next(this._workflowsStats);
     //   return;
     // }
@@ -328,7 +332,7 @@ export class AppService {
       )
       .pipe(
         map((data) => {
-          console.log('AppService Loaded workflows', data);
+          this.logger.debug('AppService Loaded workflows', data);
 
           // Process workflow items
           let stats = new AggregatedStatusStats();
@@ -338,15 +342,15 @@ export class AppService {
             // Try to get workflow data from cache if it is enabled
             if (useCache && this._workflows) {
               w = this._workflows.find(e => e['uuid'] === wdata['uuid']);
-              console.log("Using data from cache for worklow: ", w);
+              this.logger.debug("Using data from cache for worklow: ", w);
             }
             // Load workflow data from the back-end
             // if cache is disabled or it has not been found
             if (!w) {
               w = new Workflow(wdata);
-              console.log('Loading data of workflow ', w);
+              this.logger.debug('Loading data of workflow ', w);
               this.loadWorkflow(w).subscribe((wf: Workflow) => {
-                console.log("Data loaded for workflow", w.uuid)
+                this.logger.debug("Data loaded for workflow", w.uuid)
               });
             }
             // Add workflow to the list of loaded workflows
@@ -370,10 +374,10 @@ export class AppService {
   loadWorkflow(w: Workflow): Observable<Workflow> {
     return this.api.get_workflow(w.uuid, false, true).pipe(
       map((wdata: Workflow) => {
-        console.log('Loaded data:', w);
+        this.logger.debug('Loaded data:', w);
         w.update(wdata);
         w.suites = wdata.suites;
-        console.log('Workflow data updated!');
+        this.logger.debug('Workflow data updated!');
         return w;
       })
     );
@@ -381,7 +385,7 @@ export class AppService {
 
   public selectWorkflow(uuid: string) {
     let w: Workflow;
-    console.log('Workflows', this._workflows, this._workflowsStats);
+    this.logger.debug('Workflows', this._workflows, this._workflowsStats);
     if (this._workflow && this._workflow.uuid === uuid) {
       this._selectWorkflow(this._workflow);
     } else if (!this._workflows) {
@@ -424,20 +428,20 @@ export class AppService {
       )
       .pipe(
         map((data) => {
-          console.log('Data of registered workflow', data);
+          this.logger.debug('Data of registered workflow', data);
           this.api.get_workflow(data['uuid'], false, true).subscribe((w: Workflow) => {
-            console.log('Loaded data:', w);
+            this.logger.debug('Loaded data:', w);
             // TODO: atomic add
             this._workflows.push(w);
             this._workflowsStats.add(w);
-            console.log('Workflow data loaded!');
+            this.logger.debug('Workflow data loaded!');
             this.subjectWorkflows.next(this._workflowsStats);
             this.setLoadingWorkflows(false);
           });
           return data;
         }),
         catchError((err) => {
-          console.log('Error when registering workflow', err);
+          this.logger.debug('Error when registering workflow', err);
           this.setLoadingWorkflows(false);
           throw err;
         }),
@@ -464,20 +468,20 @@ export class AppService {
       )
       .pipe(
         map((data) => {
-          console.log('Data of registered workflow', data);
+          this.logger.debug('Data of registered workflow', data);
           this.api.get_workflow(data['uuid'], false, true).subscribe((w: Workflow) => {
-            console.log('Loaded data:', w);
+            this.logger.debug('Loaded data:', w);
             // TODO: atomic add
             this._workflows.push(w);
             this._workflowsStats.add(w);
-            console.log('Workflow data loaded!');
+            this.logger.debug('Workflow data loaded!');
             this.subjectWorkflows.next(this._workflowsStats);
             this.setLoadingWorkflows(false);
           });
           return data;
         }),
         catchError((err) => {
-          console.log('Error when registering workflow', err);
+          this.logger.debug('Error when registering workflow', err);
           this.setLoadingWorkflows(false);
           throw err;
         }),
@@ -499,11 +503,11 @@ export class AppService {
           this.subjectWorkflows.next(this._workflowsStats);
           this.setLoadingWorkflows(false);
         }
-        console.log("Workflow removed");
+        this.logger.debug("Workflow removed");
         return wd;
       }),
       catchError((err) => {
-        console.log('Error when deleting workflow', err);
+        this.logger.debug('Error when deleting workflow', err);
         this.setLoadingWorkflows(false);
         throw err;
       }),
@@ -525,7 +529,7 @@ export class AppService {
   }
 
   private _selectWorkflow(w: Workflow) {
-    console.log('Selected workflow', w);
+    this.logger.debug('Selected workflow', w);
     this._workflow = w;
     this.subjectWorkflow.next(w);
   }
@@ -546,7 +550,7 @@ export class AppService {
   }
 
   private _selectTestSuite(suite: Suite) {
-    console.log('Selected suite', suite);
+    this.logger.debug('Selected suite', suite);
     this._suite = suite;
     this.subjectTestSuite.next(suite);
   }
@@ -571,7 +575,7 @@ export class AppService {
         return notifications;
       }),
       catchError((err) => {
-        console.log('Error', err);
+        this.logger.debug('Error', err);
         // this.setLoadingWorkflows(false);
         throw err;
       }),

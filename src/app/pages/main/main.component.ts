@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
 import { User } from 'src/app/models/user.modes';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { ApiService } from 'src/app/utils/services/api.service';
 import { AppService } from './../../utils/services/app.service';
 
@@ -18,6 +19,9 @@ export class MainComponent implements OnInit {
   private userLoggedSubscription: any;
 
   public user: User;
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('MainComponent');
 
   constructor(
     private router: Router,
@@ -43,13 +47,13 @@ export class MainComponent implements OnInit {
         })
       )
       .subscribe((event: NavigationStart) => {
-        console.group('NavigationStart Event');
-        console.log('event', event);
+        this.logger.debug('NavigationStart Event');
+        this.logger.debug('event', event);
         // Every navigation sequence is given a unique ID. Even "popstate"
         // navigations are really just "roll forward" navigations that get
         // a new, unique ID.
-        console.log('navigation id:', event.id);
-        console.log('route:', event.url);
+        this.logger.debug('navigation id:', event.id);
+        this.logger.debug('route:', event.url);
         // The "navigationTrigger" will be one of:
         // --
         // - imperative (ie, user clicked a link).
@@ -57,7 +61,7 @@ export class MainComponent implements OnInit {
         // - hashchange
         // --
         // NOTE: I am not sure what triggers the "hashchange" type.
-        console.log('trigger:', event.navigationTrigger);
+        this.logger.debug('trigger:', event.navigationTrigger);
         // This "restoredState" property is defined when the navigation
         // event is triggered by a "popstate" event (ex, back / forward
         // buttons). It will contain the ID of the earlier navigation event
@@ -67,12 +71,11 @@ export class MainComponent implements OnInit {
         // This value is pulled out of the browser; and, may exist across
         // page refreshes.
         if (event.restoredState) {
-          console.warn(
+          this.logger.warn(
             'restoring navigation id:',
             event.restoredState.navigationId
           );
         }
-        console.groupEnd();
       });
   }
 
@@ -111,6 +114,6 @@ export class MainComponent implements OnInit {
   ngOnDestroy() {
     // prevent memory leak when component destroyed
     if (this.userLoggedSubscription) this.userLoggedSubscription.unsubscribe();
-    console.log('Destroying dashboard component');
+    this.logger.debug('Destroying dashboard component');
   }
 }

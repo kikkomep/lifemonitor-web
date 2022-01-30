@@ -1,12 +1,17 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { UserNotification } from 'src/app/models/notification.model';
+import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
   name: 'sortingNotificationFilter',
 })
 export class SortingNotificationFilterPipe implements PipeTransform {
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('SortingNotificationFilterPipe');
+
   transform(value: UserNotification[], order: string = 'asc'): UserNotification[] {
-    console.log('Sorting Input: ', order);
+    this.logger.debug('Sorting Input: ', order);
     return value.sort(
       (a, b) =>
       (

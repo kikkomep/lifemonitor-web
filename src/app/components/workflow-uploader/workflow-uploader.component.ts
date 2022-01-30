@@ -15,6 +15,7 @@ import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploade
 import { v4 as uuidv4 } from 'uuid';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { Subscription } from 'rxjs';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 declare var $: any;
 
@@ -68,6 +69,9 @@ export class WorkflowUploaderComponent
 
   source: string = 'remoteRoCrate';
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('WorkflowUploaderComponent');
+
   constructor(
     private httpClient: HttpClient,
     private appService: AppService,
@@ -77,7 +81,7 @@ export class WorkflowUploaderComponent
 
   ngOnInit(): void {
     $('#' + this.name).on('hide.bs.modal', () => {
-      console.log('hidden');
+      this.logger.debug('hidden');
     });
 
     let s = $('#' + this.name).on('show.bs.modal', () => {
@@ -106,21 +110,21 @@ export class WorkflowUploaderComponent
     this._subscriptions.push(
       this.appService.observableRegistries.subscribe((data: Registry[]) => {
         this.updateRegistries(data);
-        console.log('Loaded registries: ', this.registries);
+        this.logger.debug('Loaded registries: ', this.registries);
       })
     );
 
     this._subscriptions.push(
       this.appService.observableRegistry.subscribe((registry: Registry) => {
         this._selectedRegistry = registry;
-        console.log('Loaded registry', this.selectedRegistry);
+        this.logger.debug('Loaded registry', this.selectedRegistry);
       })
     );
 
     this._subscriptions.push(
       this.appService.observableRegistryWorkflow.subscribe((w: RegistryWorkflow) => {
         this._selectedRegistryWorkflow = w;
-        console.log('Loaded registry workflow', w);
+        this.logger.debug('Loaded registry workflow', w);
         // Set defauls
         this._workflowName = w.name;
         this._workflowVersion = w.latest_version;
@@ -137,9 +141,9 @@ export class WorkflowUploaderComponent
 
     let modal = $('#' + this.name);
     modal.on('shown.bs.modal', () => {
-      console.log('shown');
+      this.logger.debug('shown');
       this.appService.loadRegistries().subscribe((registries: Registry[]) => {
-        console.log("data registries....", registries);
+        this.logger.debug("data registries....", registries);
       });
     });
   }
@@ -157,7 +161,7 @@ export class WorkflowUploaderComponent
   public set workflowUUID(value: string) {
     this._workflowUUID = value;
     let valid = this.checkIfValidUUID(value);
-    console.log('Setting workflow UUID: ' + value + ' (valid: ' + valid + ')');
+    this.logger.debug('Setting workflow UUID: ' + value + ' (valid: ' + valid + ')');
     this._setError('uuid', valid ? null : 'Not valid UUID');
   }
 
@@ -175,7 +179,7 @@ export class WorkflowUploaderComponent
 
   public set workflowName(name: string) {
     this._workflowName = name;
-    console.log('Setting workflow name: ', this._workflowName);
+    this.logger.debug('Setting workflow name: ', this._workflowName);
   }
 
   public get workflowVersion(): string {
@@ -185,7 +189,7 @@ export class WorkflowUploaderComponent
   public set workflowVersion(value: string) {
     this._workflowVersion = value;
     let valid = this.checkIfValidVersion(value);
-    console.log(
+    this.logger.debug(
       'Setting workflow version: ' + value + ' (valid: ' + valid + ')'
     );
     this._setError('version', valid ? null : 'Not valid version');
@@ -213,7 +217,7 @@ export class WorkflowUploaderComponent
 
   public setSource(value: string) {
     this.source = value;
-    console.log('Selected Source: ', this.source);
+    this.logger.debug('Selected Source: ', this.source);
     if (this.source === 'registry') {
       this.cdref.detectChanges();
       this.updateRegistries(this.registries);
@@ -224,26 +228,26 @@ export class WorkflowUploaderComponent
     }
     this.validateWorkflowSource();
     // this.stepper.next();
-    console.log('Current step', this.currentStepIndex);
+    this.logger.debug('Current step', this.currentStepIndex);
   }
 
   public setRoCrateFile() {
-    console.log(document.getElementById('roCrateInputFile')['files']);
+    this.logger.debug(document.getElementById('roCrateInputFile')['files']);
     let input = document.getElementById('roCrateInputFile');
     this.roCrateFile = input;
-    console.log(this.roCrateFile);
+    this.logger.debug("RoCreate file", this.roCrateFile);
     var fReader = new FileReader();
     fReader.readAsDataURL(input['files'][0]);
     fReader.onloadend = (event) => {
       let data: string = event.target.result as string;
       this._workflowROCrate = data.split(',')[1];
-      console.log('Loaded RO-Crate', this._workflowROCrate);
+      this.logger.debug('Loaded RO-Crate', this._workflowROCrate);
     };
   }
 
   public updateRoCrateUrl(event: any) {
     let input = document.getElementById('roCrateUrl');
-    console.log(input);
+    this.logger.debug("RoCrate Input URL", input);
     this.roCrateURL.url = input['value'];
     if (!this.roCrateURL.isValid) {
       input.classList.add('is-invalid');
@@ -320,7 +324,7 @@ export class WorkflowUploaderComponent
 
 
   public selectRegistry(value: any) {
-    console.log('Selecting registry....', value);
+    this.logger.debug('Selecting registry....', value);
     this.updateRegistryWorkflows([]);
     if (value && value.length > 0) {
       this.appService.selectRegistry(value);
@@ -328,7 +332,7 @@ export class WorkflowUploaderComponent
   }
 
   public selectRegistryWorkflow(workflow_identifier: string) {
-    console.log("Selecting RegistryWorkflow", workflow_identifier);
+    this.logger.debug("Selecting RegistryWorkflow", workflow_identifier);
     if (workflow_identifier && workflow_identifier.length > 0) {
       this.appService.selectRegistryWorkflow(workflow_identifier);
     } else {
@@ -374,7 +378,7 @@ export class WorkflowUploaderComponent
 
   public confirm() {
     try {
-      console.log('Workflow source: ', this.source);
+      this.logger.debug('Workflow source: ', this.source);
       let request = null;
       if (this.source === 'remoteRoCrate') {
         request = this.appService.registerWorkflowRoCrate(
@@ -409,12 +413,12 @@ export class WorkflowUploaderComponent
         this._processing = true;
         request.subscribe(
           (data: any) => {
-            console.log('Workflow registered (from uploader)', data);
+            this.logger.debug('Workflow registered (from uploader)', data);
             this.hide();
             this._processing = false;
           },
           (err: HttpErrorResponse) => {
-            console.log('Error', err);
+            this.logger.debug('Error', err);
             this._handleError(err);
             this._processing = false;
           }
@@ -424,7 +428,7 @@ export class WorkflowUploaderComponent
         this.onConfirm();
       }
     } catch (ex) {
-      console.error(ex);
+      this.logger.error(ex);
     } finally {
       // this.hide();
     }
@@ -512,7 +516,7 @@ export class WorkflowUploaderComponent
 
 
   private _handleError(err: HttpErrorResponse) {
-    console.log('Processing error', err);
+    this.logger.debug('Processing error', err);
     this._registrationError = {
       code: err.status,
       title: err.error.title,

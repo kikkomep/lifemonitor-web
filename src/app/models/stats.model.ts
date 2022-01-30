@@ -108,7 +108,7 @@ export class AbstractStats extends Model {
   constructor(statuses: Array<string>, data?: Array<StatsItem>) {
     super();
     this._statuses = statuses;
-    console.log('Statuses', statuses);
+    this.logger.debug('Statuses', statuses);
     this['all'] = [];
     for (let s of statuses) {
       if (!Array.isArray(this[s])) this[s] = [];
@@ -129,13 +129,13 @@ export class AbstractStats extends Model {
   public remove(item: StatsItem) {
     if (!item) return;
     let index = this['all'].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
-    console.log("Delete item from all @index", index);
+    this.logger.debug("Delete item from all @index", index);
     if (index !== -1) {
       this['all'].splice(index, 1);
     }
     if (this[item.getStatus()]) {
       index = this[item.getStatus()].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
-      console.log("Delete item from " + item.getStatus() + " @index", index);
+      this.logger.debug("Delete item from " + item.getStatus() + " @index", index);
       if (index !== -1) {
         this[item.getStatus()].splice(index, 1);
       }
@@ -149,19 +149,19 @@ export class AbstractStats extends Model {
     this['all'].push(...data);
     for (let s of this._statuses) {
       if (s === 'all') continue;
-      console.log('Initializing', s);
+      this.logger.debug('Initializing', s);
       this[s].push(...data.filter((item: StatsItem) => item.getStatus() === s));
-      console.log('Configured', this[s]);
+      this.logger.debug('Configured', this[s]);
     }
 
     // map status 'not_available' to 'unknown'
     if (this._statuses.indexOf('unknown') != -1) {
       let s: string = 'not_available';
-      console.log('Initializing', s);
+      this.logger.debug('Initializing', s);
       this['unknown'].push(
         ...data.filter((item: StatsItem) => item.getStatus() === s)
       );
-      console.log('Configured', this['unknown']);
+      this.logger.debug('Configured', this['unknown']);
     }
 
     // notify updates

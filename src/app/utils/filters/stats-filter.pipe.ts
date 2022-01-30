@@ -3,17 +3,22 @@ import {
   AggregatedStatusStatsItem,
   AggregatedStatusStats,
 } from 'src/app/models/stats.model';
+import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
   name: 'statsFilterPipe',
 })
 export class StatsFilterPipe implements PipeTransform {
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('StatsFilterPipe');
+
   transform(
     value: AggregatedStatusStats,
     input: string,
     cryteria: string[] = undefined
   ): AggregatedStatusStats {
-    console.log('Filter Input: ', input);
+    this.logger.debug('Filter Input: ', input);
     if (input) {
       let data = value.all;
       let filteredItems: AggregatedStatusStatsItem[] = (data.filter(

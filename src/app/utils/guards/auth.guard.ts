@@ -9,12 +9,17 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/utils/services/auth.service';
+import { Logger, LoggerManager } from '../logging';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate, CanActivateChild {
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('AuthGuard');
+
   constructor(private userService: AuthService, private router: Router) {}
 
   canActivate(
@@ -25,7 +30,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    console.log(
+    this.logger.debug(
       'Can Activate, ',
       this.userService.user,
       this.userService.isUserLogged()
@@ -42,7 +47,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    console.log(
+    this.logger.debug(
       'Can Activate Child ',
       this.userService.user,
       this.userService.isUserLogged()

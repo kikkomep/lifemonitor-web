@@ -10,11 +10,16 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
+import { Logger, LoggerManager } from '../logging';
 import { AuthService } from '../services/auth.service';
 import { AppConfigService } from '../services/config.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('HttpErrorInterceptor');
+
   constructor(
     private appConfig: AppConfigService,
     private authService: AuthService,
@@ -23,7 +28,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   ) { }
 
   private isOAuthError(error: HttpErrorResponse): boolean {
-    console.debug('Checking HTTP error: ', error);
+    this.logger.debug('Checking HTTP error: ', error);
     return (
       error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl']) &&
       (error.status == 401 ||
@@ -46,12 +51,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.error('Error from error interceptor', error);
+        this.logger.error('Error from error interceptor', error);
 
         // if error code is 401 and the server is the LifeMonitor back-end
         // then try to restart the authentication process
         if (this.isOAuthError(error)) {
-          console.log('Trying to reauthenticate user');
+          this.logger.debug('Trying to reauthenticate user');
           // clear user session
           this.authService.logout();
           // force authentication process
@@ -75,7 +80,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         ) {
           // Show the error message
           //this.toastr.error(`${error.status}: ${error.message}`);
-          console.debug(`${error.status}: ${error.message}`, error);
+          this.logger.debug(`${error.status}: ${error.message}`, error);
         }
 
         // show dialog for error message

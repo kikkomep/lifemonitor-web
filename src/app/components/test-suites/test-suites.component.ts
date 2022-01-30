@@ -11,6 +11,7 @@ import {
 import { Router } from '@angular/router';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
@@ -23,6 +24,9 @@ declare var $: any;
 export class TestSuitesComponent implements OnInit, OnChanges {
   @Input() suites: Suite[];
   @Output() suiteSelected = new EventEmitter<TestBuild>();
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('TestSuitesComponent');
 
   private suitesDataTable: any;
 
@@ -39,14 +43,14 @@ export class TestSuitesComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('Change detected');
+    this.logger.debug('Change detected');
     this.cdr.detectChanges();
   }
 
   public selectTestBuild(testBuild: TestBuild) {
-    console.log('TestBuild', testBuild);
+    this.logger.debug('TestBuild', testBuild);
     if (testBuild) {
-      console.log('Test Build selected', testBuild);
+      this.logger.debug('Test Build selected', testBuild);
       window.open(testBuild.externalLink, '_blank');
       this.suiteSelected.emit(testBuild);
       this.appService.selectWorkflow(
