@@ -24,7 +24,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
   @Output() selectedItem = new EventEmitter<StatusStatsItem>();
 
   // initialize logger
-  private logger: Logger = LoggerManager.create('SortingFilterPipe');
+  private logger: Logger = LoggerManager.create('StatsBarChartComponent');
 
   public barChartOptions: ChartOptions = {
     responsive: true,
