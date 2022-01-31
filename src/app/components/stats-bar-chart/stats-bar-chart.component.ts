@@ -51,7 +51,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
           let item = this.stats[index] as TestBuild;
           return 'Build ' + item.build_id + ' : ' + item.status;
         },
-        label: function (tooltipItem, data) {
+        label: (tooltipItem, data) => {
           let label = data.labels[tooltipItem.index];
           let sec = data.datasets[tooltipItem.datasetIndex].data[
             tooltipItem.index
@@ -62,7 +62,8 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
           let seconds = sec - hours * 3600 - minutes * 60;
           if (hours > 0) duration += hours + 'h ';
           if (minutes > 0) duration += minutes + 'm ';
-          if (sec > 0) duration += seconds + 's';
+          if (sec >= 0) duration += seconds + 's';
+          this.logger.debug("DURATION", hours, minutes, seconds, duration, tooltipItem, data);
           return ' duration ' + duration;
         },
         footer: (tooltipItem, data) => {
