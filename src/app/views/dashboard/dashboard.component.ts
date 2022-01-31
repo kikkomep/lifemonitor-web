@@ -168,10 +168,11 @@ export class DashboardComponent implements OnInit, OnChanges {
         'Delete workflow <b>' +
         w.name + '</b> (version ' + w.version['version'] + ')?',
       onConfirm: () => {
+        this.updatingDataTable = true;
         this.appService.deleteWorkflowVersion(w, w.version['version'])
           .subscribe((wd: { uuid: string; version: string }) => {
             this.logger.debug("Workflow deleted", wd);
-            this.refreshDataTable();
+            this.refreshDataTable(false);
           });
       },
     });
@@ -260,14 +261,16 @@ export class DashboardComponent implements OnInit, OnChanges {
     }
   }
 
-  private refreshDataTable() {
-    this.updatingDataTable = true;
+  private refreshDataTable(resetTableStatus: boolean = true) {
+    if (resetTableStatus)
+      this.updatingDataTable = true;
     try {
       this.destroyDataTable();
       this.cdref.detectChanges();
       this.initDataTable();
     } finally {
-      this.updatingDataTable = false;
+      if (resetTableStatus)
+        this.updatingDataTable = false;
     }
   }
 

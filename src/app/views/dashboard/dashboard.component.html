@@ -146,7 +146,7 @@
     <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
     <div class="card card-primary card-outline">
-      <div *ngIf="updatingDataTable" class="overlay">
+      <div *ngIf="updatingDataTable || (isLoading | async)" class="overlay">
         <i class="fas fa-3x fa-sync-alt text-primary"></i>
       </div>
       <!-- Loading (remove the following to stop the loading)-->
@@ -182,7 +182,7 @@
                 <th class="p-4" style="width: 50px"></th>
               </tr>
             </thead>
-            <tbody *ngIf="workflows && !(isLoading | async)">
+            <tbody *ngIf="workflows">
               <!-- end loading -->
               <tr *ngFor="
                   let w of workflows
