@@ -23,8 +23,9 @@ declare var $: any;
 export class DashboardComponent implements OnInit, OnChanges {
   // reference to workflows stats
   private _workflowStats: AggregatedStatusStats | null;
-  // reference to the current subscription
+  // reference to the current subscriptions
   private workflowsStatsSubscription: Subscription;
+  private userLoggedSubscription: Subscription;
   //
   private filteredWorkflows: AggregatedStatusStatsItem[] | null;
   //
@@ -53,6 +54,14 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.logger.debug('Dashboard Created!!');
+    this.userLoggedSubscription = this.appService.observableUserLogged
+      .subscribe((isUserLogged) => {
+        this.updatingDataTable = true;
+        this._workflowStats.clear();
+        this.filteredWorkflows = [];
+        this.cdref.detectChanges();
+        this.initDataTable();
+      });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
         timer(1000).subscribe(x => {

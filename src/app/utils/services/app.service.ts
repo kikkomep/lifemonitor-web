@@ -96,13 +96,16 @@ export class AppService {
             this._currentUser = data;
           });
         } else {
-          // reset the current list of workflows
-          this._workflowsStats.update([]);
-          this.subjectWorkflows.next(this._workflowsStats);
           // reload workflows
-          this.loadWorkflows(false, false).subscribe((data) => {
+          this.loadWorkflows(false, false, false).subscribe((data) => {
             // delete reference to the previous user
             this._currentUser = null;
+            // reset the current list of workflows
+            this._currentUser = null;
+            this._workflows = null;
+            this._workflow = null;
+            this._workflowsStats.update([]);
+            this.subjectWorkflows.next(this._workflowsStats);
           });
         }
       })
@@ -198,6 +201,10 @@ export class AppService {
 
   public get testBuilds(): TestBuild {
     return this._testBuild;
+  }
+
+  public get observableUserLogged(): Observable<boolean> {
+    return this.auth.userLoggedAsObservable();
   }
 
   public get observableRegistry(): Observable<Registry> {
