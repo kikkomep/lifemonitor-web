@@ -504,6 +504,7 @@ export class WorkflowUploaderComponent
     this._workflowROCrate = null;
     this.roCrateURL = new UrlValue(this.httpClient);
     this._registrationError = null;
+    $("#roCrateInputFile").val("");
     $("#radioPrimary1").prop("checked", true);
     $("#radioPrimary2").prop("checked", false);
     $("#radioPrimary3").prop("checked", false);
