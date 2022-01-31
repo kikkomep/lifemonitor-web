@@ -150,22 +150,24 @@
         <i class="fas fa-3x fa-sync-alt text-primary"></i>
       </div>
       <!-- Loading (remove the following to stop the loading)-->
-      <div class="card-body box-profile">
-        <div *ngIf="isUserLogged()" class="float-right m-4">
-          <a *ngIf="!editModeEnabled" class="btn btn-sm m-2" (click)="openWorkflowUploader()">
-            <i class="fas fa-plus-circle"></i> add
-          </a>
-          <a *ngIf="!editModeEnabled" class="btn btn-sm m-4" (click)="editModeToggle()">
-            <i class="far fa-edit"></i> edit
-          </a>
-          <a *ngIf="editModeEnabled" class="btn btn-sm m-4 active" (click)="editModeToggle()">
-            <i class="far fa-window-close"></i> done
-          </a>
+      <div class="card-body box-profile p-4">
+        <div class="row w-100 p-0 mx-0 my-3">
+          <div *ngIf="isUserLogged()" class="offset-6 col-6 text-right p-0">
+            <a *ngIf="!editModeEnabled" class="btn btn-sm mx-2" (click)="openWorkflowUploader()">
+              <i class="fas fa-plus-circle"></i> add
+            </a>
+            <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="editModeToggle()">
+              <i class="far fa-edit"></i> edit
+            </a>
+            <a *ngIf="editModeEnabled" class="btn btn-sm active" (click)="editModeToggle()">
+              <i class="far fa-window-close"></i> done
+            </a>
+          </div>
         </div>
 
         <!-- /.card-header -->
-        <div class="card-body mt-4 p-0">
-          <table id="workflowsDashboard" class="table table-striped" #workflowsDashboard>
+        <div class="card-body mt-4 p-0 w-100">
+          <table id="workflowsDashboard" class="table table-striped w-100" #workflowsDashboard>
             <thead>
               <tr>
                 <th style="width: 10px" scope="col"></th>
