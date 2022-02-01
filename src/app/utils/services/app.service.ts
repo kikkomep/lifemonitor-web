@@ -97,14 +97,11 @@ export class AppService {
           });
         } else {
           // reload workflows
-          this.loadWorkflows(false, false, false).subscribe((data) => {
+          this.loadWorkflows(true, false, false).subscribe((data: AggregatedStatusStats) => {
             // delete reference to the previous user
             this._currentUser = null;
-            // reset the current list of workflows
-            this._currentUser = null;
-            this._workflows = null;
             this._workflow = null;
-            this._workflowsStats.update([]);
+            this.logger.debug("Check workflows loaded: ", data);
             this.subjectWorkflows.next(this._workflowsStats);
           });
         }
