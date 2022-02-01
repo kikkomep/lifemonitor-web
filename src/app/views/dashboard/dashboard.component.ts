@@ -282,6 +282,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   private initDataTable() {
     if (this.workflowDataTable) return;
     this.workflowDataTable = $("#workflowsDashboard").DataTable({
+      "searchPlaceholder": "Filter",
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [5, 10, 20, 50, 75, 100],
@@ -296,7 +297,34 @@ export class DashboardComponent implements OnInit, OnChanges {
       "autoWidth": true,
       "responsive": true,
       "deferRender": true,
-      stateSave: true
+      stateSave: true,
+      language: {
+        search: "",
+        searchPlaceholder: "Filter by UUID or name",
+        "decimal": "",
+        "emptyTable": "No workflow subscription found."
+          + "Click to 'add' to register a new workflow "
+          + "or use the main search box to subscribe to one among the existing workflows",
+        "info": "Showing _START_ to _END_ of _TOTAL_ workflows",
+        "infoEmpty": "Showing 0 to 0 of 0 workflows",
+        "infoFiltered": "(filtered from a total of _MAX_ subscribed workflows)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Show _MENU_ workflows",
+        "loadingRecords": "Loading workflows...",
+        "processing": "Processing workflows...",
+        "zeroRecords": "No matching subscribed workflow found",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        },
+        "aria": {
+          "sortAscending": ": activate to sort column ascending",
+          "sortDescending": ": activate to sort column descending"
+        }
+      }
     });
   }
 
