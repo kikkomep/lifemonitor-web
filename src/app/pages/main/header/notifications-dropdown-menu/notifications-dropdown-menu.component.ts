@@ -89,6 +89,16 @@ export class NotificationsDropdownMenuComponent implements OnInit {
       });
   }
 
+  public deleteNotitification(notification: UserNotification) {
+    this.appService.deleteNotification(notification)
+      .subscribe((data) => {
+        this.logger.debug("Notification deleted", notification);
+        this.updateNotifications(
+          this.notifications.filter(n => n !== notification)
+        )
+      });
+  }
+
   public deleteAllNotifications() {
     this.appService.deleteNotifications(this.notifications)
       .subscribe(() => {

@@ -47,6 +47,15 @@
               failed
             </div>
             <div class="text-small mx-4" style="font-size: 9pt">
+              <a
+                class="#"
+                (click)="deleteNotitification(n)"
+                title="click to delete"
+              >
+                <div class="float-right mt-3 mr-n3">
+                  <i class="far fa-trash-alt"></i>
+                </div>
+              </a>
               <div>
                 <span class="text-bold mt-n2">workflow: </span>
                 {{ n.data.build.workflow.name }}

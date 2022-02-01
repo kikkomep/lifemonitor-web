@@ -106,6 +106,21 @@ export class ApiService {
       );
   }
 
+  deleteNotification(notification: UserNotification): Observable<object> {
+    return this.http
+      .delete(
+        this.apiBaseUrl + '/users/current/notifications/' + notification.uuid,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        tap(() => {
+          this.logger.debug('Notification deleted');
+        }),
+        catchError(this.handleError('Deleting notification', []))
+      );
+  }
+
   deleteNotifications(notifications: UserNotification[]): Observable<object> {
     let body = notifications.map(function (n) { return n['uuid']; });
     return this.http

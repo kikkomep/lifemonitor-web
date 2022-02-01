@@ -597,6 +597,10 @@ export class AppService {
     return this.api.setNotificationsReadingTime(notifications);
   }
 
+  public deleteNotification(notification: UserNotification): Observable<object> {
+    return this.api.deleteNotification(notification);
+  }
+
   public deleteNotifications(notifications: UserNotification[]): Observable<object> {
     return this.api.deleteNotifications(notifications);
   }
