@@ -199,6 +199,7 @@ export class StatusStatsItem extends Model implements StatsItem {
 
   constructor(_rawData: Object) {
     super(_rawData);
+    this.timestamp = parseInt(_rawData['timestamp']);
   }
 
   getStatus(): string {
