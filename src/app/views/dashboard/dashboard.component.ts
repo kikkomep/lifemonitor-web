@@ -299,7 +299,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         "orderable": false
       }],
       "info": true,
-      "autoWidth": true,
+      "autoWidth": false,
       "responsive": true,
       "deferRender": true,
       stateSave: true,
@@ -307,7 +307,9 @@ export class DashboardComponent implements OnInit, OnChanges {
         search: "",
         searchPlaceholder: "Filter by UUID or name",
         "decimal": "",
-        "emptyTable": "No workflow " + (this.isUserLogged() ? "subscription " : "") + "found"
+        "emptyTable": this.workflowNameFilter && this.workflowNameFilter.length > 0
+          ? "No matching workflows"
+          : "No workflow " + (this.isUserLogged() ? "subscription " : "") + "found"
           + (this.isUserLogged() ? ". Click to 'add' to register a new workflow "
             + "or use the main search box to subscribe to one among the existing workflows" : ""),
         "info": "Showing _START_ to _END_ of _TOTAL_ workflows",

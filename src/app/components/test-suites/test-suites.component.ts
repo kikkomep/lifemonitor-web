@@ -78,7 +78,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
         "orderable": false
       }],
       "info": true,
-      "autoWidth": true,
+      "autoWidth": false,
       "responsive": true,
       "deferRender": true,
       "stateSave": true,
@@ -86,7 +86,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
         search: "",
         searchPlaceholder: "Filter by UUID or name",
         "decimal": "",
-        "emptyTable": "No suites associated to the current workflow.",
+        "emptyTable": "No suites associated to the current workflow",
         "info": "Showing _START_ to _END_ of _TOTAL_ suites",
         "infoEmpty": "Showing 0 to 0 of 0 suites",
         "infoFiltered": "(filtered from a total of _MAX_ suites)",
