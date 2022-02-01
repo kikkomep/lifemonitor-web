@@ -33,25 +33,109 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
       xAxes: [{ display: false }],
       yAxes: [
         {
+          ticks: {
+            minor: {
+            }
+          },
           display: false,
           time: {
-            unit: 'hour',
+            unit: 'second',
           },
         },
       ],
     },
     tooltips: {
-      enabled: true,
+      enabled: false,
       footerFontSize: 9,
       footerFontColor: 'lightgray',
       footerAlign: 'right',
+      custom: function (tooltipModel) {
+        // Tooltip Element
+        var tooltipEl = document.getElementById('chartjs-tooltip');
+
+        // Create element on first render
+        if (!tooltipEl) {
+          tooltipEl = document.createElement('div');
+          tooltipEl.style.background = "black";
+          tooltipEl.style.color = "white";
+          tooltipEl.style.fontWeight = "200";
+          tooltipEl.id = 'chartjs-tooltip';
+          tooltipEl.style.borderRadius = '10px';
+          tooltipEl.innerHTML = '<table></table>';
+          document.body.appendChild(tooltipEl);
+        }
+
+        // Hide if no tooltip
+        if (tooltipModel.opacity === 0) {
+          tooltipEl.style.opacity = "0";
+          return;
+        }
+
+        // Set caret Position
+        tooltipEl.classList.remove('above', 'below', 'no-transform');
+        if (tooltipModel.yAlign) {
+          tooltipEl.classList.add(tooltipModel.yAlign);
+        } else {
+          tooltipEl.classList.add('no-transform');
+        }
+
+        function getBody(bodyItem: { lines: any; }) {
+          return bodyItem.lines;
+        }
+
+        // Set Text
+        if (tooltipModel.body) {
+          var titleLines = tooltipModel.title || [];
+          var bodyLines = tooltipModel.body.map(getBody);
+          // set header
+          var innerHtml = '<thead>';
+          titleLines.forEach(function (title) {
+            innerHtml += '<tr>' + '<th>' + title + '</th></tr>';
+          });
+          innerHtml += '</thead><tbody>';
+          // set body
+          bodyLines.forEach(function (body, i) {
+            var colors = tooltipModel.labelColors[i];
+            var style = 'background:' + colors.backgroundColor;
+            style += '; border-color:' + colors.borderColor;
+            style += '; border-width: 2px';
+            var span = '<span style="' + style + '"></span>';
+            innerHtml += '<tr><td>' + span + body + '</td></tr>';
+          });
+          innerHtml += '</tbody>';
+          // append footer
+          var footer = '<div style="color: lightgray; font-size: 8pt; text-align: right;">';
+          footer += tooltipModel.footer;
+          footer += '</div>';
+          innerHtml += footer;
+          // append table
+          var tableRoot = tooltipEl.querySelector('table');
+          tableRoot.innerHTML = innerHtml;
+        }
+
+        // `this` will be the overall tooltip
+        var position = this._chart.canvas.getBoundingClientRect();
+
+        // Display, position, and set styles for font
+        tooltipEl.style.opacity = "1";
+        tooltipEl.style.position = 'absolute';
+        tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+        tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+        tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
+        tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
+        tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
+        tooltipEl.style.padding = tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
+        tooltipEl.style.pointerEvents = 'none';
+      },
       callbacks: {
         title: (tooltipItem, data: ChartData) => {
-          let index = tooltipItem[0]['datasetIndex'];
-          let item = this.stats[index] as TestBuild;
-          return 'Build ' + item.build_id + ' : ' + item.status;
+          let item: TestBuild = this.getItemTestBuild(tooltipItem[0], data);
+          return '<span style="color: transparent; font-size: 0.7rem; text-shadow: 0 0 0 ' + item.color + '; ">&#9899;</span>' +
+            ' Build #' + item.build_id + ' : ' + item.status;
         },
-        label: (tooltipItem, data) => {
+        label: (tooltipItem, data: ChartData) => {
+          let item: TestBuild = this.getItemTestBuild(tooltipItem, data);
+          this.logger.debug("Check stats item", tooltipItem, data);
           let label = data.labels[tooltipItem.index];
           let sec = data.datasets[tooltipItem.datasetIndex].data[
             tooltipItem.index
@@ -63,13 +147,17 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
           if (hours > 0) duration += hours + 'h ';
           if (minutes > 0) duration += minutes + 'm ';
           if (sec >= 0) duration += seconds + 's';
-          this.logger.debug("DURATION", hours, minutes, seconds, duration, tooltipItem, data);
-          return ' duration ' + duration;
+          this.logger.debug("DURATION", hours, minutes, seconds, duration, tooltipItem, item, data);
+          let ltext = '<div class="ml-1"><i class="far fa-calendar-check"></i> started: '
+            + new Date(item.timestamp).toLocaleString() + '</div>';
+          ltext += '<div class="ml-1"><i class="fas fa-stopwatch"></i> duration: '
+            + duration + '</div>'
+          return ltext;
         },
         footer: (tooltipItem, data) => {
           let index = tooltipItem[0]['datasetIndex'];
           let item = this.stats[index] as TestBuild;
-          return 'click to see on ' + item.instance.service.type;
+          return 'click to see on <b class="text-white">' + item.instance.service.type + '</b>';
         },
       },
     },
@@ -99,6 +187,13 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
     waiting: { color: '#fd7e14' },
   };
 
+  public getItemTestBuild(tooltipItem: any, data: ChartData): TestBuild {
+    if (!tooltipItem || !data) return null;
+    this.logger.debug("item, data", tooltipItem, data);
+    let index = tooltipItem['datasetIndex'];
+    return this.stats[index] as TestBuild;
+  }
+
   public selectedObject: StatusStatsItem;
 
   constructor(private router: Router) { }
@@ -124,6 +219,9 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
     // this.logger.debug('Stats ', this.stats);
     this.barChartData = [];
     this.barColors = [];
+    let max: number = Math.max.apply(Math,
+      this.stats.map(function (o) { return o.duration; }))
+    this.logger.debug("MAX duration", max);
     for (let i in this.stats) {
       let build: StatusStatsItem = this.stats[i];
       this.barChartData.push({
