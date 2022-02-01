@@ -59,8 +59,10 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.updatingDataTable = true;
         this._workflowStats.clear();
         this.filteredWorkflows = [];
+        this.workflowDataTable.clear();
+        this.workflowDataTable.draw();
         this.cdref.detectChanges();
-        this.initDataTable();
+        this.refreshDataTable();
       });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
@@ -123,16 +125,19 @@ export class DashboardComponent implements OnInit, OnChanges {
     this._workflowStats.clear();
     this.filteredWorkflows = [];
     this.cdref.detectChanges();
-    if (value && value.length > 0)
+    if (value && value.length > 0) {
+      this.workflowDataTable.clear();
       this.appService.loadWorkflows(
         false, false, this.isUserLogged()
       ).subscribe();
-    else
+    } else {
+      this.workflowDataTable.clear();
       this.appService.loadWorkflows(
         false,
         this.isUserLogged(),
         this.isUserLogged()
       ).subscribe();
+    }
   }
 
   public get isLoading(): Observable<boolean> {
