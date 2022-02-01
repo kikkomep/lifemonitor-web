@@ -87,7 +87,32 @@ export class TestInstancesComponent implements OnInit, OnChanges {
       "autoWidth": true,
       "responsive": true,
       "deferRender": true,
-      stateSave: true
+      "stateSave": true,
+      language: {
+        search: "",
+        searchPlaceholder: "Filter by UUID or name",
+        "decimal": "",
+        "emptyTable": "No instances associated to the current test suite.",
+        "info": "Showing _START_ to _END_ of _TOTAL_ instances",
+        "infoEmpty": "Showing 0 to 0 of 0 instances",
+        "infoFiltered": "(filtered from a total of _MAX_ instances)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Show _MENU_ instances",
+        "loadingRecords": "Loading instances...",
+        "processing": "Processing instances...",
+        "zeroRecords": "No matching instances found",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        },
+        "aria": {
+          "sortAscending": ": activate to sort column ascending",
+          "sortDescending": ": activate to sort column descending"
+        }
+      }
     });
   }
 
