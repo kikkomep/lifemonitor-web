@@ -21,7 +21,7 @@ export class UserNotification extends Model {
 
   private updateIcon() {
     if (this.event === 'BUILD_FAILED') {
-      this.icon = "fa-minus-circle fas";
+      this.icon = "fas fa-exclamation-circle";
     } else {
       this.icon = "fas fa-info-circle";
     }
