@@ -81,7 +81,32 @@ export class TestSuitesComponent implements OnInit, OnChanges {
       "autoWidth": true,
       "responsive": true,
       "deferRender": true,
-      stateSave: true
+      "stateSave": true,
+      language: {
+        search: "",
+        searchPlaceholder: "Filter by UUID or name",
+        "decimal": "",
+        "emptyTable": "No suites associated to the current workflow.",
+        "info": "Showing _START_ to _END_ of _TOTAL_ suites",
+        "infoEmpty": "Showing 0 to 0 of 0 suites",
+        "infoFiltered": "(filtered from a total of _MAX_ suites)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Show _MENU_ suites",
+        "loadingRecords": "Loading suites...",
+        "processing": "Processing suites...",
+        "zeroRecords": "No matching suites found",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        },
+        "aria": {
+          "sortAscending": ": activate to sort column ascending",
+          "sortDescending": ": activate to sort column descending"
+        }
+      }
     });
   }
 
