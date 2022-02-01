@@ -302,18 +302,20 @@ export class DashboardComponent implements OnInit, OnChanges {
         search: "",
         searchPlaceholder: "Filter by UUID or name",
         "decimal": "",
-        "emptyTable": "No workflow subscription found."
-          + "Click to 'add' to register a new workflow "
-          + "or use the main search box to subscribe to one among the existing workflows",
+        "emptyTable": "No workflow " + (this.isUserLogged() ? "subscription " : "") + "found"
+          + (this.isUserLogged() ? ". Click to 'add' to register a new workflow "
+            + "or use the main search box to subscribe to one among the existing workflows" : ""),
         "info": "Showing _START_ to _END_ of _TOTAL_ workflows",
         "infoEmpty": "Showing 0 to 0 of 0 workflows",
-        "infoFiltered": "(filtered from a total of _MAX_ subscribed workflows)",
+        "infoFiltered": "(filtered from a total of _MAX_"
+          + (this.isUserLogged() ? " subscribed" : "") + " workflows)",
         "infoPostFix": "",
         "thousands": ",",
         "lengthMenu": "Show _MENU_ workflows",
         "loadingRecords": "Loading workflows...",
         "processing": "Processing workflows...",
-        "zeroRecords": "No matching subscribed workflow found",
+        "zeroRecords": "No matching "
+          + (this.isUserLogged() ? "subscribed" : "") + " workflow found",
         "paginate": {
           "first": "First",
           "last": "Last",
