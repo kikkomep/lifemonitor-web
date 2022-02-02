@@ -203,7 +203,6 @@ export class DashboardComponent implements OnInit, OnChanges {
     this.logger.debug('Subscribing to workflow: ', w);
     this.appService.subscribeWorkflow(w).subscribe((w) => {
       this.logger.debug('Workflow subscription created!');
-      this.refreshDataTable();
     });
   }
 
@@ -216,6 +215,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         : this._workflowStats.all.filter(
           (v) => v.subscriptions && v.subscriptions.length > 0
         );
+      this.refreshDataTable();
     });
   }
 
