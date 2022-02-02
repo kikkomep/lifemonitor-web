@@ -215,7 +215,8 @@ export class DashboardComponent implements OnInit, OnChanges {
         : this._workflowStats.all.filter(
           (v) => v.subscriptions && v.subscriptions.length > 0
         );
-      this.refreshDataTable();
+      if (!this.searchModeEnabled)
+        this.refreshDataTable();
     });
   }
 
