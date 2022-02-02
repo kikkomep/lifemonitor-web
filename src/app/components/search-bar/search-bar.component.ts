@@ -11,7 +11,9 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 export class SearchBarComponent implements OnInit {
   _actualFilterValue: string;
   _sortingOrder: string = 'desc';
+  _searchAllValues: boolean = false;
 
+  @Input() elementType: string;
   @Input() filterValue: string;
   @Input() sortingOrder: string;
   @Output() filterValueChange = new EventEmitter<string>();
@@ -31,13 +33,20 @@ export class SearchBarComponent implements OnInit {
       .pipe(debounceTime(1500))
       .pipe(distinctUntilChanged())
       .subscribe(data => {
-        this.filterValueChange.emit(data);
+        this.emitValue(data);
         this.logger.debug('Current filter value: ', this._actualFilterValue);
       });
   }
 
+  public onKeyUpEnter() {
+    this._searchAllValues = true;
+    this.emitValue(this.actualFilterValue);
+  }
+
   public set actualFilterValue(value: string) {
     this._actualFilterValue = value;
+    if (value && value.length > 0)
+      this._searchAllValues = false;
     this.logger.debug('Current filter value: ', this._actualFilterValue);
   }
 
@@ -54,9 +63,22 @@ export class SearchBarComponent implements OnInit {
     this.sortingOrderChange.emit(this._sortingOrder);
   }
 
+  private emitValue(value: string) {
+    let valueToEmit = (this.actualFilterValue && this.actualFilterValue.length > 0)
+      ? ("SEARCH_KEY###" + this.actualFilterValue) : "______ALL_____";
+    this.filterValueChange.emit(valueToEmit);
+    this.logger.debug('Current emitted value: ', valueToEmit);
+  }
+
+  public get searchAll(): boolean {
+    return this._searchAllValues;
+  }
+
   public reset() {
-    if (this._actualFilterValue && this._actualFilterValue.length > 0) {
+    if (this._searchAllValues === true
+      || this._actualFilterValue && this._actualFilterValue.length > 0) {
       this._actualFilterValue = null;
+      this._searchAllValues = false;
       this.filterValueChange.emit(null);
     }
   }
