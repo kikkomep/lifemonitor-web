@@ -115,7 +115,11 @@ export class NotificationsDropdownMenuComponent implements OnInit {
 
   public formatTimestamp(value: string): string {
     try {
-      return new Date(parseInt(value)).toUTCString();
+      let timestamp = parseInt(value);
+      let d = new Date(timestamp);
+      if (d.getFullYear() === 1970)
+        timestamp *= 1000;
+      return formatDate(timestamp, 'M/d/yy, hh:mm z', 'en-US');
     } catch (e) {
       return value;
     }
