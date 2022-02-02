@@ -20,7 +20,7 @@
             <th class="text-center" scope="col" style="width: 100px">
               Instances
             </th>
-            <th class="text-center" scope="col">Latest Builds</th>
+            <th class="text-center" scope="col" style="width: 300px;">Latest Builds</th>
           </tr>
         </thead>
         <tbody *ngIf="suites">
@@ -50,7 +50,7 @@
                 <stats-pie-chart [stats]="s.instances"></stats-pie-chart>
               </a>
             </td>
-            <td class="text-center align-middle font-weight-light" width="50">
+            <td class="text-center align-middle font-weight-light" width="300">
               <stats-bar-chart [stats]="s.getLatestBuilds()" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
             </td>
           </tr>
