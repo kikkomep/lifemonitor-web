@@ -36,33 +36,43 @@
             (click)="setNotificationAsRead(n)"
           >
             <div
-              *ngIf="n.event === 'BUILD_FAILED'"
-              class="w-100 mt-2 {{ n.read ? 'text-muted' : 'text-red' }}"
+              class="w-100 mt-2 {{
+                n.read
+                  ? 'text-muted'
+                  : n.event === 'BUILD_FAILED'
+                  ? 'text-red'
+                  : 'text-primary'
+              }}"
             >
               <i class="{{ n.icon }} mr-1"></i>
-              Build
-              <span class="text-bold">{{ n.data.build.build_id }}</span> of
-              instance
-              <span class="text-bold">{{ n.data.build.instance.name }}</span>
-              failed
+              Test instance
+              <span class="text-bold"> {{ n.data.build.instance.name }} </span>
+              <span *ngIf="n.event === 'BUILD_FAILED'">is failing</span>
+              <span *ngIf="n.event === 'BUILD_RECOVERED'">has recovered</span>
             </div>
-            <div class="text-small mx-4" style="font-size: 9pt">
+            <div class="text-small mx-4" style="font-size: 9pt; color: black;">
               <a
-                class="#"
+                class="trash-notification"
                 (click)="deleteNotitification(n)"
                 title="click to delete"
               >
-                <div class="float-right mt-3 mr-n3">
+                <div class="float-right mt-4 mr-n3">
                   <i class="far fa-trash-alt"></i>
                 </div>
               </a>
               <div>
-                <span class="text-bold mt-n2">workflow: </span>
-                {{ n.data.build.workflow.name }}
+                <span class="text-bold mt-n2">
+                  build #{{ n.data.build.build_id }}:
+                </span>
+                {{ n.data.build.timestamp | date: 'medium' }}
               </div>
               <div>
                 <span class="text-bold mt-n2">suite: </span>
                 {{ n.data.build.suite.name }}
+              </div>
+              <div>
+                <span class="text-bold mt-n2">workflow: </span>
+                {{ n.data.build.workflow.name }}
               </div>
             </div>
           </a>
