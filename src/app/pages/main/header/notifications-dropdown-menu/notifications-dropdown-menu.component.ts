@@ -113,6 +113,14 @@ export class NotificationsDropdownMenuComponent implements OnInit {
     return this.router.navigate([url, params]);
   }
 
+  public formatTimestamp(value: string): string {
+    try {
+      return new Date(parseInt(value)).toUTCString();
+    } catch (e) {
+      return value;
+    }
+  }
+
   toggleDropdownMenu() {
     if (this.dropdownMenu) {
       if (this.dropdownMenu.nativeElement.classList.contains('show')) {

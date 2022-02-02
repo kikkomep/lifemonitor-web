@@ -51,20 +51,11 @@
               <span *ngIf="n.event === 'BUILD_RECOVERED'">has recovered</span>
             </div>
             <div class="text-small mx-4" style="font-size: 9pt; color: black;">
-              <a
-                class="trash-notification"
-                (click)="deleteNotitification(n)"
-                title="click to delete"
-              >
-                <div class="float-right mt-4 mr-n3">
-                  <i class="far fa-trash-alt"></i>
-                </div>
-              </a>
               <div>
                 <span class="text-bold mt-n2">
                   build #{{ n.data.build.build_id }}:
                 </span>
-                {{ n.data.build.timestamp | date: 'medium' }}
+                {{ formatTimestamp(n.data.build.timestamp) }}
               </div>
               <div>
                 <span class="text-bold mt-n2">suite: </span>
@@ -72,8 +63,19 @@
               </div>
               <div>
                 <span class="text-bold mt-n2">workflow: </span>
+                <span style="overflow: hidden; text-overflow: ellipsis;">
                 {{ n.data.build.workflow.name }}
+                </span>
               </div>
+              <a
+                class="trash-notification"
+                (click)="deleteNotitification(n)"
+                title="click to delete"
+              >
+                <div class="float-right mt-n1 p-0 mr-n3">
+                  <i class="far fa-trash-alt"></i>
+                </div>
+              </a>
             </div>
           </a>
         </ng-container>
