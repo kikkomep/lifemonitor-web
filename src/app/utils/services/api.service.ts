@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
+import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import {
   AggregatedStatusStats,
@@ -51,6 +52,70 @@ export class ApiService {
         map((data) => {
           return new User(data);
         })
+      );
+  }
+
+  get_current_user_notifications(): Observable<Array<UserNotification>> {
+    return this.http
+      .get(this.apiBaseUrl + '/users/current/notifications', this.get_http_options())
+      .pipe(
+        retry(3),
+        map((data) => {
+          let result = [];
+          for (let d of data['items']) {
+            result.push(new UserNotification(d))
+          }
+          return result;
+        })
+      );
+  }
+
+  setNotificationsReadingTime(notifications: UserNotification[]): Observable<UserNotification[]> {
+    let readTime = Date.now();
+    let body = {
+      'items': notifications.map(function (n) {
+        return {
+          uuid: n['uuid'],
+          read: String(readTime)
+        }
+      })
+    };
+    return this.http
+      .put(
+        this.apiBaseUrl + '/users/current/notifications',
+        body,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map(() => {
+          for (let n of notifications) {
+            n.read = readTime;
+          }
+          console.log('Notifications updated');
+          return notifications;
+        }),
+        tap(() => {
+          console.log('Notifications updated');
+        }),
+        catchError(this.handleError('Updating notifications', []))
+      );
+  }
+
+  deleteNotifications(notifications: UserNotification[]): Observable<object> {
+    let body = notifications.map(function (n) { return n['uuid']; });
+    return this.http
+      .patch(
+        this.apiBaseUrl + '/users/current/notifications',
+        body,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        tap(() => {
+          console.log('Notifications deleted');
+        }),
+        catchError(this.handleError('Deleting notifications', []))
       );
   }
 

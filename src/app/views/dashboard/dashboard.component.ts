@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit, OnChanges {
           this._workflowNameFilter
         );
         this.destroyDataTable();
-        this.filteredWorkflows = this._workflowStats.all;
+        this.filteredWorkflows = this.searchModeEnabled ? this._workflowStats.all : this._workflowStats.all.filter((v) => v.subscriptions && v.subscriptions.length > 0);
         console.log('Stats', data);
         this.cdref.detectChanges();
         this.initDataTable();
@@ -154,11 +154,12 @@ export class DashboardComponent implements OnInit, OnChanges {
     console.log('Unsubscribing from workflow: ', w);
     this.appService.unsubscribeWorkflow(w).subscribe((w) => {
       console.log('Workflow subscription deleted!');
-      this.appService.loadWorkflows(
-        !this.isUserLogged(),
-        this.isUserLogged(),
-        this.isUserLogged()
-      );
+      this.destroyDataTable();
+      this.filteredWorkflows = this.searchModeEnabled
+        ? this._workflowStats.all
+        : this._workflowStats.all.filter(
+          (v) => v.subscriptions && v.subscriptions.length > 0
+        );
     });
   }
 

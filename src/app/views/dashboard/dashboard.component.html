@@ -211,16 +211,16 @@
                   </div>
                   <div *ngIf="isUserLogged()">
                     <span *ngIf="w.subscriptions !== undefined">
-                      <a *ngIf="searchModeEnabled && !isEditable(w) && (!w.subscriptions || w.subscriptions.length == 0)"
+                      <a *ngIf="(searchModeEnabled || editModeEnabled) && (!w.subscriptions || w.subscriptions.length == 0)"
                         class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
                         SUBSCRIBE
                       </a>
                       <div
-                        *ngIf="!editModeEnabled && searchModeEnabled && (isEditable(w) || w.subscriptions && w.subscriptions.length > 0)"
-                        class="badge badge-primary mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
+                        *ngIf="!editModeEnabled && searchModeEnabled && (w.subscriptions && w.subscriptions.length > 0)"
+                        class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
                         SUBSCRIBED
                       </div>
-                      <a *ngIf="editModeEnabled && !isEditable(w) && w.subscriptions && w.subscriptions.length > 0"
+                      <a *ngIf="editModeEnabled && w.subscriptions && w.subscriptions.length > 0"
                         class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
                         UNSUBSCRIBE
                       </a>

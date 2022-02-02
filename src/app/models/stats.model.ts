@@ -34,6 +34,7 @@ export interface StatsItem {
   latestBuilds: any;
   class: string;
   statusIcon: string;
+  subscriptions: Array<object>;
 
   getStatus(): string;
 }
@@ -43,6 +44,7 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
   name: string;
   status: any;
   latestBuilds: any;
+  subscriptions: Array<object>;
 
   private static colorMapping: object = {
     all_passing: 'var(--test-passed)',
@@ -193,6 +195,7 @@ export class StatusStatsItem extends Model implements StatsItem {
   latestBuilds: TestBuild[];
   timestamp: number;
   duration: number;
+  subscriptions: Array<object>;
 
   constructor(_rawData: Object) {
     super(_rawData);

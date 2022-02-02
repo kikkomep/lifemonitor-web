@@ -2,7 +2,7 @@ import { AuthService } from 'src/app/utils/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { map, finalize, catchError } from 'rxjs/operators';
+import { map, finalize, catchError, tap } from 'rxjs/operators';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -11,12 +11,14 @@ import { User } from 'src/app/models/user.modes';
 import { Workflow } from 'src/app/models/workflow.model';
 import { ApiService } from './api.service';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
+import { UserNotification } from 'src/app/models/notification.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AppService {
   // internal state
+  private _notifications: UserNotification[];
   private _registry: Registry;
   private _registries: Registry[];
   private _registryWorkflow: RegistryWorkflow;
@@ -32,6 +34,7 @@ export class AppService {
   private loadingWorkflows = false;
 
   // initialize data sources
+  private subjectNotifications = new Subject<UserNotification[]>();
   private subjectRegistry = new Subject<Registry>();
   private subjectRegistries = new Subject<Registry[]>();
   private subjectRegistryWorkflow = new Subject<RegistryWorkflow>();
@@ -44,6 +47,7 @@ export class AppService {
   private subjectLoadingWorkflows = new Subject<boolean>();
 
   // initialize data observables
+  private _observableNotifications = this.subjectNotifications.asObservable();
   private _observableRegistry = this.subjectRegistry.asObservable();
   private _observableRegistries = this.subjectRegistries.asObservable();
   private _observableRegistryWorkflow = this.subjectRegistryWorkflow.asObservable();
@@ -228,17 +232,29 @@ export class AppService {
     return this._observableTestBuild;
   }
 
+  public get observableNotifications(): Observable<UserNotification[]> {
+    return this._observableNotifications;
+  }
+
   public decodeUrl(url: string) {
     let data = JSON.parse(atob(url));
     return data;
   }
 
   public subscribeWorkflow(w: Workflow): Observable<Workflow> {
-    return this.api.subscribeWorkflow(w);
+    return this.api.subscribeWorkflow(w).pipe(
+      tap((wd: Workflow) => {
+        console.log("Added subscription to workflow: ", wd);
+      })
+    );
   }
 
   public unsubscribeWorkflow(w: Workflow): Observable<Workflow> {
-    return this.api.unsubscribeWorkflow(w);
+    return this.api.unsubscribeWorkflow(w).pipe(
+      tap((wd: Workflow) => {
+        console.log("Removed subscription to workflow: ", wd);
+      })
+    );
   }
 
   public loadRegistries(): Observable<Registry[]> {
@@ -536,6 +552,33 @@ export class AppService {
       const url = window.URL.createObjectURL(blob);
       window.open(url);
     });
+  }
+
+  public loadNotifications(): Observable<UserNotification[]> {
+    return this.api.get_current_user_notifications().pipe(
+      map((notifications: UserNotification[]) => {
+        this._notifications = notifications;
+        this.subjectNotifications.next(notifications);
+        return notifications;
+      }),
+      catchError((err) => {
+        console.log('Error', err);
+        // this.setLoadingWorkflows(false);
+        throw err;
+      }),
+      finalize(() => {
+        // this.setLoadingWorkflows(false);
+      })
+    )
+  }
+
+
+  public setNotificationsReadingTime(notifications: UserNotification[]): Observable<object> {
+    return this.api.setNotificationsReadingTime(notifications);
+  }
+
+  public deleteNotifications(notifications: UserNotification[]): Observable<object> {
+    return this.api.deleteNotifications(notifications);
   }
 
   ngOnDestroy() {

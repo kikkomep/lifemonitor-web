@@ -20,10 +20,14 @@ export class Suite extends AggregatedStatusStatsItem {
   }
 
   public asUrlParam() {
+    return Suite.getUrlParam(this.workflow.uuid, this.uuid);
+  }
+
+  public static getUrlParam(workflow_uuid: string, suite_uuid: string): string {
     return btoa(
       JSON.stringify({
-        workflow: this.workflow.uuid,
-        suite: this.uuid,
+        workflow: workflow_uuid,
+        suite: suite_uuid,
       })
     );
   }
