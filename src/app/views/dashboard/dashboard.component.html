@@ -143,7 +143,9 @@
 
   <div class="container-fluid">
     <!-- Search Bar -->
-    <item-search-bar [(filterValue)]="workflowNameFilter" [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
+    <item-search-bar elementType="workflows"
+        [(filterValue)]="workflowNameFilter"
+        [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
     <div class="card card-primary card-outline">
       <div *ngIf="updatingDataTable || (isLoading | async)" class="overlay">

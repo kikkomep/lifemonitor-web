@@ -212,7 +212,9 @@
     </div>
 
     <!-- Search Bar -->
-    <item-search-bar [(filterValue)]="instanceNameFilter" [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
+    <item-search-bar elementType="instances"
+          [(filterValue)]="instanceNameFilter"
+          [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
 
     <test-instances [workflow]="suite.workflow" [testInstances]="
         instances

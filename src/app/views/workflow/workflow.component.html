@@ -141,7 +141,9 @@
   </div>
 
   <!-- Search Bar -->
-  <item-search-bar [(filterValue)]="suiteNameFilter" [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
+  <item-search-bar elementType="suites"
+        [(filterValue)]="suiteNameFilter"
+        [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
 
   <test-suites [suites]="
       suites
