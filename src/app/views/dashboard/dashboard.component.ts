@@ -1,5 +1,6 @@
+import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, HostListener, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription, timer } from 'rxjs';
 import {
   AggregatedStatusStats,
@@ -26,6 +27,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   // reference to the current subscriptions
   private workflowsStatsSubscription: Subscription;
   private userLoggedSubscription: Subscription;
+  private paramSubscription: Subscription;
   //
   private filteredWorkflows: AggregatedStatusStatsItem[] | null;
   //
@@ -33,6 +35,8 @@ export class DashboardComponent implements OnInit, OnChanges {
   public _workflowNameFilter: string = '';
   public workflowSortingOrder: string = 'desc';
   public editModeEnabled: boolean = false;
+
+  private openUploader: boolean = false;
 
   private statsFilter = new StatsFilterPipe();
 
@@ -45,9 +49,10 @@ export class DashboardComponent implements OnInit, OnChanges {
   private logger: Logger = LoggerManager.create('DashboardComponent');
 
   constructor(
+    private location: Location,
     private cdref: ChangeDetectorRef,
     private appService: AppService,
-    private router: Router,
+    private route: ActivatedRoute,
     private inputDialog: InputDialogService,
     private uploaderService: WorkflowUploaderService
   ) { }
@@ -82,6 +87,14 @@ export class DashboardComponent implements OnInit, OnChanges {
         });
       }
     );
+
+    this.paramSubscription = this.route.params.subscribe((params) => {
+      this.logger.debug('Dashboard params:', params);
+      if (params['add'] == "true") {
+        this.openUploader = true;
+        this.location.replaceState('/dashboard');
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -102,6 +115,8 @@ export class DashboardComponent implements OnInit, OnChanges {
       ).subscribe(
         (data) => {
           this.logger.debug("Loaded workflows ", data);
+          if (this.openUploader === true)
+            this.openWorkflowUploader();
         }
       );
     }
@@ -308,11 +323,15 @@ export class DashboardComponent implements OnInit, OnChanges {
         search: "",
         searchPlaceholder: "Filter by UUID or name",
         "decimal": "",
-        "emptyTable": this.workflowNameFilter && this.workflowNameFilter.length > 0
-          ? "No matching workflows"
-          : "No workflow " + (this.isUserLogged() ? "subscription " : "") + "found"
-          + (this.isUserLogged() ? ". Click to 'add' to register a new workflow "
-            + "or use the main search box to subscribe to one among the existing workflows" : ""),
+        "emptyTable":
+          // this.updatingDataTable ? "" :
+          this.workflowNameFilter && this.workflowNameFilter.length > 0
+            ? "No matching workflows"
+            : "<h4 class='mt-3'>No workflow found</h4>."
+            + (this.isUserLogged() ? "<div class=\"m-2\"> Click on "
+              + "<a class='add-wf' href=\"/dashboard;add=true\"><i class=\"fas fa-plus-circle\"></i> "
+              + "to add a new workflow</a> "
+              + "<br>or use the main search box <br>to find and subscribe to existing workflows</div>" : ""),
         "info": "Showing _START_ to _END_ of _TOTAL_ workflows",
         "infoEmpty": "Showing 0 to 0 of 0 workflows",
         "infoFiltered": "(filtered from a total of _MAX_"
@@ -349,6 +368,8 @@ export class DashboardComponent implements OnInit, OnChanges {
     // prevent memory leak when component destroyed
     if (this.workflowsStatsSubscription)
       this.workflowsStatsSubscription.unsubscribe();
+    if (this.paramSubscription)
+      this.paramSubscription.unsubscribe();
     this.logger.debug('Destroying dashboard component');
   }
 }

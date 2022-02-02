@@ -158,8 +158,11 @@
             <a *ngIf="!editModeEnabled" class="btn btn-sm mx-2" (click)="openWorkflowUploader()">
               <i class="fas fa-plus-circle"></i> add
             </a>
-            <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="editModeToggle()">
-              <i class="far fa-edit"></i> edit
+            <a *ngIf="!editModeEnabled"
+               class="btn btn-sm" (click)="editModeToggle()" style="min-width: 60px;">
+               <span *ngIf="workflows && workflows.length > 0">
+                  <i  class="far fa-edit"></i> edit
+               </span>
             </a>
             <a *ngIf="editModeEnabled" class="btn btn-sm active" (click)="editModeToggle()">
               <i class="far fa-window-close"></i> done
