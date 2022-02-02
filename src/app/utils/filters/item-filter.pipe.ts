@@ -15,17 +15,14 @@ export class ItemFilterPipe implements PipeTransform {
     input: string,
     cryteria: string[] = undefined
   ): StatsItem[] {
-    this.logger.debug('Filter Input: ', input);
-    if (input) {
-      let data = value;
-      return data.filter(
-        (val) => ((!cryteria || 'name' in cryteria) &&
-          val.name.toLowerCase().indexOf(input.toLowerCase()) >= 0) ||
-          ((!cryteria || 'uuid' in cryteria) &&
-            val.uuid.toLowerCase().indexOf(input.toLowerCase()) >= 0)
-      ) as unknown as AggregatedStatusStatsItem[];
-    } else {
-      return value;
-    }
+    this.logger.debug('Filter Input: ', input, value);
+    if (!input || input === "______ALL_____") return value;
+    let data = value;
+    return data.filter(
+      (val) => ((!cryteria || 'name' in cryteria) &&
+        val.name.toLowerCase().indexOf(input.toLowerCase()) >= 0) ||
+        ((!cryteria || 'uuid' in cryteria) &&
+          val.uuid.toLowerCase().indexOf(input.toLowerCase()) >= 0)
+    ) as unknown as AggregatedStatusStatsItem[];
   }
 }

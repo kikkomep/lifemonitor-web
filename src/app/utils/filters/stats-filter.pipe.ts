@@ -18,19 +18,16 @@ export class StatsFilterPipe implements PipeTransform {
     input: string,
     cryteria: string[] = undefined
   ): AggregatedStatusStats {
-    this.logger.debug('Filter Input: ', input);
-    if (input) {
-      let data = value.all;
-      let filteredItems: AggregatedStatusStatsItem[] = (data.filter(
-        (val) =>
-          ((!cryteria || 'name' in cryteria) &&
-            val.name.toLowerCase().indexOf(input.toLowerCase()) >= 0) ||
-          ((!cryteria || 'uuid' in cryteria) &&
-            val.uuid.toLowerCase().indexOf(input.toLowerCase()) >= 0)
-      ) as unknown) as AggregatedStatusStatsItem[];
-      return new AggregatedStatusStats(filteredItems);
-    } else {
-      return value;
-    }
+    this.logger.debug('Filter Input: ', input, value);
+    if (!input || input === "______ALL_____") return value;
+    let data = value.all;
+    let filteredItems: AggregatedStatusStatsItem[] = (data.filter(
+      (val) =>
+        ((!cryteria || 'name' in cryteria) &&
+          val.name.toLowerCase().indexOf(input.toLowerCase()) >= 0) ||
+        ((!cryteria || 'uuid' in cryteria) &&
+          val.uuid.toLowerCase().indexOf(input.toLowerCase()) >= 0)
+    ) as unknown) as AggregatedStatusStatsItem[];
+    return new AggregatedStatusStats(filteredItems);
   }
 }
