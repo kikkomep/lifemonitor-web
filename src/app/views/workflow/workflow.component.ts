@@ -35,7 +35,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
   public selectedTestBuild: StatusStatsItem;
 
   public statusFilter: string | null;
-  public suiteNameFilter: string = '';
+  private _suiteNameFilter: string = '';
   public suiteSortingOrder: string = 'desc';
 
   // initialize logger
@@ -47,7 +47,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
     private router: Router,
     // private apiService: ApiService,
     private appService: AppService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.logger.debug('Created component Workflow');
@@ -77,6 +77,14 @@ export class WorkflowComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.debug('Change detected');
     this.cdr.detectChanges();
+  }
+
+  public set suiteNameFilter(value: string) {
+    this._suiteNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
+  }
+
+  public get suiteNameFilter(): string {
+    return this._suiteNameFilter;
   }
 
   public filterByStatus(status: string) {

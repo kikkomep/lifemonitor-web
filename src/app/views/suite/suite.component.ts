@@ -22,7 +22,7 @@ export class SuiteComponent implements OnInit {
   @Input() suite: Suite;
 
   public statusFilter: string = null;
-  public instanceNameFilter: string = '';
+  private _instanceNameFilter: string = '';
   public instanceSortingOrder: string = 'desc';
 
   private _instances: StatusStatsItem[] = [];
@@ -38,7 +38,7 @@ export class SuiteComponent implements OnInit {
     private route: ActivatedRoute,
     private appService: AppService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.logger.debug('Created component Workflow');
@@ -90,6 +90,14 @@ export class SuiteComponent implements OnInit {
     } catch (e) {
       this.logger.debug(e);
     }
+  }
+
+  public get instanceNameFilter(): string {
+    return this._instanceNameFilter;
+  }
+
+  public set instanceNameFilter(value: string) {
+    this._instanceNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
   }
 
   public get instances(): StatusStatsItem[] {

@@ -119,12 +119,13 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public set workflowNameFilter(value: string) {
-    this._workflowNameFilter = value;
+    this._workflowNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
     this.editModeEnabled = false;
     this.updatingDataTable = true;
     this._workflowStats.clear();
     this.filteredWorkflows = [];
     this.cdref.detectChanges();
+    this.logger.debug("Updating workflow name filter", this.workflowNameFilter);
     if (value && value.length > 0) {
       this.workflowDataTable.clear();
       this.appService.loadWorkflows(
