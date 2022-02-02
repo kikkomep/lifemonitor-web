@@ -89,11 +89,12 @@ export class RoCrate {
 
   public get mainEntity(): object {
     let root = this.rootDataSet;
-    return root ? this.findGraphEntity(root['mainEntity']['@id']) : null;
+    return root && 'mainEntity' in root
+      ? this.findGraphEntity(root['mainEntity']['@id']) : null;
   }
 
   public get graphEntities(): [] {
-    return this.data ? this.data['@graph'] : null;
+    return this.data && "@graph" in this.data ? this.data['@graph'] : null;
   }
 
   public listGraphEntityIdentifiers(): any[] {
@@ -102,7 +103,9 @@ export class RoCrate {
   }
 
   public findGraphEntity(id: string, type: string = null) {
-    return this.data['@graph'].find(
+    let entities: [] = this.graphEntities;
+    if (!entities) return null;
+    return entities.find(
       (e: any) => e['@id'] === id && (!type || e['@type'] === type)
     );
   }
