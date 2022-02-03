@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import {
   InputDialogConfig,
   InputDialogService,
@@ -23,11 +24,14 @@ export class InputDialogComponent implements OnInit {
 
   name: string = 'inputModalDialog';
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('InputDialogComponent');
+
   constructor(private service: InputDialogService) {}
 
   ngOnInit(): void {
     $('#' + this.name).on('hide.bs.modal', () => {
-      console.log('hidden');
+      this.logger.debug('hidden');
     });
 
     $('#' + this.name).on('show.bs.modal', () => {
@@ -40,7 +44,7 @@ export class InputDialogComponent implements OnInit {
       this.confirmText = config.confirmText || this.confirmText;
       this.cancelText = config.cancelText || this.cancelText;
       this.onConfirm = config.onConfirm || null;
-      console.log('shown');
+      this.logger.debug('shown');
     });
   }
 

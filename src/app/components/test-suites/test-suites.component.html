@@ -20,7 +20,7 @@
             <th class="text-center" scope="col" style="width: 100px">
               Instances
             </th>
-            <th class="text-center" scope="col">Latest Builds</th>
+            <th class="text-center" scope="col" style="width: 300px;">Latest Builds</th>
           </tr>
         </thead>
         <tbody *ngIf="suites">
@@ -42,7 +42,7 @@
               <div style="height: 100%; margin: auto" data-html="true" data-toggle="tooltip" data-placement="top"
                 title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{s.engineType}}</b> engine</span>">
                 <img *ngIf="s.engineIcon" src="{{ s.engineIcon }}" width="100" />
-                <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x"></i>
+                <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x text-muted mr-3"></i>
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
@@ -50,7 +50,7 @@
                 <stats-pie-chart [stats]="s.instances"></stats-pie-chart>
               </a>
             </td>
-            <td class="text-center align-middle font-weight-light" width="50">
+            <td class="text-center align-middle font-weight-light" width="300">
               <stats-bar-chart [stats]="s.getLatestBuilds()" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
             </td>
           </tr>

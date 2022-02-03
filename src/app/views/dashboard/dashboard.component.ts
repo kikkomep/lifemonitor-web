@@ -1,12 +1,14 @@
-import { ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Location } from '@angular/common';
+import { ChangeDetectorRef, Component, HostListener, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Observable, Subscription, timer } from 'rxjs';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow } from 'src/app/models/workflow.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
 import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
@@ -22,8 +24,10 @@ declare var $: any;
 export class DashboardComponent implements OnInit, OnChanges {
   // reference to workflows stats
   private _workflowStats: AggregatedStatusStats | null;
-  // reference to the current subscription
+  // reference to the current subscriptions
   private workflowsStatsSubscription: Subscription;
+  private userLoggedSubscription: Subscription;
+  private paramSubscription: Subscription;
   //
   private filteredWorkflows: AggregatedStatusStatsItem[] | null;
   //
@@ -32,55 +36,97 @@ export class DashboardComponent implements OnInit, OnChanges {
   public workflowSortingOrder: string = 'desc';
   public editModeEnabled: boolean = false;
 
+  private openUploader: boolean = false;
+
   private statsFilter = new StatsFilterPipe();
 
   // Reference to the dataTable instance
   private workflowDataTable: any;
 
+  public updatingDataTable: boolean = false;
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('DashboardComponent');
+
   constructor(
+    private location: Location,
     private cdref: ChangeDetectorRef,
     private appService: AppService,
-    private router: Router,
+    private route: ActivatedRoute,
     private inputDialog: InputDialogService,
     private uploaderService: WorkflowUploaderService
-  ) {
-    console.log('Dashboard Created!!');
+  ) { }
+
+  ngOnInit() {
+    this.logger.debug('Dashboard Created!!');
+    this.userLoggedSubscription = this.appService.observableUserLogged
+      .subscribe((isUserLogged) => {
+        this.updatingDataTable = true;
+        this._workflowStats.clear();
+        this.filteredWorkflows = [];
+        this.workflowDataTable.clear();
+        this.workflowDataTable.draw();
+        this.cdref.detectChanges();
+        this.refreshDataTable();
+      });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
-        this._workflowStats = this.statsFilter.transform(
-          data,
-          this._workflowNameFilter
-        );
-        this.destroyDataTable();
-        this.filteredWorkflows = this.searchModeEnabled ? this._workflowStats.all : this._workflowStats.all.filter((v) => v.subscriptions && v.subscriptions.length > 0);
-        console.log('Stats', data);
-        this.cdref.detectChanges();
-        this.initDataTable();
+        timer(1000).subscribe(x => {
+          this.logger.debug("Loaded workflows: ", data);
+          this._workflowStats = this.statsFilter.transform(
+            data,
+            this._workflowNameFilter
+          );
+          this.filteredWorkflows =
+            this.searchModeEnabled || !this.isUserLogged()
+              ? this._workflowStats.all
+              : this._workflowStats.all.filter(
+                (v) => v.subscriptions && v.subscriptions.length > 0);
+          this.logger.debug('Stats', data);
+          this.refreshDataTable();
+        });
       }
     );
-    console.debug('Initializing workflow data!!');
+
+    this.paramSubscription = this.route.params.subscribe((params) => {
+      this.logger.debug('Dashboard params:', params);
+      if (params['add'] == "true") {
+        this.openUploader = true;
+        this.location.replaceState('/dashboard');
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    this.logger.debug('Initializing workflow data!!');
     this._workflowStats = this.appService.workflowStats;
-    if (this._workflowStats) this.filteredWorkflows = this._workflowStats.all;
-    else
+    this.updatingDataTable = true;
+    if (this._workflowStats) {
+      this.filteredWorkflows = this.searchModeEnabled || !this.isUserLogged()
+        ? this._workflowStats.all
+        : this._workflowStats.all.filter(
+          (v) => v.subscriptions && v.subscriptions.length > 0);
+      this.refreshDataTable();
+    } else {
       this.appService.loadWorkflows(
         true,
         this.isUserLogged(),
         this.isUserLogged()
+      ).subscribe(
+        (data) => {
+          this.logger.debug("Loaded workflows ", data);
+          if (this.openUploader === true)
+            this.openWorkflowUploader();
+        }
       );
-  }
-
-  ngOnInit() {
-  }
-
-  ngAfterViewInit() {
-    this.initDataTable();
+    }
   }
 
   ngAfterViewChecked() {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('Changes', changes);
+    this.logger.debug('Changes', changes);
   }
 
   public get workflowNameFilter(): string {
@@ -88,17 +134,26 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public set workflowNameFilter(value: string) {
-    this._workflowNameFilter = value;
+    this._workflowNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
     this.editModeEnabled = false;
-    this.destroyDataTable();
-    if (value && value.length > 0)
-      this.appService.loadWorkflows(false, false, false);
-    else
+    this.updatingDataTable = true;
+    this._workflowStats.clear();
+    this.filteredWorkflows = [];
+    this.cdref.detectChanges();
+    this.logger.debug("Updating workflow name filter", this.workflowNameFilter);
+    if (value && value.length > 0) {
+      this.workflowDataTable.clear();
+      this.appService.loadWorkflows(
+        false, false, this.isUserLogged()
+      ).subscribe();
+    } else {
+      this.workflowDataTable.clear();
       this.appService.loadWorkflows(
         false,
         this.isUserLogged(),
         this.isUserLogged()
-      );
+      ).subscribe();
+    }
   }
 
   public get isLoading(): Observable<boolean> {
@@ -115,7 +170,7 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   public editModeToggle() {
     this.editModeEnabled = !this.editModeEnabled;
-    console.log('Edit mode enabled: ' + this.editModeEnabled);
+    this.logger.debug('Edit mode enabled: ' + this.editModeEnabled);
   }
 
   public get searchModeEnabled(): boolean {
@@ -127,39 +182,41 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public deleteWorkflowVersion(w: Workflow) {
-    console.log("Deleting workflow version....", w);
+    this.logger.debug("Deleting workflow version....", w);
     this.inputDialog.show({
       iconClass: 'fas fa-trash-alt',
       description:
         'Delete workflow <b>' +
         w.name + '</b> (version ' + w.version['version'] + ')?',
       onConfirm: () => {
+        this.updatingDataTable = true;
         this.appService.deleteWorkflowVersion(w, w.version['version'])
           .subscribe((wd: { uuid: string; version: string }) => {
-            console.log("Workflow deleted", wd);
-            this.refreshDataTable();
+            this.logger.debug("Workflow deleted", wd);
+            this.refreshDataTable(false);
           });
       },
     });
   }
 
   public subscribeWorkflow(w: Workflow) {
-    console.log('Subscribing to workflow: ', w);
+    this.logger.debug('Subscribing to workflow: ', w);
     this.appService.subscribeWorkflow(w).subscribe((w) => {
-      console.log('Workflow subscription created!');
+      this.logger.debug('Workflow subscription created!');
     });
   }
 
   public unsubscribeWorkflow(w: Workflow) {
-    console.log('Unsubscribing from workflow: ', w);
+    this.logger.debug('Unsubscribing from workflow: ', w);
     this.appService.unsubscribeWorkflow(w).subscribe((w) => {
-      console.log('Workflow subscription deleted!');
-      this.destroyDataTable();
+      this.logger.debug('Workflow subscription deleted!');
       this.filteredWorkflows = this.searchModeEnabled
         ? this._workflowStats.all
         : this._workflowStats.all.filter(
           (v) => v.subscriptions && v.subscriptions.length > 0
         );
+      if (!this.searchModeEnabled)
+        this.refreshDataTable();
     });
   }
 
@@ -192,7 +249,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public selectTestBuild(testBuild: TestBuild) {
-    console.log('Test Build selected', testBuild);
+    this.logger.debug('Test Build selected', testBuild);
     window.open(testBuild.externalLink, '_blank');
   }
 
@@ -205,12 +262,12 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public filterWorkflows($event: any, workflows: AggregatedStatusStatsItem[]) {
-    console.log($event);
+    this.logger.debug($event);
     this.filteredWorkflows = workflows;
   }
 
   public filterByStatus(status: string) {
-    console.log('Filter by status', status);
+    this.logger.debug('Filter by status', status);
     if (!this._workflowStats) return;
     try {
       status = status == 'any' ? 'all' : status;
@@ -222,18 +279,32 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.statusFilter = null;
       }
     } catch (e) {
-      console.log(e);
+      this.logger.debug(e);
     }
   }
 
-  private refreshDataTable() {
-    this.destroyDataTable();
-    this.initDataTable();
+  private refreshDataTable(resetTableStatus: boolean = true) {
+    if (resetTableStatus)
+      this.updatingDataTable = true;
+    try {
+      this.destroyDataTable();
+      this.cdref.detectChanges();
+      this.initDataTable();
+    } finally {
+      if (resetTableStatus)
+        this.updatingDataTable = false;
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.refreshDataTable();
   }
 
   private initDataTable() {
     if (this.workflowDataTable) return;
     this.workflowDataTable = $("#workflowsDashboard").DataTable({
+      "searchPlaceholder": "Filter",
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [5, 10, 20, 50, 75, 100],
@@ -245,10 +316,45 @@ export class DashboardComponent implements OnInit, OnChanges {
         "orderable": false
       }],
       "info": true,
-      "autoWidth": true,
+      "autoWidth": false,
       "responsive": true,
       "deferRender": true,
-      stateSave: true
+      stateSave: true,
+      language: {
+        search: "",
+        searchPlaceholder: "Filter by UUID or name",
+        "decimal": "",
+        "emptyTable":
+          // this.updatingDataTable ? "" :
+          this.workflowNameFilter && this.workflowNameFilter.length > 0
+            ? "No matching workflows"
+            : "<h4 class='mt-3'>No workflow found</h4>."
+            + (this.isUserLogged() ? "<div class=\"m-2\"> Click on "
+              + "<a class='add-wf' href=\"/dashboard;add=true\"><i class=\"fas fa-plus-circle\"></i> "
+              + "to add a new workflow</a> "
+              + "<br>or use the main search box <br>to find and subscribe to existing workflows</div>" : ""),
+        "info": "Showing _START_ to _END_ of _TOTAL_ workflows",
+        "infoEmpty": "Showing 0 to 0 of 0 workflows",
+        "infoFiltered": "(filtered from a total of _MAX_"
+          + (this.isUserLogged() ? " subscribed" : "") + " workflows)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Show _MENU_ workflows",
+        "loadingRecords": "Loading workflows...",
+        "processing": "Processing workflows...",
+        "zeroRecords": "No matching "
+          + (this.isUserLogged() ? "subscribed" : "") + " workflow found",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        },
+        "aria": {
+          "sortAscending": ": activate to sort column ascending",
+          "sortDescending": ": activate to sort column descending"
+        }
+      }
     });
   }
 
@@ -261,7 +367,10 @@ export class DashboardComponent implements OnInit, OnChanges {
 
   ngOnDestroy() {
     // prevent memory leak when component destroyed
-    this.workflowsStatsSubscription.unsubscribe();
-    console.log('Destroying dashboard component');
+    if (this.workflowsStatsSubscription)
+      this.workflowsStatsSubscription.unsubscribe();
+    if (this.paramSubscription)
+      this.paramSubscription.unsubscribe();
+    this.logger.debug('Destroying dashboard component');
   }
 }

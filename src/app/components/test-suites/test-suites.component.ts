@@ -11,6 +11,7 @@ import {
 import { Router } from '@angular/router';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
@@ -23,6 +24,9 @@ declare var $: any;
 export class TestSuitesComponent implements OnInit, OnChanges {
   @Input() suites: Suite[];
   @Output() suiteSelected = new EventEmitter<TestBuild>();
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('TestSuitesComponent');
 
   private suitesDataTable: any;
 
@@ -39,14 +43,14 @@ export class TestSuitesComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('Change detected');
+    this.logger.debug('Change detected');
     this.cdr.detectChanges();
   }
 
   public selectTestBuild(testBuild: TestBuild) {
-    console.log('TestBuild', testBuild);
+    this.logger.debug('TestBuild', testBuild);
     if (testBuild) {
-      console.log('Test Build selected', testBuild);
+      this.logger.debug('Test Build selected', testBuild);
       window.open(testBuild.externalLink, '_blank');
       this.suiteSelected.emit(testBuild);
       this.appService.selectWorkflow(
@@ -74,10 +78,35 @@ export class TestSuitesComponent implements OnInit, OnChanges {
         "orderable": false
       }],
       "info": true,
-      "autoWidth": true,
+      "autoWidth": false,
       "responsive": true,
       "deferRender": true,
-      stateSave: true
+      "stateSave": true,
+      language: {
+        search: "",
+        searchPlaceholder: "Filter by UUID or name",
+        "decimal": "",
+        "emptyTable": "No suites associated to the current workflow",
+        "info": "Showing _START_ to _END_ of _TOTAL_ suites",
+        "infoEmpty": "Showing 0 to 0 of 0 suites",
+        "infoFiltered": "(filtered from a total of _MAX_ suites)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Show _MENU_ suites",
+        "loadingRecords": "Loading suites...",
+        "processing": "Processing suites...",
+        "zeroRecords": "No matching suites found",
+        "paginate": {
+          "first": "First",
+          "last": "Last",
+          "next": "Next",
+          "previous": "Previous"
+        },
+        "aria": {
+          "sortAscending": ": activate to sort column ascending",
+          "sortDescending": ": activate to sort column descending"
+        }
+      }
     });
   }
 

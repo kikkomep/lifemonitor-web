@@ -12,13 +12,18 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from 'src/app/utils/services/auth.service';
+import { Logger, LoggerManager } from '../logging';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
-  constructor(private userService: AuthService, private router: Router) {}
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('NonAuthGuard');
+
+  constructor(private userService: AuthService, private router: Router) { }
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -28,12 +33,12 @@ export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    console.log(
+    this.logger.debug(
       'Can Activate, ',
       this.userService.user,
       this.userService.isUserLogged()
     );
-    console.log('NonAuth can activate: ', !this.userService.isUserLogged());
+    this.logger.debug('NonAuth can activate: ', !this.userService.isUserLogged());
     return !this.userService.isUserLogged()
       ? this.router.createUrlTree(['/home'])
       : true;
@@ -46,7 +51,7 @@ export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    console.log('Can ActivateChild');
+    this.logger.debug('Can ActivateChild');
     return !this.userService.isUserLogged()
       ? this.router.createUrlTree(['/dashboard'])
       : true;
@@ -55,7 +60,7 @@ export class NonAuthGuard implements CanActivate, CanActivateChild, CanLoad {
     route: Route,
     segments: UrlSegment[]
   ): Observable<boolean> | Promise<boolean> | boolean {
-    console.log('Can Load');
+    this.logger.debug('Can Load');
     return !this.userService.isUserLogged();
   }
 }

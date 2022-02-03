@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserNotification } from 'src/app/models/notification.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({
@@ -21,9 +22,11 @@ export class NotificationsDropdownMenuComponent implements OnInit {
     }
   }
 
-
   public notifications: UserNotification[];
   private notificationsByDate: {};
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('NotificationsDropdownMenuComponent');
 
   constructor(
     private router: Router,
@@ -33,16 +36,16 @@ export class NotificationsDropdownMenuComponent implements OnInit {
 
   ngOnInit() {
     this.appService.loadNotifications().subscribe((data: UserNotification[]) => {
-      console.log("loaded notifications...", data);
+      this.logger.debug("loaded notifications...", data);
       this.updateNotifications(data);
     })
   }
 
   private updateNotifications(notifications: UserNotification[]) {
-    console.log("Updating notifications...", notifications);
+    this.logger.debug("Updating notifications...", notifications);
     this.notifications = notifications;
     this.notificationsByDate = this.groupNotificationsByDate(notifications);
-    console.log("Notifications by date: ", this.notifications);
+    this.logger.debug("Notifications by date: ", this.notifications);
   }
 
   public get notificationsToRead(): UserNotification[] {
@@ -72,7 +75,7 @@ export class NotificationsDropdownMenuComponent implements OnInit {
 
   public setNotificationAsRead(n: UserNotification) {
     this.appService.setNotificationsReadingTime([n]).subscribe((data) => {
-      console.log("Notification marked as read", n);
+      this.logger.debug("Notification marked as read", n);
       this.hideDropdownMenu();
     });
   }
@@ -81,15 +84,25 @@ export class NotificationsDropdownMenuComponent implements OnInit {
   public markAllAsRead(notifications: UserNotification[] = null) {
     this.appService.setNotificationsReadingTime(notifications ? notifications : this.notifications)
       .subscribe((data) => {
-        console.log("Notifiations marked as read", notifications);
+        this.logger.debug("Notifiations marked as read", notifications);
         this.hideDropdownMenu();
+      });
+  }
+
+  public deleteNotitification(notification: UserNotification) {
+    this.appService.deleteNotification(notification)
+      .subscribe((data) => {
+        this.logger.debug("Notification deleted", notification);
+        this.updateNotifications(
+          this.notifications.filter(n => n !== notification)
+        )
       });
   }
 
   public deleteAllNotifications() {
     this.appService.deleteNotifications(this.notifications)
       .subscribe(() => {
-        console.log("All notifications deleted", this.notifications);
+        this.logger.debug("All notifications deleted", this.notifications);
         this.updateNotifications([]);
         this.hideDropdownMenu();
       });
@@ -98,6 +111,18 @@ export class NotificationsDropdownMenuComponent implements OnInit {
 
   public navigateTo(url: string, params: object) {
     return this.router.navigate([url, params]);
+  }
+
+  public formatTimestamp(value: string): string {
+    try {
+      let timestamp = parseInt(value);
+      let d = new Date(timestamp);
+      if (d.getFullYear() === 1970)
+        timestamp *= 1000;
+      return formatDate(timestamp, 'M/d/yy, hh:mm z', 'en-US');
+    } catch (e) {
+      return value;
+    }
   }
 
   toggleDropdownMenu() {

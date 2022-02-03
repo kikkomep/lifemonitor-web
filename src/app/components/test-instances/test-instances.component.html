@@ -19,7 +19,7 @@
             <th class="text-center" scope="col" style="width: 100px">
               Platform
             </th>
-            <th class="text-center" scope="col">Latest Builds</th>
+            <th class="text-center" scope="col" style="width: 300px;">Latest Builds</th>
           </tr>
         </thead>
         <tbody *ngIf="testInstances">
@@ -53,7 +53,7 @@
                 <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
                   src="{{ testInstance.suite.engineIcon }}" width="100" />
                 <i *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
-                  class="far fa-question-circle fa-2x"></i>
+                  class="far fa-question-circle fa-2x mr-3 text-muted"></i>
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
@@ -64,7 +64,7 @@
                 </a>
               </div>
             </td>
-            <td class="text-center align-middle font-weight-light" width="50">
+            <td class="text-center align-middle font-weight-light" width="300">
               <stats-bar-chart [stats]="testInstance.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
               </stats-bar-chart>
             </td>

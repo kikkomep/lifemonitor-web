@@ -17,6 +17,7 @@ export class TestInstance extends StatusStatsItem {
 
   public set service(data: TestingService) {
     this._service = new TestingService(data);
+    this._service.url = this.links['origin'];
   }
 
   public get service(): TestingService {
@@ -53,7 +54,7 @@ export class TestInstance extends StatusStatsItem {
           a.timestamp >= b.timestamp ? 1 : -1
         );
       } catch (e) {
-        console.warn('Unable to load last builds');
+        this.logger.warn('Unable to load last builds');
         this._latest = [];
       }
     }

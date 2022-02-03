@@ -35204,3 +35204,25 @@ table.dataTable>thead .sorting_desc_disabled:before,
 table.dataTable>thead .sorting_desc_disabled:after{
   opacity: 0;
 }
+
+div.dataTables_length {
+  color: #6c757d !important;
+  font-size: 0.875rem;
+}
+
+div.dataTables_info {
+  color: #6c757d !important;
+  font-size: 0.875rem;
+}
+
+a.add-wf {
+  color: black;
+}
+
+a.add-wf:hover {
+  color: #000033;
+}
+
+a.add-wf:active {
+  color: #000033;
+}

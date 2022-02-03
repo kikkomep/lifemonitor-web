@@ -1,6 +1,6 @@
 {
   "name": "lifemonitor",
-  "version": "0.1.0-alpha5",
+  "version": "0.1.0-alpha6",
   "scripts": {
     "start": "node server.js",
     "dev:start": "ng serve",
@@ -49,6 +49,7 @@
     "rxjs": "6.6.6",
     "strip-ansi": "~7.0.0",
     "tslib": "^2.0.3",
+    "typescript-logger": "^5.0.1",
     "zone.js": "0.11.4"
   },
   "devDependencies": {

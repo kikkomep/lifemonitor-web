@@ -2,11 +2,12 @@
   <div class="input-group-prepend">
     <span class="input-group-text"><i class="fas fa-search"></i></span>
   </div>
-  <input type="text" [(ngModel)]="actualFilterValue" class="form-control font-weight-light"
-    placeholder="Search by UUID or name" aria-label="Username" aria-describedby="basic-addon1" />
+  <input #searchInputText (keyup.enter)="onKeyUpEnter()"
+    type="text" [(ngModel)]="actualFilterValue" class="form-control font-weight-light"
+    placeholder="Press ENTER to list all {{elementType}} or search by UUID or Name" aria-label="Username" aria-describedby="basic-addon1" />
 
   <div class="input-group-append">
-    <button *ngIf="actualFilterValue" class="btn btn-outline-secondary border-right-0" type="button" (click)="reset()"
+    <button *ngIf="actualFilterValue || searchAll" class="btn btn-outline-secondary border-right-0" type="button" (click)="reset()"
       aria-haspopup="true" aria-expanded="false">
       <i class="fas fa-window-close"></i>
     </button>

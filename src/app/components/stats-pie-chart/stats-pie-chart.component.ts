@@ -9,6 +9,7 @@ import {
   AggregatedStatusStats,
   InstanceStats
 } from 'src/app/models/stats.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 @Component({
   selector: 'stats-pie-chart',
@@ -17,6 +18,10 @@ import {
 })
 export class StatsPieChartComponent implements OnInit, OnChanges {
   @Input() stats!: AbstractStats;
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('StatsPieChartComponent');
+
 
   public pieChartOptions: ChartOptions = {
     responsive: true,
@@ -64,16 +69,16 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   public pieChartLegend = false;
   public pieChartPlugins = [];
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.update();
   }
 
   ngAfterViewInit() {
-    console.log('after view init ' + this.stats);
+    this.logger.debug('after view init ' + this.stats);
   }
 
   public update() {
@@ -86,7 +91,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
         },
       ];
       // this.cdr.detectChanges();
-      console.log(
+      this.logger.debug(
         'workflow pie data',
         this.pieChartData,
         this.pieChartLabels,
@@ -99,15 +104,15 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
     return this.stats instanceof AggregatedStatusStats
       ? ['#1f8787', '#f9b233', '#dc3545', 'grey']
       : this.stats instanceof InstanceStats
-      ? ['#1f8787', '#dc3545', '#ffc107', '#6c757d', '#17a2b8', '#fd7e14', 'grey']
-      : ['#D5D8DC'];
+        ? ['#1f8787', '#dc3545', '#ffc107', '#6c757d', '#17a2b8', '#fd7e14', 'grey']
+        : ['#D5D8DC'];
   }
 
   public getLabels() {
     return this.stats instanceof AggregatedStatusStats
       ? [['Passing'], ['Some passing'], ['Failing'], ['Unavailable']]
       : this.stats instanceof InstanceStats
-      ? [
+        ? [
           ['Passed'],
           ['Failed'],
           ['Error'],
@@ -116,7 +121,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
           ['Waiting'],
           ['Unavailable'],
         ]
-      : [['Unknown']];
+        : [['Unknown']];
   }
 
   public get data(): Array<number> {
@@ -129,7 +134,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
     } else {
       data.push(1);
     }
-    console.log('Data', data);
+    this.logger.debug('Data', data);
     return data;
   }
 }

@@ -12,6 +12,7 @@ import { ApiService } from 'src/app/utils/services/api.service';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { User } from 'src/app/models/user.modes';
 import { Router } from '@angular/router';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 @Component({
   selector: 'app-user-dropdown-menu',
@@ -20,6 +21,9 @@ import { Router } from '@angular/router';
 })
 export class UserDropdownMenuComponent implements OnInit {
   public user: User;
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('UserDropdownMenuComponent');
 
   @ViewChild('dropdownMenu', { static: false }) dropdownMenu;
   @HostListener('document:click', ['$event'])
@@ -40,7 +44,7 @@ export class UserDropdownMenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.get_current_user().subscribe((data) => {
-      console.log('Current user', data);
+      this.logger.debug('Current user', data);
       this.user = data;
     });
   }
@@ -72,7 +76,7 @@ export class UserDropdownMenuComponent implements OnInit {
 
   logout() {
     this.authService.logout();
-    console.info('User logout... redirecting');
+    this.logger.debug('User logout... redirecting');
     this.router.navigateByUrl('/dashboard');
   }
 }

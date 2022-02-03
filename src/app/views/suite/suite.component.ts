@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { Workflow } from 'src/app/models/workflow.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({
@@ -21,7 +22,7 @@ export class SuiteComponent implements OnInit {
   @Input() suite: Suite;
 
   public statusFilter: string = null;
-  public instanceNameFilter: string = '';
+  private _instanceNameFilter: string = '';
   public instanceSortingOrder: string = 'desc';
 
   private _instances: StatusStatsItem[] = [];
@@ -30,29 +31,32 @@ export class SuiteComponent implements OnInit {
   private workflowSubscription: Subscription;
   private suiteSubscription: Subscription;
 
+  // initialize logger
+  private logger: Logger = LoggerManager.create('SuiteComponent');
+
   constructor(
     private route: ActivatedRoute,
     private appService: AppService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
-    console.log('Created component Workflow');
+    this.logger.debug('Created component Workflow');
     this.paramSubscription = this.route.params.subscribe((params) => {
-      console.log('Params:', params);
+      this.logger.debug('Params:', params);
 
       let urlData = this.appService.decodeUrl(params['s']);
-      console.log('UrlData', urlData);
+      this.logger.debug('UrlData', urlData);
 
       // subscribe for the current selected workflow
       this.workflowSubscription = this.appService.observableWorkflow.subscribe(
         (w: Workflow) => {
-          console.log('Changed workflow', w, w.suites);
+          this.logger.debug('Changed workflow', w, w.suites);
 
           // subscribe for the current selected suite
           this.suiteSubscription = this.appService.observableTestSuite.subscribe(
             (suite: Suite) => {
-              console.log('Changed suite', suite);
+              this.logger.debug('Changed suite', suite);
               if (suite) {
                 this.suite = suite;
                 this.suite.workflow = w;
@@ -84,8 +88,16 @@ export class SuiteComponent implements OnInit {
         this.statusFilter = null;
       }
     } catch (e) {
-      console.log(e);
+      this.logger.debug(e);
     }
+  }
+
+  public get instanceNameFilter(): string {
+    return this._instanceNameFilter;
+  }
+
+  public set instanceNameFilter(value: string) {
+    this._instanceNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
   }
 
   public get instances(): StatusStatsItem[] {
@@ -93,7 +105,7 @@ export class SuiteComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('Change detected');
+    this.logger.debug('Change detected');
     this.cdr.detectChanges();
   }
 

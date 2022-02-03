@@ -48,7 +48,7 @@ registerLocaleData(localeEn, 'en-EN');
 
 export function initConfigService(appConfig: AppConfigService) {
   return (): Promise<any> => {
-    return appConfig.loadConfig();
+    return appConfig.loadConfig().toPromise();
   };
 }
 
