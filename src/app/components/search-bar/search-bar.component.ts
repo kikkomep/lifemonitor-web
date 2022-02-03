@@ -30,7 +30,7 @@ export class SearchBarComponent implements OnInit {
   ngAfterViewInit() {
     fromEvent(this.searchInputText.nativeElement, 'input')
       .pipe(map((event: Event) => (event.target as HTMLInputElement).value))
-      .pipe(debounceTime(1500))
+      .pipe(debounceTime(800))
       .pipe(distinctUntilChanged())
       .subscribe(data => {
         this.emitValue(data);
