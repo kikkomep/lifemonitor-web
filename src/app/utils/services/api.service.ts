@@ -7,13 +7,14 @@ import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status,
+  Status
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
 import { Workflow } from 'src/app/models/workflow.model';
+import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
 import { AppConfigService } from './config.service';
 
@@ -218,7 +219,8 @@ export class ApiService {
       "identifier": workflow.identifier,
       "name": name,
       "version": version,
-      "public": is_public
+      "public": is_public,
+      "uuid": uuidv4()
     }
     return this.http
       .post(

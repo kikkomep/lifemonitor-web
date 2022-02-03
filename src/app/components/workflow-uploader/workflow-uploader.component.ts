@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { Subscription } from 'rxjs';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
+import { Workflow } from 'src/app/models/workflow.model';
 
 declare var $: any;
 
@@ -165,7 +166,7 @@ export class WorkflowUploaderComponent
     this._setError('uuid', valid ? null : 'Not valid UUID');
   }
 
-  public enableEditingUUID(){
+  public enableEditingUUID() {
     this._editUUID = true;
   }
 
@@ -401,12 +402,29 @@ export class WorkflowUploaderComponent
           this.authorizationHeader
         );
       } else if (this.source === 'registry') {
-        request = this.appService.registerRegistryWorkflow(
-          this.selectedRegistryWorkflow,
-          this.workflowVersion,
-          this.workflowName,
-          false
-        );
+        this.logger.debug("Selected registry workflow: ", this.selectRegistryWorkflow);
+        let existingWorkflow = this.appService.workflows.find(
+          (w: Workflow) => w.version
+            && 'links' in w.version
+            && 'origin' in w.version['links']
+            && w.version['links']['origin'] == this.selectedRegistryWorkflow.links['origin']);
+        this.logger.debug("Found registry workflow? => ", existingWorkflow !== null, existingWorkflow);
+        if (!existingWorkflow) {
+          this.logger.debug("Trying to register the registry workflow", this.selectedRegistryWorkflow);
+          request = this.appService.registerRegistryWorkflow(
+            this.selectedRegistryWorkflow,
+            this.workflowVersion,
+            this.workflowName,
+            false
+          );
+        } else {
+          this._registrationError = {
+            code: 401,
+            title: "Conflict",
+            message: `The workflow ${this.selectedRegistryWorkflow.name}`
+              + ` (id.${this.selectedRegistryWorkflow.identifier}) already registered`,
+          } as RegistrationError;
+        }
       }
 
       if (request) {
