@@ -10,6 +10,7 @@ import {
 import { Router } from '@angular/router';
 import { ChartData, ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
+import { DateUtils } from 'src/app/models/common.models';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
@@ -149,7 +150,7 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
           if (sec >= 0) duration += seconds + 's';
           this.logger.debug("DURATION", hours, minutes, seconds, duration, tooltipItem, item, data);
           let ltext = '<div class="ml-1"><i class="far fa-calendar-check"></i> started: '
-            + new Date(item.timestamp).toLocaleString() + '</div>';
+            + DateUtils.formatTimestamp(item.timestamp.toString()) + '</div>';
           ltext += '<div class="ml-1"><i class="fas fa-stopwatch"></i> duration: '
             + duration + '</div>'
           return ltext;

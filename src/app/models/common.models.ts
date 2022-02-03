@@ -1,6 +1,6 @@
+import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Logger, LoggerManager } from '../utils/logging';
-
 export class UrlValue {
   _url: string;
   _error: string;
@@ -110,4 +110,20 @@ export class RoCrate {
     );
   }
 
+}
+
+
+export class DateUtils {
+
+  public static formatTimestamp(value: string): string {
+    try {
+      let timestamp = parseInt(value);
+      let d = new Date(timestamp);
+      if (d.getFullYear() === 1970)
+        timestamp *= 1000;
+      return formatDate(timestamp, 'M/d/yy, hh:mm z', 'en-US');
+    } catch (e) {
+      return value;
+    }
+  }
 }

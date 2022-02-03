@@ -3,6 +3,7 @@ import {
   Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { DateUtils } from 'src/app/models/common.models';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
@@ -114,15 +115,7 @@ export class NotificationsDropdownMenuComponent implements OnInit {
   }
 
   public formatTimestamp(value: string): string {
-    try {
-      let timestamp = parseInt(value);
-      let d = new Date(timestamp);
-      if (d.getFullYear() === 1970)
-        timestamp *= 1000;
-      return formatDate(timestamp, 'M/d/yy, hh:mm z', 'en-US');
-    } catch (e) {
-      return value;
-    }
+    return DateUtils.formatTimestamp(value);
   }
 
   toggleDropdownMenu() {
