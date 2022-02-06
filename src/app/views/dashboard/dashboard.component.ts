@@ -257,6 +257,13 @@ export class DashboardComponent implements OnInit, OnChanges {
     return this._workflowStats;
   }
 
+  public getStatsLength(workflows: AggregatedStatusStatsItem[]): number {
+    let items = workflows;
+    if (this.isUserLogged())
+      items = workflows.filter((v) => v.subscriptions && v.subscriptions.length > 0);
+    return items.length;
+  }
+
   public get workflows(): AggregatedStatusStatsItem[] {
     return this.filteredWorkflows;
   }
