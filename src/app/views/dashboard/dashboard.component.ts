@@ -281,9 +281,11 @@ export class DashboardComponent implements OnInit, OnChanges {
       if (status != this.statusFilter) {
         this.filteredWorkflows = this._workflowStats[status];
         this.statusFilter = status;
+        this.refreshDataTable();
       } else {
         this.filteredWorkflows = this._workflowStats['all'];
         this.statusFilter = null;
+        this.refreshDataTable();
       }
     } catch (e) {
       this.logger.debug(e);
@@ -297,6 +299,7 @@ export class DashboardComponent implements OnInit, OnChanges {
       this.destroyDataTable();
       this.cdref.detectChanges();
       this.initDataTable();
+      this.cdref.detectChanges();
     } finally {
       if (resetTableStatus)
         this.updatingDataTable = false;
