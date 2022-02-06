@@ -30,10 +30,9 @@
           class="w-100"
         >
           <a
-            [routerLink]="['/suite', { s: n.asUrlParam() }]"
             class="dropdown-item {{ n.read ? 'text-muted' : '' }}"
             style="{{ n.read ? 'opacity: 60%;' : '' }}"
-            (click)="setNotificationAsRead(n)"
+            (click)="readNotification(n)"
           >
             <div
               class="w-100 mt-2 {{

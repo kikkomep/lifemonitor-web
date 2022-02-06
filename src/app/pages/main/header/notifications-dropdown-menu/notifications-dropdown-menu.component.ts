@@ -5,8 +5,10 @@ import {
 import { Router } from '@angular/router';
 import { DateUtils } from 'src/app/models/common.models';
 import { UserNotification } from 'src/app/models/notification.model';
+import { Suite } from 'src/app/models/suite.models';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
+import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
 
 @Component({
   selector: 'app-notifications-dropdown-menu',
@@ -33,7 +35,8 @@ export class NotificationsDropdownMenuComponent implements OnInit {
     private router: Router,
     private elementRef: ElementRef,
     private renderer: Renderer2,
-    private appService: AppService) { }
+    private appService: AppService,
+    private inputDialog: InputDialogService) { }
 
   ngOnInit() {
     this.appService.loadNotifications().subscribe((data: UserNotification[]) => {
@@ -74,11 +77,33 @@ export class NotificationsDropdownMenuComponent implements OnInit {
     return result;
   }
 
-  public setNotificationAsRead(n: UserNotification) {
+  public readNotification(n: UserNotification) {
     this.appService.setNotificationsReadingTime([n]).subscribe((data) => {
       this.logger.debug("Notification marked as read", n);
       this.hideDropdownMenu();
     });
+    let suite: Suite = null;
+    if (n.data && "build" in n.data
+      && "suite" in n.data["build"]
+      && "workflow" in n.data["build"]) {
+      suite = this.appService.findTestSuite(
+        n.data["build"]["suite"]["uuid"],
+        n.data["build"]["workflow"]["uuid"]
+      );
+    }
+    this.logger.debug("Test suite related with notification", suite);
+    if (!suite || suite === undefined) {
+      this.inputDialog.show({
+        iconClass: 'fas fa-exclamation-triangle text-warning',
+        question: "Ops...",
+        description:
+          'Unable to find the test suite related with this notification',
+        confirmText: "",
+        cancelText: "Close",
+      });
+    } else {
+      return this.navigateTo('/suite', { 's': suite.asUrlParam() });
+    }
   }
 
 
