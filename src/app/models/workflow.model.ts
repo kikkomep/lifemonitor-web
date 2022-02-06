@@ -73,6 +73,7 @@ export class Workflow extends AggregatedStatusStatsItem {
 
   public set suites(suites: AggregatedStatusStats) {
     this._suites = suites;
+    this.updateLatestBuilds();
     this.notifyChanges();
   }
 
@@ -142,29 +143,33 @@ export class Workflow extends AggregatedStatusStatsItem {
     return [];
   }
 
-  public getLatestBuilds(): TestBuild[] {
-    if (!this._latestBuilds) {
-      if (!this.suites) return null;
-      let latestBuilds: TestBuild[] = [];
-      for (let item of this.suites.all) {
-        let suite: Suite = item as Suite;
-        try {
-          for (let inst of suite.instances.all) {
-            for (let b of inst.latestBuilds) {
-              latestBuilds.push(b);
-            }
-          }
-        } catch (e) {
-          this.logger.debug('Unable to load last builds');
-          this._latestBuilds = [];
-        }
-      }
+  public get latestTestBuilds(): TestBuild[] {
+    return this.getLatestBuilds();
+  }
 
-      this._latestBuilds = latestBuilds.sort((a, b) =>
-        a.timestamp >= b.timestamp ? 1 : -1
-      );
+  public getLatestBuilds(): TestBuild[] {
+    return this._latestBuilds;
+  }
+
+  public updateLatestBuilds() {
+    if (!this.suites) return null;
+    let latestBuilds: TestBuild[] = [];
+    for (let item of this.suites.all) {
+      let suite: Suite = item as Suite;
+      try {
+        for (let inst of suite.instances.all) {
+          for (let b of inst.latestBuilds) {
+            latestBuilds.push(b);
+          }
+        }
+      } catch (e) {
+        this.logger.debug('Unable to load last builds');
+        this._latestBuilds = [];
+      }
     }
 
-    return this._latestBuilds;
+    this._latestBuilds = latestBuilds.sort((a, b) =>
+      a.timestamp > b.timestamp || a.suite_uuid > b.suite_uuid ? 1 : -1
+    );
   }
 }
