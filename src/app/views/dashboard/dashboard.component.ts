@@ -64,10 +64,9 @@ export class DashboardComponent implements OnInit {
         this.updatingDataTable = true;
         this._workflowStats.clear();
         this.filteredWorkflows = [];
+        this.cdref.detectChanges();
         this.workflowDataTable.clear();
         this.workflowDataTable.draw();
-        this.cdref.detectChanges();
-        this.refreshDataTable();
       });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
