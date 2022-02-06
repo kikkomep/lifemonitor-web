@@ -21,7 +21,7 @@ declare var $: any;
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit, OnChanges {
+export class DashboardComponent implements OnInit {
   // reference to workflows stats
   private _workflowStats: AggregatedStatusStats | null;
   // reference to the current subscriptions
@@ -41,7 +41,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   private statsFilter = new StatsFilterPipe();
 
   // Reference to the dataTable instance
-  private workflowDataTable: any;
+  private workflowDataTable: any = null;
 
   public updatingDataTable: boolean = false;
 
@@ -95,9 +95,6 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.location.replaceState('/dashboard');
       }
     });
-  }
-
-  ngAfterViewInit() {
     this.logger.debug('Initializing workflow data!!');
     this._workflowStats = this.appService.workflowStats;
     this.updatingDataTable = true;
@@ -125,9 +122,6 @@ export class DashboardComponent implements OnInit, OnChanges {
   ngAfterViewChecked() {
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.logger.debug('Changes', changes);
-  }
 
   public get workflowNameFilter(): string {
     return this._workflowNameFilter;
@@ -328,9 +322,10 @@ export class DashboardComponent implements OnInit, OnChanges {
       "info": true,
       "autoWidth": false,
       "responsive": true,
-      "deferRender": true,
-      stateSave: true,
-      language: {
+      // "deferRender": true,
+      // "scrollY": "520",
+      "stateSave": true,
+      "language": {
         search: "",
         searchPlaceholder: "Filter by UUID or name",
         "decimal": "",

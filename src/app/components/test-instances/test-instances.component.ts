@@ -88,6 +88,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
       "responsive": true,
       "deferRender": true,
       "stateSave": true,
+      // "scrollY": "520",
       language: {
         search: "",
         searchPlaceholder: "Filter by UUID or name",

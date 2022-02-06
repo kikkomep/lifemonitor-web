@@ -81,6 +81,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
       "autoWidth": false,
       "responsive": true,
       "deferRender": true,
+      // "scrollY": "520",
       "stateSave": true,
       language: {
         search: "",
