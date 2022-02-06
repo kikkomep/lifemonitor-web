@@ -65,7 +65,7 @@
               </div>
             </td>
             <td class="text-center align-middle font-weight-light" width="300">
-              <stats-bar-chart [stats]="testInstance.getLatestBuilds()" (selectedItem)="selectTestBuild($event)">
+              <stats-bar-chart [stats]="testInstance.getLatestBuilds() | arraySizeFilterPipe: 10" (selectedItem)="selectTestBuild($event)">
               </stats-bar-chart>
             </td>
           </tr>

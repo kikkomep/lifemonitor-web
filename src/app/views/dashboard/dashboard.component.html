@@ -293,7 +293,7 @@
                   <div *ngIf="w.suites === undefined" class="text-muted">
                     <i class="fas fa-2x fa-sync-alt"></i>
                   </div>
-                  <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0" [stats]="w.getLatestBuilds()"
+                  <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0" [stats]="w.getLatestBuilds() | arraySizeFilterPipe: 10"
                     (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
