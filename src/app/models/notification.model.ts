@@ -30,7 +30,7 @@ export class UserNotification extends Model {
   }
 
   public asUrlParam(): string {
-    if (this.event === "BUILD_FAILED") {
+    if (this.event === "BUILD_FAILED" || this.event === "BUILD_RECOVERED") {
       return Suite.getUrlParam(
         this.data["build"]["workflow"]["uuid"],
         this.data["build"]["suite"]["uuid"]);
