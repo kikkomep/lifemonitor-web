@@ -180,6 +180,10 @@ export class AppService {
     return this._workflows;
   }
 
+  public findWorkflow(uuid: string): Workflow {
+    return this._workflows ? this._workflows.find(w => w.uuid === uuid) : null;
+  }
+
   public get workflowStats(): AggregatedStatusStats {
     return this._workflowsStats;
   }
@@ -190,6 +194,17 @@ export class AppService {
 
   public get testSuite(): Suite {
     return this._suite;
+  }
+
+  public findTestSuite(suite_uuid: string, wf_uuid: string = null): Suite {
+    if (!this._workflow && !wf_uuid) return null;
+    let workflow: Workflow = this._workflow;
+    if (wf_uuid && this._workflows) {
+      workflow = this._workflows.find(w => w.uuid === wf_uuid);
+    }
+    if (!workflow) return null;
+    return workflow.suites
+      ? workflow.suites.all.find(s => s.uuid === suite_uuid) as Suite : null;
   }
 
   public get testInstance(): TestInstance {
