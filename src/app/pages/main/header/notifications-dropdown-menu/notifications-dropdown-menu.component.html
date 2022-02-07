@@ -1,4 +1,4 @@
-<li class="nav-item dropdown" *ngIf="notifications && notifications.length > 0">
+<li class="nav-item dropdown" *ngIf="notifications">
   <a
     class="nav-link"
     data-html="true"
@@ -89,10 +89,14 @@
     <a href="#" class="dropdown-item dropdown-footer">
       Mark as read all {{ !notifications ? 0 : notifications.length }} notifications
     </a>-->
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item dropdown-footer" (click)="deleteAllNotifications()">
+    <div *ngIf="notifications && notifications.length > 0" class="dropdown-divider"></div>
+    <a *ngIf="notifications && notifications.length > 0" 
+      class="dropdown-item dropdown-footer" (click)="deleteAllNotifications()">
       <i class="fas fa-trash-alt mr-1"></i>
       Clear all notifications ({{ !notifications ? 0 : notifications.length }})
     </a>
+    <div *ngIf="notifications && notifications.length == 0" class="dropdown-item dropdown-footer">
+      No notifications found
+    </div>
   </div>
 </li>
