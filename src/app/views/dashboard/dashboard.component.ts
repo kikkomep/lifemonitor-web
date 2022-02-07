@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
   public _workflowNameFilter: string = '';
   public workflowSortingOrder: string = 'desc';
   public editModeEnabled: boolean = false;
-
+  private _searchModeEnabled: boolean = false;
   private openUploader: boolean = false;
 
   private statsFilter = new StatsFilterPipe();
@@ -129,6 +129,7 @@ export class DashboardComponent implements OnInit {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
     this.editModeEnabled = false;
+    this._searchModeEnabled = true;
     this.updatingDataTable = true;
     this._workflowStats.clear();
     this.filteredWorkflows = [];
@@ -140,6 +141,7 @@ export class DashboardComponent implements OnInit {
         false, false, this.isUserLogged()
       ).subscribe();
     } else {
+      if (!value) this._searchModeEnabled = false;
       this.workflowDataTable.clear();
       this.appService.loadWorkflows(
         false,
@@ -167,7 +169,8 @@ export class DashboardComponent implements OnInit {
   }
 
   public get searchModeEnabled(): boolean {
-    return this.workflowNameFilter && this.workflowNameFilter.length > 0;
+    // return this.workflowNameFilter && this.workflowNameFilter.length > 0;
+    return this._searchModeEnabled;
   }
 
   public isEditable(w: Workflow) {
@@ -272,11 +275,17 @@ export class DashboardComponent implements OnInit {
     try {
       status = status == 'any' ? 'all' : status;
       if (status != this.statusFilter) {
-        this.filteredWorkflows = this._workflowStats[status];
+        this.filteredWorkflows =
+          (!this.isUserLogged() || this.searchModeEnabled) ? this._workflowStats[status]
+            : this._workflowStats[status].filter(
+              (v: { subscriptions: string | any[]; }) => v.subscriptions && v.subscriptions.length > 0);
         this.statusFilter = status;
         this.refreshDataTable();
       } else {
-        this.filteredWorkflows = this._workflowStats['all'];
+        this.filteredWorkflows =
+          (!this.isUserLogged() || this.searchModeEnabled) ? this._workflowStats['all']
+            : this._workflowStats['all'].filter(
+              (v: { subscriptions: string | any[]; }) => v.subscriptions && v.subscriptions.length > 0);
         this.statusFilter = null;
         this.refreshDataTable();
       }
