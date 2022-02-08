@@ -16,7 +16,6 @@ export class Suite extends AggregatedStatusStatsItem {
 
   constructor(public workflow: Workflow, rawData: object) {
     super(rawData);
-    this.name = this.roc_suite.replace('#', '');
   }
 
   public asUrlParam() {

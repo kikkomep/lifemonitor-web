@@ -13,6 +13,24 @@ export class TestInstance extends StatusStatsItem {
 
   constructor(public suite: Suite, rawData: Object) {
     super(rawData);
+    this.setName(rawData);
+  }
+
+  public update(rawData: Object) {
+    super.update(rawData);
+    this.setName(rawData);
+  }
+
+  private setName(data: Object) {
+    let name: string = null;
+    if ("name" in data) {
+      name = data["name"];
+      if (name && name.length > 0)
+        this.name = name;
+    }
+    if (!name) {
+      this.name = this.uuid.replace('#', '');
+    }
   }
 
   public set service(data: TestingService) {
