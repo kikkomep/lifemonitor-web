@@ -61,7 +61,8 @@
                     <i class="far fa-trash-alt"></i>
                   </a>
                 </div>
-                <div class="offset-1 col-11 text-small" style="font-size: 9pt; color: black">
+                <div class="offset-1 col-11 text-small {{ n.read ? 'text-muted' : '' }}"
+                  style="font-size: 9pt; color: black">
                   <div>
                     <span class="text-bold">build: </span>
                     <span>#{{ n.data.build.build_id }}</span>
