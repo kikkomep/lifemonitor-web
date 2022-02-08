@@ -65,10 +65,10 @@
   </button>
   <div *ngIf="isUserLogged" class="navbar-collapse collapse">
     <ul class="nav navbar-nav ml-auto float-right">
-
       <!-- <app-messages-dropdown-menu></app-messages-dropdown-menu> -->
-      <app-notifications-dropdown-menu></app-notifications-dropdown-menu>
-      <app-user-dropdown-menu></app-user-dropdown-menu>
+      <app-notifications-dropdown-menu (openUserProfile)="openUserProfile()">
+      </app-notifications-dropdown-menu>
+      <app-user-dropdown-menu #userDropdownMenu></app-user-dropdown-menu>
       <!-- <li class="nav-item">
       <a
         class="nav-link"

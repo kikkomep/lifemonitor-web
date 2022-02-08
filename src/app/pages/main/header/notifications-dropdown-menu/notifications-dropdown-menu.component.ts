@@ -16,14 +16,10 @@ import { InputDialogService } from 'src/app/utils/services/input-dialog.service'
   styleUrls: ['./notifications-dropdown-menu.component.scss'],
 })
 export class NotificationsDropdownMenuComponent implements OnInit {
-  @ViewChild('dropdownMenu', { static: false }) dropdownMenu;
 
-  @HostListener('document:click', ['$event'])
-  clickout(event) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.hideDropdownMenu();
-    }
-  }
+  @ViewChild('dropdownMenu', { static: false }) dropdownMenu: any;
+
+  @Output() openUserProfile = new EventEmitter<boolean>();
 
   public notifications: UserNotification[];
   private notificationsByDate: {};
@@ -43,6 +39,13 @@ export class NotificationsDropdownMenuComponent implements OnInit {
       this.logger.debug("loaded notifications...", data);
       this.updateNotifications(data);
     })
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.hideDropdownMenu();
+    }
   }
 
   private updateNotifications(notifications: UserNotification[]) {
@@ -82,6 +85,9 @@ export class NotificationsDropdownMenuComponent implements OnInit {
       this.logger.debug("Notification marked as read", n);
       this.hideDropdownMenu();
     });
+    if (n.event === 'UNCONFIGURED_EMAIL') {
+      this.openUserProfile.emit(true);
+    } else if (n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED') {
     let suite: Suite = null;
     if (n.data && "build" in n.data
       && "suite" in n.data["build"]
