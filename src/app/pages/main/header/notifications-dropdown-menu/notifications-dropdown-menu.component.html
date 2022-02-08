@@ -1,27 +1,18 @@
 <li class="nav-item dropdown" *ngIf="notifications">
-  <a
-    class="nav-link"
-    data-html="true"
-    data-toggle="dropdown"
-    (click)="toggleDropdownMenu()"
-  >
+  <a class="nav-link" data-html="true" data-toggle="dropdown" (click)="toggleDropdownMenu()">
     <i class="far fa-bell"></i>
-    <span
-      *ngIf="notificationsToRead.length > 0"
-      class="badge badge-warning navbar-badge text-bold"
-    >
+    <span *ngIf="notificationsToRead.length > 0" class="badge badge-warning navbar-badge text-bold">
       {{ notificationsToRead.length }}
     </span>
   </a>
   <div #dropdownMenu class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-    <div style="max-height: 200px; overflow-y: scroll;">
+    <div style="max-height: 200px; overflow-y: scroll">
       <ng-container *ngFor="let nd of notificationDates">
         <div class="text-center text-muted mt-2" style="font-size: 9pt">
           <span class="text-bold">{{ nd | date: 'fullDate' }}</span>
         </div>
         <div class="dropdown-divider"></div>
-        <ng-container
-          *ngFor="
+        <ng-container *ngFor="
             let n of getNotificationOfDay(nd)
               | sortingNotificationFilter: 'desc';
             index as i;
@@ -45,42 +36,52 @@
                 </a>
               </div>
             </div>
-              }}"
-            >
-              <i class="{{ n.icon }} mr-1"></i>
-              Test instance
-              <span class="text-bold"> {{ n.data.build.instance.name }} </span>
-              <span *ngIf="n.event === 'BUILD_FAILED'">is failing</span>
-              <span *ngIf="n.event === 'BUILD_RECOVERED'">has recovered</span>
-            </div>
-            <div class="text-small mx-4" style="font-size: 9pt; color: black;">
-              <div style="overflow: hidden; text-overflow: ellipsis;">
-                <span class="text-bold mt-n2">
-                  build #{{ n.data.build.build_id }}:
-                </span>
-                {{ formatTimestamp(n.data.build.timestamp) }}
-              </div>
-              <div style="overflow: hidden; text-overflow: ellipsis;">
-                <span class="text-bold mt-n2">suite: </span>
-                {{ n.data.build.suite.name }}
-              </div>
-              <div style="overflow: hidden; text-overflow: ellipsis;">
-                <span class="text-bold mt-n2">workflow: </span>
-                <span>
-                {{ n.data.build.workflow.name }}
-                </span>
-              </div>
-              <a
-                class="trash-notification"
-                (click)="deleteNotitification(n)"
-                title="click to delete"
-              >
-                <div class="float-right mt-n1 p-0 mr-n3">
-                  <i class="far fa-trash-alt"></i>
+
+            <div class="dropdown-item-content" *ngIf="n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED'">
+              <div class="row {{
+                  n.read
+                    ? 'text-muted'
+                    : n.event === 'BUILD_FAILED'
+                    ? 'text-red'
+                    : 'text-primary'
+                }}" (click)="readNotification(n)">
+                <div class="col-1">
+                  <i class="{{ n.icon }}"></i>
                 </div>
-              </a>
+                <div class="col-10">
+                  Test instance
+                  <span class="text-bold">
+                    {{ n.data.build.instance.name }}
+                  </span>
+                  <span *ngIf="n.event === 'BUILD_FAILED'">is failing</span>
+                  <span *ngIf="n.event === 'BUILD_RECOVERED'">has recovered</span>
+                </div>
+                <div class="col-1">
+                  <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                    <i class="far fa-trash-alt"></i>
+                  </a>
+                </div>
+                <div class="offset-1 col-11 text-small" style="font-size: 9pt; color: black">
+                  <div>
+                    <span class="text-bold">build: </span>
+                    <span>#{{ n.data.build.build_id }}</span>
+                  </div>
+                  <div>
+                    <span class="text-bold">suite: </span>
+                    <span>{{ n.data.build.suite.name }}</span>
+                  </div>
+                  <div>
+                    <span class="text-bold">start time: </span>
+                    <span>{{ formatTimestamp(n.data.build.timestamp) }}</span>
+                  </div>
+                  <div class="row">
+                    <div class="col-3 text-bold">workflow:</div>
+                    <div class="col-9">{{ n.data.build.workflow.name }}</div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </a>
+          </div>
         </ng-container>
       </ng-container>
     </div>
@@ -94,10 +95,10 @@
       Mark as read all {{ !notifications ? 0 : notifications.length }} notifications
     </a>-->
     <div *ngIf="notifications && notifications.length > 0" class="dropdown-divider"></div>
-    <a *ngIf="notifications && notifications.length > 0" 
-      class="dropdown-item dropdown-footer" (click)="deleteAllNotifications()">
-      <i class="fas fa-trash-alt mr-1"></i>
-      Clear all notifications ({{ !notifications ? 0 : notifications.length }})
+    <a *ngIf="notifications && notifications.length > 0" class="dropdown-item dropdown-footer"
+      (click)="deleteAllNotifications()">
+      <i class="fas fa-trash-alt mr-1"></i> Clear all notifications ({{ !notifications ? 0 : notifications.length
+      }})
     </a>
     <div *ngIf="notifications && notifications.length == 0" class="dropdown-item dropdown-footer">
       No notifications found
