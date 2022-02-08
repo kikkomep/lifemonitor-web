@@ -26,21 +26,25 @@
               | sortingNotificationFilter: 'desc';
             index as i;
             first as isFirst
-          "
-          class="w-100"
-        >
-          <a
-            class="dropdown-item {{ n.read ? 'text-muted' : '' }}"
-            style="{{ n.read ? 'opacity: 60%;' : '' }}"
-            (click)="readNotification(n)"
-          >
-            <div
-              class="w-100 mt-2 {{
-                n.read
-                  ? 'text-muted'
-                  : n.event === 'BUILD_FAILED'
-                  ? 'text-red'
-                  : 'text-primary'
+          " class="w-100">
+          <div class="dropdown-item {{ n.read ? 'text-muted' : '' }}" style="{{ n.read ? 'opacity: 60%;' : '' }}">
+            <div *ngIf="n.event === 'UNCONFIGURED_EMAIL'" class="dropdown-item-content row">
+              <div class="col-11" (click)="readNotification(n)">
+                <div class="row">
+                  <div class="col-1">
+                    <i class="{{ n.icon }} mr-1" style="color: {{ n.color }}"></i>
+                  </div>
+                  <div class="col-10">
+                    No email address configured to receive notifications
+                  </div>
+                </div>
+              </div>
+              <div class="col-1">
+                <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                  <i class="far fa-trash-alt"></i>
+                </a>
+              </div>
+            </div>
               }}"
             >
               <i class="{{ n.icon }} mr-1"></i>

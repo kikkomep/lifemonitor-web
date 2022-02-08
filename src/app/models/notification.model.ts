@@ -10,24 +10,35 @@ export class UserNotification extends Model {
   title: string;
   body: string;
   icon: string;
+  color: string;
   lang: string;
   tag: string;
   event: string;
 
   constructor(rawData?: Object, skip?: []) {
     super(rawData, skip);
-    this.updateIcon();
   }
 
-  private updateIcon() {
-    if (this.event === 'BUILD_FAILED') {
+  public update(rawData?: Object) {
+    super.update(rawData);
+    if (this.event === 'INFO') {
+      this.icon = "fas fa-info-circle";
+      this.color = "var(--eosc-green)";
+    } else if (this.event === 'UNCONFIGURED_EMAIL') {
+      this.icon = 'fas fa-exclamation-triangle';
+      this.color = "var(--eosc-yellow)"
+    } else if (this.event === 'BUILD_FAILED') {
       this.icon = "fas fa-minus-circle";
+      this.color = "var(--test-failed)"
     } else if (this.event === 'BUILD_RECOVERED') {
       this.icon = "fas fa-check-circle";
+      this.color = "var(--test-failed)"
     } else {
-      this.icon = "fas fa-info-circle";
+      this.icon = "fas fa-question-circle";
+      this.color = "var(--eosc-green)";
     }
   }
+
 
   public asUrlParam(): string {
     if (this.event === "BUILD_FAILED" || this.event === "BUILD_RECOVERED") {

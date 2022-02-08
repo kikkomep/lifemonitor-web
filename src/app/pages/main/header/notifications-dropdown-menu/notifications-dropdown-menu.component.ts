@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import {
-  Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild
+  Component, ElementRef, EventEmitter, HostListener, OnInit, Output, Renderer2, ViewChild
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DateUtils } from 'src/app/models/common.models';
@@ -88,30 +88,30 @@ export class NotificationsDropdownMenuComponent implements OnInit {
     if (n.event === 'UNCONFIGURED_EMAIL') {
       this.openUserProfile.emit(true);
     } else if (n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED') {
-    let suite: Suite = null;
-    if (n.data && "build" in n.data
-      && "suite" in n.data["build"]
-      && "workflow" in n.data["build"]) {
-      suite = this.appService.findTestSuite(
-        n.data["build"]["suite"]["uuid"],
-        n.data["build"]["workflow"]["uuid"]
-      );
-    }
-    this.logger.debug("Test suite related with notification", suite);
-    if (!suite || suite === undefined) {
-      this.inputDialog.show({
-        iconClass: 'fas fa-exclamation-triangle text-warning',
-        question: "Ops...",
-        description:
-          'Unable to find the test suite related with this notification',
-        confirmText: "",
-        cancelText: "Close",
-      });
-    } else {
-      return this.navigateTo('/suite', { 's': suite.asUrlParam() });
+      let suite: Suite = null;
+      if (n.data && "build" in n.data
+        && "suite" in n.data["build"]
+        && "workflow" in n.data["build"]) {
+        suite = this.appService.findTestSuite(
+          n.data["build"]["suite"]["uuid"],
+          n.data["build"]["workflow"]["uuid"]
+        );
+      }
+      this.logger.debug("Test suite related with notification", suite);
+      if (!suite || suite === undefined) {
+        this.inputDialog.show({
+          iconClass: 'fas fa-exclamation-triangle text-warning',
+          question: "Ops...",
+          description:
+            'Unable to find the test suite related with this notification',
+          confirmText: "",
+          cancelText: "Close",
+        });
+      } else {
+        return this.navigateTo('/suite', { 's': suite.asUrlParam() });
+      }
     }
   }
-
 
   public markAllAsRead(notifications: UserNotification[] = null) {
     this.appService.setNotificationsReadingTime(notifications ? notifications : this.notifications)
@@ -139,7 +139,6 @@ export class NotificationsDropdownMenuComponent implements OnInit {
         this.hideDropdownMenu();
       });
   }
-
 
   public navigateTo(url: string, params: object) {
     return this.router.navigate([url, params]);
