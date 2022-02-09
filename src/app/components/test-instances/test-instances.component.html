@@ -32,19 +32,24 @@
               <i class="{{ testInstance.statusIcon }} fa-2x"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
-                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> see on <b>{{testInstance.service.type}}</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
-                <!-- <a [routerLink]="['/suite', { uuid: testInstance.uuid }]" style="color: black; font-size: larger;">{{
-                  testInstance.roc_instance
-                  }}</a> -->
-                <a href="{{ testInstance.externalLink }}" target="_blank" style="color: black; font-size: larger"
-                  (click)="selectTestInstance($event, testInstance)">
+              <div class="font-weight-light text-lg">
+                <input *ngIf="testInstance.editingMode" type="text" class="form-control"
+                  [(ngModel)]="testInstance.name"
+                  aria-describedby="emailHelp" placeholder="Enter suite name"
+                  (keyup.enter)="updateTestInstance(testInstance)"
+                  (keyup.esc)="restoreTestInstance(testInstance)">
+                <a *ngIf="!testInstance.editingMode"
+                   style="color: black; font-size: larger"
+                  (click)="showTestInstanceDetails(testInstance)"
+                  (dblclick)="enableTestInstanceEditing(testInstance)"
+                  data-html="true" data-toggle="tooltip" data-placement="top"
+                  title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> see on <b>{{testInstance.service.type}}</b> <i class='fas fa-external-link-alt mx-1'></i><br/>or double click to edit</span>">
                   <div>{{ testInstance.name }}</div>
-                  <div class="text-sm">
-                    <b>uuid:</b> {{ testInstance.uuid }}
-                  </div>
-                  <div class="text-sm cut-text"><b>url:</b> {{ testInstance.externalLink }}</div>
                 </a>
+                <div class="text-sm">
+                  <b>uuid:</b> {{ testInstance.uuid }}
+                </div>
+                <div class="text-sm cut-text"><b>url:</b> {{ testInstance.externalLink }}</div>
               </div>
             </td>
             <td class="text-center align-middle font-weight-light h-100">
