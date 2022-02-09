@@ -127,3 +127,25 @@ export class DateUtils {
     }
   }
 }
+
+
+export class MouseClickHandler {
+  private timer: any = 0;
+  private delay = 250;
+  private preventSingleClick = false;
+
+  public click(clickAction: () => void) {
+    this.preventSingleClick = false;
+    this.timer = setTimeout(() => {
+      if (!this.preventSingleClick) {
+        clickAction();
+      }
+    }, this.delay);
+  }
+
+  public doubleClick(dbclickAction: () => void) {
+    this.preventSingleClick = true;
+    clearTimeout(this.timer);
+    dbclickAction();
+  }
+}
