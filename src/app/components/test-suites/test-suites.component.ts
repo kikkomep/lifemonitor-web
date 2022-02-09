@@ -9,6 +9,8 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { MouseClickHandler } from 'src/app/models/common.models';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
@@ -30,8 +32,11 @@ export class TestSuitesComponent implements OnInit, OnChanges {
 
   private suitesDataTable: any;
 
+  private clickHandler: MouseClickHandler = new MouseClickHandler();
+
   constructor(
     private appService: AppService,
+    private toastService: ToastrService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -116,5 +121,35 @@ export class TestSuitesComponent implements OnInit, OnChanges {
       this.suitesDataTable.destroy();
       this.suitesDataTable = null;
     }
+  }
+
+  public enableSuiteEditing(suite: Suite) {
+    this.clickHandler.doubleClick(() => {
+      suite['editingMode'] = true;
+      suite['oldName'] = suite.name;
+    });
+  }
+
+  public restoreSuite(suite: Suite) {
+    suite.name = suite['oldName'];
+    suite['editingMode'] = false;
+  }
+
+  public updateSuite(suite: Suite) {
+    this.appService.updateSuite(suite).subscribe(() => {
+      suite['editingMode'] = false;
+      this.toastService.success("Test Suite updated!", '', { timeOut: 2500 });
+    },
+      (error) => {
+        this.toastService.error("Unable to update test suite", '', { timeOut: 2500 });
+        this.logger.error(error);
+      }
+    );
+  }
+
+  public showSuiteDetails(suite: Suite) {
+    this.clickHandler.click(() => {
+      this.router.navigate(['/suite', { s: suite.asUrlParam() }]);
+    });
   }
 }

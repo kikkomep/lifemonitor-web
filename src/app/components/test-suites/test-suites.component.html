@@ -29,11 +29,17 @@
               <i class="{{ s.statusIcon }} fa-2x" style="margin-top: 45px;"></i>
             </td>
             <td class="align-middle">
-              <div class="font-weight-light text-lg" data-html="true" data-toggle="tooltip" data-placement="top"
-                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
-                <a [routerLink]="['/suite', { s: s.asUrlParam() }]" style="color: black; font-size: larger">{{
-                  s.name
-                  }}</a>
+              <div class="font-weight-light text-lg">
+                <input *ngIf="s.editingMode" type="text" class="form-control" [(ngModel)]="s.name"
+                  aria-describedby="emailHelp" placeholder="Enter suite name"
+                  (keyup.enter)="updateSuite(s)"
+                  (keyup.esc)="restoreSuite(s)">
+                <a *ngIf="!s.editingMode" style="color: black; font-size: larger"
+                  (click)="showSuiteDetails(s)"
+                  (dblclick)="enableSuiteEditing(s)"
+                  data-html="true" data-toggle="tooltip" data-placement="top"
+                  title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i><br/>or double click to edit</span>">
+                  {{s.name}}</a>
                 <div class="text-sm"><b>uuid:</b> {{ s.uuid }}</div>
               </div>
 
@@ -51,7 +57,8 @@
               </a>
             </td>
             <td class="text-center align-middle font-weight-light" width="300">
-              <stats-bar-chart [stats]="s.getLatestBuilds() | arraySizeFilterPipe: 10" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+              <stats-bar-chart [stats]="s.getLatestBuilds() | arraySizeFilterPipe: 10"
+                (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
             </td>
           </tr>
         </tbody>
