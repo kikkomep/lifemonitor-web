@@ -1,7 +1,9 @@
 import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, HostListener, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { Observable, Subscription, timer } from 'rxjs';
+import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem
@@ -45,6 +47,8 @@ export class DashboardComponent implements OnInit {
 
   public updatingDataTable: boolean = false;
 
+  private clickHandler: MouseClickHandler = new MouseClickHandler();
+
   // initialize logger
   private logger: Logger = LoggerManager.create('DashboardComponent');
 
@@ -52,6 +56,8 @@ export class DashboardComponent implements OnInit {
     private location: Location,
     private cdref: ChangeDetectorRef,
     private appService: AppService,
+    private toastService: ToastrService,
+    private router: Router,
     private route: ActivatedRoute,
     private inputDialog: InputDialogService,
     private uploaderService: WorkflowUploaderService
@@ -224,6 +230,43 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  public restoreWorkflowName(w: Workflow) {
+    w.name = w['oldNameValue'];
+    w['editingMode'] = false;
+    if (w['editingTrigger'])
+      this.editModeEnabled = false;
+  }
+
+  public showWorkflowDetails(w: Workflow) {
+    this.clickHandler.click(() => {
+      this.router.navigate([
+        '/workflow', { uuid: w.asUrlParam() }]);
+    });
+  }
+
+  public enableWorkflowEditMode(w: Workflow) {
+    this.clickHandler.doubleClick(() => {
+      w['oldNameValue'] = w.name;
+      w['clickOnInputBox'] = false;
+      w['editingMode'] = true;
+      w['editingTrigger'] = !this.editModeEnabled;
+      this.editModeEnabled = true;
+    });
+  }
+
+  public updateWorkflowName(w: Workflow) {
+    this.logger.debug("Updating workflow name", w);
+    this.appService.updateWorkflowName(w).subscribe(() => {
+      this.toastService.success("Workflow updated!", '', { timeOut: 2500 });
+      w['editingMode'] = false;
+    },
+      (error) => {
+        this.toastService.error("Unable to update workflow", '', { timeOut: 2500 });
+        this.logger.error(error);
+      }
+    );
+  }
+
   public changeVisibility(w: Workflow) {
     this.inputDialog.show({
       iconClass: !w.public
@@ -239,7 +282,13 @@ export class DashboardComponent implements OnInit {
             .tooltip('hide')
             .attr('data-original-title', this.getWorkflowVisibilityTitle(w))
             .tooltip('show');
-        });
+          this.toastService.success("Workflow visibility updated!", '', { timeOut: 2500 });
+        },
+          (error) => {
+            this.toastService.error("Unable to change workflow visibility", '', { timeOut: 2500 });
+            this.logger.error(error);
+          }
+        );
       },
     });
   }

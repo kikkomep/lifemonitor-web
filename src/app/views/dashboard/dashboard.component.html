@@ -143,9 +143,8 @@
 
   <div class="container-fluid">
     <!-- Search Bar -->
-    <item-search-bar elementType="workflows"
-        [(filterValue)]="workflowNameFilter"
-        [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
+    <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
+      [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
     <div class="card card-primary card-outline">
       <div *ngIf="updatingDataTable || (isLoading | async)" class="overlay">
@@ -158,11 +157,10 @@
             <a *ngIf="!editModeEnabled" class="btn btn-sm mx-2" (click)="openWorkflowUploader()">
               <i class="fas fa-plus-circle"></i> add
             </a>
-            <a *ngIf="!editModeEnabled"
-               class="btn btn-sm" (click)="editModeToggle()" style="min-width: 60px;">
-               <span *ngIf="workflows && workflows.length > 0">
-                  <i  class="far fa-edit"></i> edit
-               </span>
+            <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="editModeToggle()" style="min-width: 60px;">
+              <span *ngIf="workflows && workflows.length > 0">
+                <i class="far fa-edit"></i> edit
+              </span>
             </a>
             <a *ngIf="editModeEnabled" class="btn btn-sm active" (click)="editModeToggle()">
               <i class="far fa-window-close"></i> done
@@ -200,14 +198,16 @@
                   <i class="{{ w.statusIcon }} fa-2x" style="margin-top: 29px;"></i>
                 </td>
                 <td class="align-top">
-                  <div class="font-weight-light text-lg mt-4" data-html="true" data-toggle="tooltip"
-                    data-placement="top"
-                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i></span>">
-                    <a [routerLink]="['/workflow', { uuid: w.asUrlParam() }]" style="color: black; font-size: larger">{{
-                      w.name
-                      }}
-                      <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
+                  <div class="font-weight-light text-lg mt-4" data-html="true">
+                    <input *ngIf="w.editingMode" type="text" class="form-control" [(ngModel)]="w.name"
+                      aria-describedby="emailHelp" placeholder="Enter workflow name"
+                      (keyup.enter)="updateWorkflowName(w)" (keyup.esc)="restoreWorkflowName(w)">
+                    <a *ngIf="!w.editingMode" (click)="showWorkflowDetails(w)" style="color: black; font-size: larger"
+                      (dblclick)="enableWorkflowEditMode(w)" data-toggle="tooltip" data-placement="top" data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i><br/>or double click to edit</span>">{{
+                      w.name }}
                     </a>
+                    <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
                   </div>
                   <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
                     <b>external ID: </b>
@@ -241,7 +241,8 @@
                     <i class="fas fa-2x fa-sync-alt text-muted"></i>
                   </div>
                   <div *ngIf="w.public !== undefined" data-html="true" data-toggle="tooltip" data-placement="top"
-                    class="mt-4 mr-3 align-top workflow-visibility-{{w.uuid}}" title="{{ getWorkflowVisibilityTitle(w) }}">
+                    class="mt-4 mr-3 align-top workflow-visibility-{{w.uuid}}"
+                    title="{{ getWorkflowVisibilityTitle(w) }}">
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
@@ -254,7 +255,8 @@
                 </td>
 
                 <td class="text-center align-middle">
-                  <div style="height: 100%; margin: 10% auto 0" data-html="true" data-toggle="tooltip" data-placement="top"
+                  <div style="height: 100%; margin: 10% auto 0" data-html="true" data-toggle="tooltip"
+                    data-placement="top"
                     title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
                     <img *ngIf="w.typeIcon" src="{{ w.typeIcon }}" width="{{ w.typeIconSize }}" />
                     <i *ngIf="!w.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
@@ -293,8 +295,8 @@
                   <div *ngIf="w.suites === undefined" class="text-muted">
                     <i class="fas fa-2x fa-sync-alt"></i>
                   </div>
-                  <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0" [stats]="w.getLatestBuilds() | arraySizeFilterPipe: 10"
-                    (selectedItem)="selectTestBuild($event)">
+                  <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0"
+                    [stats]="w.getLatestBuilds() | arraySizeFilterPipe: 10" (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
                 <td class="text-center align-middle font-weight-light">
