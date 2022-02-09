@@ -27,7 +27,7 @@ export class InputDialogComponent implements OnInit {
   // initialize logger
   private logger: Logger = LoggerManager.create('InputDialogComponent');
 
-  constructor(private service: InputDialogService) {}
+  constructor(private service: InputDialogService) { }
 
   ngOnInit(): void {
     $('#' + this.name).on('hide.bs.modal', () => {

@@ -276,6 +276,7 @@ export class DashboardComponent implements OnInit {
         'Change visibility to <b>' +
         (!w.public ? 'public' : 'private') +
         '</b>?',
+      confirmText: "Confirm",
       onConfirm: () => {
         this.appService.changeWorkflowVisibility(w).subscribe(() => {
           $('.workflow-visibility-' + w.uuid)

@@ -1,6 +1,9 @@
 <app-loader [enabled]="!user || !user.picture"></app-loader>
 
 <div class="wrapper">
+
+  <app-input-dialog></app-input-dialog>
+
   <app-header (toggleMenuSidebar)="toggleMenuSidebar()"></app-header>
 
   <!--<app-menu-sidebar
