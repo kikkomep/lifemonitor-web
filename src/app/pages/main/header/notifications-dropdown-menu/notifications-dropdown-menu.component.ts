@@ -42,7 +42,7 @@ export class NotificationsDropdownMenuComponent implements OnInit {
   }
 
   @HostListener('document:click', ['$event'])
-  clickout(event) {
+  clickout(event: { target: any; }) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.hideDropdownMenu();
     }
@@ -50,8 +50,8 @@ export class NotificationsDropdownMenuComponent implements OnInit {
 
   private updateNotifications(notifications: UserNotification[]) {
     this.logger.debug("Updating notifications...", notifications);
-    this.notifications = notifications;
-    this.notificationsByDate = this.groupNotificationsByDate(notifications);
+    this.notifications = notifications.filter(n => n.event !== 'UNCONFIGURED_EMAIL' || !n.read);
+    this.notificationsByDate = this.groupNotificationsByDate(this.notifications);
     this.logger.debug("Notifications by date: ", this.notifications);
   }
 
@@ -86,7 +86,7 @@ export class NotificationsDropdownMenuComponent implements OnInit {
       this.hideDropdownMenu();
     });
     if (n.event === 'UNCONFIGURED_EMAIL') {
-      this.openUserProfile.emit(true);
+      // this.openUserProfile.emit(true);
     } else if (n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED') {
       let suite: Suite = null;
       if (n.data && "build" in n.data
@@ -122,13 +122,20 @@ export class NotificationsDropdownMenuComponent implements OnInit {
   }
 
   public deleteNotitification(notification: UserNotification) {
-    this.appService.deleteNotification(notification)
-      .subscribe((data) => {
-        this.logger.debug("Notification deleted", notification);
-        this.updateNotifications(
-          this.notifications.filter(n => n !== notification)
-        )
-      });
+    if (!notification) return;
+    if (notification.event === 'UNCONFIGURED_EMAIL')
+      this.updateNotifications(
+        this.notifications.filter(n => n !== notification)
+      )
+    else {
+      this.appService.deleteNotification(notification)
+        .subscribe((data) => {
+          this.logger.debug("Notification deleted", notification);
+          this.updateNotifications(
+            this.notifications.filter(n => n !== notification)
+          )
+        });
+    }
   }
 
   public deleteAllNotifications() {
