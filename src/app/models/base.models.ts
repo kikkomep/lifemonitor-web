@@ -37,6 +37,18 @@ export class Model {
     this.logger = LoggerManager.create(this.constructor.name);
   }
 
+  protected setNameFromProperty(data: Object, propertyName: string = "name", defaultValue: any = null) {
+    let name: string = null;
+    if (propertyName in data) {
+      name = data[propertyName];
+      if (name && name.length > 0)
+        this["name"] = name;
+    }
+    if (!name) {
+      this["name"] = defaultValue;
+    }
+  }
+
   public update(rawData: Object) {
     if (rawData) {
       Object.assign(this, rawData);

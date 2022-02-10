@@ -55,6 +55,12 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
 
   constructor(_rawData: Object) {
     super(_rawData);
+    this.setNameFromProperty(_rawData, "name", _rawData['uuid']);
+  }
+
+  public update(rawData: Object) {
+    super.update(rawData);
+    this.setNameFromProperty(rawData, "name", rawData['uuid']);
   }
 
   getStatus(): string {

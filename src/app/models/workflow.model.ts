@@ -25,6 +25,28 @@ export class Workflow extends AggregatedStatusStatsItem {
     if (suites) {
       this._suites = suites;
     }
+    this.setName(data);
+  }
+
+  public update(rawData: Object) {
+    super.update(rawData);
+    this.setName(rawData);
+  }
+
+  private setName(data: Object) {
+    let rocIdentifier = this.rocIdentifier;
+    this.setNameFromProperty(data, "name", rocIdentifier ? rocIdentifier : data['uuid']);
+  }
+
+  public get rocIdentifier(): string {
+    let crate: RoCrate = this.roCrateMetadata;
+    if (crate) {
+      let mainEntity: object = crate.mainEntity;
+      if (mainEntity) {
+        return mainEntity['@id'];
+      }
+    }
+    return null;
   }
 
   public get type(): string {
