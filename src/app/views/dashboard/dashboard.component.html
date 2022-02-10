@@ -196,7 +196,7 @@
                   <i class="{{ w.statusIcon }} fa-2x" style="margin-top: 29px;"></i>
                 </td>
                 <td class="align-top">
-                  <div class="font-weight-light text-lg mt-4" data-html="true">
+                  <div class="font-weight-light text-lg mt-4 mb-0" data-html="true">
                     <input *ngIf="w.editingMode" type="text" class="form-control datatable-input-no-border"
                       [(ngModel)]="w.name"
                       aria-describedby="emailHelp" placeholder="Enter workflow name"
@@ -206,13 +206,17 @@
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i><br/>or double click to edit</span>">{{
                       w.name }}
                     </a>
-                    <div class="text-sm"><b>uuid:</b> {{ w.uuid }}</div>
+                    <div class="text-xs">
+                      <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
+                      <b>uuid:</b> {{ w.uuid }}
+                    </div>
                   </div>
                   <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
+                    <i class="fas fa-xs fa-external-link-alt mr-1"></i>
                     <b>external ID: </b>
                     <a href="{{ w.externalLink }}" target="_blank">{{
                       w.externalLink
-                      }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
+                      }}
                     </a>
                   </div>
                   <div *ngIf="w.version" class="text-xs cut-text font-weight-light">
