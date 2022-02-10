@@ -197,7 +197,8 @@
                 </td>
                 <td class="align-top">
                   <div class="font-weight-light text-lg mt-4" data-html="true">
-                    <input *ngIf="w.editingMode" type="text" class="form-control" [(ngModel)]="w.name"
+                    <input *ngIf="w.editingMode" type="text" class="form-control datatable-input-no-border"
+                      [(ngModel)]="w.name"
                       aria-describedby="emailHelp" placeholder="Enter workflow name"
                       (keyup.enter)="updateWorkflowName(w)" (keyup.esc)="restoreWorkflowName(w)">
                     <a *ngIf="!w.editingMode" (click)="showWorkflowDetails(w)" style="color: black; font-size: larger"

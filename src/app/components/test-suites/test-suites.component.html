@@ -30,7 +30,8 @@
             </td>
             <td class="align-middle">
               <div class="font-weight-light text-lg">
-                <input *ngIf="s.editingMode" type="text" class="form-control" [(ngModel)]="s.name"
+                <input *ngIf="s.editingMode" type="text" [(ngModel)]="s.name"
+                  class="form-control datatable-input-no-border"
                   aria-describedby="emailHelp" placeholder="Enter suite name"
                   (keyup.enter)="updateSuite(s)"
                   (keyup.esc)="restoreSuite(s)">

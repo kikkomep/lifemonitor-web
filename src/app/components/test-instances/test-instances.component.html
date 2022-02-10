@@ -33,8 +33,8 @@
             </td>
             <td class="align-middle">
               <div class="font-weight-light text-lg">
-                <input *ngIf="testInstance.editingMode" type="text" class="form-control"
-                  [(ngModel)]="testInstance.name"
+                <input *ngIf="testInstance.editingMode" type="text" [(ngModel)]="testInstance.name"
+                  class="form-control datatable-input-no-border"
                   aria-describedby="emailHelp" placeholder="Enter suite name"
                   (keyup.enter)="updateTestInstance(testInstance)"
                   (keyup.esc)="restoreTestInstance(testInstance)">
