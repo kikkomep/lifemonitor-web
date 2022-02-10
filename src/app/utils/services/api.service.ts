@@ -189,6 +189,26 @@ export class ApiService {
       );
   }
 
+  updateWorkflowName(workflow: Workflow): Observable<any> {
+    let body = {
+      name: workflow.name
+    };
+    return this.http
+      .put(
+        this.apiBaseUrl + '/workflows/' + workflow.uuid,
+        body,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((data) => {
+          workflow.public = !workflow.public;
+          this.logger.debug('Changed workflow name to:' + workflow.name);
+        }),
+        tap((data) => this.logger.debug('Workflow name changed to: ', data)),
+      );
+  }
+
   changeWorkflowVisibility(workflow: Workflow): Observable<any> {
     let body = {
       public: !workflow.public,
@@ -206,7 +226,6 @@ export class ApiService {
           this.logger.debug('Changed workflow visibility: public=' + workflow.public);
         }),
         tap((data) => this.logger.debug('Workflow visibility changed to: ', data)),
-        catchError(this.handleError('Updating workflow', []))
       );
   }
 
@@ -632,6 +651,45 @@ export class ApiService {
         })
       );
   }
+
+  updateSuite(suite: Suite): Observable<any> {
+    let body = {
+      name: suite.name
+    };
+    return this.http
+      .put(
+        this.apiBaseUrl + '/suites/' + suite.uuid,
+        body,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((data) => {
+          this.logger.debug('Changed suite name to:' + suite.name);
+        }),
+        tap((data) => this.logger.debug('Suite name changed to: ', data))
+      );
+  }
+
+  updateTestInstance(instance: TestInstance): Observable<any> {
+    let body = {
+      name: instance.name
+    };
+    return this.http
+      .put(
+        this.apiBaseUrl + '/instances/' + instance.uuid,
+        body,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map((data) => {
+          this.logger.debug('Changed instance name to:' + instance.name);
+        }),
+        tap((data) => this.logger.debug('TestInstance name changed to: ', data))
+      );
+  }
+
 
   getLatestTestInstance(uuid: string): Observable<any> {
     return this.http

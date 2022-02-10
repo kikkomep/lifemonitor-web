@@ -9,6 +9,8 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { MouseClickHandler } from 'src/app/models/common.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { Workflow } from 'src/app/models/workflow.model';
@@ -28,17 +30,19 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   @Output() suiteSelected = new EventEmitter<TestInstance>();
 
   private suiteInstancesDataTable: any;
+  private clickHandler: MouseClickHandler = new MouseClickHandler();
 
   // initialize logger
   private logger: Logger = LoggerManager.create('TestInstancesComponent');
 
   constructor(
     private appService: AppService,
+    private toast: ToastrService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   ngAfterViewInit() {
     this.initDataTable();
@@ -49,7 +53,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
     this.cdr.detectChanges();
   }
 
-  public selectTestInstance(event, testInstance: TestInstance) {
+  public selectTestInstance(testInstance: TestInstance) {
     this.logger.debug('Selected TestInstace: ', testInstance);
   }
 
@@ -122,5 +126,34 @@ export class TestInstancesComponent implements OnInit, OnChanges {
       this.suiteInstancesDataTable.destroy();
       this.suiteInstancesDataTable = null;
     }
+  }
+
+  public enableTestInstanceEditing(instance: TestInstance) {
+    this.clickHandler.doubleClick(() => {
+      instance['oldName'] = instance.name;
+      instance['editingMode'] = true;
+    });
+  }
+
+  public restoreTestInstance(instance: TestInstance) {
+    instance.name = instance['oldName'];
+    instance['editingMode'] = false;
+  }
+
+  public updateTestInstance(instance: TestInstance) {
+    this.appService.updateTestInstance(instance).subscribe(() => {
+      instance['editingMode'] = false;
+      this.toast.success("Test instance updated!", '', { timeOut: 2500 });
+    },
+      (error) => {
+        this.toast.error("Unable to update test instance", '', { timeOut: 2500 });
+        this.logger.error(error);
+      });
+  }
+
+  public showTestInstanceDetails(instance: TestInstance) {
+    this.clickHandler.click(() => {
+      window.open(instance.externalLink, "_blank");
+    });
   }
 }

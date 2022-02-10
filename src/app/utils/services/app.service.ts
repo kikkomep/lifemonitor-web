@@ -536,6 +536,18 @@ export class AppService {
     )
   }
 
+  public updateWorkflowName(w: Workflow): Observable<any> {
+    return this.api.updateWorkflowName(w);
+  }
+
+  public updateSuite(suite: Suite): Observable<any> {
+    return this.api.updateSuite(suite);
+  }
+
+  public updateTestInstance(instance: TestInstance): Observable<any> {
+    return this.api.updateTestInstance(instance);
+  }
+
   public changeWorkflowVisibility(w: Workflow): Observable<any> {
     return this.api.changeWorkflowVisibility(w);
   }
