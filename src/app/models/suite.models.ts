@@ -16,6 +16,12 @@ export class Suite extends AggregatedStatusStatsItem {
 
   constructor(public workflow: Workflow, rawData: object) {
     super(rawData);
+    this.setNameFromProperty(rawData, "name", rawData['roc_suite']);
+  }
+
+  public update(rawData: Object) {
+    super.update(rawData);
+    this.setNameFromProperty(rawData, "name", rawData['roc_suite']);
   }
 
   public asUrlParam() {
