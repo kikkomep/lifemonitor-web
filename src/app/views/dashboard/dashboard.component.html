@@ -215,6 +215,11 @@
                       }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
                     </a>
                   </div>
+                  <div *ngIf="w.version" class="text-xs cut-text font-weight-light">
+                    <i class="fas fa-xs fa-solid fa-user mr-1"></i>
+                    <b>owner: </b>
+                    <span>{{ w.version.submitter.username }}</span>
+                  </div>
                   <div *ngIf="isUserLogged()">
                     <span *ngIf="w.subscriptions !== undefined">
                       <a *ngIf="(searchModeEnabled || editModeEnabled) && (!w.subscriptions || w.subscriptions.length == 0)"
