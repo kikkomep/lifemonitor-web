@@ -21,7 +21,7 @@ declare var $: any;
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit, OnChanges {
+export class DashboardComponent implements OnInit {
   // reference to workflows stats
   private _workflowStats: AggregatedStatusStats | null;
   // reference to the current subscriptions
@@ -35,13 +35,13 @@ export class DashboardComponent implements OnInit, OnChanges {
   public _workflowNameFilter: string = '';
   public workflowSortingOrder: string = 'desc';
   public editModeEnabled: boolean = false;
-
+  private _searchModeEnabled: boolean = false;
   private openUploader: boolean = false;
 
   private statsFilter = new StatsFilterPipe();
 
   // Reference to the dataTable instance
-  private workflowDataTable: any;
+  private workflowDataTable: any = null;
 
   public updatingDataTable: boolean = false;
 
@@ -64,10 +64,9 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.updatingDataTable = true;
         this._workflowStats.clear();
         this.filteredWorkflows = [];
+        this.cdref.detectChanges();
         this.workflowDataTable.clear();
         this.workflowDataTable.draw();
-        this.cdref.detectChanges();
-        this.refreshDataTable();
       });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (data) => {
@@ -95,9 +94,6 @@ export class DashboardComponent implements OnInit, OnChanges {
         this.location.replaceState('/dashboard');
       }
     });
-  }
-
-  ngAfterViewInit() {
     this.logger.debug('Initializing workflow data!!');
     this._workflowStats = this.appService.workflowStats;
     this.updatingDataTable = true;
@@ -125,9 +121,6 @@ export class DashboardComponent implements OnInit, OnChanges {
   ngAfterViewChecked() {
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.logger.debug('Changes', changes);
-  }
 
   public get workflowNameFilter(): string {
     return this._workflowNameFilter;
@@ -136,6 +129,7 @@ export class DashboardComponent implements OnInit, OnChanges {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
     this.editModeEnabled = false;
+    this._searchModeEnabled = true;
     this.updatingDataTable = true;
     this._workflowStats.clear();
     this.filteredWorkflows = [];
@@ -147,6 +141,7 @@ export class DashboardComponent implements OnInit, OnChanges {
         false, false, this.isUserLogged()
       ).subscribe();
     } else {
+      if (!value) this._searchModeEnabled = false;
       this.workflowDataTable.clear();
       this.appService.loadWorkflows(
         false,
@@ -174,7 +169,8 @@ export class DashboardComponent implements OnInit, OnChanges {
   }
 
   public get searchModeEnabled(): boolean {
-    return this.workflowNameFilter && this.workflowNameFilter.length > 0;
+    // return this.workflowNameFilter && this.workflowNameFilter.length > 0;
+    return this._searchModeEnabled;
   }
 
   public isEditable(w: Workflow) {
@@ -257,6 +253,13 @@ export class DashboardComponent implements OnInit, OnChanges {
     return this._workflowStats;
   }
 
+  public getStatsLength(workflows: AggregatedStatusStatsItem[]): number {
+    let items = workflows;
+    if (this.isUserLogged())
+      items = workflows.filter((v) => v.subscriptions && v.subscriptions.length > 0);
+    return items.length;
+  }
+
   public get workflows(): AggregatedStatusStatsItem[] {
     return this.filteredWorkflows;
   }
@@ -272,11 +275,19 @@ export class DashboardComponent implements OnInit, OnChanges {
     try {
       status = status == 'any' ? 'all' : status;
       if (status != this.statusFilter) {
-        this.filteredWorkflows = this._workflowStats[status];
+        this.filteredWorkflows =
+          (!this.isUserLogged() || this.searchModeEnabled) ? this._workflowStats[status]
+            : this._workflowStats[status].filter(
+              (v: { subscriptions: string | any[]; }) => v.subscriptions && v.subscriptions.length > 0);
         this.statusFilter = status;
+        this.refreshDataTable();
       } else {
-        this.filteredWorkflows = this._workflowStats['all'];
+        this.filteredWorkflows =
+          (!this.isUserLogged() || this.searchModeEnabled) ? this._workflowStats['all']
+            : this._workflowStats['all'].filter(
+              (v: { subscriptions: string | any[]; }) => v.subscriptions && v.subscriptions.length > 0);
         this.statusFilter = null;
+        this.refreshDataTable();
       }
     } catch (e) {
       this.logger.debug(e);
@@ -290,6 +301,7 @@ export class DashboardComponent implements OnInit, OnChanges {
       this.destroyDataTable();
       this.cdref.detectChanges();
       this.initDataTable();
+      this.cdref.detectChanges();
     } finally {
       if (resetTableStatus)
         this.updatingDataTable = false;
@@ -318,9 +330,10 @@ export class DashboardComponent implements OnInit, OnChanges {
       "info": true,
       "autoWidth": false,
       "responsive": true,
-      "deferRender": true,
-      stateSave: true,
-      language: {
+      // "deferRender": true,
+      // "scrollY": "520",
+      "stateSave": true,
+      "language": {
         search: "",
         searchPlaceholder: "Filter by UUID or name",
         "decimal": "",

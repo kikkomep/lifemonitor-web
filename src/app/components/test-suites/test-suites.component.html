@@ -10,7 +10,7 @@
   </div>
   <div class="card-body box-profile">
     <!-- /.card-header -->
-    <div class="card-body mt-4 p-0">
+    <div class="card-body mt-4 p-0" style="min-height: 860px;">
       <table id="workflowSuites" class="table table-striped" #workflowSuites>
         <thead>
           <tr>
@@ -45,13 +45,13 @@
                 <i *ngIf="!s.engineIcon" class="far fa-question-circle fa-2x text-muted mr-3"></i>
               </div>
             </td>
-            <td class="text-center align-middle font-weight-light h-100">
+            <td class="text-center align-middle font-weight-light" style="max-width: 150px;">
               <a [routerLink]="['/suite', { s: s.asUrlParam() }]">
                 <stats-pie-chart [stats]="s.instances"></stats-pie-chart>
               </a>
             </td>
             <td class="text-center align-middle font-weight-light" width="300">
-              <stats-bar-chart [stats]="s.getLatestBuilds()" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+              <stats-bar-chart [stats]="s.getLatestBuilds() | arraySizeFilterPipe: 10" (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
             </td>
           </tr>
         </tbody>

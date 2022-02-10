@@ -46,7 +46,7 @@
             class="overlay dark"></div>
           <!-- end loading -->
           <div class="inner">
-            <h3>{{ workflows ? workflowStats.all_passing.length : 0 }}</h3>
+            <h3>{{ workflows ? getStatsLength(workflowStats.all_passing) : 0 }}</h3>
             <p>Passing</p>
           </div>
           <div class="icon">
@@ -71,7 +71,7 @@
           <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'some_passing'"
             class="overlay dark"></div>
           <div class="inner">
-            <h3>{{ workflows ? workflowStats.some_passing.length : 0 }}</h3>
+            <h3>{{ workflows ? getStatsLength(workflowStats.some_passing) : 0 }}</h3>
             <p>Some passing</p>
           </div>
           <div class="icon">
@@ -96,7 +96,7 @@
           <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_failing'"
             class="overlay dark"></div>
           <div class="inner">
-            <h3>{{ workflows ? workflowStats.all_failing.length : 0 }}</h3>
+            <h3>{{ workflows ? getStatsLength(workflowStats.all_failing) : 0 }}</h3>
             <p>Failing</p>
           </div>
           <div class="icon">
@@ -122,7 +122,7 @@
           <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'unknown'"
             class="overlay dark"></div>
           <div class="inner">
-            <h3>{{ workflows ? workflowStats.unknown.length : 0 }}</h3>
+            <h3>{{ workflows ? getStatsLength(workflowStats.unknown) : 0 }}</h3>
 
             <p>Unavailable</p>
           </div>
@@ -152,7 +152,7 @@
         <i class="fas fa-3x fa-sync-alt text-primary"></i>
       </div>
       <!-- Loading (remove the following to stop the loading)-->
-      <div class="card-body box-profile p-4" style="min-height: 600px;">
+      <div class="card-body box-profile p-4">
         <div class="row w-100 p-0 mx-0 my-3">
           <div *ngIf="isUserLogged()" class="offset-6 col-6 text-right p-0">
             <a *ngIf="!editModeEnabled" class="btn btn-sm mx-2" (click)="openWorkflowUploader()">
@@ -171,7 +171,7 @@
         </div>
 
         <!-- /.card-header -->
-        <div class="card-body mt-4 p-0 w-100">
+        <div class="card-body mt-4 p-0 w-100" style="min-height: 860px;">
           <table id="workflowsDashboard" class="table table-striped w-100" #workflowsDashboard>
             <thead>
               <tr>
@@ -293,7 +293,7 @@
                   <div *ngIf="w.suites === undefined" class="text-muted">
                     <i class="fas fa-2x fa-sync-alt"></i>
                   </div>
-                  <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0" [stats]="w.getLatestBuilds()"
+                  <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0" [stats]="w.getLatestBuilds() | arraySizeFilterPipe: 10"
                     (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
