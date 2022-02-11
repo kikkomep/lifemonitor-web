@@ -233,8 +233,6 @@ export class DashboardComponent implements OnInit {
   public restoreWorkflowName(w: Workflow) {
     w.name = w['oldNameValue'];
     w['editingMode'] = false;
-    if (w['editingTrigger'])
-      this.editModeEnabled = false;
   }
 
   public showWorkflowDetails(w: Workflow) {
@@ -250,8 +248,6 @@ export class DashboardComponent implements OnInit {
         w['oldNameValue'] = w.name;
         w['clickOnInputBox'] = false;
         w['editingMode'] = true;
-        w['editingTrigger'] = !this.editModeEnabled;
-        this.editModeEnabled = true;
       }
     });
   }

@@ -229,16 +229,16 @@
                   </div>
                   <div *ngIf="isUserLogged()">
                     <span *ngIf="w.subscriptions !== undefined">
-                      <a *ngIf="(searchModeEnabled || editModeEnabled) && (!w.subscriptions || w.subscriptions.length == 0)"
+                      <a *ngIf="(searchModeEnabled || editModeEnabled || w.editingMode) && (!w.subscriptions || w.subscriptions.length == 0)"
                         class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)">
                         SUBSCRIBE
                       </a>
                       <div
-                        *ngIf="!editModeEnabled && searchModeEnabled && (w.subscriptions && w.subscriptions.length > 0)"
+                        *ngIf="!(editModeEnabled || w.editingMode) && searchModeEnabled && (w.subscriptions && w.subscriptions.length > 0)"
                         class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
                         SUBSCRIBED
                       </div>
-                      <a *ngIf="editModeEnabled && w.subscriptions && w.subscriptions.length > 0"
+                      <a *ngIf="(editModeEnabled || w.editingMode) && w.subscriptions && w.subscriptions.length > 0"
                         class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)">
                         UNSUBSCRIBE
                       </a>
@@ -257,11 +257,11 @@
                     <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                     <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
                     <div class="text-muted">{{ w.public ? 'public': 'private' }}</div>
-                    <a *ngIf="isEditable(w) && editModeEnabled" class="btn badge badge-primary"
+                    <a *ngIf="isEditable(w) && (editModeEnabled || w.editingMode)" class="btn badge badge-primary"
                       (click)="changeVisibility(w)">
                       change
                     </a>
-                    <div *ngIf="!isEditable(w) || !editModeEnabled">&nbsp;</div>
+                    <div *ngIf="!isEditable(w) || !(editModeEnabled && w.editingMode)">&nbsp;</div>
                   </div>
                 </td>
 
