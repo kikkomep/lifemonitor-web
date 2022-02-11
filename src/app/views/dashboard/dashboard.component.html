@@ -206,7 +206,7 @@
                         <i class='fas fa-question-circle mx-1'></i>
                         click to see <b>suites</b>
                         <i class='fas fa-external-link-alt mx-1'></i>
-                        {{ isUserLogged() ? '<br/>or double click to edit' : ''}}</span>">{{
+                        {{ isEditable(w) ? '<br/>or double click to edit' : ''}}</span>">{{
                       w.name }}
                     </a>
                     <div class="text-xs">

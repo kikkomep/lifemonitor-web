@@ -127,9 +127,13 @@ export class TestSuitesComponent implements OnInit, OnChanges {
     }
   }
 
+  public isEditable(s: Suite) {
+    return this.appService.isEditable(s ? s.workflow : null);
+  }
+
   public enableSuiteEditing(suite: Suite) {
     this.clickHandler.doubleClick(() => {
-      if (this.isUserLogged()) {
+      if (this.isUserLogged() && this.isEditable(suite)) {
         suite['editingMode'] = true;
         suite['oldName'] = suite.name;
       }

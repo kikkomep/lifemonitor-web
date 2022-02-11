@@ -132,9 +132,13 @@ export class TestInstancesComponent implements OnInit, OnChanges {
     return this.appService.isUserLogged();
   }
 
+  public isEditable(i: TestInstance) {
+    return this.appService.isEditable(i && i.suite ? i.suite.workflow : null);
+  }
+
   public enableTestInstanceEditing(instance: TestInstance) {
     this.clickHandler.doubleClick(() => {
-      if (this.isUserLogged()) {
+      if (this.isUserLogged() && this.isEditable(instance)) {
         instance['oldName'] = instance.name;
         instance['editingMode'] = true;
       }

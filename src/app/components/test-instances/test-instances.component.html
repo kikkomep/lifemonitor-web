@@ -43,7 +43,7 @@
                     <i class='fas fa-question-circle mx-1'></i>
                     see on <b>{{testInstance.service.type}}</b>
                     <i class='fas fa-external-link-alt mx-1'></i>
-                    {{ isUserLogged() ? '<br/>or double click to edit' : ''}}</span>">
+                    {{ isEditable(testInstance) ? '<br/>or double click to edit' : ''}}</span>">
                   <div>{{ testInstance.name }}</div>
                 </a>
                 <div class="text-sm">
