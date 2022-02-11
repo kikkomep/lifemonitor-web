@@ -31,15 +31,13 @@
             <td class="align-middle">
               <div class="font-weight-light text-lg">
                 <input *ngIf="s.editingMode" type="text" [(ngModel)]="s.name"
-                  class="form-control datatable-input-no-border"
-                  aria-describedby="emailHelp" placeholder="Enter suite name"
-                  (keyup.enter)="updateSuite(s)"
-                  (keyup.esc)="restoreSuite(s)">
-                <a *ngIf="!s.editingMode" style="color: black; font-size: larger"
-                  (click)="showSuiteDetails(s)"
-                  (dblclick)="enableSuiteEditing(s)"
-                  data-html="true" data-toggle="tooltip" data-placement="top"
-                  title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i><br/>or double click to edit</span>">
+                  class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
+                  placeholder="Enter suite name" (keyup.enter)="updateSuite(s)" (keyup.esc)="restoreSuite(s)">
+                <a *ngIf="!s.editingMode" style="color: black; font-size: larger" (click)="showSuiteDetails(s)"
+                  (dblclick)="enableSuiteEditing(s)" data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
+                    <i class='fas fa-question-circle mx-1'></i>
+                    click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i>
+                    {{ isUserLogged() ? '<br/>or double click to edit' : ''}}</span>">
                   {{s.name}}</a>
                 <div class="text-sm">
                   <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>

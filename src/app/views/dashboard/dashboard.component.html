@@ -198,12 +198,15 @@
                 <td class="align-top">
                   <div class="font-weight-light text-lg mt-4 mb-0" data-html="true">
                     <input *ngIf="w.editingMode" type="text" class="form-control datatable-input-no-border"
-                      [(ngModel)]="w.name"
-                      aria-describedby="emailHelp" placeholder="Enter workflow name"
+                      [(ngModel)]="w.name" aria-describedby="workflowNameInput" placeholder="Enter workflow name"
                       (keyup.enter)="updateWorkflowName(w)" (keyup.esc)="restoreWorkflowName(w)">
                     <a *ngIf="!w.editingMode" (click)="showWorkflowDetails(w)" style="color: black; font-size: larger"
                       (dblclick)="enableWorkflowEditMode(w)" data-toggle="tooltip" data-placement="top" data-html="true"
-                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b> <i class='fas fa-external-link-alt mx-1'></i><br/>or double click to edit</span>">{{
+                      title="<span class='text-xs'>
+                        <i class='fas fa-question-circle mx-1'></i>
+                        click to see <b>suites</b>
+                        <i class='fas fa-external-link-alt mx-1'></i>
+                        {{ isUserLogged() ? '<br/>or double click to edit' : ''}}</span>">{{
                       w.name }}
                     </a>
                     <div class="text-xs">
