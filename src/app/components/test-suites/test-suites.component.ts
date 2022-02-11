@@ -52,6 +52,10 @@ export class TestSuitesComponent implements OnInit, OnChanges {
     this.cdr.detectChanges();
   }
 
+  public isUserLogged(): boolean {
+    return this.appService.isUserLogged();
+  }
+
   public selectTestBuild(testBuild: TestBuild) {
     this.logger.debug('TestBuild', testBuild);
     if (testBuild) {
@@ -125,8 +129,10 @@ export class TestSuitesComponent implements OnInit, OnChanges {
 
   public enableSuiteEditing(suite: Suite) {
     this.clickHandler.doubleClick(() => {
-      suite['editingMode'] = true;
-      suite['oldName'] = suite.name;
+      if (this.isUserLogged()) {
+        suite['editingMode'] = true;
+        suite['oldName'] = suite.name;
+      }
     });
   }
 

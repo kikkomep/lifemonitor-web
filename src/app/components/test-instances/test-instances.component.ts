@@ -128,10 +128,16 @@ export class TestInstancesComponent implements OnInit, OnChanges {
     }
   }
 
+  public isUserLogged(): boolean {
+    return this.appService.isUserLogged();
+  }
+
   public enableTestInstanceEditing(instance: TestInstance) {
     this.clickHandler.doubleClick(() => {
-      instance['oldName'] = instance.name;
-      instance['editingMode'] = true;
+      if (this.isUserLogged()) {
+        instance['oldName'] = instance.name;
+        instance['editingMode'] = true;
+      }
     });
   }
 

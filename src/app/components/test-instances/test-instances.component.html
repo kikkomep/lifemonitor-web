@@ -34,16 +34,16 @@
             <td class="align-middle">
               <div class="font-weight-light text-lg">
                 <input *ngIf="testInstance.editingMode" type="text" [(ngModel)]="testInstance.name"
-                  class="form-control datatable-input-no-border"
-                  aria-describedby="emailHelp" placeholder="Enter suite name"
-                  (keyup.enter)="updateTestInstance(testInstance)"
-                  (keyup.esc)="restoreTestInstance(testInstance)">
-                <a *ngIf="!testInstance.editingMode"
-                   style="color: black; font-size: larger"
-                  (click)="showTestInstanceDetails(testInstance)"
-                  (dblclick)="enableTestInstanceEditing(testInstance)"
-                  data-html="true" data-toggle="tooltip" data-placement="top"
-                  title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> see on <b>{{testInstance.service.type}}</b> <i class='fas fa-external-link-alt mx-1'></i><br/>or double click to edit</span>">
+                  class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
+                  placeholder="Enter suite name" (keyup.enter)="updateTestInstance(testInstance)"
+                  (keyup.esc)="restoreTestInstance(testInstance)" autofocus>
+                <a *ngIf="!testInstance.editingMode" style="color: black; font-size: larger"
+                  (click)="showTestInstanceDetails(testInstance)" (dblclick)="enableTestInstanceEditing(testInstance)"
+                  data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
+                    <i class='fas fa-question-circle mx-1'></i>
+                    see on <b>{{testInstance.service.type}}</b>
+                    <i class='fas fa-external-link-alt mx-1'></i>
+                    {{ isUserLogged() ? '<br/>or double click to edit' : ''}}</span>">
                   <div>{{ testInstance.name }}</div>
                 </a>
                 <div class="text-sm">
@@ -74,7 +74,8 @@
               </div>
             </td>
             <td class="text-center align-middle font-weight-light" width="300">
-              <stats-bar-chart [stats]="testInstance.getLatestBuilds() | arraySizeFilterPipe: 10" (selectedItem)="selectTestBuild($event)">
+              <stats-bar-chart [stats]="testInstance.getLatestBuilds() | arraySizeFilterPipe: 10"
+                (selectedItem)="selectTestBuild($event)">
               </stats-bar-chart>
             </td>
           </tr>
