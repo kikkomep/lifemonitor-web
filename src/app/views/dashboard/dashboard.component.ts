@@ -244,7 +244,7 @@ export class DashboardComponent implements OnInit {
 
   public enableWorkflowEditMode(w: Workflow) {
     this.clickHandler.doubleClick(() => {
-      if (this.isUserLogged()) {
+      if (this.isUserLogged() && this.isEditable(w)) {
         w['oldNameValue'] = w.name;
         w['clickOnInputBox'] = false;
         w['editingMode'] = true;
