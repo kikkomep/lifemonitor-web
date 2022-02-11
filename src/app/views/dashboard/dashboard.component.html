@@ -199,7 +199,7 @@
                   <div class="font-weight-light text-lg mt-4 mb-0" data-html="true">
                     <input *ngIf="w.editingMode" type="text" class="form-control datatable-input-no-border"
                       [(ngModel)]="w.name" aria-describedby="workflowNameInput" placeholder="Enter workflow name"
-                      (keyup.enter)="updateWorkflowName(w)" (keyup.esc)="restoreWorkflowName(w)">
+                      (keyup.enter)="updateWorkflowName(w)" (keyup.esc)="restoreWorkflowName(w)" autofocus>
                     <a *ngIf="!w.editingMode" (click)="showWorkflowDetails(w)" style="color: black; font-size: larger"
                       (dblclick)="enableWorkflowEditMode(w)" data-toggle="tooltip" data-placement="top" data-html="true"
                       title="<span class='text-xs'>

@@ -36,7 +36,7 @@
                 <input *ngIf="testInstance.editingMode" type="text" [(ngModel)]="testInstance.name"
                   class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
                   placeholder="Enter suite name" (keyup.enter)="updateTestInstance(testInstance)"
-                  (keyup.esc)="restoreTestInstance(testInstance)">
+                  (keyup.esc)="restoreTestInstance(testInstance)" autofocus>
                 <a *ngIf="!testInstance.editingMode" style="color: black; font-size: larger"
                   (click)="showTestInstanceDetails(testInstance)" (dblclick)="enableTestInstanceEditing(testInstance)"
                   data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
