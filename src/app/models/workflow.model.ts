@@ -35,7 +35,11 @@ export class Workflow extends AggregatedStatusStatsItem {
 
   private setName(data: Object) {
     let rocIdentifier = this.rocIdentifier;
-    this.setNameFromProperty(data, "name", rocIdentifier ? rocIdentifier : data['uuid']);
+    this.setNameFromProperty(
+      data,
+      'name',
+      rocIdentifier ? rocIdentifier : data['uuid']
+    );
   }
 
   public get rocIdentifier(): string {
@@ -52,23 +56,26 @@ export class Workflow extends AggregatedStatusStatsItem {
   public get type(): string {
     if (!this._type) {
       if (this._rawData && 'type' in this._rawData) {
-        this._type = this._rawData["type"];
+        this._type = this._rawData['type'];
       } else {
         let crate: RoCrate = this.roCrateMetadata;
         if (crate) {
           let mainEntity: object = crate.mainEntity;
           if (mainEntity) {
-            let programminLanguage = crate.findGraphEntity(mainEntity['programmingLanguage']['@id']);
+            let programminLanguage = crate.findGraphEntity(
+              mainEntity['programmingLanguage']['@id']
+            );
             if (programminLanguage) {
               this._type = this.normalizeWorkflowTypeName(
-                ("" + programminLanguage['name']).toLowerCase());
-              this.logger.debug("Workflow type detected: ", this._type);
+                ('' + programminLanguage['name']).toLowerCase()
+              );
+              this.logger.debug('Workflow type detected: ', this._type);
               return this._type;
             }
           }
         } else if (this.version) {
           this._type = 'unknown';
-          this.logger.debug("Workflow type detected: ", this._type);
+          this.logger.debug('Workflow type detected: ', this._type);
         }
       }
     }
@@ -76,10 +83,8 @@ export class Workflow extends AggregatedStatusStatsItem {
   }
 
   private normalizeWorkflowTypeName(type: string): string {
-    if (type === 'common workflow language')
-      return 'cwl';
-    if (type === 'unrecognized workflow type')
-      return 'unknown'
+    if (type === 'common workflow language') return 'cwl';
+    if (type === 'unrecognized workflow type') return 'unknown';
     return type;
   }
 
@@ -104,32 +109,25 @@ export class Workflow extends AggregatedStatusStatsItem {
   }
 
   public get typeIcon(): string {
-    if (this.type === 'galaxy')
-      return 'assets/img/logo/wf/GalaxyLogo.png';
+    if (this.type === 'galaxy') return 'assets/img/logo/wf/GalaxyLogo.png';
     else if (this.type === 'snakemake')
       return 'assets/img/logo/wf/SnakeMakeLogo.png';
-    else if (this.type === 'cwl')
-      return 'assets/img/logo/wf/CwlLogo.png';
+    else if (this.type === 'cwl') return 'assets/img/logo/wf/CwlLogo.png';
     else if (this.type === 'nextflow')
       return 'assets/img/logo/wf/NextFlowLogo.png';
     else if (this.type === 'jupyter')
       return 'assets/img/logo/wf/JupyterLogo.png';
-    else if (this.type === 'knime')
-      return 'assets/img/logo/wf/KnimeLogo.png';
+    else if (this.type === 'knime') return 'assets/img/logo/wf/KnimeLogo.png';
     else if (this.type === 'shell script')
       return 'assets/img/logo/wf/ShellLogo.png';
-    return 'assets/img/logo/wf/GenericWorkflowLogo.png';;
+    return 'assets/img/logo/wf/GenericWorkflowLogo.png';
   }
 
   public get typeIconSize(): number {
-    if (this.type === 'galaxy')
-      return 50;
-    if (this.type === 'nextflow')
-      return 40;
-    else if (this.type === 'cwl')
-      return 55;
-    else if (this.typeIcon.endsWith('GenericWorkflowLogo.png'))
-      return 48;
+    if (this.type === 'galaxy') return 50;
+    if (this.type === 'nextflow') return 40;
+    else if (this.type === 'cwl') return 55;
+    else if (this.typeIcon.endsWith('GenericWorkflowLogo.png')) return 48;
     return 45;
   }
 
