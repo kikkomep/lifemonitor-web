@@ -5,16 +5,13 @@ import { Workflow } from 'src/app/models/workflow.model';
 @Component({
   selector: 'workflow-header',
   templateUrl: './workflow-header.component.html',
-  styleUrls: ['./workflow-header.component.scss']
+  styleUrls: ['./workflow-header.component.scss'],
 })
 export class WorkflowHeaderComponent implements OnInit {
-
   @Input() workflow: Workflow;
   @Input() suite: Suite;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

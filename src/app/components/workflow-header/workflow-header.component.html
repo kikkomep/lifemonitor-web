@@ -1,5 +1,5 @@
-<div class="row mx-lg-2 mx-sm-0 mt-4 h-100 align-items-end" style="font-weight: 300; color: gray;">
-    <div class="col-lg-7 col-sm-12">
+<div class="row mx-lg-2 mx-sm-0 mt-4 h-100 align-items-top" style="font-weight: 300; color: gray;">
+    <div class="col-lg-6 col-sm-12">
         <div class="row">
             <div class="col-2 align-middle" style="max-width: 50px; font-size: 2.4rem; margin-top: 3px; color: {{
             workflow.color
@@ -16,34 +16,68 @@
         <!-- row -->
 
         <div *ngIf="suite" class="row" style="font-size: 1.0rem;">
-            <div class="col-2 p-0 m-0" style="max-width: 50px">
-                <i class="fas fa-lg fa-cubes mx-3"></i>
+            <div class="col-2 p-0 ml-1" style="max-width: 50px">
+                <i class="fas fa-solid fa-cubes mx-3"></i>
             </div>
-            <div class="col-9 mx-1">
+            <div class="col-9">
                 <b>suite uuid: </b>{{ suite.uuid }}
             </div>
         </div>
         <!-- row -->
 
         <div class="row" style="font-size: 1.0rem;">
-            <div class="col-2 p-0 m-0" style="max-width: 50px">
-                <img class="mx-3" src="{{ workflow.typeIcon }}" height="25" />
+            <div class="col-2 p-0 ml-1" style="max-width: 50px">
+                <!-- <img class="mx-3" src="{{ workflow.typeIcon }}" height="18" /> -->
+                <i class="fas fa-solid fa-fingerprint ml-3"></i>
             </div>
-            <div class="col-10 mx-1">
+            <div class="col-10 mx-0">
                 <b>workflow uuid: </b>{{ workflow.uuid }}
             </div>
         </div>
         <!-- row -->
 
-        <div *ngIf="workflow.registry" class="row" style="font-size: 1.0rem;">
+        <div class="row" style="font-size: 1.0rem;">
+            <div class="col-2 p-0 ml-1" style="max-width: 50px">
+                <!-- <img class="mx-3" src="{{ workflow.typeIcon }}" height="25" /> -->
+                <i class="fas fa-database ml-3"></i>
+            </div>
+            <div class="col-10">
+                <b>workflow origin: </b><a href="{{ workflow.originLink }}">{{ workflow.originLink }}</a>
+            </div>
+        </div>
+        <!-- row -->
+
+        <div class="row" style="font-size: 1.0rem;">
+            <div class="col-2 p-0 ml-1" style="max-width: 50px">
+                <!-- <img class="mx-3" src="{{ workflow.typeIcon }}" height="25" /> -->
+                <i class="fas fa-solid fa-cog ml-3"></i>
+            </div>
+            <div class="col-10">
+                <b>workflow type: </b>{{ workflow.type }}
+            </div>
+        </div>
+        <!-- row -->
+
+        <div class="row" style="font-size: 1.0rem;">
+            <div class="col-2 p-0 ml-1" style="max-width: 50px">
+                <!-- <img class="mx-3" src="{{ workflow.typeIcon }}" height="25" /> -->
+                <i class="fas fa-solid fa-user ml-3"></i>
+            </div>
+            <div class="col-10">
+                <b>workflow owner: </b>{{ workflow.submitter['username'] }}
+            </div>
+        </div>
+        <!-- row -->
+
+        <div *ngFor="let r of workflow.registries" class="row" style="font-size: 1.0rem;">
             <div class="col-2 p-0 m-0" style="max-width: 50px">
                 <img class="mx-3" src="/assets/img/logo/registries/workflowhub.svg" height="25" />
             </div>
             <div class="col-10 mx-1" style="color: gray;">
-                <b>external workflow ID: </b>
-                <a href="{{ workflow.externalLink }}" target="_blank">{{
-                    workflow.externalLink
-                    }}<i class="fas fa-xs fa-external-link-alt mx-2"></i>
+                <b>{{ r.name }} ID: </b>
+                <a href="{{ workflow.getRegistryLink(r.name) }}" target="_blank">
+                    {{workflow.getRegistryLink(r.name)}}
+                    <i class="fas fa-xs fa-external-link-alt mx-2"></i>
                 </a>
             </div>
         </div>
@@ -51,25 +85,58 @@
     </div>
     <!-- /.col -->
 
-    <div class="col-lg-2 d-none d-sm-none d-md-none d-lg-block mt-n4 text-center">
-        <a *ngIf="workflow.registry" class="hvr-float-shadow" data-html="true" data-toggle="tooltip" target="_blank"
-            data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
-                click to see the workflow on <b>{{workflow.registry['name']}}</b> registry
-                <i class='fas fa-sm fa-external-link-alt mx-1'></i>" href="{{workflow.externalLink}}">
-            <img src="/assets/img/logo/registries/workflowhub.svg" class="p-0 m-0" height="150" />
-            <div class="text-center mt-n3" style="font-size: 0.9rem;">
-                <span>see on <b>{{workflow.registry['name']}}</b></span>
-                <i class="fas fa-sm fa-external-link-alt mx-2"></i>
+    <!-- TODO: fix alignment with more than 2 registries -->
+    <div class="col-lg-6 col-sm-12">
+        <div class="row flex flex-row-reverse">
+
+            <div *ngIf="workflow.registries.length < 3"
+                class="col-lg-3 d-none d-sm-none d-md-none d-lg-block text-center ml-4 float-right">
+                <div class="row">
+                    <rocrate-logo [workflow]="workflow"></rocrate-logo>
+                </div>
             </div>
-        </a>
-    </div>
-    <!-- /.col -->
+            <!-- /.col -->
 
-    <div class="col-lg-3 mt-3"><!-- px-5 -->
-        <rocrate-logo [workflow]="workflow"></rocrate-logo>
-    </div>
-    <!-- /.col -->
+            <div *ngFor="let r of workflow.registries; index as i; first as isFirst"
+                class="col-lg-3 d-none d-sm-none d-md-none d-lg-block text-center mx-n2">
+                <a style="margin-top: 25px;" class="hvr-float-shadow" data-html="true"
+                    data-toggle="tooltip" target="_blank" data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                        click to see the workflow on <b>{{r}}</b> registry
+                        <i class='fas fa-sm fa-external-link-alt mx-1'></i>"
+                    href="{{workflow.getRegistryLink(r.name)}}">
+                    <img src="/assets/img/logo/registries/workflowhub.svg" class="p-0 m-0" height="110" />
+                    <div class="text-center" style="margin-top: -12px; font-size: 0.8rem;">
+                        <span>see on <b>{{r.name}}</b></span>
+                        <i class="fas fa-sm fa-external-link-alt mx-1"></i>
+                    </div>
+                </a>
+            </div>
+            <!-- /.row -->
 
+            <div *ngIf="workflow.githubOrigin" class="col-lg-3 d-none d-sm-none d-md-none d-lg-block text-center">
+                <a style="margin-top: 40px;" class="hvr-float-shadow" data-html="true"
+                    data-toggle="tooltip" target="_blank" data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                        click to see the workflow on <b>GitHub</b>
+                        <i class='fas fa-sm fa-external-link-alt mx-1'></i>" href="{{workflow.originLink}}">
+                    <img src="/assets/img/logo/testingServices/github.png" class="p-0 m-0" height="80" />
+                    <div class="text-center" style="margin-top: 0px; font-size: 0.8rem;">
+                        <span>see on <b>GitHub</b></span>
+                        <i class="fas fa-sm fa-external-link-alt mx-1"></i>
+                    </div>
+                </a>
+            </div>
+            <!-- /.col -->
+
+        </div><!-- /.row -->
+        <div *ngIf="workflow.registries.length == 3" class="row float-right">
+            <!-- /.col -->
+            <div class="col-lg-6 d-none d-sm-none d-md-none d-lg-block text-right px-5">
+                <div class="row">
+                    <rocrate-logo [workflow]="workflow"></rocrate-logo>
+                </div>
+            </div>
+            <!-- /.col -->
+        </div><!-- /.row -->
+    </div>
 </div>
 <!-- /.row -->
-
