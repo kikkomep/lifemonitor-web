@@ -9,7 +9,6 @@ import { TestBuild } from './testBuild.models';
 
 export class Workflow extends AggregatedStatusStatsItem {
   public: boolean;
-  registry: Object;
   version: Object;
   status: Status;
   _type: string;
@@ -135,10 +134,38 @@ export class Workflow extends AggregatedStatusStatsItem {
     return this.version ? this.version['submitter'] : null;
   }
 
-  public get externalLink(): string {
+  public get githubOrigin(): boolean {
+    return this.originLink && this.originLink.startsWith('https://github');
+  }
+
+  public get basedOnLink(): string {
+    if (this.version) {
+      return this.version['links']['based_on'];
+    } else {
+      return null;
+    }
+  }
+
+  public get originLink(): string {
     if (this.version) {
       return this.version['links']['origin'];
     } else {
+      return null;
+    }
+  }
+
+  public get registries(): string[] {
+    if (this.version) {
+      return Object.keys(this.version['links']['registries']);
+    } else {
+      return null;
+    }
+  }
+
+  public getRegistryLink(registry: string) {
+    try {
+      return this.version['links']['registries'][registry];
+    } catch (Exception) {
       return null;
     }
   }
