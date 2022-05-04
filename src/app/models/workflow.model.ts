@@ -1,4 +1,5 @@
 import { RoCrate } from './common.models';
+import { Registry } from './registry.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
@@ -11,6 +12,7 @@ export class Workflow extends AggregatedStatusStatsItem {
   public: boolean;
   version: Object;
   status: Status;
+  registries: Registry[];
   _type: string;
   _rocrate: RoCrate;
   _suites: AggregatedStatusStats;
@@ -149,14 +151,6 @@ export class Workflow extends AggregatedStatusStatsItem {
   public get originLink(): string {
     if (this.version) {
       return this.version['links']['origin'];
-    } else {
-      return null;
-    }
-  }
-
-  public get registries(): string[] {
-    if (this.version) {
-      return Object.keys(this.version['links']['registries']);
     } else {
       return null;
     }
