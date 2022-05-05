@@ -428,6 +428,7 @@ export class ApiService {
       map((result) => {
         w.update(result[0]);
         w.status = result[1];
+        w.previousVersions = result[0]['previous_versions'];
         w.suites = new AggregatedStatusStats(suites ? result[2] : []);
         this.logger.debug('workflow', w);
         return w;

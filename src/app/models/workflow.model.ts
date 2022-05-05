@@ -1,3 +1,4 @@
+import { Model } from './base.models';
 import { RoCrate } from './common.models';
 import { Registry } from './registry.models';
 import {
@@ -12,6 +13,7 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
   public: boolean;
   version: Object;
   status: Status;
+  _previous_versions: WorkflowVersionDescriptor[];
   registries: Registry[];
   _type: string;
   _rocrate: RoCrate;
@@ -81,6 +83,18 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
       }
     }
     return this._type;
+  }
+
+  public get previousVersions(): WorkflowVersionDescriptor[] {
+    return this._previous_versions;
+  }
+
+  public set previousVersions(versions: WorkflowVersionDescriptor[]) {
+    if (!versions) return;
+    this._previous_versions = [];
+    for (let v of versions) {
+      this._previous_versions.push(new WorkflowVersionDescriptor(v));
+    }
   }
 
   private normalizeWorkflowTypeName(type: string): string {
@@ -212,5 +226,23 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
     this._latestBuilds = latestBuilds.sort((a, b) =>
       a.timestamp > b.timestamp || a.suite_uuid > b.suite_uuid ? 1 : -1
     );
+  }
+}
+
+export class WorkflowVersionDescriptor extends Model {
+  submitter: Object;
+
+  public get name(): string {
+    return this._rawData['version'];
+  }
+
+  public get isLatest(): boolean {
+    return this._rawData['is_latest'];
+  }
+
+  public get links(): Object {
+    return 'ro_crate' in this._rawData
+      ? this._rawData['ro_crate']['links']
+      : [];
   }
 }
