@@ -377,9 +377,9 @@ export class ApiService {
       includeSubScriptions
     );
     let url: string = !filteredByUser
-      ? this.apiBaseUrl + '/workflows?status=true'
+      ? this.apiBaseUrl + '/workflows?status=true&versions=true'
       : this.apiBaseUrl +
-      '/users/current/workflows?status=true&subscriptions=' +
+      '/users/current/workflows?status=true&versions=true&subscriptions=' +
       includeSubScriptions.toString();
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
