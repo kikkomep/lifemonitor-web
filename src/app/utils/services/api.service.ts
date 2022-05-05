@@ -13,7 +13,7 @@ import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
 import { AppConfigService } from './config.service';
@@ -189,7 +189,7 @@ export class ApiService {
       );
   }
 
-  updateWorkflowName(workflow: Workflow): Observable<any> {
+  updateWorkflowName(workflow: WorkflowVersion): Observable<any> {
     let body = {
       name: workflow.name
     };
@@ -209,7 +209,7 @@ export class ApiService {
       );
   }
 
-  changeWorkflowVisibility(workflow: Workflow): Observable<any> {
+  changeWorkflowVisibility(workflow: WorkflowVersion): Observable<any> {
     let body = {
       public: !workflow.public,
     };
@@ -308,7 +308,7 @@ export class ApiService {
       );
   }
 
-  downloadROCrate(workflow: Workflow): Observable<any> {
+  downloadROCrate(workflow: WorkflowVersion): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
     return this.http
       .get(workflow.downloadLink, {
@@ -324,7 +324,7 @@ export class ApiService {
       );
   }
 
-  subscribeWorkflow(workflow: Workflow): Observable<Workflow> {
+  subscribeWorkflow(workflow: WorkflowVersion): Observable<WorkflowVersion> {
     return this.http
       .post(
         this.apiBaseUrl + '/workflows/' + workflow.uuid + '/subscribe',
@@ -344,7 +344,7 @@ export class ApiService {
       );
   }
 
-  unsubscribeWorkflow(workflow: Workflow): Observable<Workflow> {
+  unsubscribeWorkflow(workflow: WorkflowVersion): Observable<WorkflowVersion> {
     return this.http
       .post(
         this.apiBaseUrl + '/workflows/' + workflow.uuid + '/unsubscribe',
@@ -393,9 +393,9 @@ export class ApiService {
     previous_versions = false,
     ro_crate = false,
     load_suites = true
-  ): Observable<Workflow> {
+  ): Observable<WorkflowVersion> {
     this.logger.debug('Request login');
-    const workflow = this.http.get<Workflow>(
+    const workflow = this.http.get<WorkflowVersion>(
       this.apiBaseUrl + '/workflows/' + uuid,
       this.get_http_options({
         previous_versions: previous_versions,
@@ -416,7 +416,7 @@ export class ApiService {
         })
       );
 
-    let w = new Workflow({ uuid: uuid });
+    let w = new WorkflowVersion({ uuid: uuid });
     let suites = null;
     let queries: Array<object> = [workflow, status];
     if (load_suites) {
@@ -467,7 +467,7 @@ export class ApiService {
       .pipe(
         retry(3),
         mergeMap((status: Object) => {
-          let suite: Suite = new Suite({} as Workflow, suiteData);
+          let suite: Suite = new Suite({} as WorkflowVersion, suiteData);
           suite.status = new Status({
             aggregate_test_status: status['status'],
           });
@@ -525,7 +525,7 @@ export class ApiService {
       );
   }
 
-  get_suites(workflow: Workflow): Observable<Suite[]> {
+  get_suites(workflow: WorkflowVersion): Observable<Suite[]> {
     this.logger.debug('Loading suites of workflow ....', workflow);
     return this.http
       .get<Suite[]>(
@@ -747,7 +747,7 @@ export class ApiService {
       );
   }
 
-  public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
+  public checkROCrateAvailability(workflow: WorkflowVersion): Observable<boolean> {
     return this.http
       .head(workflow.downloadLink, this.get_http_options({}, true))
       .pipe(

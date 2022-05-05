@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
@@ -25,7 +25,7 @@ declare var $: any;
   styleUrls: ['./test-instances.component.scss'],
 })
 export class TestInstancesComponent implements OnInit, OnChanges {
-  @Input() workflow: Workflow;
+  @Input() workflow: WorkflowVersion;
   @Input() testInstances: TestInstance[];
   @Output() suiteSelected = new EventEmitter<TestInstance>();
 

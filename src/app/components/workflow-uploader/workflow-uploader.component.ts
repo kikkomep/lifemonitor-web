@@ -16,7 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { Subscription } from 'rxjs';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 
 declare var $: any;
 
@@ -404,7 +404,7 @@ export class WorkflowUploaderComponent
       } else if (this.source === 'registry') {
         this.logger.debug("Selected registry workflow: ", this.selectRegistryWorkflow);
         let existingWorkflow = this.appService.workflows.find(
-          (w: Workflow) => w.version
+          (w: WorkflowVersion) => w.version
             && 'links' in w.version
             && 'origin' in w.version['links']
             && w.version['links']['origin'] == this.selectedRegistryWorkflow.links['origin']);

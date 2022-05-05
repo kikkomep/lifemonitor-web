@@ -8,7 +8,7 @@ import {
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';
 
-export class Workflow extends AggregatedStatusStatsItem {
+export class WorkflowVersion extends AggregatedStatusStatsItem {
   public: boolean;
   version: Object;
   status: Status;

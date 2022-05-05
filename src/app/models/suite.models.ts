@@ -4,7 +4,7 @@ import {
   Status,
   StatusStatsItem,
 } from './stats.model';
-import { Workflow } from './workflow.model';
+import { WorkflowVersion } from './workflow.model';
 
 export class Suite extends AggregatedStatusStatsItem {
   public roc_suite: string;
@@ -14,7 +14,7 @@ export class Suite extends AggregatedStatusStatsItem {
 
   private _latest: StatusStatsItem[] = null;
 
-  constructor(public workflow: Workflow, rawData: object) {
+  constructor(public workflow: WorkflowVersion, rawData: object) {
     super(rawData);
     this.setNameFromProperty(rawData, "name", rawData['roc_suite']);
   }

@@ -9,7 +9,7 @@ import {
   AggregatedStatusStatsItem
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion, WorkflowVersionDetails } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
@@ -179,11 +179,11 @@ export class DashboardComponent implements OnInit {
     return this._searchModeEnabled;
   }
 
-  public isEditable(w: Workflow) {
+  public isEditable(w: WorkflowVersion) {
     return this.appService.isEditable(w);
   }
 
-  public deleteWorkflowVersion(w: Workflow) {
+  public deleteWorkflowVersion(w: WorkflowVersion) {
     this.logger.debug("Deleting workflow version....", w);
     this.inputDialog.show({
       iconClass: 'fas fa-trash-alt',
@@ -201,14 +201,14 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  public subscribeWorkflow(w: Workflow) {
+  public subscribeWorkflow(w: WorkflowVersion) {
     this.logger.debug('Subscribing to workflow: ', w);
     this.appService.subscribeWorkflow(w).subscribe((w) => {
       this.logger.debug('Workflow subscription created!');
     });
   }
 
-  public unsubscribeWorkflow(w: Workflow) {
+  public unsubscribeWorkflow(w: WorkflowVersion) {
     this.logger.debug('Unsubscribing from workflow: ', w);
     this.appService.unsubscribeWorkflow(w).subscribe((w) => {
       this.logger.debug('Workflow subscription deleted!');
@@ -222,7 +222,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  public getWorkflowVisibilityTitle(w: Workflow) {
+  public getWorkflowVisibilityTitle(w: WorkflowVersion) {
     return (
       "<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>" +
       (w.public ? 'public' : 'private') +
@@ -230,19 +230,19 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  public restoreWorkflowName(w: Workflow) {
+  public restoreWorkflowName(w: WorkflowVersion) {
     w.name = w['oldNameValue'];
     w['editingMode'] = false;
   }
 
-  public showWorkflowDetails(w: Workflow) {
+  public showWorkflowDetails(w: WorkflowVersion) {
     this.clickHandler.click(() => {
       this.router.navigate([
         '/workflow', { uuid: w.asUrlParam() }]);
     });
   }
 
-  public enableWorkflowEditMode(w: Workflow) {
+  public enableWorkflowEditMode(w: WorkflowVersion) {
     this.clickHandler.doubleClick(() => {
       if (this.isUserLogged() && this.isEditable(w)) {
         w['oldNameValue'] = w.name;
@@ -252,7 +252,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  public updateWorkflowName(w: Workflow) {
+  public updateWorkflowName(w: WorkflowVersion) {
     this.logger.debug("Updating workflow name", w);
     this.appService.updateWorkflowName(w).subscribe(() => {
       this.toastService.success("Workflow updated!", '', { timeOut: 2500 });
@@ -265,7 +265,7 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  public changeVisibility(w: Workflow) {
+  public changeVisibility(w: WorkflowVersion) {
     this.inputDialog.show({
       iconClass: !w.public
         ? 'fas fa-lg fa-globe-americas'
@@ -317,6 +317,11 @@ export class DashboardComponent implements OnInit {
     this.filteredWorkflows = workflows;
   }
 
+
+  public selectWorkflowVersion(version: any){
+    this.logger.debug("Selected workflow version:", version);
+  }
+
   public filterByStatus(status: string) {
     this.logger.debug('Filter by status', status);
     if (!this._workflowStats) return;
@@ -350,6 +355,8 @@ export class DashboardComponent implements OnInit {
       this.cdref.detectChanges();
       this.initDataTable();
       this.cdref.detectChanges();
+      $('.selectpicker').selectpicker();
+      // $('#registryWorkflowSelector').selectpicker('refresh');
     } finally {
       if (resetTableStatus)
         this.updatingDataTable = false;

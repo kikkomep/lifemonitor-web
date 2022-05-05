@@ -8,7 +8,7 @@ import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { ApiService } from './api.service';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { UserNotification } from 'src/app/models/notification.model';
@@ -25,8 +25,8 @@ export class AppService {
   private _registryWorkflow: RegistryWorkflow;
   private _registryWorkflows: { [uuid: string]: RegistryWorkflow[] } = {};
   private _workflowsStats: AggregatedStatusStats;
-  private _workflows: Workflow[];
-  private _workflow: Workflow;
+  private _workflows: WorkflowVersion[];
+  private _workflow: WorkflowVersion;
   private _suite: Suite;
   private _testInstance: TestInstance;
   private _testBuild: TestBuild;
@@ -41,7 +41,7 @@ export class AppService {
   private subjectRegistryWorkflow = new Subject<RegistryWorkflow>();
   private subjectRegistryWorkflows = new Subject<RegistryWorkflow[]>();
   private subjectWorkflows = new Subject<AggregatedStatusStats>();
-  private subjectWorkflow = new Subject<Workflow>();
+  private subjectWorkflow = new Subject<WorkflowVersion>();
   private subjectTestSuite = new Subject<Suite>();
   private subjectTestInstance = new Subject<TestInstance>();
   private subjectTestBuild = new Subject<TestBuild>();
@@ -81,7 +81,7 @@ export class AppService {
 
     // subscribe for the current selected workflow
     this.subscriptions.push(
-      this._observableWorkflow.subscribe((w: Workflow) => {
+      this._observableWorkflow.subscribe((w: WorkflowVersion) => {
         this._workflow = w;
       })
     );
@@ -176,11 +176,11 @@ export class AppService {
     return this._registryWorkflows[registry_uuid];
   }
 
-  public get workflows(): Workflow[] {
+  public get workflows(): WorkflowVersion[] {
     return this._workflows;
   }
 
-  public findWorkflow(uuid: string): Workflow {
+  public findWorkflow(uuid: string): WorkflowVersion {
     return this._workflows ? this._workflows.find(w => w.uuid === uuid) : null;
   }
 
@@ -188,7 +188,7 @@ export class AppService {
     return this._workflowsStats;
   }
 
-  public get workflow(): Workflow {
+  public get workflow(): WorkflowVersion {
     return this._workflow;
   }
 
@@ -198,7 +198,7 @@ export class AppService {
 
   public findTestSuite(suite_uuid: string, wf_uuid: string = null): Suite {
     if (!this._workflow && !wf_uuid) return null;
-    let workflow: Workflow = this._workflow;
+    let workflow: WorkflowVersion = this._workflow;
     if (wf_uuid && this._workflows) {
       workflow = this._workflows.find(w => w.uuid === wf_uuid);
     }
@@ -239,7 +239,7 @@ export class AppService {
     return this._observableWorkflows;
   }
 
-  public get observableWorkflow(): Observable<Workflow> {
+  public get observableWorkflow(): Observable<WorkflowVersion> {
     return this._observableWorkflow;
   }
 
@@ -264,17 +264,17 @@ export class AppService {
     return data;
   }
 
-  public subscribeWorkflow(w: Workflow): Observable<Workflow> {
+  public subscribeWorkflow(w: WorkflowVersion): Observable<WorkflowVersion> {
     return this.api.subscribeWorkflow(w).pipe(
-      tap((wd: Workflow) => {
+      tap((wd: WorkflowVersion) => {
         this.logger.debug("Added subscription to workflow: ", wd);
       })
     );
   }
 
-  public unsubscribeWorkflow(w: Workflow): Observable<Workflow> {
+  public unsubscribeWorkflow(w: WorkflowVersion): Observable<WorkflowVersion> {
     return this.api.unsubscribeWorkflow(w).pipe(
-      tap((wd: Workflow) => {
+      tap((wd: WorkflowVersion) => {
         this.logger.debug("Removed subscription to workflow: ", wd);
       })
     );
@@ -355,9 +355,9 @@ export class AppService {
 
           // Process workflow items
           let stats = new AggregatedStatusStats();
-          let workflows: Workflow[] = [];
+          let workflows: WorkflowVersion[] = [];
           for (let wdata of data['items']) {
-            let w: Workflow = null;
+            let w: WorkflowVersion = null;
             // Try to get workflow data from cache if it is enabled
             if (useCache && this._workflows) {
               w = this._workflows.find(e => e['uuid'] === wdata['uuid']);
@@ -366,9 +366,9 @@ export class AppService {
             // Load workflow data from the back-end
             // if cache is disabled or it has not been found
             if (!w) {
-              w = new Workflow(wdata);
+              w = new WorkflowVersion(wdata);
               this.logger.debug('Loading data of workflow ', w);
-              this.loadWorkflow(w).subscribe((wf: Workflow) => {
+              this.loadWorkflow(w).subscribe((wf: WorkflowVersion) => {
                 this.logger.debug("Data loaded for workflow", w.uuid)
               });
             }
@@ -390,9 +390,9 @@ export class AppService {
       );
   }
 
-  loadWorkflow(w: Workflow): Observable<Workflow> {
-    return this.api.get_workflow(w.uuid, false, true).pipe(
-      map((wdata: Workflow) => {
+  loadWorkflow(w: WorkflowVersion): Observable<WorkflowVersion> {
+    return this.api.get_workflow(w.uuid, true, true).pipe(
+      map((wdata: WorkflowVersion) => {
         this.logger.debug('Loaded data:', w);
         w.update(wdata);
         w.suites = wdata.suites;
@@ -403,20 +403,20 @@ export class AppService {
   }
 
   public selectWorkflow(uuid: string) {
-    let w: Workflow;
+    let w: WorkflowVersion;
     this.logger.debug('Workflows', this._workflows, this._workflowsStats);
     if (this._workflow && this._workflow.uuid === uuid) {
       this._selectWorkflow(this._workflow);
     } else if (!this._workflows) {
-      this.api.get_workflow(uuid, true, true, true).subscribe((w: Workflow) => {
+      this.api.get_workflow(uuid, true, true, true).subscribe((w: WorkflowVersion) => {
         this._selectWorkflow(w);
       });
     } else {
-      w = this._workflows.find((w: Workflow) => w.uuid === uuid);
+      w = this._workflows.find((w: WorkflowVersion) => w.uuid === uuid);
       if (!w || !w.suites) {
         this.api
           .get_workflow(uuid, true, true, true)
-          .subscribe((w: Workflow) => {
+          .subscribe((w: WorkflowVersion) => {
             this._selectWorkflow(w);
           });
       } else {
@@ -448,7 +448,7 @@ export class AppService {
       .pipe(
         map((data) => {
           this.logger.debug('Data of registered workflow', data);
-          this.api.get_workflow(data['uuid'], false, true).subscribe((w: Workflow) => {
+          this.api.get_workflow(data['uuid'], false, true).subscribe((w: WorkflowVersion) => {
             this.logger.debug('Loaded data:', w);
             // TODO: atomic add
             this._workflows.push(w);
@@ -488,7 +488,7 @@ export class AppService {
       .pipe(
         map((data) => {
           this.logger.debug('Data of registered workflow', data);
-          this.api.get_workflow(data['uuid'], false, true).subscribe((w: Workflow) => {
+          this.api.get_workflow(data['uuid'], false, true).subscribe((w: WorkflowVersion) => {
             this.logger.debug('Loaded data:', w);
             // TODO: atomic add
             this._workflows.push(w);
@@ -510,7 +510,7 @@ export class AppService {
       );
   }
 
-  public deleteWorkflowVersion(w: Workflow, version: string):
+  public deleteWorkflowVersion(w: WorkflowVersion, version: string):
     Observable<{ uuid: string; version: string }> {
     this.setLoadingWorkflows(true);
     return this.api.deleteWorkflowVersion(w.uuid, version).pipe(
@@ -536,7 +536,7 @@ export class AppService {
     )
   }
 
-  public updateWorkflowName(w: Workflow): Observable<any> {
+  public updateWorkflowName(w: WorkflowVersion): Observable<any> {
     return this.api.updateWorkflowName(w);
   }
 
@@ -548,18 +548,18 @@ export class AppService {
     return this.api.updateTestInstance(instance);
   }
 
-  public changeWorkflowVisibility(w: Workflow): Observable<any> {
+  public changeWorkflowVisibility(w: WorkflowVersion): Observable<any> {
     return this.api.changeWorkflowVisibility(w);
   }
 
-  public isEditable(workflow: Workflow): boolean {
+  public isEditable(workflow: WorkflowVersion): boolean {
     if (!this.currentUser || !workflow || !workflow.submitter) {
       return false;
     }
     return this.currentUser.id === workflow.submitter['id'] ? true : false;
   }
 
-  private _selectWorkflow(w: Workflow) {
+  private _selectWorkflow(w: WorkflowVersion) {
     this.logger.debug('Selected workflow', w);
     this._workflow = w;
     this.subjectWorkflow.next(w);
@@ -586,11 +586,11 @@ export class AppService {
     this.subjectTestSuite.next(suite);
   }
 
-  public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
+  public checkROCrateAvailability(workflow: WorkflowVersion): Observable<boolean> {
     return this.api.checkROCrateAvailability(workflow);
   }
 
-  public downloadROCrate(workflow: Workflow) {
+  public downloadROCrate(workflow: WorkflowVersion) {
     this.api.downloadROCrate(workflow).subscribe((data) => {
       const blob = new Blob([data], { type: 'application/zip' });
       const url = window.URL.createObjectURL(blob);
