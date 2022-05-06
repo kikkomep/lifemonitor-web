@@ -9,7 +9,7 @@ import {
   AggregatedStatusStatsItem
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { WorkflowVersion, WorkflowVersionDetails } from 'src/app/models/workflow.model';
+import { Workflow, WorkflowVersion, WorkflowVersionDescriptor } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
@@ -24,6 +24,7 @@ declare var $: any;
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
+  private _workflows: Workflow[] = null;
   // reference to workflows stats
   private _workflowStats: AggregatedStatusStats | null;
   // reference to the current subscriptions
@@ -75,19 +76,10 @@ export class DashboardComponent implements OnInit {
         this.workflowDataTable.draw();
       });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
-      (data) => {
+      (workflows: Workflow[]) => {
         timer(1000).subscribe(x => {
-          this.logger.debug("Loaded workflows: ", data);
-          this._workflowStats = this.statsFilter.transform(
-            data,
-            this._workflowNameFilter
-          );
-          this.filteredWorkflows =
-            this.searchModeEnabled || !this.isUserLogged()
-              ? this._workflowStats.all
-              : this._workflowStats.all.filter(
-                (v) => v.subscriptions && v.subscriptions.length > 0);
-          this.logger.debug('Stats', data);
+          this.logger.debug("Loaded workflows: ", workflows);
+          this.prepareTableData(workflows);
           this.refreshDataTable();
         });
       }
@@ -101,13 +93,11 @@ export class DashboardComponent implements OnInit {
       }
     });
     this.logger.debug('Initializing workflow data!!');
-    this._workflowStats = this.appService.workflowStats;
+    this._workflows = this.appService.workflows;
+    this._workflowNameFilter = '';
     this.updatingDataTable = true;
-    if (this._workflowStats) {
-      this.filteredWorkflows = this.searchModeEnabled || !this.isUserLogged()
-        ? this._workflowStats.all
-        : this._workflowStats.all.filter(
-          (v) => v.subscriptions && v.subscriptions.length > 0);
+    if (this._workflows) {
+      this.prepareTableData();
       this.refreshDataTable();
     } else {
       this.appService.loadWorkflows(
@@ -125,6 +115,32 @@ export class DashboardComponent implements OnInit {
   }
 
   ngAfterViewChecked() {
+  }
+
+  private prepareTableData(workflows: Workflow[] = null){
+    workflows = workflows || this._workflows;
+    if(!workflows)return;
+    this.logger.debug("Loaded workflows: ", workflows);
+    // Initialize workflow stats
+    let stats = new AggregatedStatusStats();
+    //let workflow_versions: WorkflowVersion[] = data
+    this._workflows = workflows;
+    workflows.forEach((w: Workflow) => {
+      if(w.currentVersion) stats.add(w.currentVersion);
+    });
+    this.logger.debug('Initialized Stats', stats);
+    
+    this._workflowStats = this.statsFilter.transform(
+      stats,
+      this._workflowNameFilter
+    );
+    this.filteredWorkflows =
+      this.searchModeEnabled || !this.isUserLogged()
+        ? this._workflowStats.all
+        : this._workflowStats.all.filter(
+          (v) => v.subscriptions && v.subscriptions.length > 0);
+    
+    this.refreshDataTable();
   }
 
 
@@ -181,6 +197,11 @@ export class DashboardComponent implements OnInit {
 
   public isEditable(w: WorkflowVersion) {
     return this.appService.isEditable(w);
+  }
+
+  public updateSelectedVersion(workflow_version: WorkflowVersion){
+    this.logger.debug("Updated workflow version", workflow_version);
+    this.prepareTableData();
   }
 
   public deleteWorkflowVersion(w: WorkflowVersion) {
