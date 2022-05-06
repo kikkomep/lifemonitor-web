@@ -10,8 +10,7 @@ import {
 } from '@angular/core';
 import Stepper from 'bs-stepper';
 import { UrlValue } from 'src/app/models/common.models';
-import { InputDialogConfig } from 'src/app/utils/services/input-dialog.service';
-import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
+import { Config, WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { Subscription } from 'rxjs';
@@ -59,6 +58,7 @@ export class WorkflowUploaderComponent
   _registries: Registry[];
 
   private _editUUID: boolean = false;
+  private _canEditUUID: boolean = true;
   private _registryWorkflows: RegistryWorkflow[] = [];
   private _selectedRegistry: Registry = null;
   private _selectedRegistryWorkflow: RegistryWorkflow = null;
@@ -86,7 +86,7 @@ export class WorkflowUploaderComponent
     });
 
     let s = $('#' + this.name).on('show.bs.modal', () => {
-      let config: InputDialogConfig = this.service.getConfig();
+      let config: Config = this.service.getConfig();
       this.title = config.title || this.title;
       this.iconClass = config.iconClass || this.iconClass;
       this.iconClassSize = config.iconClassSize || this.iconClassSize;
@@ -95,6 +95,7 @@ export class WorkflowUploaderComponent
       this.confirmText = config.confirmText || this.confirmText;
       this.cancelText = config.cancelText || this.cancelText;
       this.onConfirm = config.onConfirm || null;
+      
       // initialise stepper
       if (!this.stepper) {
         this.stepper = new Stepper(document.querySelector('#uploaderStepper'), {
@@ -105,6 +106,10 @@ export class WorkflowUploaderComponent
       // reset all input
       this._reset();
 
+      // set workflow UUID to register new versions of existing workflows
+      this._workflowUUID = config.workflowUUID;
+      this._workflowName = config.workflowName;
+      this._canEditUUID = !config.workflowUUID;
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     });
 
@@ -164,6 +169,10 @@ export class WorkflowUploaderComponent
     let valid = this.checkIfValidUUID(value);
     this.logger.debug('Setting workflow UUID: ' + value + ' (valid: ' + valid + ')');
     this._setError('uuid', valid ? null : 'Not valid UUID');
+  }
+
+  public canEditUUID(): boolean{
+    return this._canEditUUID;
   }
 
   public enableEditingUUID() {
@@ -513,11 +522,12 @@ export class WorkflowUploaderComponent
   public _reset() {
     this.stepper.reset();
     this.errors = [];
-    this.source = 'localRoCrate';
+    this.source = 'localRoCrate';    
     this.workflowName = null;
     this.workflowUUID = uuidv4();
     this.workflowVersion = '1.0';
     this.roCrateFile = null;
+    this._canEditUUID = true;
     this._editUUID = false;
     this._workflowROCrate = null;
     this.roCrateURL = new UrlValue(this.httpClient);

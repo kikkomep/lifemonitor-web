@@ -11,6 +11,7 @@ import { TestBuild } from './testBuild.models';
 
 export class Workflow extends Model {
   uuid: string;
+  name: string;
   _version_descriptors: WorkflowVersionDescriptor[] = null;
   _current_version: WorkflowVersion = null;
   private __versions: { [name: string]: WorkflowVersion };
@@ -66,6 +67,13 @@ export class Workflow extends Model {
       this._versions[v.version['version']] = v;
       v.workflow = this;
       if (setAsCurrent) this.currentVersion = v;
+      if (!this.getVersionDescriptor(v.version['version'])) {
+        let data = { ...v.version };
+        delete data['links'];
+        delete data['name'];
+        this.logger.debug('Data VERSION: ', v.version, data);
+        this.addVersionDescriptor(data);
+      }
     }
   }
 
@@ -107,6 +115,20 @@ export class Workflow extends Model {
         this._version_descriptors.push(new WorkflowVersionDescriptor(v));
       });
     }
+  }
+
+  public getVersionDescriptor(version: string): WorkflowVersionDescriptor {
+    return this._version_descriptors.find((v) => v.name === version);
+  }
+
+  public addVersionDescriptor(version: object) {
+    let vd = new WorkflowVersionDescriptor(version);
+    if (vd.isLatest) {
+      this._version_descriptors.forEach((v) => {
+        v.isLatest = false;
+      });
+    }
+    this._version_descriptors.push(vd);
   }
 
   public get versionDescriptors(): WorkflowVersionDescriptor[] {
@@ -352,6 +374,10 @@ export class WorkflowVersionDescriptor extends Model {
 
   public get isLatest(): boolean {
     return this._rawData['is_latest'];
+  }
+
+  public set isLatest(value: boolean) {
+    this._rawData['is_latest'] = value;
   }
 
   public get links(): Object {

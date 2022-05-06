@@ -12,6 +12,10 @@ export interface Config {
   confirmText?: string;
   cancelText?: string;
   onConfirm?: any;
+  // workflow properties
+  workflowUUID?: string;
+  workflowName?: string;
+  workflowPublic?: boolean;
 }
 
 @Injectable({
@@ -33,8 +37,7 @@ export class WorkflowUploaderService {
   // initialize logger
   private logger: Logger = LoggerManager.create('WorkflowUploaderService');
 
-  constructor(
-    private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
   public show(options: Config) {
     this._config = options;

@@ -185,6 +185,13 @@ export class DashboardComponent implements OnInit {
     this.uploaderService.show({});
   }
 
+  public openWorkflowVersionUploader(workflow: Workflow) {
+    this.uploaderService.show({
+      title: "Register Workflow Version",
+      workflowUUID: workflow.uuid, workflowName: workflow.name
+    });
+  }
+
   public editModeToggle() {
     this.editModeEnabled = !this.editModeEnabled;
     this.logger.debug('Edit mode enabled: ' + this.editModeEnabled);

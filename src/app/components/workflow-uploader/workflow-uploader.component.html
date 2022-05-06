@@ -171,7 +171,8 @@
                       <div class="text-muted font-weight-light small">
                         The following identifier will be assigned to the workflow
                         <div class="float-right">
-                          <a class="btn btn-sm m-2" (click)="enableEditingUUID()" title="Click to change the identifier">
+                          <a *ngIf="canEditUUID()" class="btn btn-sm m-2" (click)="enableEditingUUID()" 
+                             title="Click to change the identifier">
                             <i class="far fa-edit"></i> edit
                           </a>
                         </div>
