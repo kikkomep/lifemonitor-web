@@ -13,7 +13,7 @@ import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
-import { WorkflowVersion } from 'src/app/models/workflow.model';
+import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
 import { AppConfigService } from './config.service';
@@ -388,7 +388,35 @@ export class ApiService {
     );
   }
 
-  get_workflow(
+  get_workflow(uuid: string): Observable<Workflow>{
+    this.logger.debug('Request login');
+    const workflow_query = this.http.get<WorkflowVersion>(
+      this.apiBaseUrl + '/workflows/' + uuid,
+      this.get_http_options({
+        ro_crate: false,
+      })
+    );
+
+    const workflow_versions_query = this.http.get<WorkflowVersion>(
+      this.apiBaseUrl + '/workflows/' + uuid + '/versions',
+      this.get_http_options({})
+    );
+
+    const queries = [workflow_query, workflow_versions_query];
+
+    return forkJoin(queries).pipe(
+      map((result) => {
+        let workflow: Workflow = new Workflow(result[0]);
+        workflow.updateDescriptors(result[1]["versions"]);
+        this.logger.debug('Loaded workflow', workflow);
+        return workflow;
+      }),
+      tap((result) => this.logger.debug('Loaded workflow: ', result)),
+      retry(3)
+    );
+  }
+
+  get_workflow_version(
     uuid: string,
     version: string = "latest",
     previous_versions = false,

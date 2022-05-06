@@ -20,18 +20,15 @@ export class Workflow extends Model {
     let versions: [] = rawData['versions'];
     delete rawData['versions'];
     this.update(rawData);
-    this._version_descriptors = [];
-    versions.forEach((v) => {
-      this._version_descriptors.push(new WorkflowVersionDescriptor(v));
-    });
+    this.updateDescriptors(versions, true);
   }
 
   public pickVersion(skip: string[] = null): WorkflowVersionDescriptor {
-    this.logger.debug("Skip", skip);
-    for(let v of this.versionDescriptors){
-      if(!skip || skip.length === 0) return v;
-      else if(skip.indexOf(v.name) === -1) return v;      
-    }    
+    this.logger.debug('Skip', skip);
+    for (let v of this.versionDescriptors) {
+      if (!skip || skip.length === 0) return v;
+      else if (skip.indexOf(v.name) === -1) return v;
+    }
     return null;
   }
 
@@ -99,6 +96,17 @@ export class Workflow extends Model {
 
   public get versions(): WorkflowVersion[] {
     return Object.values(this._versions);
+  }
+
+  public updateDescriptors(versions: [], replaceExisting: boolean = false) {
+    this._version_descriptors = replaceExisting
+      ? []
+      : this._version_descriptors;
+    if (versions) {
+      versions.forEach((v) => {
+        this._version_descriptors.push(new WorkflowVersionDescriptor(v));
+      });
+    }
   }
 
   public get versionDescriptors(): WorkflowVersionDescriptor[] {
