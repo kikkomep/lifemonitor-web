@@ -300,15 +300,9 @@
                     <div class="text-muted mt-1" style="font-size: 8pt;">{{ w.type }}</div>
                   </div>
                 </td>
-                <td class="text-center align-middle font-weight-light">
-                  <div data-toggle="tooltip" data-placement="top" data-html="true"
-                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
-                    {{ w.version ? w.version.version : ''}}
-                  </div>
-                  <div *ngIf="w.registry" class="text-sm" title="{{ w.externalLink }}">
-                    <a href="{{ w.externalLink }}" target="_blank">[details <i
-                        class="fas fa-external-link-alt"></i>]</a>
-                  </div>
+                <td class="text-center align-middle font-weight-light" style="min-width: 120px">
+                  <workflow-version-selector [workflow]="w.workflow" 
+                                             (workflow_version)="updateSelectedVersion($event)"></workflow-version-selector>
                 </td>
                 <td class="text-center align-middle font-weight-light" style="max-width: 150px;">
                   <div *ngIf="w.suites && w.suites.all.length == 0" data-toggle="tooltip" data-placement="top"

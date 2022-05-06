@@ -1,0 +1,10 @@
+<select class="form-select selectpicker show-tick" data-width="fit" 
+    data-style="version" aria-label="Select workflow version" (change)="selectVersion($event.target.value)">
+    <ng-container *ngFor="let v of versions">
+        <option [value]="v.name" [selected]="v.name == workflow.currentVersion.version['version']" 
+            class="version-option"
+            [attr.data-content]="v.name + (v.isLatest ? '<span class=\'mx-2 badge badge-success\' style=\'font-size: 0.8em;\'>latest</span>' : '')">
+            {{ v.name }}
+        </option>
+    </ng-container>
+</select>
