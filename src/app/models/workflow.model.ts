@@ -9,8 +9,79 @@ import {
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';
 
+export class Workflow extends Model {
+  uuid: string;
+  _version_descriptors: WorkflowVersionDescriptor[] = null;
+  _current_version: WorkflowVersion = null;
+  private __versions: { [name: string]: WorkflowVersion };
+
+  constructor(rawData?: Object, skip?: []) {
+    super();
+    let versions: [] = rawData['versions'];
+    delete rawData['versions'];
+    this.update(rawData);
+    this._version_descriptors = [];
+    versions.forEach((v) => {
+      this._version_descriptors.push(new WorkflowVersionDescriptor(v));
+    });
+  }
+
+  public set currentVersion(v: WorkflowVersion) {
+    this._current_version = v;
+    this.logger.debug('Updated current workflow version', v, this);
+  }
+
+  public get currentVersion(): WorkflowVersion {
+    return this._current_version;
+  }
+
+  private get _versions(): { [name: string]: WorkflowVersion } {
+    if (!this.__versions) this.__versions = {};
+    return this.__versions;
+  }
+
+  public getVersion(version: string): WorkflowVersion {
+    try {
+      return this._versions[version];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public addVersion(v: WorkflowVersion, setAsCurrent: boolean = false) {
+    if (v && v.workflow == null) {
+      this._versions[v.name] = v;
+      v.workflow = this;
+      if (setAsCurrent) this.currentVersion = v;
+    }
+  }
+
+  public removeVersion(v: WorkflowVersion) {
+    if (v.workflow == this) {
+      delete this._versions[v.name];
+      v.workflow = null;
+    }
+  }
+
+  public set versions(versions: WorkflowVersion[]) {
+    this.__versions = {};
+    for (let v of versions) {
+      this._versions[v.name] = v;
+    }
+  }
+
+  public get versions(): WorkflowVersion[] {
+    return Object.values(this._versions);
+  }
+
+  public get versionDescriptors(): WorkflowVersionDescriptor[] {
+    return this._version_descriptors;
+  }
+}
+
 export class WorkflowVersion extends AggregatedStatusStatsItem {
   public: boolean;
+  _workflow: Workflow;
   version: Object;
   status: Status;
   _previous_versions: WorkflowVersionDescriptor[];
@@ -29,6 +100,14 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
       this._suites = suites;
     }
     this.setName(data);
+  }
+
+  public set workflow(w: Workflow) {
+    this._workflow = w;
+  }
+
+  public get workflow(): Workflow {
+    return this._workflow;
   }
 
   public update(rawData: Object) {
