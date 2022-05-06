@@ -14,7 +14,7 @@
               <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
             </li>
             <li class="breadcrumb-item active">
-              <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid }]">
+              <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid, version: suite.workflow.version['version'] }]">
                 <i class="fas fa-cogs p-1"></i>Workflow
               </a>
             </li>
