@@ -543,7 +543,8 @@ export class AppService {
               this.logger.debug('Registered Workflow RO-Crate:', workflow_version);
               this._workflow_versions.push(workflow_version);
               this.logger.debug('Workflow data loaded!');
-              if (!this.findWorkflow(uuid)) {
+              let workflow: Workflow = this.findWorkflow(uuid);
+              if (!workflow) {
                 this.api.get_workflow(uuid).subscribe((workflow: Workflow) => {
                   workflow.addVersion(workflow_version, true);
                   this._workflows.push(workflow);
@@ -551,6 +552,7 @@ export class AppService {
                   this.setLoadingWorkflows(false);
                 });
               } else {
+                workflow.addVersion(workflow_version, true);
                 this.subjectWorkflows.next(this._workflows);
                 this.setLoadingWorkflows(false);
               }
@@ -591,7 +593,8 @@ export class AppService {
               this.logger.debug('Registered Workflow RO-Crate:', workflow_version);
               this._workflow_versions.push(workflow_version);
               this.logger.debug('Workflow data loaded!');
-              if (!this.findWorkflow(workflow_version.uuid)) {
+              let workflow: Workflow = this.findWorkflow(workflow_version.uuid);
+              if (!workflow) {
                 this.api.get_workflow(workflow_version.uuid).subscribe((workflow: Workflow) => {
                   workflow.addVersion(workflow_version, true);
                   this._workflows.push(workflow);
@@ -599,6 +602,7 @@ export class AppService {
                   this.setLoadingWorkflows(false);
                 });
               } else {
+                workflow.addVersion(workflow_version, true);
                 this.subjectWorkflows.next(this._workflows);
                 this.setLoadingWorkflows(false);
               }
