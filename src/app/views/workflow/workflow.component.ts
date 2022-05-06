@@ -70,7 +70,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
 
     this.paramSubscription = this.route.params.subscribe((params) => {
       // select a workflow
-      this.appService.selectWorkflow(params['uuid'], params['version']);
+      this.appService.selectWorkflowVersion(params['uuid'], params['version']);
     });
   }
 

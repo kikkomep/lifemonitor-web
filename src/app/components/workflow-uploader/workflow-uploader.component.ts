@@ -403,7 +403,7 @@ export class WorkflowUploaderComponent
         );
       } else if (this.source === 'registry') {
         this.logger.debug("Selected registry workflow: ", this.selectRegistryWorkflow);
-        let existingWorkflow = this.appService.workflows.find(
+        let existingWorkflow = this.appService.workflow_versions.find(
           (w: WorkflowVersion) => w.version
             && 'links' in w.version
             && 'origin' in w.version['links']

@@ -71,7 +71,7 @@ export class SuiteComponent implements OnInit {
       );
 
       // select a workflow
-      this.appService.selectWorkflow(urlData['workflow'], urlData['version']);
+      this.appService.selectWorkflowVersion(urlData['workflow'], urlData['version']);
     });
   }
 

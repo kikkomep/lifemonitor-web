@@ -62,7 +62,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
       this.logger.debug('Test Build selected', testBuild);
       window.open(testBuild.externalLink, '_blank');
       this.suiteSelected.emit(testBuild);
-      this.appService.selectWorkflow(
+      this.appService.selectWorkflowVersion(
         testBuild.testInstance.suite.workflow.uuid
       );
     }

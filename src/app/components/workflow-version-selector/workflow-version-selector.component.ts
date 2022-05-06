@@ -60,7 +60,7 @@ export class WorkflowVersionSelectorComponent implements OnInit {
     let wv = this.workflow.getVersion(version);
     if (!wv) {
       this.appService
-        .loadWorkflow(this.workflow, version)
+        .loadWorkflowVersion(this.workflow, version)
         .subscribe((v: WorkflowVersion) => {
           this.workflow.addVersion(v, true);
           this.workflow_version.emit(v);
