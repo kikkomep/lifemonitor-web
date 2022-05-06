@@ -238,7 +238,7 @@ export class DashboardComponent implements OnInit {
   public showWorkflowDetails(w: WorkflowVersion) {
     this.clickHandler.click(() => {
       this.router.navigate([
-        '/workflow', { uuid: w.asUrlParam() }]);
+        '/workflow', { uuid: w.asUrlParam(), version: w.version["version"] }]);
     });
   }
 
