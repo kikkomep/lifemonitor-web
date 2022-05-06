@@ -227,7 +227,7 @@
                       }}
                     </a>
                   </div>
-                  <div >
+                  <div>
                     <div *ngFor="let r of w.registries" class="text-xs cut-text font-weight-light">
                       <span class="icon-wrapper">
                         <i class="fa-xs fas fa-sitemap mr-1"></i>
@@ -301,8 +301,8 @@
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light" style="min-width: 120px">
-                  <workflow-version-selector [workflow]="w.workflow" 
-                                             (workflow_version)="updateSelectedVersion($event)"></workflow-version-selector>
+                  <workflow-version-selector [workflow]="w.workflow" (workflow_version)="updateSelectedVersion($event)">
+                  </workflow-version-selector>
                 </td>
                 <td class="text-center align-middle font-weight-light" style="max-width: 150px;">
                   <div *ngIf="w.suites && w.suites.all.length == 0" data-toggle="tooltip" data-placement="top"
