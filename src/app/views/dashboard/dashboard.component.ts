@@ -187,7 +187,8 @@ export class DashboardComponent implements OnInit {
 
   public openWorkflowVersionUploader(workflow: Workflow) {
     this.uploaderService.show({
-      title: "Register Workflow Version",
+      iconImage: '/assets/icons/branch-add-eosc-green.png',
+      title: "Register new version of <br><b>\"" + workflow.name + "\"</b>",
       workflowUUID: workflow.uuid, workflowName: workflow.name
     });
   }
@@ -214,6 +215,20 @@ export class DashboardComponent implements OnInit {
   public deleteWorkflowVersion(w: WorkflowVersion) {
     this.logger.debug("Deleting workflow version....", w);
     this.inputDialog.show({
+      iconImage: '/assets/icons/branch-delete-eosc-green.png',
+      iconImageSize: "160",
+      description:
+        'Delete version <b>"' + w.version["version"] + '"</b><br/> of workflow <b>' + w.name + '</b>?',
+      onConfirm: () => {
+        this.updatingDataTable = true;
+        this.appService.deleteWorkflowVersion(w)
+          .subscribe((wd: { uuid: string; version: string }) => {
+            this.logger.debug("Workflow deleted", wd);
+            this.refreshDataTable(false);
+          });
+      },
+    });
+  }
       iconClass: 'fas fa-trash-alt',
       description:
         'Delete workflow <b>' +

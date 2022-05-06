@@ -33,8 +33,10 @@ interface RegistrationError {
 export class WorkflowUploaderComponent
   implements OnInit, AfterViewChecked, AfterViewInit {
   @Input() title = 'Register Workflow';
-  @Input() iconClass = 'far fa-question-circle';
+  @Input() iconClass = 'fas fa-cogs';
   @Input() iconClassSize = 'fa-7x';
+  @Input() iconImage = null;
+  @Input() iconImageSize = "120";
   @Input() question = 'Are you sure?';
   @Input() description = 'Would you like to confirm?';
   @Input() confirmText = 'Register';
@@ -90,6 +92,8 @@ export class WorkflowUploaderComponent
       this.title = config.title || this.title;
       this.iconClass = config.iconClass || this.iconClass;
       this.iconClassSize = config.iconClassSize || this.iconClassSize;
+      this.iconImage = config.iconImage || this.iconImage;
+      this.iconImageSize = config.iconImageSize || this.iconImageSize;
       this.question = config.question || this.question;
       this.description = config.description || this.description;
       this.confirmText = config.confirmText || this.confirmText;

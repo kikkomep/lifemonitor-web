@@ -6,6 +6,8 @@ export interface InputDialogConfig {
   title?: string;
   iconClass?: string;
   iconClassSize?: string;
+  iconImage?: string;
+  iconImageSize?: string;
   question?: string;
   description?: string;
   confirmText?: string;

@@ -333,9 +333,19 @@
                 <td class="text-center align-middle font-weight-light">
                   <div *ngIf="editModeEnabled && isEditable(w)">
                     <a class="btn btn-sm" (click)="openWorkflowVersionUploader(w.workflow)" style="min-width: 60px;"
-                       data-toggle="tooltip" data-placement="top"
-                       data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>add new version</span>">
-                        <i class="far fa-code-branch"></i>                      
+                      data-toggle="tooltip" data-placement="top" data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>add new version</span>">
+                      <!-- <i class="far fa-code-branch"></i> -->
+                      <i class="fas fa-plus-circle"></i>
+                      <!-- <img src="assets/icons/branch-add.png" width="50px"> -->
+                    </a>
+                  </div>
+                  <div *ngIf="editModeEnabled && isEditable(w)">
+                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflowVersion(w)" data-toggle="tooltip" data-placement="top"
+                      data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete version</span>">
+                      <i class="fas fa-minus-circle"></i>
+                      <!-- <img src="assets/icons/branch-delete.png" width="50px"> -->
                     </a>
                   </div>
                   <div *ngIf="editModeEnabled && isEditable(w)">

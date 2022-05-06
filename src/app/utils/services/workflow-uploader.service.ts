@@ -7,6 +7,8 @@ export interface Config {
   title?: string;
   iconClass?: string;
   iconClassSize?: string;
+  iconImage?: string;
+  iconImageSize?: string;
   question?: string;
   description?: string;
   confirmText?: string;
