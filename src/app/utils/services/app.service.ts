@@ -510,19 +510,39 @@ export class AppService {
       );
   }
 
-  public deleteWorkflowVersion(w: WorkflowVersion, version: string):
-    Observable<{ uuid: string; version: string }> {
+  public deleteWorkflowVersion(workflow_version: WorkflowVersion): Observable<{ uuid: string; version: string }> {
+    if(!workflow_version) return;
+    let workflow : Workflow = workflow_version.workflow;    
     this.setLoadingWorkflows(true);
-    return this.api.deleteWorkflowVersion(w.uuid, version).pipe(
+    return this.api.deleteWorkflowVersion(workflow_version.uuid, workflow_version.version["version"]).pipe(
       map((wd: { uuid: string; version: string }) => {
-        const index = this._workflows.findIndex(obj => obj.uuid === w.uuid && obj.version['version'] === version);
-        if (index > -1) {
-          this._workflows.splice(index, 1);
-          this._workflowsStats.remove(w);
-          this.subjectWorkflows.next(this._workflowsStats);
-          this.setLoadingWorkflows(false);
+        const versionIndex = workflow.findIndex(workflow_version);
+        this.logger.debug("Version index: ", versionIndex);
+        if (versionIndex > -1) {
+          this._workflow_versions.splice(versionIndex, 1);
+          this._workflowsStats.remove(workflow_version);
+          let nextVersionDescriptor : WorkflowVersionDescriptor = workflow.pickVersion([workflow_version.version["version"]]);
+          this.logger.debug("Next version: ", nextVersionDescriptor);    
+          if(nextVersionDescriptor){
+            this.loadWorkflow(workflow, nextVersionDescriptor.name).subscribe((wv: WorkflowVersion) => {
+              workflow.addVersion(wv, true);
+              workflow.removeVersion(workflow_version);
+              this.subjectWorkflows.next(this._workflows);
+              this.setLoadingWorkflows(false);
+            },
+            catchError((e) => {
+              this.setLoadingWorkflows(false);
+              throw e;
+            }));      
+          }else{
+            workflow.removeVersion(workflow_version);
+            this.subjectWorkflows.next(this._workflows);
+            this.setLoadingWorkflows(false);
+          }          
         }
-        this.logger.debug("Workflow removed");
+          }          
+        }
+        this.logger.debug('Workflow removed');
         return wd;
       }),
       catchError((err) => {
@@ -533,7 +553,7 @@ export class AppService {
       finalize(() => {
         // this.setLoadingWorkflows(false);
       })
-    )
+    );
   }
 
   public updateWorkflowName(w: WorkflowVersion): Observable<any> {

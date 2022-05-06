@@ -213,7 +213,7 @@ export class DashboardComponent implements OnInit {
         w.name + '</b> (version ' + w.version['version'] + ')?',
       onConfirm: () => {
         this.updatingDataTable = true;
-        this.appService.deleteWorkflowVersion(w, w.version['version'])
+        this.appService.deleteWorkflowVersion(w)
           .subscribe((wd: { uuid: string; version: string }) => {
             this.logger.debug("Workflow deleted", wd);
             this.refreshDataTable(false);

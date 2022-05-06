@@ -26,6 +26,22 @@ export class Workflow extends Model {
     });
   }
 
+  public pickVersion(skip: string[] = null): WorkflowVersionDescriptor {
+    this.logger.debug("Skip", skip);
+    for(let v of this.versionDescriptors){
+      if(!skip || skip.length === 0) return v;
+      else if(skip.indexOf(v.name) === -1) return v;      
+    }    
+    return null;
+  }
+
+  public findIndex(v: WorkflowVersion): number {
+    return this.versions.findIndex(
+      (obj) =>
+        obj.uuid === v.uuid && obj.version['version'] === v.version['version']
+    );
+  }
+
   public set currentVersion(v: WorkflowVersion) {
     this._current_version = v;
     this.logger.debug('Updated current workflow version', v, this);
@@ -50,23 +66,34 @@ export class Workflow extends Model {
 
   public addVersion(v: WorkflowVersion, setAsCurrent: boolean = false) {
     if (v && v.workflow == null) {
-      this._versions[v.name] = v;
+      this._versions[v.version['version']] = v;
       v.workflow = this;
       if (setAsCurrent) this.currentVersion = v;
     }
   }
 
-  public removeVersion(v: WorkflowVersion) {
+  public removeVersion(v: WorkflowVersion, removeDescriptor: boolean = true) {
     if (v.workflow == this) {
-      delete this._versions[v.name];
+      delete this._versions[v.version['version']];
       v.workflow = null;
+      if (removeDescriptor && this._version_descriptors) {
+        let index = this._version_descriptors.findIndex(
+          (d: WorkflowVersionDescriptor) => d.name === v.version['version']
+        );
+        if (this.currentVersion === v) {
+          this.currentVersion = null;
+        }
+        if (index > -1) {
+          this._version_descriptors.splice(index, 1);
+        }
+      }
     }
   }
 
   public set versions(versions: WorkflowVersion[]) {
     this.__versions = {};
     for (let v of versions) {
-      this._versions[v.name] = v;
+      this._versions[v.version['version']] = v;
     }
   }
 
