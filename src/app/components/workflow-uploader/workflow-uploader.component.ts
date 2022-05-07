@@ -111,8 +111,8 @@ export class WorkflowUploaderComponent
       this._reset();
 
       // set workflow UUID to register new versions of existing workflows
-      this._workflowUUID = config.workflowUUID;
-      this._workflowName = config.workflowName;
+      this._workflowUUID = config.workflowUUID || uuidv4();
+      this._workflowName = config.workflowName || null;
       this._canEditUUID = !config.workflowUUID;
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     });
@@ -528,7 +528,7 @@ export class WorkflowUploaderComponent
     this.errors = [];
     this.source = 'localRoCrate';    
     this.workflowName = null;
-    this.workflowUUID = uuidv4();
+    this.workflowUUID = null;
     this.workflowVersion = '1.0';
     this.roCrateFile = null;
     this._canEditUUID = true;
