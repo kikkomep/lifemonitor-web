@@ -330,7 +330,7 @@
                     [stats]="w.getLatestBuilds() | arraySizeFilterPipe: 10" (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
-                <td class="text-center align-middle font-weight-light">
+                <td class="text-center align-middle font-weight-light" width="62px">
                   <div *ngIf="editModeEnabled && isEditable(w)">
                     <a class="btn btn-sm" (click)="openWorkflowVersionUploader(w.workflow)" style="min-width: 60px;"
                       data-toggle="tooltip" data-placement="top" data-html="true"
