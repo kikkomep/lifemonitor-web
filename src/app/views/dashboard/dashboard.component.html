@@ -349,12 +349,12 @@
                     </a>
                   </div>
                   <div *ngIf="editModeEnabled && isEditable(w)">
-                    <a [routerLink]="" (click)="deleteWorkflowVersion(w)"
-                       data-toggle="tooltip" data-placement="top"
-                       data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete version</span>">
-                      <i class="fas fa-trash-alt" style="color: black;"></i>
+                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflow(w.workflow)" data-toggle="tooltip" data-placement="top"
+                      data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete workflow</span>">
+                      <i class="fas fa-trash-alt"></i>
                     </a>
-                  </div>                  
+                  </div>
                 </td>
               </tr>
             </tbody>

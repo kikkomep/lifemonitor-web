@@ -176,8 +176,8 @@ export class AppService {
     let registry_uuid = uuid
       ? uuid
       : this._registry
-      ? this._registry.uuid
-      : null;
+        ? this._registry.uuid
+        : null;
     if (!registry_uuid) return null;
     return this._registryWorkflows[registry_uuid];
   }
@@ -199,8 +199,8 @@ export class AppService {
   public findWorkflowVersion(uuid: string, version: string): WorkflowVersion {
     return this._workflow_versions
       ? this._workflow_versions.find(
-          (w) => w.uuid === uuid && w.version['version'] === version
-        )
+        (w) => w.uuid === uuid && w.version['version'] === version
+      )
       : null;
   }
 
@@ -673,6 +673,37 @@ export class AppService {
         }),
         finalize(() => {
           // this.setLoadingWorkflows(false);
+        })
+      );
+  }
+
+  public deleteWorkflow(
+    workflow: Workflow
+  ): Observable<{ uuid: string; }> {
+    if (!workflow) return;
+    this.setLoadingWorkflows(true);
+    return this.api
+      .deleteWorkflow(workflow.uuid)
+      .pipe(
+        map((wd: { uuid: string; }) => {
+          const workflowIndex = this.workflows.findIndex((w) => w.uuid === workflow.uuid);
+          this.logger.debug('Version index: ', workflowIndex);
+          if (workflowIndex > -1) {
+            this._workflows.splice(workflowIndex, 1);
+            this.subjectWorkflows.next(this._workflows);
+            this.logger.debug('Workflow removed');
+          } else {
+            this.logger.warn("Workflow not found", workflow);
+          }
+          return wd;
+        }),
+        catchError((err) => {
+          this.logger.debug('Error when deleting workflow', err);
+          this.setLoadingWorkflows(false);
+          throw err;
+        }),
+        finalize(() => {
+          this.setLoadingWorkflows(false);
         })
       );
   }

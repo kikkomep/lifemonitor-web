@@ -229,13 +229,16 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
+
+  public deleteWorkflow(w: Workflow) {
+    this.logger.debug("Deleting workflow ....", w);
+    this.inputDialog.show({
       iconClass: 'fas fa-trash-alt',
       description:
-        'Delete workflow <b>' +
-        w.name + '</b> (version ' + w.version['version'] + ')?',
+        'Delete workflow <b>' + w.name + '</b>?',
       onConfirm: () => {
         this.updatingDataTable = true;
-        this.appService.deleteWorkflowVersion(w)
+        this.appService.deleteWorkflow(w)
           .subscribe((wd: { uuid: string; version: string }) => {
             this.logger.debug("Workflow deleted", wd);
             this.refreshDataTable(false);
