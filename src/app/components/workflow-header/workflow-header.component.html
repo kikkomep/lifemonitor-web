@@ -86,8 +86,8 @@
             </div>
             <div class="col-10 mx-1" style="color: gray;">
                 <b>{{ r.name }} ID: </b>
-                <a href="{{ workflow.getRegistryLink(r.name) }}" target="_blank">
-                    {{workflow.getRegistryLink(r.name)}}
+                <a href="{{ workflow.getRegistryLink(r.identifier) }}" target="_blank">
+                    {{workflow.getRegistryLink(r.identifier)}}
                     <i class="fas fa-xs fa-external-link-alt mx-2"></i>
                 </a>
             </div>
@@ -114,7 +114,7 @@
                     data-toggle="tooltip" target="_blank" data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
                         click to see the workflow on <b>{{r}}</b> registry
                         <i class='fas fa-sm fa-external-link-alt mx-1'></i>"
-                    href="{{workflow.getRegistryLink(r.name)}}">
+                    href="{{workflow.getRegistryLink(r.identifier)}}">
                     <img src="/assets/img/logo/registries/workflowhub.svg" class="p-0 m-0" height="110" />
                     <div class="text-center" style="margin-top: -12px; font-size: 0.8rem;">
                         <span>see on <b>{{r.name}}</b></span>
