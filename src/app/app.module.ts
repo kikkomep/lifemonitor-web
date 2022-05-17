@@ -42,6 +42,7 @@ import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
+import { WorkflowVersionSelectorComponent } from './components/workflow-version-selector/workflow-version-selector.component';
 
 
 
@@ -86,6 +87,7 @@ export function initConfigService(appConfig: AppConfigService) {
     WorkflowHeaderComponent,
     InputDialogComponent,
     WorkflowUploaderComponent,
+    WorkflowVersionSelectorComponent,
   ],
   imports: [
     FormsModule,
@@ -119,4 +121,4 @@ export function initConfigService(appConfig: AppConfigService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

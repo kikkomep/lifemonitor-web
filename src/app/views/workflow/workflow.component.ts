@@ -12,7 +12,7 @@ import {
   StatusStatsItem
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
@@ -24,7 +24,7 @@ import { AppService } from 'src/app/utils/services/app.service';
 })
 export class WorkflowComponent implements OnInit, OnChanges {
   // current workflow
-  public workflow: Workflow;
+  public workflow: WorkflowVersion;
   // suites of the current workflow
   public suites: AggregatedStatusStatsItem[] = null;
 
@@ -54,7 +54,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
 
     // subscribe for the current selected workflow
     this.workflowSubscription = this.appService.observableWorkflow.subscribe(
-      (w: Workflow) => {
+      (w: WorkflowVersion) => {
         this.logger.debug('Changed workflow', w, w.suites);
         this.workflow = w;
         this.workflowChangesSubscription = this.workflow
@@ -70,7 +70,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
 
     this.paramSubscription = this.route.params.subscribe((params) => {
       // select a workflow
-      this.appService.selectWorkflow(params['uuid']);
+      this.appService.selectWorkflowVersion(params['uuid'], params['version']);
     });
   }
 

@@ -55,12 +55,12 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
 
   constructor(_rawData: Object) {
     super(_rawData);
-    this.setNameFromProperty(_rawData, "name", _rawData['uuid']);
+    this.setNameFromProperty(_rawData, 'name', _rawData['uuid']);
   }
 
   public update(rawData: Object) {
     super.update(rawData);
-    this.setNameFromProperty(rawData, "name", rawData['uuid']);
+    this.setNameFromProperty(rawData, 'name', rawData['uuid']);
   }
 
   getStatus(): string {
@@ -132,20 +132,36 @@ export class AbstractStats extends Model {
     }
   }
 
-  public remove(item: StatsItem) {
+  public replace(item: StatsItem, newItem: StatsItem = null) {
     if (!item) return;
-    let index = this['all'].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
-    this.logger.debug("Delete item from all @index", index);
+    let index = this['all'].findIndex(
+      (o: { uuid: string }) => o.uuid === item.uuid
+    );
+    this.logger.debug('Delete item from all @index', index);
     if (index !== -1) {
-      this['all'].splice(index, 1);
-    }
-    if (this[item.getStatus()]) {
-      index = this[item.getStatus()].findIndex((o: { uuid: string; }) => o.uuid === item.uuid);
-      this.logger.debug("Delete item from " + item.getStatus() + " @index", index);
-      if (index !== -1) {
-        this[item.getStatus()].splice(index, 1);
+      if (!newItem) {
+        this['all'].splice(index, 1);
+        if (this[item.getStatus()]) {
+          index = this[item.getStatus()].findIndex(
+            (o: { uuid: string }) => o.uuid === item.uuid
+          );
+          this.logger.debug(
+            'Delete item from ' + item.getStatus() + ' @index',
+            index
+          );
+          if (index !== -1) {
+            this[item.getStatus()].splice(index, 1);
+          }
+        }
+      } else {
+        this['all'][index] = newItem;
+        this.update([...this['all']], true);
       }
     }
+  }
+
+  public remove(item: StatsItem) {
+    this.replace(item);
   }
 
   public update(data: Array<StatsItem>, removeExisting: boolean = false) {

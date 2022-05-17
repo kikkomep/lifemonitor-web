@@ -16,6 +16,8 @@ export class InputDialogComponent implements OnInit {
   @Input() title = null;
   @Input() iconClass = 'far fa-question-circle';
   @Input() iconClassSize = 'fa-7x';
+  @Input() iconImage = null;
+  @Input() iconImageSize = '100px';
   @Input() question = 'Are you sure?';
   @Input() description = 'Would you like to confirm?';
   @Input() confirmText = 'Confirm';
@@ -27,7 +29,7 @@ export class InputDialogComponent implements OnInit {
   // initialize logger
   private logger: Logger = LoggerManager.create('InputDialogComponent');
 
-  constructor(private service: InputDialogService) { }
+  constructor(private service: InputDialogService) {}
 
   ngOnInit(): void {
     $('#' + this.name).on('hide.bs.modal', () => {
@@ -39,6 +41,8 @@ export class InputDialogComponent implements OnInit {
       this.title = config.title || this.title;
       this.iconClass = config.iconClass || this.iconClass;
       this.iconClassSize = config.iconClassSize || this.iconClassSize;
+      this.iconImage = config.iconImage || this.iconImage;
+      this.iconImageSize = config.iconImageSize || this.iconImageSize;
       this.question = config.question || this.question;
       this.description = config.description || this.description;
       this.confirmText = config.confirmText || this.confirmText;

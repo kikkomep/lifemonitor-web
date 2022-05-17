@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
@@ -11,7 +11,7 @@ declare var $: any;
   styleUrls: ['./rocrate-logo.component.scss'],
 })
 export class RocrateLogoComponent implements OnInit {
-  @Input() workflow: Workflow;
+  @Input() workflow: WorkflowVersion;
 
   private _availableForDownload: boolean;
 

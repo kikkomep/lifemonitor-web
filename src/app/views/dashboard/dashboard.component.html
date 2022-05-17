@@ -210,20 +210,46 @@
                       w.name }}
                     </a>
                     <div class="text-xs">
-                      <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
+                      <span class="icon-wrapper">
+                        <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
+                      </span>
                       <b>uuid:</b> {{ w.uuid }}
                     </div>
                   </div>
+                  <div class="text-xs cut-text font-weight-light">
+                    <span class="icon-wrapper">
+                      <!-- <i class="fas fa-xs fa-cloud-upload-alt mr-1"></i> -->
+                      <i class="fas fa-xs fa-database mr-1"></i>
+                    </span>
+                    <b>origin: </b>
+                    <a href="{{ w.originLink }}" target="_blank">{{
+                      w.originLink
+                      }}
+                    </a>
+                  </div>
+                  <div>
+                    <div *ngFor="let r of w.registries" class="text-xs cut-text font-weight-light">
+                      <span class="icon-wrapper">
+                        <i class="fa-xs fas fa-sitemap mr-1"></i>
+                      </span>
+                      <b>{{ r.name }}: </b>
+                      <a href="{{ w.getRegistryLink(r.identifier) }}" target="_blank">{{ w.getRegistryLink(r.identifier) }}</a>
+                    </div>
+                  </div>
                   <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
-                    <i class="fas fa-xs fa-external-link-alt mr-1"></i>
-                    <b>external ID: </b>
-                    <a href="{{ w.externalLink }}" target="_blank">{{
-                      w.externalLink
+                    <span class="icon-wrapper">
+                      <i class="fa-xs fas fa-sitemap mr-1"></i>
+                    </span>
+                    <b>registry ID: </b>
+                    <a href="{{ w.registryLink }}" target="_blank">{{
+                      w.registryLink
                       }}
                     </a>
                   </div>
                   <div *ngIf="w.version" class="text-xs cut-text font-weight-light">
-                    <i class="fas fa-xs fa-solid fa-user mr-1"></i>
+                    <span class="icon-wrapper">
+                      <i class="fas fa-xs fa-solid fa-user mr-1"></i>
+                    </span>
                     <b>owner: </b>
                     <span>{{ w.version.submitter.username }}</span>
                   </div>
@@ -274,15 +300,9 @@
                     <div class="text-muted mt-1" style="font-size: 8pt;">{{ w.type }}</div>
                   </div>
                 </td>
-                <td class="text-center align-middle font-weight-light">
-                  <div data-toggle="tooltip" data-placement="top" data-html="true"
-                    title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>latest version</span>">
-                    {{ w.version ? w.version.version : ''}}
-                  </div>
-                  <div *ngIf="w.registry" class="text-sm" title="{{ w.externalLink }}">
-                    <a href="{{ w.externalLink }}" target="_blank">[details <i
-                        class="fas fa-external-link-alt"></i>]</a>
-                  </div>
+                <td class="text-center align-middle font-weight-light" style="min-width: 120px">
+                  <workflow-version-selector [workflow]="w.workflow" (workflow_version)="updateSelectedVersion($event)">
+                  </workflow-version-selector>
                 </td>
                 <td class="text-center align-middle font-weight-light" style="max-width: 150px;">
                   <div *ngIf="w.suites && w.suites.all.length == 0" data-toggle="tooltip" data-placement="top"
@@ -310,10 +330,29 @@
                     [stats]="w.getLatestBuilds() | arraySizeFilterPipe: 10" (selectedItem)="selectTestBuild($event)">
                   </stats-bar-chart>
                 </td>
-                <td class="text-center align-middle font-weight-light">
+                <td class="text-center align-middle font-weight-light" width="62px">
                   <div *ngIf="editModeEnabled && isEditable(w)">
-                    <a [routerLink]="" (click)="deleteWorkflowVersion(w)">
-                      <i class="fas fa-trash-alt" style="color: black;"></i>
+                    <a class="btn btn-sm" (click)="openWorkflowVersionUploader(w.workflow)" style="min-width: 60px;"
+                      data-toggle="tooltip" data-placement="top" data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>add new version</span>">
+                      <!-- <i class="far fa-code-branch"></i> -->
+                      <i class="fas fa-plus-circle"></i>
+                      <!-- <img src="assets/icons/branch-add.png" width="50px"> -->
+                    </a>
+                  </div>
+                  <div *ngIf="editModeEnabled && isEditable(w)">
+                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflowVersion(w)" data-toggle="tooltip" data-placement="top"
+                      data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete version</span>">
+                      <i class="fas fa-minus-circle"></i>
+                      <!-- <img src="assets/icons/branch-delete.png" width="50px"> -->
+                    </a>
+                  </div>
+                  <div *ngIf="editModeEnabled && isEditable(w)">
+                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflow(w.workflow)" data-toggle="tooltip" data-placement="top"
+                      data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete workflow</span>">
+                      <i class="fas fa-trash-alt"></i>
                     </a>
                   </div>
                 </td>

@@ -11,8 +11,12 @@
           <span aria-hidden="true">&times;</span>
         </button>
 
-        <div class="text-center p-5 text-primary">
+        <div *ngIf="!iconImage" class="text-center p-5 text-primary">
           <i class="{{iconClass}} {{iconClassSize}}"></i>
+        </div>
+
+        <div *ngIf="iconImage" class="text-center p-5 text-primary">
+          <img src="{{iconImage}}" width="{{iconImageSize}}">
         </div>
 
         <div class="text-center">

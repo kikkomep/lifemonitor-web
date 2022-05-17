@@ -9,8 +9,12 @@
         </div>
       </div>
 
-      <div *ngIf="title" class="modal-header text-center">
-        <h4 class="modal-title text-weight-bold">{{ title }}</h4>
+      <div class="text-center text-primary mt-4">
+        <i *ngIf="!iconImage && iconClass" class="{{ iconClass }} {{ iconClassSize }}"></i>
+        <img *ngIf="iconImage" src="{{ iconImage }}" width="{{ iconImageSize }}">
+      </div>
+      <div *ngIf="title" class="modal-header text-center m-auto">
+        <h3 class="modal-title text-weight-bold" [innerHtml]="title"></h3>
       </div>
       <div class="modal-body">
         <div class="card card-default">
@@ -90,8 +94,8 @@
 
                       <!-- RO-Crate authorization header -->
                       <div class="float-right">
-                        <a class="text-primary collapsed" data-toggle="collapse" href="#authForm"
-                           role="button" aria-expanded="false" aria-controls="Advanced Setting">
+                        <a class="text-primary collapsed" data-toggle="collapse" href="#authForm" role="button"
+                          aria-expanded="false" aria-controls="Advanced Setting">
                           Advanced Settings
                         </a>
                       </div>
@@ -171,7 +175,8 @@
                       <div class="text-muted font-weight-light small">
                         The following identifier will be assigned to the workflow
                         <div class="float-right">
-                          <a class="btn btn-sm m-2" (click)="enableEditingUUID()" title="Click to change the identifier">
+                          <a *ngIf="canEditUUID()" class="btn btn-sm m-2" (click)="enableEditingUUID()"
+                            title="Click to change the identifier">
                             <i class="far fa-edit"></i> edit
                           </a>
                         </div>
@@ -185,8 +190,7 @@
 
                     </div>
                     <div *ngIf="isEditingUUID">
-                      <label for="workflow-uuid" class="m-0">UUID (<i
-                        class="fas fa-star-of-life fa-xs text-muted"></i>)
+                      <label for="workflow-uuid" class="m-0">UUID (<i class="fas fa-star-of-life fa-xs text-muted"></i>)
                       </label>
                       <div class="text-muted font-weight-light">
                         Enter a UUID for the workflow
@@ -218,7 +222,8 @@
                     <span class='larger'> {{ selectedRegistryWorkflow.name }} </span>
                     <div class='mr-4 text-muted'>
                       <span class='badge badge-primary mr-1'>{{selectedRegistry.type}} ID</span>
-                      <span class='small'><a [href]='selectedRegistry.uri'>{{ selectedRegistryWorkflow.links['origin'] }}</a></span>
+                      <span class='small'><a [href]='selectedRegistry.uri'>{{ selectedRegistryWorkflow.links['origin']
+                          }}</a></span>
                     </div>
                   </div>
 

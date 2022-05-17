@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
@@ -50,7 +50,7 @@ export class SuiteComponent implements OnInit {
 
       // subscribe for the current selected workflow
       this.workflowSubscription = this.appService.observableWorkflow.subscribe(
-        (w: Workflow) => {
+        (w: WorkflowVersion) => {
           this.logger.debug('Changed workflow', w, w.suites);
 
           // subscribe for the current selected suite
@@ -71,7 +71,7 @@ export class SuiteComponent implements OnInit {
       );
 
       // select a workflow
-      this.appService.selectWorkflow(urlData['workflow']);
+      this.appService.selectWorkflowVersion(urlData['workflow'], urlData['version']);
     });
   }
 
