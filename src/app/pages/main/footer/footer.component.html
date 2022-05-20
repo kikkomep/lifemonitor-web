@@ -22,7 +22,8 @@
   </div>
 
   <div class="text-center p-2">
-    <div class="row">
+    
+    <div class="row">      
       <!-- Github references -->
       <div class="col-lg-2 col-md-12 text-center m-5 m-lg-0">
         <div class="">
@@ -35,6 +36,11 @@
           <a class="text-white" href="https://github.com/crs4/lifemonitor-web" target="_blank">
             <span class="small">crs4/lifemonitor-web</span>
           </a>
+          <div class="col-lg-2 text-center d-block d-lg-none mt-3">
+            <div class="text-white" style="margin: auto;">
+              <b>Version</b> {{ appVersion }}
+            </div>
+          </div>
         </div>
       </div>
       <!-- Developed by -->
@@ -67,18 +73,33 @@
             <img src="/assets/img/logo/brand/csc.png" width="150">
           </a>
         </div>
-      </div>
+      </div>      
     </div>
   </div>
 
   <!-- EOSC-Life Project -->
   <div class="text-center text-small m-4 m-md-0">
-    <img src="/assets/img/logo/brand/eu-flag.png" class="mr-2" alt="Flag of the European Union" width="50">
-    <a class="text-white font-weight-bold" href="https://www.eosc-life.eu/" target="_blank" rel="noopener">EOSC-Life</a> is funded by the European Union’s
-    Horizon 2020 programme under grant agreement number 
-    <a class="text-white font-weight-bold" href="https://cordis.europa.eu/project/id/824087"
-      target="_blank" rel="noopener">824087</a>.
-    <!-- <div class="copyright text-center">CRS4 © 2021-2022</div> -->
+    <div class="row">
+      <div class="col-lg-2 text-center d-none d-lg-block">
+        <div class="text-white" style="margin: auto;">
+          <b>Version</b> {{ appVersion }}
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <img src="/assets/img/logo/brand/eu-flag.png" class="mr-2" alt="Flag of the European Union" width="50">
+        <a class="text-white font-weight-bold" href="https://www.eosc-life.eu/" target="_blank"
+          rel="noopener">EOSC-Life</a>
+        is funded by the European Union’s
+        Horizon 2020 programme under grant agreement number
+        <a class="text-white font-weight-bold" href="https://cordis.europa.eu/project/id/824087" target="_blank"
+          rel="noopener">824087</a>.
+        <!-- <div class="copyright text-center">CRS4 © 2021-2022</div> -->
+      </div>
+      <div class="col-lg-2 text-center"></div>
+    </div>
+
   </div>
+
 
 </footer>
