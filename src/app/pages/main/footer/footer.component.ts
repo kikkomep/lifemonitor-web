@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppConfigService } from 'src/app/utils/services/config.service';
 import { version } from '../../../../../package.json';
 
 @Component({
@@ -8,7 +9,10 @@ import { version } from '../../../../../package.json';
 })
 export class FooterComponent implements OnInit {
   public appVersion = version;
-  constructor() {}
+  public backendBaseUrl: string = null;
+  constructor(private appConfig: AppConfigService) {
+    this.backendBaseUrl = this.appConfig.getConfig()['apiBaseUrl'];
+  }
 
-  ngOnInit() {}
+  ngOnInit() { }
 }
