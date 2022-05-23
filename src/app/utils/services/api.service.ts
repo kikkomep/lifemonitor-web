@@ -327,11 +327,13 @@ export class ApiService {
 
   downloadROCrate(workflow: WorkflowVersion): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
+    let headers = new HttpHeaders();
+    if (token) {
+      headers.append["Authorization"] = 'Bearer ' + token['token']['value'];
+    }
     return this.http
       .get(workflow.downloadLink, {
-        headers: new HttpHeaders({
-          Authorization: 'Bearer ' + token['token']['value'],
-        }),
+        headers: headers,
         responseType: 'blob',
       })
       .pipe(
