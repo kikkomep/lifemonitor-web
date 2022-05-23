@@ -1,22 +1,23 @@
-<footer class="p-2 m-0 font-weight-light" style="background: #003333;">
+<footer class="p-2 m-0 font-weight-light" style="background: #cad9d9;">
 
   <!-- Useful links -->
   <div class="text-center text-x-large p-5 font-weight-light" style="font-size: x-large">
     <ul class="list-inline p-2">
       <li class="list-inline-item p-2">
-        <a href="." alt="LifeMonitor Web" class="text-white">Home</a>
+        <a href="." title="LifeMonitor Web App" class="text-dark footer-link p-2">Home</a>
       </li>
       <li class="list-inline-item p-2">
-        <a class="text-white" href="{{backendBaseUrl}}/static/apidocs.html" alt="LifeMonitor API Explorer"
-          target="_blank">API Explorer</a>
+        <a class="text-dark footer-link p-2" href="{{backendBaseUrl}}/static/apidocs.html"
+          title="LifeMonitor API Explorer" target="_blank">API Explorer</a>
       </li>
       <li class="list-inline-item p-2">
-        <a class="text-white" href="https://www.crs4.it/privacy-policy/" alt="LifeMonitor Terms & Conditions"
-          target="_blank">Terms &
+        <a class="text-dark footer-link p-2" href="https://www.crs4.it/privacy-policy/"
+          title="LifeMonitor Terms & Conditions" target="_blank">Terms &
           Conditions</a>
       </li>
       <li class="list-inline-item p-2">
-        <a class="text-white" href="https://lifemonitor.eu" alt="LifeMonitor Docs" target="_blank">About</a>
+        <a class="text-dark footer-link p-2" href="https://lifemonitor.eu" title="LifeMonitor Docs"
+          target="_blank">About</a>
       </li>
     </ul>
   </div>
@@ -25,48 +26,86 @@
     <div class="row">
       <!-- Github references -->
       <div class="col-lg-2 col-md-12 text-center m-5 m-lg-0">
-        <div class="">
-          <img src="/assets/img/logo/brand/github-white.png" width="60px" alt="Github Repository">
+        <div class="text-dark">
+          <img src="/assets/img/logo/brand/github-dark.png" width="60px" alt="Github Repository">
           <div>View on <b>GitHub</b></div>
-          <a class="text-white" href="https://github.com/crs4/life_monitor" target="_blank">
-            <span class="small">crs4/lifemonitor</span>
+          <a class="text-dark footer-link p-1" href="https://github.com/crs4/life_monitor" target="_blank"
+            alt="LifeMonitor Back-end" title="LifeMonitor Back-end">
+            <span class="small">crs4/life_monitor</span>
           </a>
           <br>
-          <a class="text-white" href="https://github.com/crs4/lifemonitor-web" target="_blank">
+          <a class="text-dark footer-link p-1" href="https://github.com/crs4/lifemonitor-web" target="_blank"
+            alt="LifeMonitor Web App" title="LifeMonitor Web App">
             <span class="small">crs4/lifemonitor-web</span>
           </a>
-          <div class="d-block d-md-none small text-center p-3">Version: <b>{{appVersion}}</b></div>
+          <div class="d-block d-md-none small text-center text-dark p-3">Version:
+            <a class="text-dark footer-link p-1"
+              href="https://github.com/crs4/lifemonitor-web/releases/tag/{{appVersion}}" target="_blank"
+              title="Web App Version: {{appVersion}}">
+              <b>{{appVersion}}</b>
+            </a>
+          </div>
         </div>
       </div>
       <!-- Developed by -->
       <div class="col-lg-8 col-md-12 m-5 m-lg-0">
-        <div>
-          <a href="https://lifemonitor.eu/" target_="_blank" class="text-white">
+        <div class="text-dark">
+          <a href="https://lifemonitor.eu/" target_="_blank" class="text-dark footer-link p-1">
             <span
               style="font-style: italic; font-family: Baskerville,Baskerville Old Face,Hoefler Text,Garamond,Times New Roman,serif;">Life</span>
             <span class="small" style="font-size: 75%; margin: 0 -1px 0 1px;">-</span>
             <span style="font-weight: bold; font-family: Gill Sans,Gill Sans MT,Calibri,sans-serif;">Monitor</span>
-          </a> is developed by <a href="https://www.crs4.it" class="text-white font-weight-bold">CRS4</a>
-          with <a href="https://www.bbmri-eric.eu" class="text-white font-weight-bold">BBMRI-ERIC</a>
+          </a> is developed by <a href="https://www.crs4.it"
+            title="CRS4 | Center for Advanced Studies, Research and Development inf Sardinia"
+            class="text-dark font-weight-bold footer-link p-1">CRS4</a>
+          with <a href="https://www.bbmri-eric.eu" title="BBMRI-ERIC | European research infrastructure for biobanking"
+            class="text-dark font-weight-bold footer-link p-1">BBMRI-ERIC</a>
           as part of the
-          <a class="text-white font-weight-bold" href="https://www.eosc-life.eu/" target="_blank"
-            rel="noopener">EOSC-Life</a>
-          project and
-          distributed under the
+          <a class="text-dark font-weight-bold footer-link p-1" href="https://www.eosc-life.eu/" target="_blank"
+            rel="noopener" title="EOSC-Life Project">EOSC-Life</a>
+          project
+          <!--
+          and distributed under the
           <a href="https://github.com/crs4/life_monitor/blob/master/LICENSE" target="_blank" rel="noopener"
-            class="text-white font-weight-bold">MIT
+            class="text-dark font-weight-bold">MIT
             License</a>
+            -->
         </div>
         <br>
-        <img src="/assets/img/logo/brand/partners-logo.png" class="img-fluid" width="300">
+        <!-- Partners Logos -->
+        <div class="text-center">
+          <div class="d-inline-block partner-logo m-2 p-2">
+            <a class="partner-logo text-right" href="https://crs4.it" target="_blank"
+              title="CRS4 | Center for Advanced Studies, Research and Development inf Sardinia"
+              alt="CRS4 | Center for Advanced Studies, Research and Development inf Sardinia">
+              <img src="/assets/img/logo/brand/crs4.png" class="img-fluid" width="200">
+            </a>
+          </div>
+          <div class="d-inline-block partner-logo m-2 p-3">
+            <a class="partner-logo" href="https://www.eosc-life.eu" target="_blank" title="EOSC-Life Project"
+              alt="EOSC-Life Project">
+              <img src="/assets/img/logo/brand/eosc.png" class="img-fluid" width="120">
+            </a>
+          </div>
+          <div class="d-inline-block partner-logo m-2 p-2 pt-3">
+            <a href="https://www.bbmri-eric.eu" target="_blank"
+              title="BBMRI-ERIC | European research infrastructure for biobanking"
+              alt="BBMRI-ERIC | European research infrastructure for biobanking">
+              <img src="/assets/img/logo/brand/bbmri.png" class="img-fluid" width="200">
+            </a>
+          </div>
+        </div>
       </div>
       <!-- Hosted By -->
       <div class="col-lg-2 col-md-12 m-5 m-lg-0">
         <div class="text-center">
-          <p class="text-white">hosted by</p>
-          <a href="https://research.csc.fi/computing" target="_blank">
-            <img src="/assets/img/logo/brand/csc.png" width="150">
-          </a>
+          <p class="text-dark">hosted by</p>
+          <div class="partner-logo m-auto p-2" style="max-width: 200px;">
+            <a href="https://research.csc.fi/computing" target="_blank" alt="CSC | IT Center for Scienc"
+              title="CSC | IT Center for Science">
+              <img src="/assets/img/logo/brand/csc.png" width="150">
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -74,14 +113,20 @@
 
   <!-- App version & EOSC-Life Project -->
   <div class="row py-2 m-md-0">
-    <div class="col-lg-2 col-md-12 d-lg-block d-none small text-center">Version: <b>{{appVersion}}</b></div>
-    <div class="col-lg-8 col-md-12 d-lg-block text-center text-small">
+    <div class="col-lg-2 col-md-12 d-lg-block d-none small text-center text-dark">Version:
+      <a class="text-dark footer-link footer-link p-1"
+        href="https://github.com/crs4/lifemonitor-web/releases/tag/{{appVersion}}" target="_blank"
+        title="Web App Version: {{appVersion}}">
+        <b>{{appVersion}}</b>
+      </a>
+    </div>
+    <div class="col-lg-8 col-md-12 d-lg-block text-center text-dark text-small">
       <img src="/assets/img/logo/brand/eu-flag.png" class="mr-2" alt="Flag of the European Union" width="50">
-      <a class="text-white font-weight-bold" href="https://www.eosc-life.eu/" target="_blank"
-        rel="noopener">EOSC-Life</a> is funded by the European Union’s
+      <a class="text-dark font-weight-bold footer-link p-1" href="https://www.eosc-life.eu/" target="_blank"
+        rel="noopener" title="EOSC-Life Project">EOSC-Life</a> is funded by the European Union’s
       Horizon 2020 programme under grant agreement number
-      <a class="text-white font-weight-bold" href="https://cordis.europa.eu/project/id/824087" target="_blank"
-        rel="noopener">824087</a>.
+      <a class="text-dark font-weight-bold footer-link p-1" href="https://cordis.europa.eu/project/id/824087"
+        target="_blank" rel="noopener">824087</a>
       <!-- <div class="copyright text-center">CRS4 © 2021-2022</div> -->
     </div>
     <div class="col-lg-2 col-md-12 small"></div>
