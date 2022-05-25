@@ -6,7 +6,8 @@ import { Observable, Subscription, timer } from 'rxjs';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
-  AggregatedStatusStatsItem
+  AggregatedStatusStatsItem,
+  AggregatedTestStatusMap
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow, WorkflowVersion, WorkflowVersionDescriptor } from 'src/app/models/workflow.model';
@@ -30,7 +31,9 @@ export class DashboardComponent implements OnInit {
   // reference to the current subscriptions
   private workflowsStatsSubscription: Subscription;
   private userLoggedSubscription: Subscription;
-  private paramSubscription: Subscription;
+  private internalParamsSubscription: Subscription;
+  private queryParamsSubscription: Subscription;
+  private internalParamSubscription: Subscription;
   //
   private filteredWorkflows: AggregatedStatusStatsItem[] | null;
   //
@@ -85,7 +88,23 @@ export class DashboardComponent implements OnInit {
       }
     );
 
-    this.paramSubscription = this.route.params.subscribe((params) => {
+    this.queryParamsSubscription = this.route.queryParams
+      .subscribe(params => {
+        console.debug("Query params: ", params);
+        if ('status' in params) {
+          // Parse and normalize status filter
+          let status: string = params['status'].toLowerCase();
+          console.debug("Status: ", status);
+          for (let s in AggregatedTestStatusMap) {
+            if (s === status || AggregatedTestStatusMap[s].includes(status)) {
+              this.statusFilter = s;
+            }
+          }
+        }
+      });
+
+
+    this.internalParamSubscription = this.route.params.subscribe((params) => {
       this.logger.debug('Dashboard params:', params);
       if (params['add'] == "true") {
         this.openUploader = true;
@@ -117,29 +136,34 @@ export class DashboardComponent implements OnInit {
   ngAfterViewChecked() {
   }
 
-  private prepareTableData(workflows: Workflow[] = null){
+  private prepareTableData(workflows: Workflow[] = null) {
     workflows = workflows || this._workflows;
-    if(!workflows)return;
+    if (!workflows) return;
     this.logger.debug("Loaded workflows: ", workflows);
     // Initialize workflow stats
     let stats = new AggregatedStatusStats();
     //let workflow_versions: WorkflowVersion[] = data
     this._workflows = workflows;
-    workflows.forEach((w: Workflow) => {
-      if(w.currentVersion) stats.add(w.currentVersion);
+    workflows.forEach((w: Workflow) => {
+      if (w.currentVersion) stats.add(w.currentVersion);
     });
     this.logger.debug('Initialized Stats', stats);
-    
+
     this._workflowStats = this.statsFilter.transform(
       stats,
       this._workflowNameFilter
     );
-    this.filteredWorkflows =
-      this.searchModeEnabled || !this.isUserLogged()
-        ? this._workflowStats.all
-        : this._workflowStats.all.filter(
-          (v) => v.subscriptions && v.subscriptions.length > 0);
-    
+
+    if (this.statusFilter) {
+      this.filterByStatus(this.statusFilter, false);
+    } else {
+      this.filteredWorkflows =
+        this.searchModeEnabled || !this.isUserLogged()
+          ? this._workflowStats.all
+          : this._workflowStats.all.filter(
+            (v) => v.subscriptions && v.subscriptions.length > 0);
+    }
+
     this.refreshDataTable();
   }
 
@@ -207,7 +231,7 @@ export class DashboardComponent implements OnInit {
     return this.appService.isEditable(w);
   }
 
-  public updateSelectedVersion(workflow_version: WorkflowVersion){
+  public updateSelectedVersion(workflow_version: WorkflowVersion) {
     this.logger.debug("Updated workflow version", workflow_version);
     this.prepareTableData();
   }
@@ -364,16 +388,16 @@ export class DashboardComponent implements OnInit {
   }
 
 
-  public selectWorkflowVersion(version: any){
+  public selectWorkflowVersion(version: any) {
     this.logger.debug("Selected workflow version:", version);
   }
 
-  public filterByStatus(status: string) {
+  public filterByStatus(status: string, asToggle: boolean = true) {
     this.logger.debug('Filter by status', status);
     if (!this._workflowStats) return;
     try {
       status = status == 'any' ? 'all' : status;
-      if (status != this.statusFilter) {
+      if (status != this.statusFilter || !asToggle) {
         this.filteredWorkflows =
           (!this.isUserLogged() || this.searchModeEnabled) ? this._workflowStats[status]
             : this._workflowStats[status].filter(
@@ -386,6 +410,10 @@ export class DashboardComponent implements OnInit {
             : this._workflowStats['all'].filter(
               (v: { subscriptions: string | any[]; }) => v.subscriptions && v.subscriptions.length > 0);
         this.statusFilter = null;
+        // remove status params from query if defined
+        const queryParams = { ...this.route.snapshot.queryParams };
+        delete queryParams.status;
+        this.router.navigate([], { queryParams: queryParams });
         this.refreshDataTable();
       }
     } catch (e) {
@@ -483,8 +511,12 @@ export class DashboardComponent implements OnInit {
     // prevent memory leak when component destroyed
     if (this.workflowsStatsSubscription)
       this.workflowsStatsSubscription.unsubscribe();
-    if (this.paramSubscription)
-      this.paramSubscription.unsubscribe();
+    if (this.internalParamsSubscription)
+      this.internalParamsSubscription.unsubscribe();
+    if (this.queryParamsSubscription)
+      this.queryParamsSubscription.unsubscribe();
+    if (this.userLoggedSubscription)
+      this.userLoggedSubscription.unsubscribe();
     this.logger.debug('Destroying dashboard component');
   }
 }

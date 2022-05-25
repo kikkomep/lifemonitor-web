@@ -7,8 +7,10 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { Location } from '@angular/common';
 import {
   AggregatedStatusStatsItem,
+  AggregatedTestStatusMap,
   StatusStatsItem
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -28,7 +30,8 @@ export class WorkflowComponent implements OnInit, OnChanges {
   // suites of the current workflow
   public suites: AggregatedStatusStatsItem[] = null;
 
-  private paramSubscription: Subscription;
+  private internalParamSubscription: Subscription;
+  private queryParamsSubscription: Subscription;
   private workflowSubscription: Subscription;
   private workflowChangesSubscription: Subscription;
 
@@ -45,6 +48,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     // private apiService: ApiService,
     private appService: AppService
   ) { }
@@ -60,15 +64,36 @@ export class WorkflowComponent implements OnInit, OnChanges {
         this.workflowChangesSubscription = this.workflow
           .asObservable()
           .subscribe((change) => {
-            this.suites = this.workflow.suites.all;
+            if (this.statusFilter)
+              this.suites = this.workflow.suites[this.statusFilter]
+            else this.suites = this.workflow.suites.all;
             this.cdr.detectChanges();
             this.logger.debug('Handle change', change);
           });
-        if (this.workflow.suites) this.suites = this.workflow.suites.all;
+        if (this.workflow.suites) {
+          if (this.statusFilter)
+            this.suites = this.workflow.suites[this.statusFilter]
+          else this.suites = this.workflow.suites.all;
+        }
       }
     );
 
-    this.paramSubscription = this.route.params.subscribe((params) => {
+    this.queryParamsSubscription = this.route.queryParams
+      .subscribe(params => {
+        console.debug("Query params: ", params);
+        if ('status' in params) {
+          // Parse and normalize status filter
+          let status: string = params['status'].toLowerCase();
+          console.debug("Status: ", status);
+          for (let s in AggregatedTestStatusMap) {
+            if (s === status || AggregatedTestStatusMap[s].includes(status)) {
+              this.statusFilter = s;
+            }
+          }
+        }
+      });
+
+    this.internalParamSubscription = this.route.params.subscribe((params) => {
       // select a workflow
       this.appService.selectWorkflowVersion(params['uuid'], params['version']);
     });
@@ -98,6 +123,10 @@ export class WorkflowComponent implements OnInit, OnChanges {
       } else {
         this.suites = this.workflow.suites['all'];
         this.statusFilter = null;
+        // remove status param from query
+        const queryParams = { ...this.route.snapshot.queryParams };
+        delete queryParams.status;
+        this.router.navigate([], { queryParams: queryParams });
       }
     } catch (e) {
       this.logger.debug(e);
@@ -110,9 +139,11 @@ export class WorkflowComponent implements OnInit, OnChanges {
 
   ngOnDestroy() {
     // prevent memory leak when component destroyed
-    this.paramSubscription.unsubscribe();
+    this.internalParamSubscription.unsubscribe();
     this.workflowSubscription.unsubscribe();
     if (this.workflowChangesSubscription)
       this.workflowChangesSubscription.unsubscribe();
+    if (this.queryParamsSubscription)
+      this.queryParamsSubscription.unsubscribe();
   }
 }
