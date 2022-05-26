@@ -125,6 +125,28 @@
                 </div>
               </div>
             </div>
+
+            <!-- generic notifications -->
+            <div class="dropdown-item-content"
+              *ngIf="!['BUILD_FAILED', 'BUILD_RECOVERED', 'GITHUB_WORKFLOW_VERSION', 'GITHUB_WORKFLOW_ISSUE'].includes(n.event)">
+              <div class="row {{
+                  n.read
+                    ? 'text-muted'
+                    : ''
+                }}" (click)="readNotification(n)">
+                <div class="col-1" [ngStyle]="{'color': n.color}">
+                  <i class="{{ n.icon }}"></i>
+                </div>
+                <div class="col-10">
+                  {{n.name}}
+                </div>
+                <div class="col-1">
+                  <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                    <i class="far fa-trash-alt"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </ng-container>
       </ng-container>
