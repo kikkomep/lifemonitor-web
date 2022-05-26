@@ -37,6 +37,49 @@
               </div>
             </div>
 
+            <!-- Render GITHUB_WORKFLOW_VERSION notifications-->
+            <div class="dropdown-item-content" *ngIf="n.event === 'GITHUB_WORKFLOW_VERSION'">
+              <div class="row {{
+                  n.read
+                    ? 'text-muted'
+                    : ''
+                }}" (click)="readNotification(n)">
+                <div class="col-1" [ngStyle]="{'color': n.color}">
+                  <i class="{{ n.icon }}" style="margin: 2px;"></i>
+                </div>
+                <div class="col-10">
+                  <div class="mb-1">
+                    Github workflow version {{n.data.action}}
+                  </div>
+                </div>
+                <div class="col-1">
+                  <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                    <i class="far fa-trash-alt"></i>
+                  </a>
+                </div>
+                <div class="offset-1 col-11 text-small {{ n.read ? 'text-muted' : '' }}"
+                  style="font-size: 9pt; color: black">
+                  <div class="row">
+                    <div class="col-3 text-bold">repo:</div>
+                    <div class="col-9">{{ n.data.repository.full_name }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-3 text-bold">version:</div>
+                    <div class="col-9">{{ n.data.workflow_version.version.version }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-3 text-bold">name:</div>
+                    <div class="col-9">{{ n.data.workflow_version.name }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-3 text-bold">uuid:</div>
+                    <div class="col-9">{{ n.data.workflow_version.uuid }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Render notifications for BUILD_FAILED and BUILD_RECOVERED events -->
             <div class="dropdown-item-content" *ngIf="n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED'">
               <div class="row {{
                   n.read
