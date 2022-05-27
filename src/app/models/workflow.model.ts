@@ -192,6 +192,10 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
     return null;
   }
 
+  public get authors(): [] {
+    return this.version ? this.version['authors'] : [];
+  }
+
   public get type(): string {
     if (!this._type) {
       if (this._rawData && 'type' in this._rawData) {
