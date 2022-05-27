@@ -250,8 +250,20 @@
                     <span class="icon-wrapper">
                       <i class="fas fa-xs fa-solid fa-user mr-1"></i>
                     </span>
-                    <b>owner: </b>
+                    <b>submitter: </b>
                     <span>{{ w.version.submitter.username }}</span>
+                  </div>
+                  <div *ngIf="w.version && w.authors" class="text-xs cut-text font-weight-light">
+                    <span class="icon-wrapper">
+                      <i class="fas fa-xs fa-solid fa-users mr-1"></i>
+                    </span>
+                    <b>author<span *ngIf="w.authors.length > 1">s</span>: </b>                    
+                    <div class="d-inline" *ngFor="let author of w.authors; index as a_index;">
+                      <div *ngIf="author.url" class="d-inline">
+                        <a href="{{author.url}}">{{ author.name }}</a><span class="m-0 p-0" *ngIf="a_index < w.authors.length - 1">, </span>
+                      </div>                      
+                      <div *ngIf="!author.url" class="d-inline">{{ author.name }}<span class="m-0 p-0" *ngIf="a_index < w.authors.length - 1">, </span></div>
+                    </div>
                   </div>
                   <div *ngIf="isUserLogged()">
                     <span *ngIf="w.subscriptions !== undefined">
