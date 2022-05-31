@@ -253,7 +253,7 @@
                     <b>submitter: </b>
                     <span>{{ w.version.submitter.username }}</span>
                   </div>
-                  <div *ngIf="w.version && w.authors" class="text-xs cut-text font-weight-light">
+                  <div *ngIf="w.version && w.authors && w.authors.length > 0" class="text-xs cut-text font-weight-light">
                     <span class="icon-wrapper">
                       <i class="fas fa-xs fa-solid fa-users mr-1"></i>
                     </span>
