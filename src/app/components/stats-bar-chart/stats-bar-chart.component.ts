@@ -220,13 +220,14 @@ export class StatsBarChartComponent implements OnInit, OnChanges {
     // this.logger.debug('Stats ', this.stats);
     this.barChartData = [];
     this.barColors = [];
+    this.logger.debug("Current bar stas: ", this.stats);
     let max: number = Math.max.apply(Math,
-      this.stats.map(function (o) { return o.duration; }))
+      this.stats.map(function (o) { return o.duration || 0; }))
     this.logger.debug("MAX duration", max);
     for (let i in this.stats) {
       let build: StatusStatsItem = this.stats[i];
       this.barChartData.push({
-        data: [build.duration],
+        data: [build.duration || 0],
         label: 'duration',
       });
       this.barColors.push(this.getColor(build.status));
