@@ -79,7 +79,7 @@
         </div>
         <!-- row -->
 
-        <div *ngIf="workflow.version && workflow.authors" class="row" style="font-size: 1.0rem;">
+        <div *ngIf="workflow.version && workflow.authors && workflow.authors.length > 0" class="row" style="font-size: 1.0rem;">
             <div class="col-2 p-0 ml-1" style="max-width: 50px">
                 <i class="fas fa-solid fa-users" style="margin-left: 0.85rem !important"></i>
             </div>
