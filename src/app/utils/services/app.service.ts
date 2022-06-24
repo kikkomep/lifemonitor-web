@@ -394,15 +394,21 @@ export class AppService {
                 workflow_version
               );
             }
-            // Load workflow data from the back-end
+            // Load the latest workflow version from the back-end
             // if cache is disabled or it has not been found
             if (!workflow_version) {
+              let versions_data = wdata['versions'];
               workflow = new Workflow(wdata);
               workflows.push(workflow);
+              let vdata = versions_data.find((v: { [x: string]: any; }) => v['is_latest']);
+              this.logger.warn("VDATA", vdata);
               this.logger.debug('Loading data of workflow ', workflow_version);
-              this.loadWorkflowVersion(workflow).subscribe(
+              this.loadWorkflowVersion(workflow, 'latest', !vdata).subscribe(
                 (wf: WorkflowVersion) => {
                   workflow_version = wf;
+                  if (vdata) {
+                    workflow_version.status = vdata['status'];
+                  }
                   workflow.addVersion(workflow_version, true);
                   workflow_versions.push(workflow_version);
                   // workflow.currentVersion = workflow_version;
@@ -464,9 +470,10 @@ export class AppService {
 
   loadWorkflowVersion(
     w: Workflow,
-    version: string = 'latest'
+    version: string = 'latest',
+    status: boolean = false
   ): Observable<WorkflowVersion> {
-    return this.api.get_workflow_version(w.uuid, version, true, true).pipe(
+    return this.api.get_workflow_version(w.uuid, version, true, true, true, status).pipe(
       map((workflow_version: WorkflowVersion) => {
         this.logger.debug('Loaded data:', workflow_version);
         //w.update(wdata);
@@ -493,10 +500,16 @@ export class AppService {
       this._selectWorkflowVersion(this._workflow);
     } else if (!this._workflow_versions) {
       this.api
-        .get_workflow_version(uuid, version, true, true, true)
+        .get_workflow_version(uuid, version, true, true, true, true)
         .subscribe((w: WorkflowVersion) => {
           this._selectWorkflowVersion(w);
-        });
+        },
+          (error) => {
+            this.logger.error("Error", error);
+            if (error.status === 404) {
+              this.selectWorkflowVersion(uuid, 'latest');
+            }
+          });
     } else {
       w = this._workflow_versions.find(
         (w: WorkflowVersion) =>
@@ -504,7 +517,7 @@ export class AppService {
       );
       if (!w || !w.suites) {
         this.api
-          .get_workflow_version(uuid, version, true, true, true)
+          .get_workflow_version(uuid, version, true, true, true, true)
           .subscribe((w: WorkflowVersion) => {
             this._selectWorkflowVersion(w);
           });
