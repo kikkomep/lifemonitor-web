@@ -400,7 +400,7 @@ export class AppService {
               let versions_data = wdata['versions'];
               workflow = new Workflow(wdata);
               workflows.push(workflow);
-              let vdata = versions_data.find((v: { [x: string]: any; }) => v['is_latest']);
+              let vdata = versions_data ? versions_data.find((v: { [x: string]: any; }) => v['is_latest']) : null;
               this.logger.warn("VDATA", vdata);
               this.logger.debug('Loading data of workflow ', workflow_version);
               this.loadWorkflowVersion(workflow, 'latest', !vdata).subscribe(
@@ -408,6 +408,8 @@ export class AppService {
                   workflow_version = wf;
                   if (vdata) {
                     workflow_version.status = vdata['status'];
+                  } else {
+                    workflow_version.status = wf.status;
                   }
                   workflow.addVersion(workflow_version, true);
                   workflow_versions.push(workflow_version);
