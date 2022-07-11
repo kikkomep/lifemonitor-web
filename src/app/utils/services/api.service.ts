@@ -799,7 +799,6 @@ export class ApiService {
     return this.http
       .head(workflow.downloadLink, this.get_http_options({}, true))
       .pipe(
-        retry(3),
         map((result) => {
           this.logger.debug('Result: ', result);
           return true;

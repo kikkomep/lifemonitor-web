@@ -1,8 +1,8 @@
-<app-loader [enabled]="!workflows || (isLoading|async)"></app-loader>
+<app-loader [enabled]="(isLoading|async)!==false"></app-loader>
 
 <app-workflow-uploader></app-workflow-uploader>
 
-<div *ngIf="workflows" class="content-header">
+<div *ngIf="workflows && (isLoading|async)===false" class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
@@ -25,7 +25,7 @@
 <!-- /.content-header -->
 
 <!-- Main content -->
-<section *ngIf="workflows" class="content mx-lg-4 mx-md-2 mt-md-3">
+<section *ngIf="workflows && (isLoading|async)===false" class="content mx-lg-4 mx-md-2 mt-md-3">
   <h2 class="text-primary font-weight-light p-2"><span *ngIf="isUserLogged()">My </span>Workflows</h2>
 
   <div class="container-fluid">
@@ -141,11 +141,11 @@
 
   <div class="container-fluid">
     <!-- Search Bar -->
-    <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
+    <item-search-bar elementType="workflow" [(filterValue)]="workflowNameFilter"
       [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
 
     <div class="card card-primary card-outline">
-      <div *ngIf="updatingDataTable || (isLoading | async)" class="overlay">
+      <div *ngIf="updatingDataTable" class="overlay">
         <i class="fas fa-3x fa-sync-alt text-primary"></i>
       </div>
       <!-- Loading (remove the following to stop the loading)-->
@@ -233,7 +233,8 @@
                         <i class="fa-xs fas fa-sitemap mr-1"></i>
                       </span>
                       <b>{{ r.name }}: </b>
-                      <a href="{{ w.getRegistryLink(r.identifier) }}" target="_blank">{{ w.getRegistryLink(r.identifier) }}</a>
+                      <a href="{{ w.getRegistryLink(r.identifier) }}" target="_blank">{{ w.getRegistryLink(r.identifier)
+                        }}</a>
                     </div>
                   </div>
                   <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
@@ -253,16 +254,19 @@
                     <b>submitter: </b>
                     <span>{{ w.version.submitter.username }}</span>
                   </div>
-                  <div *ngIf="w.version && w.authors && w.authors.length > 0" class="text-xs cut-text font-weight-light">
+                  <div *ngIf="w.version && w.authors && w.authors.length > 0"
+                    class="text-xs cut-text font-weight-light">
                     <span class="icon-wrapper">
                       <i class="fas fa-xs fa-solid fa-users mr-1"></i>
                     </span>
-                    <b>author<span *ngIf="w.authors.length > 1">s</span>: </b>                    
+                    <b>author<span *ngIf="w.authors.length > 1">s</span>: </b>
                     <div class="d-inline" *ngFor="let author of w.authors; index as a_index;">
                       <div *ngIf="author.url" class="d-inline">
-                        <a href="{{author.url}}">{{ author.name }}</a><span class="m-0 p-0" *ngIf="a_index < w.authors.length - 1">, </span>
-                      </div>                      
-                      <div *ngIf="!author.url" class="d-inline">{{ author.name }}<span class="m-0 p-0" *ngIf="a_index < w.authors.length - 1">, </span></div>
+                        <a href="{{author.url}}">{{ author.name }}</a><span class="m-0 p-0"
+                          *ngIf="a_index < w.authors.length - 1">, </span>
+                      </div>
+                      <div *ngIf="!author.url" class="d-inline">{{ author.name }}<span class="m-0 p-0"
+                          *ngIf="a_index < w.authors.length - 1">, </span></div>
                     </div>
                   </div>
                   <div *ngIf="isUserLogged()">
@@ -353,16 +357,16 @@
                     </a>
                   </div>
                   <div *ngIf="editModeEnabled && isEditable(w)">
-                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflowVersion(w)" data-toggle="tooltip" data-placement="top"
-                      data-html="true"
+                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflowVersion(w)" data-toggle="tooltip"
+                      data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete version</span>">
                       <i class="fas fa-minus-circle"></i>
                       <!-- <img src="assets/icons/branch-delete.png" width="50px"> -->
                     </a>
                   </div>
                   <div *ngIf="editModeEnabled && isEditable(w)">
-                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflow(w.workflow)" data-toggle="tooltip" data-placement="top"
-                      data-html="true"
+                    <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflow(w.workflow)" data-toggle="tooltip"
+                      data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete workflow</span>">
                       <i class="fas fa-trash-alt"></i>
                     </a>

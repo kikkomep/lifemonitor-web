@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, HostListener, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subscription, timer } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
@@ -80,11 +80,9 @@ export class DashboardComponent implements OnInit {
       });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (workflows: Workflow[]) => {
-        timer(1000).subscribe(x => {
-          this.logger.debug("Loaded workflows: ", workflows);
-          this.prepareTableData(workflows);
-          this.refreshDataTable();
-        });
+        this.logger.debug("Loaded workflows: ", workflows);
+        this.prepareTableData(workflows);
+        this.refreshDataTable();
       }
     );
 
@@ -103,7 +101,6 @@ export class DashboardComponent implements OnInit {
         }
       });
 
-
     this.internalParamSubscription = this.route.params.subscribe((params) => {
       this.logger.debug('Dashboard params:', params);
       if (params['add'] == "true") {
@@ -118,6 +115,7 @@ export class DashboardComponent implements OnInit {
     if (this._workflows) {
       this.prepareTableData();
       this.refreshDataTable();
+      this.appService.setLoadingWorkflows(false);
     } else {
       this.appService.loadWorkflows(
         true,
