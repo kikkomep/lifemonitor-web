@@ -519,7 +519,8 @@ export class WorkflowUploaderComponent
   }
 
   public checkIfValidVersion(version: string) {
-    const versionExp = /^\d+(\.\d+){0,2}$/;
+    // const versionExp = /^\d+(\.\d+){0,2}$/;
+    const versionExp = /^[0-9a-zA-Z\.\-_]+$/;
     return versionExp.test(version);
   }
 
