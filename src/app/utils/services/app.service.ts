@@ -416,18 +416,17 @@ export class AppService {
                   workflow.addVersion(workflow_version, true);
                   workflow_versions.push(workflow_version);
                   // workflow.currentVersion = workflow_version;
-                  stats.add(workflow_version);
-                  this.subjectWorkflows.next(this._workflows);
+                  stats.add(workflow_version);                  
                   this.logger.debug(
                     'Data loaded for workflow',
                     workflow_version.uuid,
                     workflow_versions,
                     stats
                   );
-
                   if (wdata_index === (data['items'].length - 1)) {
                     this.setLoadingWorkflows(false);
                   }
+                  this.subjectWorkflows.next(this._workflows);
                 }
               );
             }

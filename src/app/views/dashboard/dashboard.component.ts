@@ -51,6 +51,8 @@ export class DashboardComponent implements OnInit {
 
   public updatingDataTable: boolean = false;
 
+  private loadingWorkflowVersions = [];
+
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
   // initialize logger
@@ -232,6 +234,23 @@ export class DashboardComponent implements OnInit {
   public updateSelectedVersion(workflow_version: WorkflowVersion) {
     this.logger.debug("Updated workflow version", workflow_version);
     this.prepareTableData();
+  }
+
+
+  public isLoadingWorkflowVersion(workflow: Workflow) {
+    return workflow && this.loadingWorkflowVersions.indexOf(workflow.uuid) >= 0;
+  }
+
+
+  public loadingWorkflowVersion(workflow: Workflow) {
+    if (workflow) {
+      this.loadingWorkflowVersions.push(workflow.uuid);
+    } else {
+      let i = this.loadingWorkflowVersions.indexOf(workflow.uuid);
+      if (i >= 0) {
+        this.loadingWorkflowVersions.splice(i, 1);
+      }
+    }
   }
 
   public deleteWorkflowVersion(w: WorkflowVersion) {

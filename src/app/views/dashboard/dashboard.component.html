@@ -317,7 +317,9 @@
                   </div>
                 </td>
                 <td class="text-center align-middle font-weight-light" style="min-width: 120px">
-                  <workflow-version-selector [workflow]="w.workflow" (workflow_version)="updateSelectedVersion($event)">
+                  <workflow-version-selector [workflow]="w.workflow"
+                    (loadingWorkflowVersion)="loadingWorkflowVersion($event)"
+                    (workflow_version)="updateSelectedVersion($event)">
                   </workflow-version-selector>
                 </td>
                 <td class="text-center align-middle font-weight-light" style="max-width: 150px;">

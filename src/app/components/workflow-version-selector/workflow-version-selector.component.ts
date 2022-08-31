@@ -23,15 +23,16 @@ export class WorkflowVersionSelectorComponent implements OnInit {
   private _workflow_version: WorkflowVersionDescriptor;
 
   @Output() workflow_version = new EventEmitter<WorkflowVersion>();
+  @Output() loadingWorkflowVersion = new EventEmitter<Workflow>();
 
   // initialize logger
   private logger: Logger = LoggerManager.create(
     'WorkflowVersionSelectorComponent'
   );
 
-  constructor(private appService: AppService) {}
+  constructor(private appService: AppService) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   @Input()
   set workflow(w: Workflow) {
@@ -56,7 +57,7 @@ export class WorkflowVersionSelectorComponent implements OnInit {
     this.logger.debug('Selected workflow version:', version);
     this._workflow_version = this._versions_map[version];
     this.logger.debug('Selected workflow version:', this._workflow_version);
-
+    this.loadingWorkflowVersion.next(this._workflow);
     let wv = this.workflow.getVersion(version);
     if (!wv) {
       this.appService
@@ -64,10 +65,12 @@ export class WorkflowVersionSelectorComponent implements OnInit {
         .subscribe((v: WorkflowVersion) => {
           this.workflow.addVersion(v, true);
           this.workflow_version.emit(v);
+          this.loadingWorkflowVersion.next(null);
         });
     } else {
       this.workflow.currentVersion = wv;
       this.workflow_version.emit(wv);
+      this.loadingWorkflowVersion.next(null);
     }
   }
 }
