@@ -43,6 +43,7 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
 import { WorkflowVersionSelectorComponent } from './components/workflow-version-selector/workflow-version-selector.component';
+import { TrimPipe } from './utils/filters/trim.pipe';
 
 
 
@@ -82,6 +83,7 @@ export function initConfigService(appConfig: AppConfigService) {
     ArraySizeFilterPipe,
     SortingFilterPipe,
     SearchBarComponent,
+    TrimPipe,
     LoaderComponent,
     RocrateLogoComponent,
     WorkflowHeaderComponent,
