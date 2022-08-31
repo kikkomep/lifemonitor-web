@@ -1,6 +1,6 @@
 {
   "name": "lifemonitor",
-  "version": "0.2.0-alpha1",
+  "version": "0.2.0-beta1",
   "scripts": {
     "start": "node server.js",
     "dev:start": "ng serve",
