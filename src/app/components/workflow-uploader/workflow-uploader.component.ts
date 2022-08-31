@@ -86,8 +86,11 @@ export class WorkflowUploaderComponent
     $('#' + this.name).on('hide.bs.modal', () => {
       this.logger.debug('hidden');
     });
-
+    // Register modal handler
     let s = $('#' + this.name).on('show.bs.modal', () => {
+      // Set defaults
+      this.initDefaults();
+      // Set actual config
       let config: Config = this.service.getConfig();
       this.title = config.title || this.title;
       this.iconClass = config.iconClass || this.iconClass;
@@ -99,7 +102,7 @@ export class WorkflowUploaderComponent
       this.confirmText = config.confirmText || this.confirmText;
       this.cancelText = config.cancelText || this.cancelText;
       this.onConfirm = config.onConfirm || null;
-      
+
       // initialise stepper
       if (!this.stepper) {
         this.stepper = new Stepper(document.querySelector('#uploaderStepper'), {
@@ -164,6 +167,20 @@ export class WorkflowUploaderComponent
     this.cdref.detectChanges();
   }
 
+  private initDefaults() {
+    this.title = 'Register Workflow';
+    this.iconClass = 'fas fa-cogs';
+    this.iconClassSize = 'fa-7x';
+    this.iconImage = null;
+    this.iconImageSize = "120";
+    this.question = 'Are you sure?';
+    this.description = 'Would you like to confirm?';
+    this.confirmText = 'Register';
+    this.cancelText = 'Cancel';
+    this.onConfirm = null;
+
+  }
+
   public get workflowUUID(): string {
     return this._workflowUUID;
   }
@@ -175,7 +192,7 @@ export class WorkflowUploaderComponent
     this._setError('uuid', valid ? null : 'Not valid UUID');
   }
 
-  public canEditUUID(): boolean{
+  public canEditUUID(): boolean {
     return this._canEditUUID;
   }
 
@@ -527,7 +544,7 @@ export class WorkflowUploaderComponent
   public _reset() {
     this.stepper.reset();
     this.errors = [];
-    this.source = 'localRoCrate';    
+    this.source = 'localRoCrate';
     this.workflowName = null;
     this.workflowUUID = null;
     this.workflowVersion = '1.0';

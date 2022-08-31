@@ -206,7 +206,12 @@ export class DashboardComponent implements OnInit {
   }
 
   public openWorkflowUploader() {
-    this.uploaderService.show({});
+    this.uploaderService.show({
+      title: "Register Workflow",
+      iconClass: 'fas fa-cogs',
+      iconClassSize: 'fa-7x',
+      iconImage: null
+    });
   }
 
   public openWorkflowVersionUploader(workflow: Workflow) {
