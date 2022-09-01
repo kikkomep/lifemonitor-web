@@ -1,6 +1,6 @@
 {
   "name": "lifemonitor",
-  "version": "0.2.0-alpha1",
+  "version": "0.2.0-beta1",
   "scripts": {
     "start": "node server.js",
     "dev:start": "ng serve",
@@ -32,7 +32,7 @@
     "@angular/platform-browser": "11.2.5",
     "@angular/platform-browser-dynamic": "11.2.5",
     "@angular/router": "11.2.5",
-    "@bity/oauth2-auth-code-pkce": "^2.12.0",
+    "@bity/oauth2-auth-code-pkce": "^2.13.0",
     "@ng-bootstrap/ng-bootstrap": "9.0.2",
     "ansi-html": "~0.0.7",
     "bootstrap": "4.6.0",

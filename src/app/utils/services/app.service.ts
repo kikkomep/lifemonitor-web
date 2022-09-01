@@ -127,7 +127,7 @@ export class AppService {
     return this.auth.isUserLogged();
   }
 
-  private setLoadingWorkflows(value: boolean) {
+  public setLoadingWorkflows(value: boolean) {
     this.loadingWorkflows = value;
     this.subjectLoadingWorkflows.next(value);
   }
@@ -381,7 +381,8 @@ export class AppService {
           let stats = new AggregatedStatusStats();
           let workflows: Workflow[] = [];
           let workflow_versions: WorkflowVersion[] = [];
-          for (let wdata of data['items']) {
+          for (let wdata_index = 0; wdata_index < data['items'].length; wdata_index++) {
+            let wdata = data['items'][wdata_index];
             let workflow: Workflow = null;
             let workflow_version: WorkflowVersion = null;
             // Try to get workflow data from cache if it is enabled
@@ -397,10 +398,11 @@ export class AppService {
             // Load the latest workflow version from the back-end
             // if cache is disabled or it has not been found
             if (!workflow_version) {
+              this.setLoadingWorkflows(true);
               let versions_data = wdata['versions'];
               workflow = new Workflow(wdata);
               workflows.push(workflow);
-              let vdata = versions_data.find((v: { [x: string]: any; }) => v['is_latest']);
+              let vdata = versions_data ? versions_data.find((v: { [x: string]: any; }) => v['is_latest']) : null;
               this.logger.warn("VDATA", vdata);
               this.logger.debug('Loading data of workflow ', workflow_version);
               this.loadWorkflowVersion(workflow, 'latest', !vdata).subscribe(
@@ -408,18 +410,23 @@ export class AppService {
                   workflow_version = wf;
                   if (vdata) {
                     workflow_version.status = vdata['status'];
+                  } else {
+                    workflow_version.status = wf.status;
                   }
                   workflow.addVersion(workflow_version, true);
                   workflow_versions.push(workflow_version);
                   // workflow.currentVersion = workflow_version;
-                  stats.add(workflow_version);
-                  this.subjectWorkflows.next(this._workflows);
+                  stats.add(workflow_version);                  
                   this.logger.debug(
                     'Data loaded for workflow',
                     workflow_version.uuid,
                     workflow_versions,
                     stats
                   );
+                  if (wdata_index === (data['items'].length - 1)) {
+                    this.setLoadingWorkflows(false);
+                  }
+                  this.subjectWorkflows.next(this._workflows);
                 }
               );
             }
@@ -443,7 +450,8 @@ export class AppService {
           return stats;
         }),
         finalize(() => {
-          this.setLoadingWorkflows(false);
+          if (this._workflows && this._workflows.length == 0)
+            this.setLoadingWorkflows(false);
         })
       );
   }
