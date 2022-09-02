@@ -175,7 +175,7 @@ export class DashboardComponent implements OnInit {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
     this.editModeEnabled = false;
-    this._searchModeEnabled = (this._workflowNameFilter && this._workflowNameFilter !== '______ALL_____') ? true : false;
+    this._searchModeEnabled = true; //(this._workflowNameFilter && this._workflowNameFilter !== '______ALL_____') ? true : false;
     this.updatingDataTable = true;
     this._workflowStats.clear();
     this.filteredWorkflows = [];
