@@ -11,8 +11,15 @@ export class AppComponent {
   title = 'LifeMonitor';
 
   ngAfterViewInit() {
-    $(document).on('mouseover', '[data-toggle="tooltip"]', function () {
-      $(this).tooltip('show');
-    });
+    $(document)
+      .on('mouseover', '[data-toggle="tooltip"]', function () {
+        $(this).tooltip('show');
+      })
+      .on('mouseout', '[data-toggle="tooltip"]', function () {
+        $(this).tooltip('hide');
+      })
+      .on('click', '[data-toggle="tooltip"]', function () {
+        $(this).tooltip('hide');
+      });
   }
 }
