@@ -29,7 +29,11 @@
   <section class="content mx-lg-4 mx-md-2 mt-md-3">
     <!-- *ngIf="workflows && (isLoading|async)===false -->
     <ng-container>
-      <h2 class="text-primary font-weight-light p-2"><span *ngIf="isUserLogged()">My </span>Workflows</h2>
+        <span *ngIf="!isUserLogged()">Workflows</span>
+        <span *ngIf="isUserLogged() && !searchModeEnabled" data-toggle="tooltip" data-placement="right" data-html="true"
+          title="The dashboard collects your subscribed workflows">
+          Dashboard
+        </span>
 
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
