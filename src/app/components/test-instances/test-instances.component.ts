@@ -95,7 +95,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
       // "scrollY": "520",
       language: {
         search: "",
-        searchPlaceholder: "Filter by UUID or name",
+        searchPlaceholder: "Filter your dashboard",
         "decimal": "",
         "emptyTable": "No instances associated to the current test suite",
         "info": "Showing _START_ to _END_ of _TOTAL_ instances",
@@ -119,6 +119,12 @@ export class TestInstancesComponent implements OnInit, OnChanges {
         }
       }
     });
+    // Add tooltip to the SearchBox
+    $("input[type=search]")
+      .attr('data-placement', 'top')
+      .attr('data-toggle', "tooltip")
+      .attr('data-html', "true")
+      .attr('title', "Filter by UUID or Name");
   }
 
   private destroyDataTable() {

@@ -467,7 +467,6 @@ export class DashboardComponent implements OnInit {
   private initDataTable() {
     if (this.workflowDataTable) return;
     this.workflowDataTable = $("#workflowsDashboard").DataTable({
-      "searchPlaceholder": "Filter",
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [5, 10, 20, 50, 75, 100],
@@ -486,7 +485,7 @@ export class DashboardComponent implements OnInit {
       "stateSave": true,
       "language": {
         search: "",
-        searchPlaceholder: "Filter by UUID or name",
+        searchPlaceholder: "Filter your dashboard",
         "decimal": "",
         "emptyTable":
           // this.updatingDataTable ? "" :
@@ -520,6 +519,12 @@ export class DashboardComponent implements OnInit {
         }
       }
     });
+    // Add tooltip to the SearchBox
+    $("input[type=search]")
+      .attr('data-placement', 'top')
+      .attr('data-toggle', "tooltip")
+      .attr('data-html', "true")
+      .attr('title', "Filter by UUID or Name");
   }
 
   private destroyDataTable() {

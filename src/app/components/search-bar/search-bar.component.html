@@ -4,7 +4,9 @@
   </div>
   <input #searchInputText (keyup.enter)="onKeyUpEnter()"
     type="text" [(ngModel)]="actualFilterValue" class="form-control font-weight-light"
-    placeholder="Press ENTER to list all {{elementType}} or search by UUID or Name" aria-label="Username" aria-describedby="basic-addon1" />
+    placeholder="Search for {{elementType}}" aria-label="search" aria-describedby="basic-addon1" 
+    data-toggle="tooltip" data-placement="bottom" data-html="true"
+    title="Press ENTER to list all {{elementType}} or search {{elementType}} by UUID or Name"/>
 
   <div class="input-group-append">
     <button *ngIf="actualFilterValue || searchAll" class="btn btn-outline-secondary border-right-0" type="button" (click)="reset()"
