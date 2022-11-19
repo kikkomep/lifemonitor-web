@@ -10,13 +10,19 @@
 
   <div class="input-group-append">
     <button *ngIf="actualFilterValue || searchAll" class="btn btn-outline-secondary border-right-0" type="button" (click)="reset()"
-      aria-haspopup="true" aria-expanded="false">
+      aria-haspopup="true" aria-expanded="false"
+      data-toggle="tooltip" data-placement="top" data-html="true"
+      title="Clear search for {{elementType}}">
       <i class="fas fa-window-close"></i>
     </button>
     <button class="btn btn-outline-secondary border-left-0" type="button" (click)="changeSortingOrder()"
       aria-haspopup="true" aria-expanded="false">
-      <i *ngIf="actualSortingOrder == 'asc'" class="fas fa-sort-amount-up"></i>
-      <i *ngIf="actualSortingOrder == 'desc'" class="fas fa-sort-amount-down"></i>
+      <i *ngIf="actualSortingOrder == 'asc'" class="fas fa-sort-amount-up"
+         data-toggle="tooltip" data-placement="top" data-html="true"
+         title="Sort {{elementType}} in ascending order"></i>
+      <i *ngIf="actualSortingOrder == 'desc'" class="fas fa-sort-amount-down"
+         data-toggle="tooltip" data-placement="top" data-html="true"
+         title="Sort {{elementType}} in descending order"></i>
     </button>
     <!-- <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
       aria-haspopup="true" aria-expanded="false">
