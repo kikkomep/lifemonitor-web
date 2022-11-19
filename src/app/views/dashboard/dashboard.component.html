@@ -29,7 +29,32 @@
   <section class="content mx-lg-4 mx-md-2 mt-md-3">
     <!-- *ngIf="workflows && (isLoading|async)===false -->
     <ng-container>
-      <h2 class="text-primary font-weight-light p-2"><span *ngIf="isUserLogged()">My </span>Workflows</h2>
+      <h2 class="text-primary font-weight-light p-2">
+        <span *ngIf="!isUserLogged()">Workflows</span>
+        <span *ngIf="isUserLogged() && !searchModeEnabled" data-toggle="tooltip" data-placement="right" data-html="true"
+          title="The dashboard collects your subscribed workflows">
+          Dashboard
+        </span>
+        <div *ngIf="isUserLogged() && searchModeEnabled">
+          <ng-container *ngIf="(isLoading|async)!==false; then searchingForWorkflows; else searchResults;">
+          </ng-container>
+          <ng-template #searchingForWorkflows>Searching...</ng-template>
+          <ng-template #searchResults>
+            <ng-container
+              *ngIf="((workflows | itemFilterPipe: workflowNameFilter).length == 0); then noMatchingWorkflow; else foundWorkflows">
+            </ng-container>
+          </ng-template>
+          <ng-template #noMatchingWorkflow>
+            No Workflow matching "{{workflowNameFilter}}"
+          </ng-template>
+          <ng-template #foundWorkflows>
+            <ng-container *ngIf="workflowNameFilter == '______ALL_____'; then allWorkflows; else matchingWorkflows;">
+            </ng-container>
+            <ng-template #allWorkflows>All found workflows</ng-template>
+            <ng-template #matchingWorkflows>Workflows matching "{{workflowNameFilter}}"</ng-template>
+          </ng-template>
+        </div>
+      </h2>
 
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
