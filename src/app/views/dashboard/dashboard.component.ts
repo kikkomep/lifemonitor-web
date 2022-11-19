@@ -519,6 +519,12 @@ export class DashboardComponent implements OnInit {
         }
       }
     });
+    // Add tooltip to the SearchBox
+    $("input[type=search]")
+      .attr('data-placement', 'top')
+      .attr('data-toggle', "tooltip")
+      .attr('data-html', "true")
+      .attr('title', "Filter by UUID or Name");
   }
 
   private destroyDataTable() {
