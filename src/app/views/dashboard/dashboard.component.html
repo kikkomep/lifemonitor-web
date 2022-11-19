@@ -304,16 +304,22 @@
                       <div *ngIf="isUserLogged()">
                         <span *ngIf="w.subscriptions !== undefined">
                           <a *ngIf="(searchModeEnabled || editModeEnabled || w.editingMode) && (!w.subscriptions || w.subscriptions.length == 0)"
-                            class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)" role="button">
+                            class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)" role="button"
+                            data-toggle="tooltip" data-placement="bottom" data-html="true"
+                            title="Click to subscribe to this workflow and add it to your dashboard">
                             SUBSCRIBE
                           </a>
                           <div
                             *ngIf="!(editModeEnabled || w.editingMode) && searchModeEnabled && (w.subscriptions && w.subscriptions.length > 0)"
-                            class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)" role="button">
+                            class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)" role="button"
+                            data-toggle="tooltip" data-placement="bottom" data-html="true"
+                            title="Click to unsubscribe from this workflow and remove it from your dashboard">
                             SUBSCRIBED
                           </div>
                           <a *ngIf="(editModeEnabled || w.editingMode) && w.subscriptions && w.subscriptions.length > 0"
-                            class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)" role="button">
+                            class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)" role="button"
+                            data-toggle="tooltip" data-placement="bottom" data-html="true"
+                            title="Click to unsubscribe from this workflow and remove it from your dashboard">
                             UNSUBSCRIBE
                           </a>
                         </span>
