@@ -41,17 +41,21 @@
           <ng-template #searchingForWorkflows>Searching...</ng-template>
           <ng-template #searchResults>
             <ng-container
-              *ngIf="((workflows | itemFilterPipe: workflowNameFilter).length == 0); then noMatchingWorkflow; else foundWorkflows">
+              *ngIf="((workflows | itemFilterPipe: workflowNameFilter).length == 0); then noWorkflow; else foundWorkflows">
             </ng-container>
           </ng-template>
-          <ng-template #noMatchingWorkflow>
-            No Workflow matching "{{workflowNameFilter}}"
+          <ng-template #noWorkflow>
+            <ng-container
+              *ngIf="workflowNameFilter == '______ALL_____'; then noWorkflowFound; else noMatchingWorkflow;">
+            </ng-container>
+            <ng-template #noWorkflowFound>No workflow found</ng-template>
+            <ng-template #noMatchingWorkflow>No workflow matching "<b>{{workflowNameFilter}}</b>"</ng-template>
           </ng-template>
           <ng-template #foundWorkflows>
             <ng-container *ngIf="workflowNameFilter == '______ALL_____'; then allWorkflows; else matchingWorkflows;">
             </ng-container>
-            <ng-template #allWorkflows>All found workflows</ng-template>
-            <ng-template #matchingWorkflows>Workflows matching "{{workflowNameFilter}}"</ng-template>
+            <ng-template #allWorkflows>Workflows found</ng-template>
+            <ng-template #matchingWorkflows>Workflows matching "<b>{{workflowNameFilter}}</b>"</ng-template>
           </ng-template>
         </div>
       </h2>

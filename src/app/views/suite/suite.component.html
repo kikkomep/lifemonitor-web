@@ -48,17 +48,21 @@
         <div *ngIf="instanceNameFilter">
           <ng-container #searchResults>
             <ng-container
-              *ngIf="((instances | itemFilterPipe: instanceNameFilter).length == 0); then noMatchingInstances; else foundInstances">
+              *ngIf="((instances | itemFilterPipe: instanceNameFilter).length == 0); then noInstance; else foundInstances">
             </ng-container>
           </ng-container>
-          <ng-template #noMatchingInstances>
-            No Test Instance matching "{{instanceNameFilter}}"
+          <ng-template #noInstance>
+            <ng-container
+              *ngIf="instanceNameFilter == '______ALL_____'; then noInstanceFound; else noMatchingInstance;">
+            </ng-container>
+            <ng-template #noInstanceFound>No test instance found</ng-template>
+            <ng-template #noMatchingInstance>No test instance matching "<b>{{instanceNameFilter}}</b>"</ng-template>
           </ng-template>
           <ng-template #foundInstances>
             <ng-container *ngIf="instanceNameFilter == '______ALL_____'; then allInstances; else matchingInstances;">
             </ng-container>
             <ng-template #allInstances>Test instances</ng-template>
-            <ng-template #matchingInstances>Test instances matching "{{instanceNameFilter}}"</ng-template>
+            <ng-template #matchingInstances>Test instances matching "<b>{{instanceNameFilter}}</b>"</ng-template>
           </ng-template>
         </div>
       </h3>

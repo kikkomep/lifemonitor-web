@@ -41,17 +41,21 @@
       <div *ngIf="suiteNameFilter">
         <ng-container #searchResults>
           <ng-container
-            *ngIf="((suites | itemFilterPipe: suiteNameFilter).length == 0); then noMatchingSuite; else foundSuites">
+            *ngIf="((suites | itemFilterPipe: suiteNameFilter).length == 0); then noSuite; else foundSuites">
           </ng-container>
         </ng-container>
-        <ng-template #noMatchingSuite>
-          No Suite matching "{{suiteNameFilter}}"
+        <ng-template #noSuite>
+          <ng-container
+            *ngIf="suiteNameFilter == '______ALL_____'; then noSuiteFound; else noMatchingSuite;">
+          </ng-container>
+          <ng-template #noSuiteFound>No test suite found</ng-template>
+          <ng-template #noMatchingSuite>No test suite matching "<b>{{suiteNameFilter}}</b>"</ng-template>
         </ng-template>
         <ng-template #foundSuites>
           <ng-container *ngIf="suiteNameFilter == '______ALL_____'; then allSuites; else matchingSuites;">
           </ng-container>
           <ng-template #allSuites>Suites</ng-template>
-          <ng-template #matchingSuites>Suites matching "{{suiteNameFilter}}"</ng-template>
+          <ng-template #matchingSuites>Suites matching "<b>{{suiteNameFilter}}</b>"</ng-template>
         </ng-template>
       </div>
     </h3>
