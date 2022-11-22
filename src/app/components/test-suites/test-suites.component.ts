@@ -62,7 +62,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
       this.logger.debug('Test Build selected', testBuild);
       window.open(testBuild.externalLink, '_blank');
       this.suiteSelected.emit(testBuild);
-      this.appService.selectWorkflow(
+      this.appService.selectWorkflowVersion(
         testBuild.testInstance.suite.workflow.uuid
       );
     }
@@ -94,7 +94,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
       "stateSave": true,
       language: {
         search: "",
-        searchPlaceholder: "Filter by UUID or name",
+        searchPlaceholder: "Filter your dashboard",
         "decimal": "",
         "emptyTable": "No suites associated to the current workflow",
         "info": "Showing _START_ to _END_ of _TOTAL_ suites",
@@ -118,6 +118,12 @@ export class TestSuitesComponent implements OnInit, OnChanges {
         }
       }
     });
+    // Add tooltip to the SearchBox
+    $("input[type=search]")
+      .attr('data-placement', 'top')
+      .attr('data-toggle', "tooltip")
+      .attr('data-html', "true")
+      .attr('title', "Filter by UUID or Name");
   }
 
   private destroyDataTable() {

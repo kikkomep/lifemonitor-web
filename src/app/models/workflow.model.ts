@@ -1,4 +1,6 @@
+import { Model } from './base.models';
 import { RoCrate } from './common.models';
+import { Registry } from './registry.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
@@ -7,11 +9,140 @@ import {
 import { Suite } from './suite.models';
 import { TestBuild } from './testBuild.models';
 
-export class Workflow extends AggregatedStatusStatsItem {
+export class Workflow extends Model {
+  uuid: string;
+  name: string;
+  _version_descriptors: WorkflowVersionDescriptor[] = null;
+  _current_version: WorkflowVersion = null;
+  private __versions: { [name: string]: WorkflowVersion };
+
+  constructor(rawData?: Object, skip?: []) {
+    super();
+    let versions: [] = rawData['versions'];
+    delete rawData['versions'];
+    this.update(rawData);
+    this.updateDescriptors(versions, true);
+  }
+
+  public pickVersion(skip: string[] = null): WorkflowVersionDescriptor {
+    this.logger.debug('Skip', skip);
+    for (let v of this.versionDescriptors) {
+      if (!skip || skip.length === 0) return v;
+      else if (skip.indexOf(v.name) === -1) return v;
+    }
+    return null;
+  }
+
+  public findIndex(v: WorkflowVersion): number {
+    return this.versions.findIndex(
+      (obj) =>
+        obj.uuid === v.uuid && obj.version['version'] === v.version['version']
+    );
+  }
+
+  public set currentVersion(v: WorkflowVersion) {
+    this._current_version = v;
+    this.logger.debug('Updated current workflow version', v, this);
+  }
+
+  public get currentVersion(): WorkflowVersion {
+    return this._current_version;
+  }
+
+  private get _versions(): { [name: string]: WorkflowVersion } {
+    if (!this.__versions) this.__versions = {};
+    return this.__versions;
+  }
+
+  public getVersion(version: string): WorkflowVersion {
+    try {
+      return this._versions[version];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public addVersion(v: WorkflowVersion, setAsCurrent: boolean = false) {
+    if (v && v.workflow == null) {
+      this._versions[v.version['version']] = v;
+      v.workflow = this;
+      if (setAsCurrent) this.currentVersion = v;
+      if (!this.getVersionDescriptor(v.version['version'])) {
+        let data = { ...v.version };
+        delete data['links'];
+        delete data['name'];
+        this.logger.debug('Data VERSION: ', v.version, data);
+        this.addVersionDescriptor(data);
+      }
+    }
+  }
+
+  public removeVersion(v: WorkflowVersion, removeDescriptor: boolean = true) {
+    if (v.workflow == this) {
+      delete this._versions[v.version['version']];
+      v.workflow = null;
+      if (removeDescriptor && this._version_descriptors) {
+        let index = this._version_descriptors.findIndex(
+          (d: WorkflowVersionDescriptor) => d.name === v.version['version']
+        );
+        if (this.currentVersion === v) {
+          this.currentVersion = null;
+        }
+        if (index > -1) {
+          this._version_descriptors.splice(index, 1);
+        }
+      }
+    }
+  }
+
+  public set versions(versions: WorkflowVersion[]) {
+    this.__versions = {};
+    for (let v of versions) {
+      this._versions[v.version['version']] = v;
+    }
+  }
+
+  public get versions(): WorkflowVersion[] {
+    return Object.values(this._versions);
+  }
+
+  public updateDescriptors(versions: [], replaceExisting: boolean = false) {
+    this._version_descriptors = replaceExisting
+      ? []
+      : this._version_descriptors;
+    if (versions) {
+      versions.forEach((v) => {
+        this._version_descriptors.push(new WorkflowVersionDescriptor(v));
+      });
+    }
+  }
+
+  public getVersionDescriptor(version: string): WorkflowVersionDescriptor {
+    return this._version_descriptors.find((v) => v.name === version);
+  }
+
+  public addVersionDescriptor(version: object) {
+    let vd = new WorkflowVersionDescriptor(version);
+    if (vd.isLatest) {
+      this._version_descriptors.forEach((v) => {
+        v.isLatest = false;
+      });
+    }
+    this._version_descriptors.push(vd);
+  }
+
+  public get versionDescriptors(): WorkflowVersionDescriptor[] {
+    return this._version_descriptors;
+  }
+}
+
+export class WorkflowVersion extends AggregatedStatusStatsItem {
   public: boolean;
-  registry: Object;
+  _workflow: Workflow;
   version: Object;
   status: Status;
+  _previous_versions: WorkflowVersionDescriptor[];
+  registries: Registry[];
   _type: string;
   _rocrate: RoCrate;
   _suites: AggregatedStatusStats;
@@ -28,6 +159,14 @@ export class Workflow extends AggregatedStatusStatsItem {
     this.setName(data);
   }
 
+  public set workflow(w: Workflow) {
+    this._workflow = w;
+  }
+
+  public get workflow(): Workflow {
+    return this._workflow;
+  }
+
   public update(rawData: Object) {
     super.update(rawData);
     this.setName(rawData);
@@ -35,7 +174,11 @@ export class Workflow extends AggregatedStatusStatsItem {
 
   private setName(data: Object) {
     let rocIdentifier = this.rocIdentifier;
-    this.setNameFromProperty(data, "name", rocIdentifier ? rocIdentifier : data['uuid']);
+    this.setNameFromProperty(
+      data,
+      'name',
+      rocIdentifier ? rocIdentifier : data['uuid']
+    );
   }
 
   public get rocIdentifier(): string {
@@ -49,37 +192,54 @@ export class Workflow extends AggregatedStatusStatsItem {
     return null;
   }
 
+  public get authors(): [] {
+    return this.version ? this.version['authors'] : [];
+  }
+
   public get type(): string {
     if (!this._type) {
       if (this._rawData && 'type' in this._rawData) {
-        this._type = this._rawData["type"];
+        this._type = this._rawData['type'];
       } else {
         let crate: RoCrate = this.roCrateMetadata;
         if (crate) {
           let mainEntity: object = crate.mainEntity;
           if (mainEntity) {
-            let programminLanguage = crate.findGraphEntity(mainEntity['programmingLanguage']['@id']);
+            let programminLanguage = crate.findGraphEntity(
+              mainEntity['programmingLanguage']['@id']
+            );
             if (programminLanguage) {
               this._type = this.normalizeWorkflowTypeName(
-                ("" + programminLanguage['name']).toLowerCase());
-              this.logger.debug("Workflow type detected: ", this._type);
+                ('' + programminLanguage['name']).toLowerCase()
+              );
+              this.logger.debug('Workflow type detected: ', this._type);
               return this._type;
             }
           }
         } else if (this.version) {
           this._type = 'unknown';
-          this.logger.debug("Workflow type detected: ", this._type);
+          this.logger.debug('Workflow type detected: ', this._type);
         }
       }
     }
     return this._type;
   }
 
+  public get previousVersions(): WorkflowVersionDescriptor[] {
+    return this._previous_versions;
+  }
+
+  public set previousVersions(versions: WorkflowVersionDescriptor[]) {
+    if (!versions) return;
+    this._previous_versions = [];
+    for (let v of versions) {
+      this._previous_versions.push(new WorkflowVersionDescriptor(v));
+    }
+  }
+
   private normalizeWorkflowTypeName(type: string): string {
-    if (type === 'common workflow language')
-      return 'cwl';
-    if (type === 'unrecognized workflow type')
-      return 'unknown'
+    if (type === 'common workflow language') return 'cwl';
+    if (type === 'unrecognized workflow type') return 'unknown';
     return type;
   }
 
@@ -104,32 +264,25 @@ export class Workflow extends AggregatedStatusStatsItem {
   }
 
   public get typeIcon(): string {
-    if (this.type === 'galaxy')
-      return 'assets/img/logo/wf/GalaxyLogo.png';
+    if (this.type === 'galaxy') return 'assets/img/logo/wf/GalaxyLogo.png';
     else if (this.type === 'snakemake')
       return 'assets/img/logo/wf/SnakeMakeLogo.png';
-    else if (this.type === 'cwl')
-      return 'assets/img/logo/wf/CwlLogo.png';
+    else if (this.type === 'cwl') return 'assets/img/logo/wf/CwlLogo.png';
     else if (this.type === 'nextflow')
       return 'assets/img/logo/wf/NextFlowLogo.png';
     else if (this.type === 'jupyter')
       return 'assets/img/logo/wf/JupyterLogo.png';
-    else if (this.type === 'knime')
-      return 'assets/img/logo/wf/KnimeLogo.png';
+    else if (this.type === 'knime') return 'assets/img/logo/wf/KnimeLogo.png';
     else if (this.type === 'shell script')
       return 'assets/img/logo/wf/ShellLogo.png';
-    return 'assets/img/logo/wf/GenericWorkflowLogo.png';;
+    return 'assets/img/logo/wf/GenericWorkflowLogo.png';
   }
 
   public get typeIconSize(): number {
-    if (this.type === 'galaxy')
-      return 50;
-    if (this.type === 'nextflow')
-      return 40;
-    else if (this.type === 'cwl')
-      return 55;
-    else if (this.typeIcon.endsWith('GenericWorkflowLogo.png'))
-      return 48;
+    if (this.type === 'galaxy') return 50;
+    if (this.type === 'nextflow') return 40;
+    else if (this.type === 'cwl') return 55;
+    else if (this.typeIcon.endsWith('GenericWorkflowLogo.png')) return 48;
     return 45;
   }
 
@@ -137,10 +290,30 @@ export class Workflow extends AggregatedStatusStatsItem {
     return this.version ? this.version['submitter'] : null;
   }
 
-  public get externalLink(): string {
+  public get githubOrigin(): boolean {
+    return this.originLink && this.originLink.startsWith('https://github');
+  }
+
+  public get basedOnLink(): string {
+    if (this.version) {
+      return this.version['links']['based_on'];
+    } else {
+      return null;
+    }
+  }
+
+  public get originLink(): string {
     if (this.version) {
       return this.version['links']['origin'];
     } else {
+      return null;
+    }
+  }
+
+  public getRegistryLink(registry: string) {
+    try {
+      return this.version['links']['registries'][registry];
+    } catch (Exception) {
       return null;
     }
   }
@@ -193,5 +366,27 @@ export class Workflow extends AggregatedStatusStatsItem {
     this._latestBuilds = latestBuilds.sort((a, b) =>
       a.timestamp > b.timestamp || a.suite_uuid > b.suite_uuid ? 1 : -1
     );
+  }
+}
+
+export class WorkflowVersionDescriptor extends Model {
+  submitter: Object;
+
+  public get name(): string {
+    return this._rawData['version'];
+  }
+
+  public get isLatest(): boolean {
+    return this._rawData['is_latest'];
+  }
+
+  public set isLatest(value: boolean) {
+    this._rawData['is_latest'] = value;
+  }
+
+  public get links(): Object {
+    return 'ro_crate' in this._rawData
+      ? this._rawData['ro_crate']['links']
+      : [];
   }
 }

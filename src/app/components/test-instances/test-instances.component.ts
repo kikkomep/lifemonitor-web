@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
-import { Workflow } from 'src/app/models/workflow.model';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
@@ -25,7 +25,7 @@ declare var $: any;
   styleUrls: ['./test-instances.component.scss'],
 })
 export class TestInstancesComponent implements OnInit, OnChanges {
-  @Input() workflow: Workflow;
+  @Input() workflow: WorkflowVersion;
   @Input() testInstances: TestInstance[];
   @Output() suiteSelected = new EventEmitter<TestInstance>();
 
@@ -63,7 +63,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
       this.logger.debug('Test Build selected', testBuild);
       // this.suiteSelected.emit(testBuild);
       window.open(testBuild.externalLink, '_blank');
-      this.appService.selectWorkflow(
+      this.appService.selectWorkflowVersion(
         testBuild.testInstance.suite.workflow.uuid
       );
     }
@@ -95,7 +95,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
       // "scrollY": "520",
       language: {
         search: "",
-        searchPlaceholder: "Filter by UUID or name",
+        searchPlaceholder: "Filter your dashboard",
         "decimal": "",
         "emptyTable": "No instances associated to the current test suite",
         "info": "Showing _START_ to _END_ of _TOTAL_ instances",
@@ -119,6 +119,12 @@ export class TestInstancesComponent implements OnInit, OnChanges {
         }
       }
     });
+    // Add tooltip to the SearchBox
+    $("input[type=search]")
+      .attr('data-placement', 'top')
+      .attr('data-toggle', "tooltip")
+      .attr('data-html', "true")
+      .attr('title', "Filter by UUID or Name");
   }
 
   private destroyDataTable() {

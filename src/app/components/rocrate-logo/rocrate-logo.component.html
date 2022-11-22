@@ -1,4 +1,4 @@
-<div *ngIf="availableForDownload === true">
+<div *ngIf="availableForDownload === true" style="margin-top: 40%;">
   <div class="d-none d-sm-none d-md-none d-lg-block">
     <a [routerLink]="" (click)="downloadROCrate()" class="hvr-float-shadow" data-toggle="tooltip" data-placement="left"
       data-html="true"
@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<div *ngIf="availableForDownload === false">
+<div *ngIf="availableForDownload === false" style="margin-top: 40%;">
   <div class="d-none d-sm-none d-md-none d-lg-block">
     <div class="text-muted text-center disabled" data-toggle="tooltip" data-html="true" data-placement="left"
       title="Download not available" style="min-width: 175px; max-width: 175px;">

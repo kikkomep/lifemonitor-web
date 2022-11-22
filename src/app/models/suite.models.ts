@@ -4,7 +4,7 @@ import {
   Status,
   StatusStatsItem,
 } from './stats.model';
-import { Workflow } from './workflow.model';
+import { WorkflowVersion } from './workflow.model';
 
 export class Suite extends AggregatedStatusStatsItem {
   public roc_suite: string;
@@ -14,7 +14,7 @@ export class Suite extends AggregatedStatusStatsItem {
 
   private _latest: StatusStatsItem[] = null;
 
-  constructor(public workflow: Workflow, rawData: object) {
+  constructor(public workflow: WorkflowVersion, rawData: object) {
     super(rawData);
     this.setNameFromProperty(rawData, "name", rawData['roc_suite']);
   }
@@ -25,13 +25,14 @@ export class Suite extends AggregatedStatusStatsItem {
   }
 
   public asUrlParam() {
-    return Suite.getUrlParam(this.workflow.uuid, this.uuid);
+    return Suite.getUrlParam(this.workflow.uuid, this.workflow.version["version"], this.uuid);
   }
 
-  public static getUrlParam(workflow_uuid: string, suite_uuid: string): string {
+  public static getUrlParam(workflow_uuid: string, workflow_version: string, suite_uuid: string): string {
     return btoa(
       JSON.stringify({
         workflow: workflow_uuid,
+        version: workflow_version,
         suite: suite_uuid,
       })
     );

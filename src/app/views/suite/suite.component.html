@@ -14,7 +14,7 @@
               <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
             </li>
             <li class="breadcrumb-item active">
-              <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid }]">
+              <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid, version: suite.workflow.version['version'] }]">
                 <i class="fas fa-cogs p-1"></i>Workflow
               </a>
             </li>
@@ -40,7 +40,32 @@
 
   <section *ngIf="suite.workflow" class="content mx-lg-4 p-2">
     <div *ngIf="suite.workflow && suite.workflow.suites" class="mt-5">
-      <h3 style="color: var(--primary)">Test instances</h3>
+      <h3 style="color: var(--primary)">
+        <span *ngIf="!instanceNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
+          title="The dashboard collects test instances for the suite '{{suite.name}}'">
+          Test instances
+        </span>
+        <div *ngIf="instanceNameFilter">
+          <ng-container #searchResults>
+            <ng-container
+              *ngIf="((instances | itemFilterPipe: instanceNameFilter).length == 0); then noInstance; else foundInstances">
+            </ng-container>
+          </ng-container>
+          <ng-template #noInstance>
+            <ng-container
+              *ngIf="instanceNameFilter == '______ALL_____'; then noInstanceFound; else noMatchingInstance;">
+            </ng-container>
+            <ng-template #noInstanceFound>No test instance found</ng-template>
+            <ng-template #noMatchingInstance>No test instance matching "<b>{{instanceNameFilter}}</b>"</ng-template>
+          </ng-template>
+          <ng-template #foundInstances>
+            <ng-container *ngIf="instanceNameFilter == '______ALL_____'; then allInstances; else matchingInstances;">
+            </ng-container>
+            <ng-template #allInstances>Test instances</ng-template>
+            <ng-template #matchingInstances>Test instances matching "<b>{{instanceNameFilter}}</b>"</ng-template>
+          </ng-template>
+        </div>
+      </h3>
       <!-- Small boxes (Stat box) -->
       <div class="row">
         <div class="col-lg-2 col-6">

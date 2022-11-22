@@ -2,14 +2,15 @@ import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, HostListener, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subscription, timer } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
-  AggregatedStatusStatsItem
+  AggregatedStatusStatsItem,
+  AggregatedTestStatusMap
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
-import { Workflow } from 'src/app/models/workflow.model';
+import { Workflow, WorkflowVersion, WorkflowVersionDescriptor } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
@@ -24,12 +25,15 @@ declare var $: any;
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
+  private _workflows: Workflow[] = null;
   // reference to workflows stats
   private _workflowStats: AggregatedStatusStats | null;
   // reference to the current subscriptions
   private workflowsStatsSubscription: Subscription;
   private userLoggedSubscription: Subscription;
-  private paramSubscription: Subscription;
+  private internalParamsSubscription: Subscription;
+  private queryParamsSubscription: Subscription;
+  private internalParamSubscription: Subscription;
   //
   private filteredWorkflows: AggregatedStatusStatsItem[] | null;
   //
@@ -46,6 +50,8 @@ export class DashboardComponent implements OnInit {
   private workflowDataTable: any = null;
 
   public updatingDataTable: boolean = false;
+
+  private loadingWorkflowVersions = [];
 
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
@@ -75,25 +81,29 @@ export class DashboardComponent implements OnInit {
         this.workflowDataTable.draw();
       });
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
-      (data) => {
-        timer(1000).subscribe(x => {
-          this.logger.debug("Loaded workflows: ", data);
-          this._workflowStats = this.statsFilter.transform(
-            data,
-            this._workflowNameFilter
-          );
-          this.filteredWorkflows =
-            this.searchModeEnabled || !this.isUserLogged()
-              ? this._workflowStats.all
-              : this._workflowStats.all.filter(
-                (v) => v.subscriptions && v.subscriptions.length > 0);
-          this.logger.debug('Stats', data);
-          this.refreshDataTable();
-        });
+      (workflows: Workflow[]) => {
+        this.logger.debug("Loaded workflows: ", workflows);
+        this.prepareTableData(workflows);
+        this.refreshDataTable();
       }
     );
 
-    this.paramSubscription = this.route.params.subscribe((params) => {
+    this.queryParamsSubscription = this.route.queryParams
+      .subscribe(params => {
+        console.debug("Query params: ", params);
+        if ('status' in params) {
+          // Parse and normalize status filter
+          let status: string = params['status'].toLowerCase();
+          console.debug("Status: ", status);
+          for (let s in AggregatedTestStatusMap) {
+            if (s === status || AggregatedTestStatusMap[s].includes(status)) {
+              this.statusFilter = s;
+            }
+          }
+        }
+      });
+
+    this.internalParamSubscription = this.route.params.subscribe((params) => {
       this.logger.debug('Dashboard params:', params);
       if (params['add'] == "true") {
         this.openUploader = true;
@@ -101,14 +111,13 @@ export class DashboardComponent implements OnInit {
       }
     });
     this.logger.debug('Initializing workflow data!!');
-    this._workflowStats = this.appService.workflowStats;
+    this._workflows = this.appService.workflows;
+    this._workflowNameFilter = '';
     this.updatingDataTable = true;
-    if (this._workflowStats) {
-      this.filteredWorkflows = this.searchModeEnabled || !this.isUserLogged()
-        ? this._workflowStats.all
-        : this._workflowStats.all.filter(
-          (v) => v.subscriptions && v.subscriptions.length > 0);
+    if (this._workflows) {
+      this.prepareTableData();
       this.refreshDataTable();
+      this.appService.setLoadingWorkflows(false);
     } else {
       this.appService.loadWorkflows(
         true,
@@ -127,6 +136,37 @@ export class DashboardComponent implements OnInit {
   ngAfterViewChecked() {
   }
 
+  private prepareTableData(workflows: Workflow[] = null) {
+    workflows = workflows || this._workflows;
+    if (!workflows) return;
+    this.logger.debug("Loaded workflows: ", workflows);
+    // Initialize workflow stats
+    let stats = new AggregatedStatusStats();
+    //let workflow_versions: WorkflowVersion[] = data
+    this._workflows = workflows;
+    workflows.forEach((w: Workflow) => {
+      if (w.currentVersion) stats.add(w.currentVersion);
+    });
+    this.logger.debug('Initialized Stats', stats);
+
+    this._workflowStats = this.statsFilter.transform(
+      stats,
+      this._workflowNameFilter
+    );
+
+    if (this.statusFilter) {
+      this.filterByStatus(this.statusFilter, false);
+    } else {
+      this.filteredWorkflows =
+        this.searchModeEnabled || !this.isUserLogged()
+          ? this._workflowStats.all
+          : this._workflowStats.all.filter(
+            (v) => v.subscriptions && v.subscriptions.length > 0);
+    }
+
+    this.refreshDataTable();
+  }
+
 
   public get workflowNameFilter(): string {
     return this._workflowNameFilter;
@@ -135,7 +175,7 @@ export class DashboardComponent implements OnInit {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
     this.editModeEnabled = false;
-    this._searchModeEnabled = true;
+    this._searchModeEnabled = true; //(this._workflowNameFilter && this._workflowNameFilter !== '______ALL_____') ? true : false;
     this.updatingDataTable = true;
     this._workflowStats.clear();
     this.filteredWorkflows = [];
@@ -166,7 +206,20 @@ export class DashboardComponent implements OnInit {
   }
 
   public openWorkflowUploader() {
-    this.uploaderService.show({});
+    this.uploaderService.show({
+      title: "Register Workflow",
+      iconClass: 'fas fa-cogs',
+      iconClassSize: 'fa-7x',
+      iconImage: null
+    });
+  }
+
+  public openWorkflowVersionUploader(workflow: Workflow) {
+    this.uploaderService.show({
+      iconImage: '/assets/icons/branch-add-eosc-green.png',
+      title: "Register new version of <br><b>\"" + workflow.name + "\"</b>",
+      workflowUUID: workflow.uuid, workflowName: workflow.name
+    });
   }
 
   public editModeToggle() {
@@ -179,20 +232,42 @@ export class DashboardComponent implements OnInit {
     return this._searchModeEnabled;
   }
 
-  public isEditable(w: Workflow) {
+  public isEditable(w: WorkflowVersion) {
     return this.appService.isEditable(w);
   }
 
-  public deleteWorkflowVersion(w: Workflow) {
+  public updateSelectedVersion(workflow_version: WorkflowVersion) {
+    this.logger.debug("Updated workflow version", workflow_version);
+    this.prepareTableData();
+  }
+
+
+  public isLoadingWorkflowVersion(workflow: Workflow) {
+    return workflow && this.loadingWorkflowVersions.indexOf(workflow.uuid) >= 0;
+  }
+
+
+  public loadingWorkflowVersion(workflow: Workflow) {
+    if (workflow) {
+      this.loadingWorkflowVersions.push(workflow.uuid);
+    } else {
+      let i = this.loadingWorkflowVersions.indexOf(workflow.uuid);
+      if (i >= 0) {
+        this.loadingWorkflowVersions.splice(i, 1);
+      }
+    }
+  }
+
+  public deleteWorkflowVersion(w: WorkflowVersion) {
     this.logger.debug("Deleting workflow version....", w);
     this.inputDialog.show({
-      iconClass: 'fas fa-trash-alt',
+      iconImage: '/assets/icons/branch-delete-eosc-green.png',
+      iconImageSize: "160",
       description:
-        'Delete workflow <b>' +
-        w.name + '</b> (version ' + w.version['version'] + ')?',
+        'Delete version <b>"' + w.version["version"] + '"</b><br/> of workflow <b>' + w.name + '</b>?',
       onConfirm: () => {
         this.updatingDataTable = true;
-        this.appService.deleteWorkflowVersion(w, w.version['version'])
+        this.appService.deleteWorkflowVersion(w)
           .subscribe((wd: { uuid: string; version: string }) => {
             this.logger.debug("Workflow deleted", wd);
             this.refreshDataTable(false);
@@ -201,14 +276,31 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  public subscribeWorkflow(w: Workflow) {
+  public deleteWorkflow(w: Workflow) {
+    this.logger.debug("Deleting workflow ....", w);
+    this.inputDialog.show({
+      iconClass: 'fas fa-trash-alt',
+      description:
+        'Delete workflow <b>' + w.name + '</b>?',
+      onConfirm: () => {
+        this.updatingDataTable = true;
+        this.appService.deleteWorkflow(w)
+          .subscribe((wd: { uuid: string; version: string }) => {
+            this.logger.debug("Workflow deleted", wd);
+            this.refreshDataTable(false);
+          });
+      },
+    });
+  }
+
+  public subscribeWorkflow(w: WorkflowVersion) {
     this.logger.debug('Subscribing to workflow: ', w);
     this.appService.subscribeWorkflow(w).subscribe((w) => {
       this.logger.debug('Workflow subscription created!');
     });
   }
 
-  public unsubscribeWorkflow(w: Workflow) {
+  public unsubscribeWorkflow(w: WorkflowVersion) {
     this.logger.debug('Unsubscribing from workflow: ', w);
     this.appService.unsubscribeWorkflow(w).subscribe((w) => {
       this.logger.debug('Workflow subscription deleted!');
@@ -222,7 +314,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  public getWorkflowVisibilityTitle(w: Workflow) {
+  public getWorkflowVisibilityTitle(w: WorkflowVersion) {
     return (
       "<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>" +
       (w.public ? 'public' : 'private') +
@@ -230,19 +322,19 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  public restoreWorkflowName(w: Workflow) {
+  public restoreWorkflowName(w: WorkflowVersion) {
     w.name = w['oldNameValue'];
     w['editingMode'] = false;
   }
 
-  public showWorkflowDetails(w: Workflow) {
+  public showWorkflowDetails(w: WorkflowVersion) {
     this.clickHandler.click(() => {
       this.router.navigate([
-        '/workflow', { uuid: w.asUrlParam() }]);
+        '/workflow', { uuid: w.asUrlParam(), version: w.version["version"] }]);
     });
   }
 
-  public enableWorkflowEditMode(w: Workflow) {
+  public enableWorkflowEditMode(w: WorkflowVersion) {
     this.clickHandler.doubleClick(() => {
       if (this.isUserLogged() && this.isEditable(w)) {
         w['oldNameValue'] = w.name;
@@ -252,7 +344,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  public updateWorkflowName(w: Workflow) {
+  public updateWorkflowName(w: WorkflowVersion) {
     this.logger.debug("Updating workflow name", w);
     this.appService.updateWorkflowName(w).subscribe(() => {
       this.toastService.success("Workflow updated!", '', { timeOut: 2500 });
@@ -265,7 +357,7 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  public changeVisibility(w: Workflow) {
+  public changeVisibility(w: WorkflowVersion) {
     this.inputDialog.show({
       iconClass: !w.public
         ? 'fas fa-lg fa-globe-americas'
@@ -317,12 +409,17 @@ export class DashboardComponent implements OnInit {
     this.filteredWorkflows = workflows;
   }
 
-  public filterByStatus(status: string) {
+
+  public selectWorkflowVersion(version: any) {
+    this.logger.debug("Selected workflow version:", version);
+  }
+
+  public filterByStatus(status: string, asToggle: boolean = true) {
     this.logger.debug('Filter by status', status);
     if (!this._workflowStats) return;
     try {
       status = status == 'any' ? 'all' : status;
-      if (status != this.statusFilter) {
+      if (status != this.statusFilter || !asToggle) {
         this.filteredWorkflows =
           (!this.isUserLogged() || this.searchModeEnabled) ? this._workflowStats[status]
             : this._workflowStats[status].filter(
@@ -335,6 +432,10 @@ export class DashboardComponent implements OnInit {
             : this._workflowStats['all'].filter(
               (v: { subscriptions: string | any[]; }) => v.subscriptions && v.subscriptions.length > 0);
         this.statusFilter = null;
+        // remove status params from query if defined
+        const queryParams = { ...this.route.snapshot.queryParams };
+        delete queryParams.status;
+        this.router.navigate([], { queryParams: queryParams });
         this.refreshDataTable();
       }
     } catch (e) {
@@ -350,6 +451,8 @@ export class DashboardComponent implements OnInit {
       this.cdref.detectChanges();
       this.initDataTable();
       this.cdref.detectChanges();
+      $('.selectpicker').selectpicker();
+      // $('#registryWorkflowSelector').selectpicker('refresh');
     } finally {
       if (resetTableStatus)
         this.updatingDataTable = false;
@@ -364,7 +467,6 @@ export class DashboardComponent implements OnInit {
   private initDataTable() {
     if (this.workflowDataTable) return;
     this.workflowDataTable = $("#workflowsDashboard").DataTable({
-      "searchPlaceholder": "Filter",
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [5, 10, 20, 50, 75, 100],
@@ -383,7 +485,7 @@ export class DashboardComponent implements OnInit {
       "stateSave": true,
       "language": {
         search: "",
-        searchPlaceholder: "Filter by UUID or name",
+        searchPlaceholder: "Filter your dashboard",
         "decimal": "",
         "emptyTable":
           // this.updatingDataTable ? "" :
@@ -417,6 +519,12 @@ export class DashboardComponent implements OnInit {
         }
       }
     });
+    // Add tooltip to the SearchBox
+    $("input[type=search]")
+      .attr('data-placement', 'top')
+      .attr('data-toggle', "tooltip")
+      .attr('data-html', "true")
+      .attr('title', "Filter by UUID or Name");
   }
 
   private destroyDataTable() {
@@ -430,8 +538,12 @@ export class DashboardComponent implements OnInit {
     // prevent memory leak when component destroyed
     if (this.workflowsStatsSubscription)
       this.workflowsStatsSubscription.unsubscribe();
-    if (this.paramSubscription)
-      this.paramSubscription.unsubscribe();
+    if (this.internalParamsSubscription)
+      this.internalParamsSubscription.unsubscribe();
+    if (this.queryParamsSubscription)
+      this.queryParamsSubscription.unsubscribe();
+    if (this.userLoggedSubscription)
+      this.userLoggedSubscription.unsubscribe();
     this.logger.debug('Destroying dashboard component');
   }
 }

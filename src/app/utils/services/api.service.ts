@@ -13,7 +13,7 @@ import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { TestInstance } from 'src/app/models/testInstance.models';
 import { User } from 'src/app/models/user.modes';
-import { Workflow } from 'src/app/models/workflow.model';
+import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
 import { AppConfigService } from './config.service';
@@ -189,7 +189,7 @@ export class ApiService {
       );
   }
 
-  updateWorkflowName(workflow: Workflow): Observable<any> {
+  updateWorkflowName(workflow: WorkflowVersion): Observable<any> {
     let body = {
       name: workflow.name
     };
@@ -209,7 +209,7 @@ export class ApiService {
       );
   }
 
-  changeWorkflowVisibility(workflow: Workflow): Observable<any> {
+  changeWorkflowVisibility(workflow: WorkflowVersion): Observable<any> {
     let body = {
       public: !workflow.public,
     };
@@ -308,7 +308,24 @@ export class ApiService {
       );
   }
 
-  downloadROCrate(workflow: Workflow): Observable<any> {
+  deleteWorkflow(uuid: string):
+    Observable<{ uuid: string; }> {
+    return this.http
+      .delete(
+        this.apiBaseUrl + '/workflows/' + uuid,
+        this.get_http_options()
+      )
+      .pipe(
+        retry(3),
+        map(() => {
+          this.logger.debug('Workflow deleted');
+          return { uuid: uuid };
+        })
+      );
+  }
+
+
+  downloadROCrate(workflow: WorkflowVersion): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
     let headers = new HttpHeaders();
     if (token) {
@@ -326,7 +343,7 @@ export class ApiService {
       );
   }
 
-  subscribeWorkflow(workflow: Workflow): Observable<Workflow> {
+  subscribeWorkflow(workflow: WorkflowVersion): Observable<WorkflowVersion> {
     return this.http
       .post(
         this.apiBaseUrl + '/workflows/' + workflow.uuid + '/subscribe',
@@ -346,7 +363,7 @@ export class ApiService {
       );
   }
 
-  unsubscribeWorkflow(workflow: Workflow): Observable<Workflow> {
+  unsubscribeWorkflow(workflow: WorkflowVersion): Observable<WorkflowVersion> {
     return this.http
       .post(
         this.apiBaseUrl + '/workflows/' + workflow.uuid + '/unsubscribe',
@@ -371,7 +388,9 @@ export class ApiService {
 
   get_workflows(
     filteredByUser: boolean = false,
-    includeSubScriptions: boolean = false
+    includeSubScriptions: boolean = false,
+    status: boolean = true,
+    versions: boolean = true
   ): Observable<object> {
     this.logger.debug(
       'Loading workflows params',
@@ -379,10 +398,9 @@ export class ApiService {
       includeSubScriptions
     );
     let url: string = !filteredByUser
-      ? this.apiBaseUrl + '/workflows?status=true'
+      ? this.apiBaseUrl + `/workflows?status=${status}&versions=${versions}`
       : this.apiBaseUrl +
-      '/users/current/workflows?status=true&subscriptions=' +
-      includeSubScriptions.toString();
+      `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
       tap((data) => this.logger.debug('Loaded workflows: ', data)),
@@ -390,47 +408,83 @@ export class ApiService {
     );
   }
 
-  get_workflow(
-    uuid: string,
-    previous_versions = false,
-    ro_crate = false,
-    load_suites = true
-  ): Observable<Workflow> {
+  get_workflow(uuid: string): Observable<Workflow> {
     this.logger.debug('Request login');
-    const workflow = this.http.get<Workflow>(
+    const workflow_query = this.http.get<WorkflowVersion>(
       this.apiBaseUrl + '/workflows/' + uuid,
       this.get_http_options({
+        ro_crate: false,
+      })
+    );
+
+    const workflow_versions_query = this.http.get<WorkflowVersion>(
+      this.apiBaseUrl + '/workflows/' + uuid + '/versions',
+      this.get_http_options({})
+    );
+
+    const queries = [workflow_query, workflow_versions_query];
+
+    return forkJoin(queries).pipe(
+      map((result) => {
+        let workflow: Workflow = new Workflow(result[0]);
+        workflow.updateDescriptors(result[1]["versions"]);
+        this.logger.debug('Loaded workflow', workflow);
+        return workflow;
+      }),
+      tap((result) => this.logger.debug('Loaded workflow: ', result)),
+      retry(3)
+    );
+  }
+
+  get_workflow_version(
+    uuid: string,
+    version: string = "latest",
+    previous_versions = false,
+    ro_crate = false,
+    load_suites = true,
+    load_status = true
+  ): Observable<WorkflowVersion> {
+    this.logger.debug('Request login');
+    const workflow = this.http.get<WorkflowVersion>(
+      this.apiBaseUrl + '/workflows/' + uuid + '/versions/' + version,
+      this.get_http_options({
+        // TODO: remove previoius versions
         previous_versions: previous_versions,
         ro_crate: ro_crate,
       })
     );
 
-    const status = this.http
-      .get<Status>(
-        this.apiBaseUrl + '/workflows/' + uuid + '/status',
-        this.get_http_options()
-      )
-      .pipe(
-        retry(3),
-        catchError((err) => {
-          this.logger.debug('workflow status error', err);
-          return throwError(err);
-        })
-      );
+    let queries: Array<object> = [workflow];
 
-    let w = new Workflow({ uuid: uuid });
+    if (load_status) {
+      const status = this.http
+        .get<Status>(
+          this.apiBaseUrl + '/workflows/' + uuid + '/status?version=' + version,
+          this.get_http_options()
+        )
+        .pipe(
+          retry(3),
+          catchError((err) => {
+            this.logger.debug('workflow status error', err);
+            return throwError(err);
+          })
+        );
+      queries.push(status);
+    }
+
+    let w = new WorkflowVersion({ uuid: uuid });
     let suites = null;
-    let queries: Array<object> = [workflow, status];
     if (load_suites) {
-      suites = this.get_suites(w);
-      if (suites) queries = [workflow, status, suites];
+      suites = this.get_suites(w, version);
+      if (suites) queries.push(suites);
     }
 
     return forkJoin(queries).pipe(
       map((result) => {
         w.update(result[0]);
-        w.status = result[1];
-        w.suites = new AggregatedStatusStats(suites ? result[2] : []);
+        if (load_status)
+          w.status = result[1];
+        w.suites = new AggregatedStatusStats(load_status && load_suites ? result[2] : (load_suites ? result[1] : []));
         this.logger.debug('workflow', w);
         return w;
       }),
@@ -469,7 +523,7 @@ export class ApiService {
       .pipe(
         retry(3),
         mergeMap((status: Object) => {
-          let suite: Suite = new Suite({} as Workflow, suiteData);
+          let suite: Suite = new Suite({} as WorkflowVersion, suiteData);
           suite.status = new Status({
             aggregate_test_status: status['status'],
           });
@@ -527,11 +581,11 @@ export class ApiService {
       );
   }
 
-  get_suites(workflow: Workflow): Observable<Suite[]> {
+  get_suites(workflow: WorkflowVersion, version: string = "latest"): Observable<Suite[]> {
     this.logger.debug('Loading suites of workflow ....', workflow);
     return this.http
       .get<Suite[]>(
-        this.apiBaseUrl + '/workflows/' + workflow.uuid + '/suites',
+        `${this.apiBaseUrl}/workflows/${workflow.uuid}/suites?version=${version}&status=true&latest_builds=true`,
         this.get_http_options()
       )
       .pipe(
@@ -545,13 +599,6 @@ export class ApiService {
           let dataIndexMap: { [key: string]: number } = {};
           let queries = [];
           for (let suite of rawSuitesData) {
-            dataIndexMap[suite['uuid']] = queries.length;
-            queries.push(
-              this.http.get<Status>(
-                this.apiBaseUrl + '/suites/' + suite['uuid'] + '/status',
-                this.get_http_options()
-              )
-            );
 
             let instances: Array<any> = suite['instances'];
             for (let instanceData of instances) {
@@ -600,11 +647,10 @@ export class ApiService {
               let suites: Array<Suite> = [];
               for (let suiteData of rawSuitesData) {
                 let suite: Suite = new Suite(workflow, suiteData);
-                let status = statuses[dataIndexMap[suiteData['uuid']]];
                 suite.status = new Status({
-                  aggregate_test_status: status['status'],
+                  aggregate_test_status: suiteData['status'],
                 });
-                suite.latestBuilds = status['latest_builds'];
+                suite.latestBuilds = suiteData['latest_builds'];
                 suite.instances = new InstanceStats();
 
                 let listOfinstances: Array<any> = suiteData['instances'];
@@ -749,11 +795,10 @@ export class ApiService {
       );
   }
 
-  public checkROCrateAvailability(workflow: Workflow): Observable<boolean> {
+  public checkROCrateAvailability(workflow: WorkflowVersion): Observable<boolean> {
     return this.http
       .head(workflow.downloadLink, this.get_http_options({}, true))
       .pipe(
-        retry(3),
         map((result) => {
           this.logger.debug('Result: ', result);
           return true;

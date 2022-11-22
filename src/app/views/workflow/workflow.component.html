@@ -32,8 +32,34 @@
 
 <section *ngIf="workflow && suites" class="content mx-lg-4 p-2">
   <!-- <div class="container-fluid"> -->
-  <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">
-    <h3 style="color: var(--primary)">Suites</h3>
+  <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">    
+    <h3 style="color: var(--primary)">
+      <span *ngIf="!suiteNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
+        title="The dashboard collects test suites for the workflow '{{workflow.name}}'">
+        Suites
+      </span>
+      <div *ngIf="suiteNameFilter">
+        <ng-container #searchResults>
+          <ng-container
+            *ngIf="((suites | itemFilterPipe: suiteNameFilter).length == 0); then noSuite; else foundSuites">
+          </ng-container>
+        </ng-container>
+        <ng-template #noSuite>
+          <ng-container
+            *ngIf="suiteNameFilter == '______ALL_____'; then noSuiteFound; else noMatchingSuite;">
+          </ng-container>
+          <ng-template #noSuiteFound>No test suite found</ng-template>
+          <ng-template #noMatchingSuite>No test suite matching "<b>{{suiteNameFilter}}</b>"</ng-template>
+        </ng-template>
+        <ng-template #foundSuites>
+          <ng-container *ngIf="suiteNameFilter == '______ALL_____'; then allSuites; else matchingSuites;">
+          </ng-container>
+          <ng-template #allSuites>Suites</ng-template>
+          <ng-template #matchingSuites>Suites matching "<b>{{suiteNameFilter}}</b>"</ng-template>
+        </ng-template>
+      </div>
+    </h3>
+
     <!-- Small boxes (Stat box) -->
     <div class="row">
       <div class="col-lg-3 col-6">

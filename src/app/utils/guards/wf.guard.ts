@@ -19,6 +19,6 @@ export class WfGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    return this.appService.workflows != null;
+    return this.appService.workflow_versions != null;
   }
 }
