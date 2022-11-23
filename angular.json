@@ -46,7 +46,9 @@
               "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
             ],
             "allowedCommonJsDependencies": [
-              "chart.js"
+              "chart.js",
+              "bs-stepper",
+              "@bity/oauth2-auth-code-pkce"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
