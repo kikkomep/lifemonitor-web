@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install -g @angular/cli@11.2.14 && npm ci
+RUN npm install -g @angular/cli@13.3.10 && npm ci
 
 # Copy sources from a clone of the repository @ https://github.com/crs4/LifeMonitorWeb
 COPY  . .
