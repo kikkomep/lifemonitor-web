@@ -1,7 +1,7 @@
 import { AppService } from 'src/app/utils/services/app.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormGroup, Validators } from '@angular/forms';
 
 import { AuthService } from '../../utils/services/auth.service';
 import { Subscription } from 'rxjs';
@@ -14,7 +14,7 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  public loginForm: FormGroup;
+  public loginForm: UntypedFormGroup;
   public isAuthLoading = false;
   private previousToast: ActiveToast<any> = null;
   private userLoggedSubscription: Subscription;

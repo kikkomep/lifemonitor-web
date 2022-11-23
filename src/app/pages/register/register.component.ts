@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
-  public registerForm: FormGroup;
+  public registerForm: UntypedFormGroup;
   constructor(
     private renderer: Renderer2,
     private toastr: ToastrService,
@@ -19,11 +19,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.renderer.addClass(document.querySelector('app-root'), 'register-page');
-    this.registerForm = new FormGroup({
-      fullName: new FormControl(null, Validators.required),
-      email: new FormControl(null, Validators.required),
-      password: new FormControl(null, Validators.required),
-      retypePassword: new FormControl(null, Validators.required),
+    this.registerForm = new UntypedFormGroup({
+      fullName: new UntypedFormControl(null, Validators.required),
+      email: new UntypedFormControl(null, Validators.required),
+      password: new UntypedFormControl(null, Validators.required),
+      retypePassword: new UntypedFormControl(null, Validators.required),
     });
   }
 
