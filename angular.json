@@ -45,6 +45,9 @@
               "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
               "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
             ],
+            "allowedCommonJsDependencies": [
+              "chart.js"
+            ],
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": false,
