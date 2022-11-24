@@ -36,7 +36,7 @@ jobs:
           echo "SOFTWARE_VERSION=${sw_version}" >> $GITHUB_ENV
           sw_version_tag=false
           if [[ "${branch}" == "master" || -n "${tag}" ]]; then sw_version_tag=true; fi
-          echo "ENABLE_SOFTWARE_VERSION_TAG={sw_version_tag}" >> $GITHUB_ENV
+          echo "ENABLE_SOFTWARE_VERSION_TAG=${sw_version_tag}" >> $GITHUB_ENV
 
       # Extract Docker metadata
       - name: Extract Docker metadata
