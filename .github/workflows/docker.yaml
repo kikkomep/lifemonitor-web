@@ -1,12 +1,12 @@
 ---
-name: "Docker Pipeline"
+name: 'Docker Pipeline'
 
 on:
   push:
     branches:
-      - "**"
+      - '**'
     tags:
-      - "*.*.*"
+      - '*.*.*'
   pull_request:
 
 env:
