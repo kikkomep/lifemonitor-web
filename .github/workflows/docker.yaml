@@ -51,7 +51,9 @@ jobs:
             type=raw,value=${{ env.SOFTWARE_VERSION}}.build${{ github.run_number }},enable=${{env.ENABLE_SOFTWARE_VERSION_TAG}}
             type=sha
           labels: |
+            org.opencontainers.image.description="Front-end for the LifeMonitor back-end"
             org.opencontainers.image.version=${{ env.SOFTWARE_VERSION }}.build${{ github.run_number }}
+            org.opencontainers.image.build={{ github.run_number }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
