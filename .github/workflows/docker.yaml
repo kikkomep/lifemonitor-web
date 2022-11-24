@@ -34,6 +34,7 @@ jobs:
           tag=${GITHUB_REF#refs/tags/}
           echo $tag
           echo $branch
+          echo ${{ github.ref_name }}
           if [[ ${branch} == 'develop'  ]]; then sw_version="${sw_version}-dev"; fi
           echo "SOFTWARE_VERSION=${sw_version}" >> $GITHUB_ENV
           sw_version_tag=false
