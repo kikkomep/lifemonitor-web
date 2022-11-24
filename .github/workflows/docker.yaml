@@ -47,10 +47,10 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            type=semver,pattern={{version}},enable={{env.ENABLE_SOFTWARE_VERSION_TAG}}
-            type=semver,pattern={{major}}.{{minor}},enable={{env.ENABLE_SOFTWARE_VERSION_TAG}}
-            type=raw,value=${{ env.SOFTWARE_VERSION }},enable={{env.ENABLE_SOFTWARE_VERSION_TAG}}
-            type=raw,value=${{ env.SOFTWARE_VERSION}}.build${{ github.run_number }},enable={{env.ENABLE_SOFTWARE_VERSION_TAG}}
+            type=semver,pattern={{version}},enable=${{env.ENABLE_SOFTWARE_VERSION_TAG}}
+            type=semver,pattern={{major}}.{{minor}},enable=${{env.ENABLE_SOFTWARE_VERSION_TAG}}
+            type=raw,value=${{ env.SOFTWARE_VERSION }},enable=${{env.ENABLE_SOFTWARE_VERSION_TAG}}
+            type=raw,value=${{ env.SOFTWARE_VERSION}}.build${{ github.run_number }},enable=${{env.ENABLE_SOFTWARE_VERSION_TAG}}
             type=sha
           labels: |
             org.opencontainers.image.version=${{ env.SOFTWARE_VERSION }}.build${{ github.run_number }}
