@@ -1,12 +1,12 @@
 ---
-name: "Docker Pipeline"
+name: 'Docker Pipeline'
 
 on:
   push:
     branches:
-      - "**"
+      - '**'
     tags:
-      - "*.*.*"
+      - '*.*.*'
   pull_request:
 
 env:
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
         # Set Docker image
       - name: Set up Docker repository
@@ -30,38 +30,42 @@ jobs:
       - name: Set software version
         run: |
           sw_version=$(jq -r ".version" package.json)
+          ref_name=${{ github.ref_name }}
+          if [[ ${ref_name} == 'develop'  ]]; then sw_version="${sw_version}-dev"; fi
           echo "SOFTWARE_VERSION=${sw_version}" >> $GITHUB_ENV
-          echo ::set-output name=sw_version::${sw_version}
+          sw_version_tag=false
+          if [[ "${ref_name}" == "master" || "${ref_name}" == "develop" ]]; then sw_version_tag=true; fi
+          echo "ENABLE_SOFTWARE_VERSION_TAG=${sw_version_tag}" >> $GITHUB_ENV
 
       # Extract Docker metadata
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: ${{ env.DOCKERHUB_REPO }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=${{ env.SOFTWARE_VERSION }}
-            type=raw,value=${{ env.SOFTWARE_VERSION}}.build${{ github.run_number }}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'master') }}
+            type=raw,value=${{ env.SOFTWARE_VERSION }},enable=${{env.ENABLE_SOFTWARE_VERSION_TAG}}
+            type=raw,value=${{ env.SOFTWARE_VERSION}}.build${{ github.run_number }},enable=${{env.ENABLE_SOFTWARE_VERSION_TAG}}
             type=sha
           labels: |
-            org.opencontainers.image.version=${{ env.SOFTWARE_VERSION }}.build${{ github.run_number }}
+            org.opencontainers.image.software=${{ env.SOFTWARE_VERSION }}.build${{ github.run_number }}
+            org.opencontainers.image.build=${{ github.run_number }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@master
+        uses: docker/setup-qemu-action@v2
         with:
           platforms: all
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@master
+        uses: docker/setup-buildx-action@v2
 
       # DockerHub Login
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         if: ${{ env.ENABLE_DOCKER_PUSH == 'true' }}
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
@@ -69,7 +73,7 @@ jobs:
 
       # Build and push
       - name: Build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
