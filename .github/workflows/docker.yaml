@@ -32,6 +32,8 @@ jobs:
           sw_version=$(jq -r ".version" package.json)
           branch=${GITHUB_REF#refs/heads/}
           tag=${GITHUB_REF#refs/tags/}
+          echo $tag
+          echo $branch
           if [[ ${branch} == 'develop'  ]]; then sw_version="${sw_version}-dev"; fi
           echo "SOFTWARE_VERSION=${sw_version}" >> $GITHUB_ENV
           sw_version_tag=false
