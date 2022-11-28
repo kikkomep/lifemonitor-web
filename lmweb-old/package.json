@@ -1,0 +1,84 @@
+{
+  "name": "lifemonitor",
+  "version": "0.2.0",
+  "scripts": {
+    "start": "node server.js",
+    "dev:start": "ng serve",
+    "dev:build": "ng build --configuration production",
+    "dev:test": "ng test",
+    "dev:lint": "ng lint",
+    "dev:e2e": "ng e2e",
+    "postinstall": "ngcc"
+  },
+  "private": true,
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "node ng-lint-staged.js dev:lint",
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged && ng lint && lint-staged"
+    }
+  },
+  "dependencies": {
+    "@angular/animations": "14.2.12",
+    "@angular/common": "14.2.12",
+    "@angular/compiler": "14.2.12",
+    "@angular/core": "14.2.12",
+    "@angular/forms": "14.2.12",
+    "@angular/localize": "14.2.12",
+    "@angular/platform-browser": "14.2.12",
+    "@angular/platform-browser-dynamic": "14.2.12",
+    "@angular/router": "14.2.12",
+    "@bity/oauth2-auth-code-pkce": "^2.13.0",
+    "@ng-bootstrap/ng-bootstrap": "~13.0.0",
+    "ansi-html": "~0.0.7",
+    "bootstrap": "5.2.0",
+    "bootstrap-select": "^1.13.18",
+    "bs-stepper": "~1.7.0",
+    "chalk": "~4.1.1",
+    "chart.js": "^2.9.4",
+    "core-js": "3.9.1",
+    "datatables": "^1.10.18",
+    "express": "4.17.1",
+    "hover.css": "^2.3.2",
+    "ng2-charts": "^2.4.2",
+    "ngx-toastr": "13.2.0",
+    "rxjs": "6.6.6",
+    "strip-ansi": "~7.0.0",
+    "tslib": "^2.0.3",
+    "typescript-logger": "^5.0.1",
+    "zone.js": "~0.11.4"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^14.2.10",
+    "@angular/cli": "^14.2.10",
+    "@angular/compiler-cli": "14.2.12",
+    "@angular/language-service": "14.2.12",
+    "@types/jasmine": "~3.6.2",
+    "@types/jasminewd2": "2.0.8",
+    "@types/node": "14.14.33",
+    "admin-lte": "3.2.0",
+    "codelyzer": "^6.0.1",
+    "husky": "5.1.3",
+    "jasmine-core": "~3.9.0",
+    "jasmine-spec-reporter": "~6.0.0",
+    "karma": "^6.3.17",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-jasmine": "~4.0.1",
+    "karma-jasmine-html-reporter": "^1.5.4",
+    "lint-staged": "10.5.4",
+    "prettier": "2.2.1",
+    "pretty-quick": "3.1.0",
+    "protractor": "^7.0.0",
+    "ts-node": "9.1.1",
+    "tslint": "6.1.3",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-plugin-prettier": "2.3.0",
+    "typescript": "4.6.4",
+    "webdriver-manager": "^12.1.8"
+  }
+}

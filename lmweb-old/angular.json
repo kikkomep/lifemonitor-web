@@ -1,0 +1,141 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "lifemonitor": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/lifemonitor",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": [
+              "./node_modules/chart.js/dist/Chart.min.css",
+              "./node_modules/bs-stepper/dist/css/bs-stepper.min.css",
+              "./node_modules/bootstrap-select/dist/css/bootstrap-select.min.css",
+              "./node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css",
+              "./node_modules/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css",
+              "src/styles.scss"
+            ],
+            "scripts": [
+              "./node_modules/jquery/dist/jquery.min.js",
+              "./node_modules/popper.js/dist/umd/popper.min.js",
+              "./node_modules/bootstrap/dist/js/bootstrap.min.js",
+              "./node_modules/bootstrap-select/dist/js/bootstrap-select.min.js",
+              "./node_modules/datatables.net/js/jquery.dataTables.min.js",
+              "./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js",
+              "./node_modules/datatables.net-responsive/js/dataTables.responsive.min.js",
+              "./node_modules/datatables.net-buttons/js/dataTables.buttons.min.js",
+              "./node_modules/datatables.net-buttons/js/buttons.html5.min.js",
+              "./node_modules/datatables.net-buttons/js/buttons.print.min.js",
+              "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
+              "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
+            ],
+            "allowedCommonJsDependencies": [
+              "chart.js",
+              "bs-stepper",
+              "@bity/oauth2-auth-code-pkce"
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          },
+          "defaultConfiguration": ""
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "lifemonitor:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "lifemonitor:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "lifemonitor:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
+            "scripts": []
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "e2e/protractor.conf.js",
+            "devServerTarget": "lifemonitor:serve"
+          },
+          "chromeOptions": {
+            "args": ["--headless", "--no-sandbox"]
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "lifemonitor:serve:production"
+            }
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "43a7ce40-5fb9-4a0d-8b40-b48fc0426e9d"
+  }
+}
