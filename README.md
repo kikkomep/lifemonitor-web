@@ -2,7 +2,7 @@
 
 
 <div align="center" style="text-align: center; margin-top: 50px;">
-<img src="/src/assets/img/logo/lm/LifeMonitorLogo.png" alt="Life-Monitor logo"
+<img src="/src/assets/icons/lm/icon.png" alt="Life-Monitor logo"
      width="300px" style="margin-top: 50px;" align="center" />
 </div>
 
