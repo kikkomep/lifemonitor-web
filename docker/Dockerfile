@@ -1,7 +1,7 @@
 ##############################################################
 # "builder" stage: build webapp with npm and Angular-CLI
 ##############################################################
-FROM node:16.10-alpine as builder
+FROM node:16.18-alpine as builder
 
 # Set the working dir
 WORKDIR /app
