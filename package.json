@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start-pwa": "ng build --configuration production && http-server -p 8081 -c-1 dist/lifemonitor",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
