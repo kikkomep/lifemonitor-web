@@ -22,7 +22,6 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": true,
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               "./node_modules/chart.js/dist/Chart.min.css",
@@ -45,7 +44,18 @@
               "./node_modules/datatables.net-buttons/js/buttons.print.min.js",
               "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
               "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
-            ]
+            ],
+            "allowedCommonJsDependencies": [
+              "chart.js",
+              "bs-stepper",
+              "@bity/oauth2-auth-code-pkce"
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -75,7 +85,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -106,17 +117,6 @@
             "scripts": []
           }
         },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": ["**/node_modules/**"]
-          }
-        },
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
@@ -135,7 +135,6 @@
       }
     }
   },
-  "defaultProject": "lifemonitor",
   "cli": {
     "analytics": "43a7ce40-5fb9-4a0d-8b40-b48fc0426e9d"
   }
