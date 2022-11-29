@@ -1,29 +1,47 @@
 import { isDevMode, NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
+
+// PrimNG modules
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ChipsModule } from 'primeng/chips';
 import { DockModule } from 'primeng/dock';
+import { DropdownModule } from 'primeng/dropdown';
 import { EditorModule } from 'primeng/editor';
+import { InputTextModule } from 'primeng/inputtext';
 import { PanelModule } from 'primeng/panel';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { TabViewModule } from 'primeng/tabview';
+
+// Apps components
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, TestComponent],
   imports: [
+    AppRoutingModule,
+    FormsModule,
     BrowserModule,
     BrowserAnimationsModule,
-    AppRoutingModule,
     // NG Prime Modules
-    PanelModule,
     ButtonModule,
-    EditorModule,
     CardModule,
+    CheckboxModule,
+    ChipsModule,
     DockModule,
+    DropdownModule,
+
+    EditorModule,
+    InputTextModule,
+    PanelModule,
+    SelectButtonModule,
+    TabViewModule,
     // Register ngsw Service Worker
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
