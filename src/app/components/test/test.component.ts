@@ -13,8 +13,8 @@ interface City {
   providers: [MessageService],
 })
 export class TestComponent {
-  text: string = '';
-  text1: string =
+  text = '';
+  text1 =
     '<div>Hello World!</div><div>PrimeNG <b>Editor</b> Rocks</div><div><br></div>';
 
   selectedValues: string[] = ['val1', 'val2'];
