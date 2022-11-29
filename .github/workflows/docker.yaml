@@ -33,7 +33,10 @@ jobs:
       - name: ESLinting
         run: npm run lint
 
+  # Build and Push Docker image
   docker:
+    needs: [test]
+    name: Build and Push Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
