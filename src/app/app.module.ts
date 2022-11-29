@@ -5,7 +5,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 // PrimNG modules
-import {BadgeModule} from 'primeng/badge';
+import { AvatarModule } from 'primeng/avatar';
+import { AvatarGroupModule } from 'primeng/avatargroup';
+import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -36,6 +38,8 @@ import { TestComponent } from './components/test/test.component';
     BrowserModule,
     BrowserAnimationsModule,
     // NG Prime Modules
+    AvatarModule,
+    AvatarGroupModule,
     BadgeModule,
     ButtonModule,
     CardModule,
