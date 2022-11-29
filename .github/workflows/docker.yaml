@@ -16,12 +16,20 @@ env:
 
 jobs:
   # Lint TypeScript code
-  linting:
-    name: Lint Typescript Code
+  test:
+    name: Lint and Test the Angular App
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Install node
+        uses: actions/setup-node@v1 #this will install Node and npm on Ubuntu
+        with:
+          node-version: '16.18'
+      - name: Install dependencies
+        run: npm install
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli@15.0.0
       - name: ESLinting
         run: npm run lint
 
