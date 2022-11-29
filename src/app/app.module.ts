@@ -13,9 +13,13 @@ import { DockModule } from 'primeng/dock';
 import { DropdownModule } from 'primeng/dropdown';
 import { EditorModule } from 'primeng/editor';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
 import { PanelModule } from 'primeng/panel';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { StepsModule } from 'primeng/steps';
 import { TabViewModule } from 'primeng/tabview';
+import { ToastModule } from 'primeng/toast';
 
 // Apps components
 import { AppRoutingModule } from './app-routing.module';
@@ -36,11 +40,13 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     ChipsModule,
     DockModule,
     DropdownModule,
-
     EditorModule,
     InputTextModule,
+    MessageModule,
+    MessagesModule,
     PanelModule,
     SelectButtonModule,
+    StepsModule,
     TabViewModule,
     // Register ngsw Service Worker
     ServiceWorkerModule.register('ngsw-worker.js', {
