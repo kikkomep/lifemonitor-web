@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "start-pwa": "ng build --configuration production && http-server -p 8081 -c-1 dist/lifemonitor",
+    "lint": "ng lint",
+    "start": "ng build --configuration production && http-server -p 8081 -c-1 dist/lifemonitor",
+    "start:dev": "ng serve",    
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "test:ci": "ng test --browsers=ChromeHeadless --watch=false"    
   },
   "private": true,
   "dependencies": {
