@@ -23,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: ESLinting
-        run: npm lint
+        run: npm run lint
 
   docker:
     runs-on: ubuntu-latest
