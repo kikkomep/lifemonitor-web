@@ -13,6 +13,7 @@ import { ChipsModule } from 'primeng/chips';
 import { DockModule } from 'primeng/dock';
 import { DropdownModule } from 'primeng/dropdown';
 import { EditorModule } from 'primeng/editor';
+import { ImageModule } from 'primeng/image';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
@@ -43,6 +44,7 @@ import { TestComponent } from './components/test/test.component';
     DockModule,
     DropdownModule,
     EditorModule,
+    ImageModule,
     InputTextModule,
     MessageModule,
     MessagesModule,
