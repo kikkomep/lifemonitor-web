@@ -24,7 +24,7 @@ import { ToastModule } from 'primeng/toast';
 // Apps components
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
+import { TestComponent } from './components/test/test.component';
 
 @NgModule({
   declarations: [AppComponent, TestComponent],
@@ -48,6 +48,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     SelectButtonModule,
     StepsModule,
     TabViewModule,
+    // TODO: Don't include this
+    ToastModule,
     // Register ngsw Service Worker
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
