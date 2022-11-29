@@ -56,7 +56,6 @@ import { TestComponent } from './components/test/test.component';
     SelectButtonModule,
     StepsModule,
     TabViewModule,
-    // TODO: Don't include this
     ToastModule,
     // Register ngsw Service Worker
     ServiceWorkerModule.register('ngsw-worker.js', {

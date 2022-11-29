@@ -1,5 +1,4 @@
-[![main workflow](https://github.com/crs4/lifemonitor-web/actions/workflows/docker.yaml/badge.svg)](https://github.com/crs4/lifemonitor-web/actions/workflows/docker.yaml)
-
+[![CI Pipeline](https://github.com/kikkomep/lifemonitor-web/actions/workflows/ci.yaml/badge.svg)](https://github.com/kikkomep/lifemonitor-web/actions/workflows/ci.yaml)
 
 <div align="center" style="text-align: center; margin-top: 50px;">
 <img src="/src/assets/icons/lm/icon.png" alt="Life-Monitor logo"
