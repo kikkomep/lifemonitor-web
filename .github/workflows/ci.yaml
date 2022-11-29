@@ -32,6 +32,8 @@ jobs:
         run: npm install -g @angular/cli@15.0.0
       - name: ESLinting
         run: npm run lint
+      - name: Run tests
+        run: npm run test:ci
 
   # Build and Push Docker image
   docker:
