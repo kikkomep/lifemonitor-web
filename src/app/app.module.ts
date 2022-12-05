@@ -35,6 +35,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TestComponent } from './components/test/test.component';
 import { CoreModule } from './core/core.module';
+import { ViewModule } from './view/view.module';
 
 @NgModule({
   declarations: [AppComponent, TestComponent],
@@ -65,6 +66,7 @@ import { CoreModule } from './core/core.module';
     ToastModule,
     // Import core module
     CoreModule,
+    ViewModule,
     // Register ngsw Service Worker
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
