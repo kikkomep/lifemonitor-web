@@ -28,11 +28,12 @@ import { ToastModule } from 'primeng/toast';
 
 // View Containers
 import { PageLayoutComponent } from './containers/page-layout/page-layout.component';
+import { ViewComponent } from './view.component';
 
 // View Components
 
 @NgModule({
-  declarations: [PageLayoutComponent],
+  declarations: [PageLayoutComponent, ViewComponent],
   imports: [
     // Common Angular dependencies
     CommonModule,
@@ -60,6 +61,6 @@ import { PageLayoutComponent } from './containers/page-layout/page-layout.compon
     TabViewModule,
     ToastModule,
   ],
-  exports: [PageLayoutComponent],
+  exports: [ViewComponent],
 })
 export class ViewModule {}
