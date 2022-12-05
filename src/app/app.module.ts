@@ -34,6 +34,7 @@ import { StoreModule } from '@ngrx/store';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TestComponent } from './components/test/test.component';
+import { CoreModule } from './core/core.module';
 
 @NgModule({
   declarations: [AppComponent, TestComponent],
@@ -62,6 +63,8 @@ import { TestComponent } from './components/test/test.component';
     StepsModule,
     TabViewModule,
     ToastModule,
+    // Import core module
+    CoreModule,
     // Register ngsw Service Worker
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
