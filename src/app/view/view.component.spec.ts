@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PageLayoutComponent } from './containers/page-layout/page-layout.component';
 
 import { ViewComponent } from './view.component';
 
@@ -8,9 +9,8 @@ describe('ViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ViewComponent ]
-    })
-    .compileComponents();
+      declarations: [ViewComponent, PageLayoutComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ViewComponent);
     component = fixture.componentInstance;
