@@ -30,6 +30,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TestComponent } from './components/test/test.component';
 import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 @NgModule({
   declarations: [AppComponent, TestComponent],
@@ -66,6 +67,7 @@ import { StoreModule } from '@ngrx/store';
       registrationStrategy: 'registerWhenStable:30000',
     }),
     StoreModule.forRoot({}, {}),
+    EffectsModule.forRoot([]),
   ],
   providers: [],
   bootstrap: [AppComponent],
