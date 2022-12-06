@@ -4,18 +4,16 @@ import {
   ActionReducerMap,
   createFeatureSelector,
   createSelector,
-  MetaReducer
+  MetaReducer,
 } from '@ngrx/store';
+import { reducer as workflowsReducers } from './reducers/workflow.reducer';
 
 export const stateFeatureKey = 'state';
 
 export interface State {
-  //workflows: State
+  workflowState: State;
 }
 
-export const reducers: ActionReducerMap<State> = {
-
-};
-
+export const reducers: ActionReducerMap<State> = {};
 
 export const metaReducers: MetaReducer<State>[] = isDevMode() ? [] : [];

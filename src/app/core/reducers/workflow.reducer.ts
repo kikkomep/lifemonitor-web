@@ -7,51 +7,46 @@ export const workflowsFeatureKey = 'workflows';
 
 export interface State extends EntityState<Workflow> {
   // additional entities state properties
+  selectedWorkflow?: Workflow;
 }
 
 export const adapter: EntityAdapter<Workflow> = createEntityAdapter<Workflow>();
 
 export const initialState: State = adapter.getInitialState({
-  // additional entity state properties
+  // additional entity state properties  
 });
 
 export const reducer = createReducer(
   initialState,
-  on(WorkflowActions.addWorkflow,
-    (state, action) => adapter.addOne(action.workflow, state)
+  on(WorkflowActions.addWorkflow, (state, action) =>
+    adapter.addOne(action.workflow, state)
   ),
-  on(WorkflowActions.upsertWorkflow,
-    (state, action) => adapter.upsertOne(action.workflow, state)
+  on(WorkflowActions.upsertWorkflow, (state, action) =>
+    adapter.upsertOne(action.workflow, state)
   ),
-  on(WorkflowActions.addWorkflows,
-    (state, action) => adapter.addMany(action.workflows, state)
+  on(WorkflowActions.addWorkflows, (state, action) =>
+    adapter.addMany(action.workflows, state)
   ),
-  on(WorkflowActions.upsertWorkflows,
-    (state, action) => adapter.upsertMany(action.workflows, state)
+  on(WorkflowActions.upsertWorkflows, (state, action) =>
+    adapter.upsertMany(action.workflows, state)
   ),
-  on(WorkflowActions.updateWorkflow,
-    (state, action) => adapter.updateOne(action.workflow, state)
+  on(WorkflowActions.updateWorkflow, (state, action) =>
+    adapter.updateOne(action.workflow, state)
   ),
-  on(WorkflowActions.updateWorkflows,
-    (state, action) => adapter.updateMany(action.workflows, state)
+  on(WorkflowActions.updateWorkflows, (state, action) =>
+    adapter.updateMany(action.workflows, state)
   ),
-  on(WorkflowActions.deleteWorkflow,
-    (state, action) => adapter.removeOne(action.id, state)
+  on(WorkflowActions.deleteWorkflow, (state, action) =>
+    adapter.removeOne(action.id, state)
   ),
-  on(WorkflowActions.deleteWorkflows,
-    (state, action) => adapter.removeMany(action.ids, state)
+  on(WorkflowActions.deleteWorkflows, (state, action) =>
+    adapter.removeMany(action.ids, state)
   ),
-  on(WorkflowActions.loadWorkflows,
-    (state, action) => adapter.setAll(action.workflows, state)
+  on(WorkflowActions.loadWorkflows, (state, action) =>
+    adapter.setAll(action.workflows, state)
   ),
-  on(WorkflowActions.clearWorkflows,
-    state => adapter.removeAll(state)
-  ),
+  on(WorkflowActions.clearWorkflows, (state) => adapter.removeAll(state))
 );
 
-export const {
-  selectIds,
-  selectEntities,
-  selectAll,
-  selectTotal,
-} = adapter.getSelectors();
+export const { selectIds, selectEntities, selectAll, selectTotal } =
+  adapter.getSelectors();

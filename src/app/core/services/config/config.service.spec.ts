@@ -34,7 +34,7 @@ describe('ConfigService', () => {
 
   it('should raise an error if the configuration asset is not available', (done: DoneFn) => {
     // set config file to not existing file
-    let spy = spyOn(service, 'getConfig').and.returnValue({
+    spyOn(service, 'getConfig').and.returnValue({
       configFile: '/notExistingFilename',
     });
 
@@ -53,13 +53,13 @@ describe('ConfigService', () => {
   it('should load a valid configuration object', (done: DoneFn) => {
     service.loadConfig().subscribe({
       next: (data) => {
-        let expectedProperties: string[] = [
+        const expectedProperties: string[] = [
           'production',
           'apiBaseUrl',
           'clientId',
           'configFile',
         ];
-        let actualProperties: string[] = Object.keys(data);
+        const actualProperties: string[] = Object.keys(data);
         expectedProperties.forEach((key) => {
           expect(actualProperties).toContain(key);
         });

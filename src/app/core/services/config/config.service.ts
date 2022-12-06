@@ -18,7 +18,7 @@ export class ConfigService {
   constructor(private http: HttpClient) {}
 
   public loadConfig(): Observable<Config> {
-    let config = this.getConfig();
+    const config = this.getConfig();
     if (!('configFile' in config)) {
       return of(config);
     }
@@ -29,7 +29,7 @@ export class ConfigService {
           'Configuration updated from ' + environment['configFile'],
           this.config
         );
-        let result = { ...data } as Config;
+        const result = { ...data } as Config;
         result['configFile'] = config['configFile'];
         return result;
       }),
