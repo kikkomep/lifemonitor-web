@@ -19,7 +19,6 @@ export class ConfigService {
 
   public loadConfig(): Observable<Config> {
     let config = this.getConfig();
-    debugger;
     if (!('configFile' in config)) {
       return of(config);
     }
