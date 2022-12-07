@@ -3,9 +3,16 @@ import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 
 // Import core state
-import * as fromState from './state';
-import * as fromWorkflow from './reducers/workflow.reducer';
 import { HttpClientModule } from '@angular/common/http';
+import { EffectsModule } from '@ngrx/effects';
+import { ConfigEffects } from './effects/config.effects';
+
+// Import feature state reducers
+import * as fromConfig from './reducers/config.reducer';
+import * as fromWorkflow from './reducers/workflow.reducer';
+
+// Import global state
+import * as fromState from './state';
 
 @NgModule({
   declarations: [],
@@ -13,7 +20,11 @@ import { HttpClientModule } from '@angular/common/http';
     // core Angular modules
     CommonModule,
     HttpClientModule,
-    // register core store
+    // Register feature effects
+    EffectsModule.forFeature([ConfigEffects]),
+    // Register feature stores
+    StoreModule.forFeature(fromConfig.featureKey, fromConfig.reducer),
+    // Register main feature store
     StoreModule.forFeature(fromState.stateFeatureKey, fromState.reducers, {
       metaReducers: fromState.metaReducers,
     }),
