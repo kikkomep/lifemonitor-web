@@ -41,7 +41,7 @@ jobs:
             apiKey: "${API_KEY}"
           };
           EndOfSettings
-          ln -sf src/app/environments/environment.test.ts src/assets/config.json
+          cp src/app/environments/environment.test.ts src/assets/config.json
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
