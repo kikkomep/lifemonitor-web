@@ -32,8 +32,8 @@ jobs:
         run: npm install -g @angular/cli@15.0.0
       - name: Initialize testing environment file
         run: |
-          cat > src/app/environments/environment.test.ts <<- EndOfSettings
-          export const environment = {
+          cat > src/assets/config.json <<- EndOfSettings
+          {
             production: false,
             apiBaseUrl: "${API_BASE_URL}",
             clientId: "${API_CLIENT_ID}",
@@ -41,7 +41,7 @@ jobs:
             apiKey: "${API_KEY}"
           };
           EndOfSettings
-          cp src/app/environments/environment.test.ts src/assets/config.json
+          echo "export const environment = $(cat src/assets/config.json)" > src/app/environments/environment.test.ts
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
