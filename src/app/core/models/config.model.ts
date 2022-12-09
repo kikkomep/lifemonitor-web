@@ -12,4 +12,7 @@ export interface Config {
   //               They overwrite the default environment settings defined at build-time
   //               and are exposed by the `AppConfigService.getConfig()` method.
   configFile: string;
+
+  // 
+  apiKey?: string;
 }

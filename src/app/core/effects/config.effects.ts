@@ -2,18 +2,18 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { EMPTY } from 'rxjs';
 import {
-  map,
-  mergeMap,
   catchError,
-  delay,
-  switchMap,
-  tap,
+  delay, map,
+  mergeMap, switchMap,
+  tap
 } from 'rxjs/operators';
 import {
   configurationLoadingSuccess,
-  loadConfiguration,
+  loadConfiguration
 } from '../actions/config.actions';
+import { Config } from '../models/config.model';
 import { ConfigService } from '../services/config/config.service';
+import { LifeMonitorApiService } from '../services/lifemonitor/lifemonitor-api.service';
 
 @Injectable()
 export class ConfigEffects {
@@ -23,7 +23,14 @@ export class ConfigEffects {
       mergeMap(() =>
         this.configService.loadConfig().pipe(
           delay(2000),
-          map((data) => configurationLoadingSuccess({ config: data })),
+          map((data) => {
+            const config: Config = data;
+            this.lifeMonitorApiService.initialize(
+              config.apiBaseUrl,
+              config.apiKey
+            );
+            return configurationLoadingSuccess({ config: config });
+          }),
           catchError(() => EMPTY)
         )
       )
@@ -32,8 +39,9 @@ export class ConfigEffects {
 
   constructor(
     private actions$: Actions,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private lifeMonitorApiService: LifeMonitorApiService
   ) {
-    console.log(actions$, configService);
+    console.log(actions$, configService, lifeMonitorApiService);
   }
 }
