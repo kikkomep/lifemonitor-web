@@ -1,16 +1,21 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 
-import { LifemonitorApiService } from './lifemonitor-api.service';
+import { environment } from '../../../environments/environment.test';
+
+import { LifeMonitorApiService } from './lifemonitor-api.service';
+
+const baseApiUrl: string = environment.apiBaseUrl;
 
 describe('LifemonitorService', () => {
-  let service: LifemonitorApiService;
+  let service: LifeMonitorApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientModule],
     });
-    service = TestBed.inject(LifemonitorApiService);
+    service = TestBed.inject(LifeMonitorApiService);
+    service.initialize(environment.apiBaseUrl, environment.apiKey);
   });
 
   it('should be created', () => {
@@ -18,7 +23,15 @@ describe('LifemonitorService', () => {
   });
 
   it('should return a list of workflows', (done: DoneFn) => {
-    service.getWorkflows().subscribe((value) => {
+    service.getPublicWorkflows().subscribe((value) => {
+      console.log('The value: ', value);
+      expect(value).toBeDefined();
+      done();
+    });
+  });
+
+  it('should return a list of workflows', (done: DoneFn) => {
+    service.getPublicWorkflows().subscribe((value) => {
       console.log('The value: ', value);
       expect(value).toBeDefined();
       done();
