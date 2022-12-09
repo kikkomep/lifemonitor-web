@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { PrimeNGConfig } from 'primeng/api';
+import { loadConfiguration } from './core/actions/config.actions';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +11,9 @@ import { PrimeNGConfig } from 'primeng/api';
 export class AppComponent implements OnInit {
   title = 'lifemonitor';
 
-  constructor(private primengConfig: PrimeNGConfig) {}
+  constructor(private primengConfig: PrimeNGConfig, private store: Store) {
+    this.store.dispatch(loadConfiguration());
+  }
 
   ngOnInit() {
     this.primengConfig.ripple = true;
