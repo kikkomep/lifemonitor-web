@@ -3,8 +3,26 @@ import { Update } from '@ngrx/entity';
 
 import { Workflow } from '../models/workflow.model';
 
+export const loadPublicWorkflows = createAction(
+  '[Workflow/API] Load Public Workflows'
+);
+
+export const loadingPublicWorkflowsSuccess = createAction(
+  '[Workflow/API] Loading Public Workflows Success',
+  props<{ workflows: Workflow[] }>()
+);
+
+export const loadingPublicWorkflowsFailure = createAction(
+  '[Workflow/API] Loading Public Workflows Failure'
+);
+
+export const loadSubscribedWorkflows = createAction(
+  '[Workflow/API] Load Subscribed Workflows',
+  props<{ user: any }>()
+);
+
 export const loadWorkflows = createAction(
-  '[Workflow/API] Load Workflows', 
+  '[Workflow/API] Load Workflows',
   props<{ workflows: Workflow[] }>()
 );
 
@@ -48,6 +66,4 @@ export const deleteWorkflows = createAction(
   props<{ ids: string[] }>()
 );
 
-export const clearWorkflows = createAction(
-  '[Workflow/API] Clear Workflows'
-);
+export const clearWorkflows = createAction('[Workflow/API] Clear Workflows');
