@@ -21,7 +21,7 @@ describe('ConfigEffects', () => {
   let actions$: Observable<any>;
   let effects: ConfigEffects;
   let store: MockStore<State>;
-  let configService: ConfigService = jasmine.createSpyObj('configService', {
+  const configService: ConfigService = jasmine.createSpyObj('configService', {
     getConfig: null,
     loadConfig: of(fakeConfig),
   });

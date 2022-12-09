@@ -25,7 +25,9 @@ export class ViewComponent implements OnInit, OnDestroy {
       }
     });
   }
-  ngOnInit() {}
+  ngOnInit() {
+    logger.debug('ViewComponent initialized');
+  }
 
   ngOnDestroy(): void {
     if (this.readSubscription) this.readSubscription.unsubscribe();

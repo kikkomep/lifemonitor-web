@@ -14,8 +14,8 @@ export class LifeMonitorApiService extends BaseService {
   private logger: Logger = LoggerManager.getLogger('LifeMonitorApiService');
 
   public getUserWorkflows(
-    versions: boolean = true,
-    status: boolean = false
+    versions = true,
+    status = false
   ): Observable<Workflow[]> {
     return this.doGet('workflows', {
       params: {
@@ -32,8 +32,8 @@ export class LifeMonitorApiService extends BaseService {
   }
 
   public getPublicWorkflows(
-    versions: boolean = true,
-    status: boolean = false
+    versions = true,
+    status = false
   ): Observable<Workflow[]> {
     return this.doGet('workflows', {
       params: {
