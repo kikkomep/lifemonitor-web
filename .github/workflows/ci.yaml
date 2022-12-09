@@ -34,14 +34,16 @@ jobs:
         run: |
           cat > src/assets/config.json <<- EndOfSettings
           {
-            production: false,
-            apiBaseUrl: "${API_BASE_URL}",
-            clientId: "${API_CLIENT_ID}",
-            configFile: "/assets/config.json",
-            apiKey: "${API_KEY}"
-          };
+            "production": false,
+            "apiBaseUrl": "${API_BASE_URL}",
+            "clientId": "${API_CLIENT_ID}",
+            "configFile": "/assets/config.json",
+            "apiKey": "${API_KEY}"
+          }
           EndOfSettings
-          echo "export const environment = $(cat src/assets/config.json)" > src/app/environments/environment.test.ts
+          cat src/assets/config.json
+          echo "export const environment = $(cat src/assets/config.json);" > src/app/environments/environment.test.ts
+          cat src/app/environments/environment.test.ts
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
