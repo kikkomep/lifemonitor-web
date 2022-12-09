@@ -38,12 +38,14 @@ jobs:
             apiBaseUrl: "${API_BASE_URL}",
             clientId: "${API_CLIENT_ID}",
             configFile: "/assets/config.json",
+            apiKey: "${API_KEY}"
           };
           EndOfSettings
           ln -sf src/app/environments/environment.test.ts src/assets/config.json
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
           API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
+          API_KEY: ${{ secrets.API_KEy }}
       - name: ESLinting
         run: npm run lint
       - name: Run tests
