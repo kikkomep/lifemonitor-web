@@ -10,13 +10,6 @@ export const isLoading = createSelector(selectFeature, (state: State) => {
   return state.loading;
 });
 
-// export const selectCollectionState =
-//   createFeatureSelector<ReadonlyArray<string>>('collection');
-
-// export const selectBookCollection = createSelector(
-//   selectBooks,
-//   selectCollectionState,
-//   (books, collection) => {
-//     return collection.map((id) => books.find((book) => book.id === id));
-//   }
-// );
+export const ready = createSelector(selectFeature, (state: State) => {
+  return !state.loading && state.config !== null;
+});
