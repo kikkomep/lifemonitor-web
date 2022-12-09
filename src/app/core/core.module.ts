@@ -6,6 +6,7 @@ import { StoreModule } from '@ngrx/store';
 import { HttpClientModule } from '@angular/common/http';
 import { EffectsModule } from '@ngrx/effects';
 import { ConfigEffects } from './effects/config.effects';
+import { WorkflowEffects } from './effects/workflow.effects';
 
 // Import feature state reducers
 import * as fromConfig from './reducers/config.reducer';
@@ -21,7 +22,7 @@ import * as fromState from './state';
     CommonModule,
     HttpClientModule,
     // Register feature effects
-    EffectsModule.forFeature([ConfigEffects]),
+    EffectsModule.forFeature([ConfigEffects, WorkflowEffects]),
     // Register feature stores
     StoreModule.forFeature(fromConfig.featureKey, fromConfig.reducer),
     // Register main feature store
