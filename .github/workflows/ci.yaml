@@ -33,12 +33,12 @@ jobs:
       - name: Initialize testing environment file
         run: |
           cat > src/app/environments/environment.test.ts <<- EndOfSettings
-          {
+          export const environment = {
             production: false,
             apiBaseUrl: "${API_BASE_URL}",
             clientId: "${API_CLIENT_ID}",
             configFile: "/assets/config.json",
-          }
+          };
           EndOfSettings
           ln -sf src/app/environments/environment.test.ts src/assets/config.json
         env:
