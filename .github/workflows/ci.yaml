@@ -30,6 +30,24 @@ jobs:
         run: npm install
       - name: Install Angular CLI
         run: npm install -g @angular/cli@15.0.0
+      - name: Initialize testing environment file
+        run: |
+          cat > src/assets/config.json <<- EndOfSettings
+          {
+            "production": false,
+            "apiBaseUrl": "${API_BASE_URL}",
+            "clientId": "${API_CLIENT_ID}",
+            "configFile": "/assets/config.json",
+            "apiKey": "${API_KEY}"
+          }
+          EndOfSettings
+          cat src/assets/config.json
+          echo "export const environment = $(cat src/assets/config.json);" > src/app/environments/environment.test.ts
+          cat src/app/environments/environment.test.ts
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_CLIENT_ID: ${{ secrets.API_CLIENT_ID }}
+          API_KEY: ${{ secrets.API_KEy }}
       - name: ESLinting
         run: npm run lint
       - name: Run tests

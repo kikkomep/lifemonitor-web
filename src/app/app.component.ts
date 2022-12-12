@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { PrimeNGConfig } from 'primeng/api';
+import { loadConfiguration } from './core/actions/config.actions';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +11,9 @@ import { PrimeNGConfig } from 'primeng/api';
 export class AppComponent implements OnInit {
   title = 'lifemonitor';
 
-  constructor(private primengConfig: PrimeNGConfig) {}
+  constructor(private primengConfig: PrimeNGConfig, private store: Store) {
+    this.store.dispatch(loadConfiguration());
+  }
 
   ngOnInit() {
     this.primengConfig.ripple = true;
@@ -26,6 +30,12 @@ if (typeof Worker !== 'undefined') {
     console.log(`page got message: ${data}`);
   };
   worker.postMessage('hello');
+
+  // const w2 = new Worker(new URL('./workers/w2.worker', import.meta.url));
+  // w2.onmessage = ({ data }) => {
+  //   console.log(`page got message: ${data}`);
+  // };
+  // w2.postMessage('hello');
 } else {
   // Web workers are not supported in this environment.
   // You should add a fallback so that your program still executes correctly.
