@@ -17,6 +17,13 @@ export const initialState: State = adapter.getInitialState({
 
 export const reducer = createReducer(
   initialState,
+  on(WorkflowActions.loadingPublicWorkflowsSuccess, (state, action) => {
+    console.log('Reducing public workflows', action.workflows);
+    return {
+      ...state,
+      publicWorkflows: action.workflows,
+    };
+  }),
   on(WorkflowActions.addWorkflow, (state, action) =>
     adapter.addOne(action.workflow, state)
   ),
