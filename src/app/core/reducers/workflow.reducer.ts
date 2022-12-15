@@ -6,14 +6,13 @@ import * as WorkflowActions from '../actions/workflow.actions';
 export const workflowsFeatureKey = 'workflows';
 
 export interface State extends EntityState<Workflow> {
-  // additional entities state properties
   selectedWorkflow?: Workflow;
 }
 
 export const adapter: EntityAdapter<Workflow> = createEntityAdapter<Workflow>();
 
 export const initialState: State = adapter.getInitialState({
-  // additional entity state properties  
+  // additional entity state properties
 });
 
 export const reducer = createReducer(
