@@ -25,6 +25,7 @@ import * as fromState from './state';
     EffectsModule.forFeature([ConfigEffects, WorkflowEffects]),
     // Register feature stores
     StoreModule.forFeature(fromConfig.featureKey, fromConfig.reducer),
+    StoreModule.forFeature(fromWorkflow.featureKey, fromWorkflow.reducer),
     // Register main feature store
     StoreModule.forFeature(fromState.stateFeatureKey, fromState.reducers, {
       metaReducers: fromState.metaReducers,
