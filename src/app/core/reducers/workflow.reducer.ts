@@ -53,6 +53,3 @@ export const reducer = createReducer(
   ),
   on(WorkflowActions.clearWorkflows, (state) => adapter.removeAll(state))
 );
-
-export const { selectIds, selectEntities, selectAll, selectTotal } =
-  adapter.getSelectors();
