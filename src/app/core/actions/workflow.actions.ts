@@ -16,7 +16,12 @@ export const loadingPublicWorkflowsFailure = createAction(
   '[Workflow/API] Loading Public Workflows Failure'
 );
 
-export const loadSubscribedWorkflows = createAction(
+export const loadDashboarddWorkflows = createAction(
+  '[Workflow/API] Load Subscribed Workflows',
+  props<{ user: any }>()
+);
+
+export const loadUserWorkflows = createAction(
   '[Workflow/API] Load Subscribed Workflows',
   props<{ user: any }>()
 );
