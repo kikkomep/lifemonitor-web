@@ -30,11 +30,11 @@ describe('LifemonitorService', () => {
     });
   });
 
-  it('should return a list of workflows', (done: DoneFn) => {
-    service.getPublicWorkflows().subscribe((value) => {
-      console.log('The value: ', value);
-      expect(value).toBeDefined();
-      done();
-    });
-  });
+  // it('should return a list of workflows', (done: DoneFn) => {
+  //   service.getPublicWorkflows().subscribe((value) => {
+  //     console.log('The value: ', value);
+  //     expect(value).toBeDefined();
+  //     done();
+  //   });
+  // });
 });
