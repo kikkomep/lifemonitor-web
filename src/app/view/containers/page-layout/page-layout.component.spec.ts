@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
+import { PublicWorkflowsComponent } from '../public-workflows/public-workflows.component';
 
 import { PageLayoutComponent } from './page-layout.component';
 
@@ -9,7 +10,7 @@ describe('PageLayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [PageLayoutComponent],
+      declarations: [PageLayoutComponent, PublicWorkflowsComponent],
       providers: [provideMockStore({})],
     }).compileComponents();
 

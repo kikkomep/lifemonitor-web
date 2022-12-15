@@ -29,11 +29,12 @@ import { ToastModule } from 'primeng/toast';
 // View Containers
 import { PageLayoutComponent } from './containers/page-layout/page-layout.component';
 import { ViewComponent } from './view.component';
+import { PublicWorkflowsComponent } from './containers/public-workflows/public-workflows.component';
 
 // View Components
 
 @NgModule({
-  declarations: [PageLayoutComponent, ViewComponent],
+  declarations: [PageLayoutComponent, ViewComponent, PublicWorkflowsComponent],
   imports: [
     // Common Angular dependencies
     CommonModule,
