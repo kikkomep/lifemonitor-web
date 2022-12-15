@@ -23,6 +23,10 @@ export interface WorkflowVersionStatus {
   unavailability_reason?: string;
 }
 
+export type WorkflowStats = {
+  [key in AggregatedTestStatus]: number;
+};
+
 export const deserialize = function (data: any): Workflow {
   const workflow = {};
 

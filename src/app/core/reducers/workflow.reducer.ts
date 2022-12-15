@@ -1,18 +1,27 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { Workflow } from '../models/workflow.model';
+import { Workflow, WorkflowStats } from '../models/workflow.model';
 import * as WorkflowActions from '../actions/workflow.actions';
+import { AggregatedTestStatus } from '../models/status.model';
 
-export const workflowsFeatureKey = 'workflows';
+export const featureKey = 'workflows';
 
 export interface State extends EntityState<Workflow> {
   selectedWorkflow?: Workflow;
+  publicWorkflows: Workflow[];
+  publicWorkflowsStats: WorkflowStats;
 }
 
 export const adapter: EntityAdapter<Workflow> = createEntityAdapter<Workflow>();
 
 export const initialState: State = adapter.getInitialState({
-  // additional entity state properties
+  publicWorkflows: [],
+  publicWorkflowsStats: {
+    [AggregatedTestStatus.all_passing]: 0,
+    [AggregatedTestStatus.some_passing]: 0,
+    [AggregatedTestStatus.all_failing]: 0,
+    [AggregatedTestStatus.not_available]: 0,
+  },
 });
 
 export const reducer = createReducer(
