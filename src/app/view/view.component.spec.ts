@@ -4,6 +4,7 @@ import { PageLayoutComponent } from './containers/page-layout/page-layout.compon
 
 import { ViewComponent } from './view.component';
 import { provideMockStore } from '@ngrx/store/testing';
+import { PublicWorkflowsComponent } from './containers/public-workflows/public-workflows.component';
 
 describe('ViewComponent', () => {
   let component: ViewComponent;
@@ -12,7 +13,11 @@ describe('ViewComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [],
-      declarations: [ViewComponent, PageLayoutComponent],
+      declarations: [
+        ViewComponent,
+        PageLayoutComponent,
+        PublicWorkflowsComponent,
+      ],
       providers: [provideMockStore({})],
     }).compileComponents();
 
