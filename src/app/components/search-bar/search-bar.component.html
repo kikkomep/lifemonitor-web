@@ -50,4 +50,22 @@
     <i class="fas fa-search mx-2"></i>
     <span>Search</span>
   </button>
+
+  <div *ngIf="showAllButtonName" class="mx-2 mr-4" style="width: 135px">
+    <button
+      [hidden]="!actualFilterValue && !searchAll"
+      class="btn btn-primary"
+      type="button"
+      (click)="reset()"
+      aria-haspopup="true"
+      aria-expanded="false"
+      data-toggle="tooltip"
+      data-placement="top"
+      data-html="true"
+      title="Show {{ showAllButtonName }}"
+    >
+      <i class="fas fa-list mx-2"></i>
+      <span>{{ showAllButtonName }}</span>
+    </button>
+  </div>
 </div>
