@@ -177,7 +177,7 @@
       <!-- Search Bar -->
       <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
         [(sortingOrder)]="workflowSortingOrder" 
-        [browseButton]="true" showAllButtonName="Dashboard"></item-search-bar>
+        [browseButton]="true" showAllButtonName="{{isUserLogged() ? 'Dashboard': ''}}"></item-search-bar>
 
       <div>
         <div class="card card-primary card-outline" [hidden]="!workflows && (isLoading|async)!==false">
