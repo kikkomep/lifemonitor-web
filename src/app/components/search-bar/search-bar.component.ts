@@ -13,6 +13,8 @@ export class SearchBarComponent implements OnInit {
   _sortingOrder: string = 'desc';
   _searchAllValues: boolean = false;
 
+  @Input() showAllButtonName: string;
+  @Input() browseButton: boolean = true;
   @Input() elementType: string;
   @Input() filterValue: string;
   @Input() sortingOrder: string;

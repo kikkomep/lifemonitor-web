@@ -35,4 +35,19 @@
       <a class="dropdown-item" href="#">Separated link</a>
     </div> -->
   </div>
+  <button
+    *ngIf="browseButton"
+    class="btn btn-primary"
+    data-toggle="tooltip"
+    data-placement="bottom"
+    data-html="true"
+    title="list all {{ elementType }} or search {{
+      elementType
+    }} by UUID or Name"
+    (click)="onKeyUpEnter()"
+    style="width: 105px"
+  >
+    <i class="fas fa-search mx-2"></i>
+    <span>Search</span>
+  </button>
 </div>
