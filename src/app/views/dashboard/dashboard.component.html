@@ -176,7 +176,8 @@
     <div class="container-fluid">
       <!-- Search Bar -->
       <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
-        [(sortingOrder)]="workflowSortingOrder"></item-search-bar>
+        [(sortingOrder)]="workflowSortingOrder" 
+        [browseButton]="true" showAllButtonName="Dashboard"></item-search-bar>
 
       <div>
         <div class="card card-primary card-outline" [hidden]="!workflows && (isLoading|async)!==false">
