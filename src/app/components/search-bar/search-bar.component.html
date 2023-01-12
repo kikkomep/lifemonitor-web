@@ -1,21 +1,42 @@
-<div class="input-group p-5">
+<div [ngClass]="showAllButtonName ? 'input-group p-5 ml-5' : 'input-group p-5'">
   <div class="input-group-prepend">
-    <span class="input-group-text"><i class="fas fa-search"></i></span>
+    <span class="input-group-text"><i class="fas fa-angle-right"></i></span>
   </div>
-  <input #searchInputText (keyup.enter)="onKeyUpEnter()"
-    type="text" [(ngModel)]="actualFilterValue" class="form-control font-weight-light"
-    placeholder="Search for {{elementType}}" aria-label="search" aria-describedby="basic-addon1" 
-    data-toggle="tooltip" data-placement="bottom" data-html="true"
-    title="Press ENTER to list all {{elementType}} or search {{elementType}} by UUID or Name"/>
+  <input
+    #searchInputText
+    (keyup.enter)="onKeyUpEnter()"
+    type="text"
+    [(ngModel)]="actualFilterValue"
+    class="form-control font-weight-light border-right-0"
+    stule="border-color: gray"
+    placeholder="Search for {{ elementType }}"
+    aria-label="search"
+    aria-describedby="basic-addon1"
+    data-toggle="tooltip"
+    data-placement="bottom"
+    data-html="true"    
+    title="Press ENTER to list all {{ elementType }} or search {{
+      elementType
+    }} by UUID or Name"
+  />
 
   <div class="input-group-append">
-    <button *ngIf="actualFilterValue || searchAll" class="btn btn-outline-secondary border-right-0" type="button" (click)="reset()"
-      aria-haspopup="true" aria-expanded="false"
-      data-toggle="tooltip" data-placement="top" data-html="true"
-      title="Clear search for {{elementType}}">
+    <button
+      *ngIf="actualFilterValue"
+      class="btn btn-outline-secondary border-left-0 border-right-0 border-left-0 bg-white"
+      style="border-color: #ced4da"
+      type="button"
+      (click)="reset()"
+      aria-haspopup="true"
+      aria-expanded="false"
+      data-toggle="tooltip"
+      data-placement="top"
+      data-html="true"
+      title="Clear search for {{ elementType }}"
+    >
       <i class="fas fa-window-close"></i>
     </button>
-    <button class="btn btn-outline-secondary border-left-0" type="button" (click)="changeSortingOrder()"
+    <!-- <button class="btn btn-outline-secondary border-left-0" type="button" (click)="changeSortingOrder()"
       aria-haspopup="true" aria-expanded="false">
       <i *ngIf="actualSortingOrder == 'asc'" class="fas fa-sort-amount-up"
          data-toggle="tooltip" data-placement="top" data-html="true"
@@ -23,7 +44,7 @@
       <i *ngIf="actualSortingOrder == 'desc'" class="fas fa-sort-amount-down"
          data-toggle="tooltip" data-placement="top" data-html="true"
          title="Sort {{elementType}} in descending order"></i>
-    </button>
+    </button> -->
     <!-- <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
       aria-haspopup="true" aria-expanded="false">
       <i class="fas fa-sort-amount-up"></i> Filter
