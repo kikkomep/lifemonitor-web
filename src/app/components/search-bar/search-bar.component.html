@@ -1,4 +1,4 @@
-<div [ngClass]="showAllButtonName ? 'input-group p-5 ml-5' : 'input-group p-5'">
+<div [ngClass]="enableBrowseButton ? 'input-group p-5 ml-5' : 'input-group p-5'">
   <div class="input-group-prepend">
     <span class="input-group-text"><i class="fas fa-angle-right"></i></span>
   </div>
@@ -14,10 +14,8 @@
     aria-describedby="basic-addon1"
     data-toggle="tooltip"
     data-placement="bottom"
-    data-html="true"    
-    title="Press ENTER to list all {{ elementType }} or search {{
-      elementType
-    }} by UUID or Name"
+    data-html="true"
+    [title]="'search ' + elementType + ' by UUID or Name'"
   />
 
   <div class="input-group-append">
@@ -57,36 +55,63 @@
     </div> -->
   </div>
   <button
-    *ngIf="browseButton"
+    #searchButton
+    [disabled]="!allowEmptySearch && !actualFilterValue"
     class="btn btn-primary"
     data-toggle="tooltip"
     data-placement="bottom"
     data-html="true"
-    title="list all {{ elementType }} or search {{
-      elementType
-    }} by UUID or Name"
+    [title]="
+      actualFilterValue
+        ? 'search ' + elementType + ' by UUID or name'
+        : 'browse registered ' + elementType
+    "
+    [title]="'search ' + elementType + ' by UUID or name'"
     (click)="onKeyUpEnter()"
-    style="width: 105px"
   >
     <i class="fas fa-search mx-2"></i>
-    <span>Search</span>
+    <span>{{ actualFilterValue ? 'Search' : searchButtonName }}</span>
   </button>
 
-  <div *ngIf="showAllButtonName" class="mx-2 mr-4" style="width: 135px">
+  <div *ngIf="enableBrowseButton" class="mx-2 mr-4">
     <button
-      [hidden]="!actualFilterValue && !searchAll"
+      #browseButton
+      type="button"
+      class="btn btn-primary"
+      [ngClass]="{
+        'browse-disabled': !browseButtonEnabled,
+        'browse-enabled': browseButtonEnabled
+      }"
+      [hidden]="!enableBrowseButton"
+      style="min-width: 132px"
       class="btn btn-primary"
       type="button"
-      (click)="reset()"
-      aria-haspopup="true"
-      aria-expanded="false"
-      data-toggle="tooltip"
-      data-placement="top"
-      data-html="true"
-      title="Show {{ showAllButtonName }}"
+      (click)="onBrowseButtonClick($event)"
     >
-      <i class="fas fa-list mx-2"></i>
-      <span>{{ showAllButtonName }}</span>
+      <div
+        *ngIf="browseButtonEnabled"
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-toggle="tooltip"
+        data-placement="top"
+        data-html="true"
+        title="Go back to the {{ goBackButtonName }}"
+      >
+        <i class="fas fa-list mx-2"></i>
+        <span>{{goBackButtonName}}</span>
+      </div>
+      <div
+        *ngIf="!browseButtonEnabled"
+        aria-haspopup="true"
+        aria-expanded="false"
+        data-toggle="tooltip"
+        data-placement="top"
+        data-html="true"
+        title="Browse registered {{ elementType }}"
+      >
+        <i class="far fa-folder-open mx-2"></i>
+        <span>Browse</span>
+      </div>
     </button>
   </div>
 </div>

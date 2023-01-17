@@ -1,3 +1,19 @@
-.form-control:focus{
-    border-color: #ced4da;
+.form-control:focus {
+  border-color: #ced4da;
+}
+
+.browse-disabled {
+  background-color: var(--eosc-green);
+  color: white;
+}
+
+.browse-enabled {
+  background-color: var(--eosc-green-dark);
+  color: white;
+}
+
+button:disabled,
+button[disabled] {
+  cursor: none;
+  pointer-events: none;
 }
