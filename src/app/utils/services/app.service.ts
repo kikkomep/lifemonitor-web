@@ -1,9 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  forkJoin, Observable, Subject,
-  Subscription
-} from 'rxjs';
+import { forkJoin, Observable, Subject, Subscription } from 'rxjs';
 import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
@@ -15,7 +12,7 @@ import { User } from 'src/app/models/user.modes';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor
+  WorkflowVersionDescriptor,
 } from 'src/app/models/workflow.model';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
