@@ -7,7 +7,7 @@ import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status
+  Status,
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -62,28 +62,33 @@ export class ApiService {
 
   get_current_user_notifications(): Observable<Array<UserNotification>> {
     return this.http
-      .get(this.apiBaseUrl + '/users/current/notifications', this.get_http_options())
+      .get(
+        this.apiBaseUrl + '/users/current/notifications',
+        this.get_http_options()
+      )
       .pipe(
         retry(3),
         map((data) => {
           let result = [];
           for (let d of data['items']) {
-            result.push(new UserNotification(d))
+            result.push(new UserNotification(d));
           }
           return result;
         })
       );
   }
 
-  setNotificationsReadingTime(notifications: UserNotification[]): Observable<UserNotification[]> {
+  setNotificationsReadingTime(
+    notifications: UserNotification[]
+  ): Observable<UserNotification[]> {
     let readTime = Date.now();
     let body = {
-      'items': notifications.map(function (n) {
+      items: notifications.map(function (n) {
         return {
           uuid: n['uuid'],
-          read: String(readTime)
-        }
-      })
+          read: String(readTime),
+        };
+      }),
     };
     return this.http
       .put(
@@ -123,7 +128,9 @@ export class ApiService {
   }
 
   deleteNotifications(notifications: UserNotification[]): Observable<object> {
-    let body = notifications.map(function (n) { return n['uuid']; });
+    let body = notifications.map(function (n) {
+      return n['uuid'];
+    });
     return this.http
       .patch(
         this.apiBaseUrl + '/users/current/notifications',
@@ -174,10 +181,17 @@ export class ApiService {
       );
   }
 
-  getRegistryWorkflow(registry_uuid: string, workflow_identifier: string): Observable<RegistryWorkflow> {
+  getRegistryWorkflow(
+    registry_uuid: string,
+    workflow_identifier: string
+  ): Observable<RegistryWorkflow> {
     return this.http
       .get(
-        this.apiBaseUrl + '/registries/' + registry_uuid + '/index/' + workflow_identifier,
+        this.apiBaseUrl +
+          '/registries/' +
+          registry_uuid +
+          '/index/' +
+          workflow_identifier,
         this.get_http_options()
       )
       .pipe(
@@ -191,7 +205,7 @@ export class ApiService {
 
   updateWorkflowName(workflow: WorkflowVersion): Observable<any> {
     let body = {
-      name: workflow.name
+      name: workflow.name,
     };
     return this.http
       .put(
@@ -205,7 +219,7 @@ export class ApiService {
           workflow.public = !workflow.public;
           this.logger.debug('Changed workflow name to:' + workflow.name);
         }),
-        tap((data) => this.logger.debug('Workflow name changed to: ', data)),
+        tap((data) => this.logger.debug('Workflow name changed to: ', data))
       );
   }
 
@@ -223,9 +237,13 @@ export class ApiService {
         retry(3),
         map((data) => {
           workflow.public = !workflow.public;
-          this.logger.debug('Changed workflow visibility: public=' + workflow.public);
+          this.logger.debug(
+            'Changed workflow visibility: public=' + workflow.public
+          );
         }),
-        tap((data) => this.logger.debug('Workflow visibility changed to: ', data)),
+        tap((data) =>
+          this.logger.debug('Workflow visibility changed to: ', data)
+        )
       );
   }
 
@@ -233,17 +251,21 @@ export class ApiService {
     workflow: RegistryWorkflow,
     version: string = null,
     name: string = null,
-    is_public: boolean = false): Observable<object> {
+    is_public: boolean = false
+  ): Observable<object> {
     let data = {
-      "identifier": workflow.identifier,
-      "name": name,
-      "version": version,
-      "public": is_public,
-      "uuid": uuidv4()
-    }
+      identifier: workflow.identifier,
+      name: name,
+      version: version,
+      public: is_public,
+      uuid: uuidv4(),
+    };
     return this.http
       .post(
-        this.apiBaseUrl + '/registries/' + workflow.registry.uuid + '/workflows',
+        this.apiBaseUrl +
+          '/registries/' +
+          workflow.registry.uuid +
+          '/workflows',
         data,
         this.get_http_options()
       )
@@ -292,8 +314,10 @@ export class ApiService {
       );
   }
 
-  deleteWorkflowVersion(uuid: string, version: string):
-    Observable<{ uuid: string; version: string }> {
+  deleteWorkflowVersion(
+    uuid: string,
+    version: string
+  ): Observable<{ uuid: string; version: string }> {
     return this.http
       .delete(
         this.apiBaseUrl + '/workflows/' + uuid + '/versions/' + version,
@@ -308,13 +332,9 @@ export class ApiService {
       );
   }
 
-  deleteWorkflow(uuid: string):
-    Observable<{ uuid: string; }> {
+  deleteWorkflow(uuid: string): Observable<{ uuid: string }> {
     return this.http
-      .delete(
-        this.apiBaseUrl + '/workflows/' + uuid,
-        this.get_http_options()
-      )
+      .delete(this.apiBaseUrl + '/workflows/' + uuid, this.get_http_options())
       .pipe(
         retry(3),
         map(() => {
@@ -324,12 +344,11 @@ export class ApiService {
       );
   }
 
-
   downloadROCrate(workflow: WorkflowVersion): Observable<any> {
     let token = JSON.parse(localStorage.getItem('token'));
     let headers = new HttpHeaders();
     if (token) {
-      headers.append["Authorization"] = 'Bearer ' + token['token']['value'];
+      headers.append['Authorization'] = 'Bearer ' + token['token']['value'];
     }
     return this.http
       .get(workflow.downloadLink, {
@@ -359,7 +378,9 @@ export class ApiService {
           }
           return workflow;
         }),
-        tap((data) => this.logger.debug('Workflow visibility changed to: ', data))
+        tap((data) =>
+          this.logger.debug('Workflow visibility changed to: ', data)
+        )
       );
   }
 
@@ -382,7 +403,9 @@ export class ApiService {
           }
           return workflow;
         }),
-        tap((data) => this.logger.debug('Workflow visibility changed to: ', data))
+        tap((data) =>
+          this.logger.debug('Workflow visibility changed to: ', data)
+        )
       );
   }
 
@@ -400,7 +423,7 @@ export class ApiService {
     let url: string = !filteredByUser
       ? this.apiBaseUrl + `/workflows?status=${status}&versions=${versions}`
       : this.apiBaseUrl +
-      `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;
+        `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;
     return this.http.get(url, this.get_http_options()).pipe(
       retry(3),
       tap((data) => this.logger.debug('Loaded workflows: ', data)),
@@ -427,7 +450,7 @@ export class ApiService {
     return forkJoin(queries).pipe(
       map((result) => {
         let workflow: Workflow = new Workflow(result[0]);
-        workflow.updateDescriptors(result[1]["versions"]);
+        workflow.updateDescriptors(result[1]['versions']);
         this.logger.debug('Loaded workflow', workflow);
         return workflow;
       }),
@@ -463,7 +486,7 @@ export class ApiService {
 
     let queries: Array<object> = [workflow];
 
-    if (load_status) {
+    if (options.load_status) {
       const status = this.http
         .get<Status>(
           this.apiBaseUrl + '/workflows/' + uuid + '/status?version=' + version,
@@ -481,7 +504,7 @@ export class ApiService {
 
     let w = new WorkflowVersion({ uuid: uuid });
     let suites = null;
-    if (load_suites) {
+    if (options.load_suites) {
       suites = this.get_suites(w, version);
       if (suites) queries.push(suites);
     }
@@ -489,36 +512,21 @@ export class ApiService {
     return forkJoin(queries).pipe(
       map((result) => {
         w.update(result[0]);
-        if (load_status)
-          w.status = result[1];
-        w.suites = new AggregatedStatusStats(load_status && load_suites ? result[2] : (load_suites ? result[1] : []));
-        this.logger.debug('workflow', w);
+        if (options.load_status) w.status = result[1];
+        this.logger.debug('The complete workflow version SUITEs', result[2]);
+        w.suites = new AggregatedStatusStats(
+          options.load_status && options.load_suites
+            ? result[2]
+            : options.load_suites
+            ? result[1]
+            : []
+        );
+        this.logger.debug('The complete workflow version', w);
         return w;
       }),
       tap((result) => this.logger.debug('Loaded workflow: ', result)),
       retry(3)
     );
-  }
-
-  get_suites_parallel(uuid: string): Observable<Suite[]> {
-    this.logger.debug('Loading suites....');
-    return this.http
-      .get<Suite[]>(
-        this.apiBaseUrl + '/workflows/' + uuid + '/suites',
-        this.get_http_options()
-      )
-      .pipe(
-        retry(3),
-        map((rawSuitesData) => {
-          let suites: Suite[] = [];
-          for (let suiteData of rawSuitesData['items']) {
-            this.loadSuite(suiteData).subscribe((suite: Suite) => {
-              suites.push(suite);
-            });
-          }
-          return suites;
-        })
-      );
   }
 
   loadSuite(suiteData: Object): Observable<Suite> {
@@ -543,9 +551,9 @@ export class ApiService {
               this.http
                 .get(
                   this.apiBaseUrl +
-                  '/instances/' +
-                  instanceData['uuid'] +
-                  '/latest-builds',
+                    '/instances/' +
+                    instanceData['uuid'] +
+                    '/latest-builds',
                   this.get_http_options()
                 )
                 .pipe(
@@ -568,7 +576,10 @@ export class ApiService {
                     return instance;
                   }),
                   tap((result) => {
-                    this.logger.debug('Loaded latest test instance builds', result);
+                    this.logger.debug(
+                      'Loaded latest test instance builds',
+                      result
+                    );
                   })
                 )
             );
@@ -588,7 +599,10 @@ export class ApiService {
       );
   }
 
-  get_suites(workflow: WorkflowVersion, version: string = "latest"): Observable<Suite[]> {
+  get_suites(
+    workflow: WorkflowVersion,
+    version: string = 'latest'
+  ): Observable<Suite[]> {
     this.logger.debug('Loading suites of workflow ....', workflow);
     return this.http
       .get<Suite[]>(
@@ -598,7 +612,12 @@ export class ApiService {
       .pipe(
         retry(3),
         map((rawSuitesData) => {
-          return rawSuitesData['items'];
+          return rawSuitesData['items'].map((data: any) => {
+            const suite = { ...data };
+            if ('aggregate_test_status' in suite)
+              suite['status'] = suite['aggregate_test_status'];
+            return suite;
+          });
         }),
         mergeMap((rawSuitesData: []) => {
           this.logger.debug('Suites', rawSuitesData);
@@ -606,16 +625,15 @@ export class ApiService {
           let dataIndexMap: { [key: string]: number } = {};
           let queries = [];
           for (let suite of rawSuitesData) {
-
             let instances: Array<any> = suite['instances'];
             for (let instanceData of instances) {
               dataIndexMap[instanceData['uuid']] = queries.length;
               queries.push(
                 this.http.get(
                   this.apiBaseUrl +
-                  '/instances/' +
-                  instanceData['uuid'] +
-                  '/latest-builds',
+                    '/instances/' +
+                    instanceData['uuid'] +
+                    '/latest-builds',
                   this.get_http_options()
                 )
               );
@@ -709,7 +727,7 @@ export class ApiService {
 
   updateSuite(suite: Suite): Observable<any> {
     let body = {
-      name: suite.name
+      name: suite.name,
     };
     return this.http
       .put(
@@ -728,7 +746,7 @@ export class ApiService {
 
   updateTestInstance(instance: TestInstance): Observable<any> {
     let body = {
-      name: instance.name
+      name: instance.name,
     };
     return this.http
       .put(
@@ -744,7 +762,6 @@ export class ApiService {
         tap((data) => this.logger.debug('TestInstance name changed to: ', data))
       );
   }
-
 
   getLatestTestInstance(uuid: string): Observable<any> {
     return this.http
@@ -784,11 +801,11 @@ export class ApiService {
     return this.http
       .get(
         this.apiBaseUrl +
-        '/instances/' +
-        testInstanceUUID +
-        '/builds/' +
-        buildID +
-        '/logs',
+          '/instances/' +
+          testInstanceUUID +
+          '/builds/' +
+          buildID +
+          '/logs',
         this.get_http_options()
       )
       .pipe(
@@ -797,12 +814,18 @@ export class ApiService {
           return data;
         }),
         tap((result) => {
-          this.logger.debug('Loaded logs of test instance build', buildID, result);
+          this.logger.debug(
+            'Loaded logs of test instance build',
+            buildID,
+            result
+          );
         })
       );
   }
 
-  public checkROCrateAvailability(workflow: WorkflowVersion): Observable<boolean> {
+  public checkROCrateAvailability(
+    workflow: WorkflowVersion
+  ): Observable<boolean> {
     return this.http
       .head(workflow.downloadLink, this.get_http_options({}, true))
       .pipe(

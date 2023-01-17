@@ -1,8 +1,12 @@
-import { AuthService } from 'src/app/utils/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { map, finalize, catchError, tap } from 'rxjs/operators';
+import {
+  forkJoin, Observable, Subject,
+  Subscription
+} from 'rxjs';
+import { catchError, finalize, map, tap } from 'rxjs/operators';
+import { UserNotification } from 'src/app/models/notification.model';
+import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -11,12 +15,11 @@ import { User } from 'src/app/models/user.modes';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor,
+  WorkflowVersionDescriptor
 } from 'src/app/models/workflow.model';
-import { ApiService } from './api.service';
-import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
-import { UserNotification } from 'src/app/models/notification.model';
+import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -176,8 +179,8 @@ export class AppService {
     let registry_uuid = uuid
       ? uuid
       : this._registry
-        ? this._registry.uuid
-        : null;
+      ? this._registry.uuid
+      : null;
     if (!registry_uuid) return null;
     return this._registryWorkflows[registry_uuid];
   }
@@ -199,8 +202,8 @@ export class AppService {
   public findWorkflowVersion(uuid: string, version: string): WorkflowVersion {
     return this._workflow_versions
       ? this._workflow_versions.find(
-        (w) => w.uuid === uuid && w.version['version'] === version
-      )
+          (w) => w.uuid === uuid && w.version['version'] === version
+        )
       : null;
   }
 
@@ -650,17 +653,22 @@ export class AppService {
               load_suites: true,
             })
             .subscribe((workflow_version: WorkflowVersion) => {
-              this.logger.debug('Registered Workflow RO-Crate:', workflow_version);
+              this.logger.debug(
+                'Registered Workflow RO-Crate:',
+                workflow_version
+              );
               this._workflow_versions.push(workflow_version);
               this.logger.debug('Workflow data loaded!');
               let workflow: Workflow = this.findWorkflow(workflow_version.uuid);
               if (!workflow) {
-                this.api.get_workflow(workflow_version.uuid).subscribe((workflow: Workflow) => {
-                  workflow.addVersion(workflow_version, true);
-                  this._workflows.push(workflow);
-                  this.subjectWorkflows.next(this._workflows);
-                  this.setLoadingWorkflows(false);
-                });
+                this.api
+                  .get_workflow(workflow_version.uuid)
+                  .subscribe((workflow: Workflow) => {
+                    workflow.addVersion(workflow_version, true);
+                    this._workflows.push(workflow);
+                    this.subjectWorkflows.next(this._workflows);
+                    this.setLoadingWorkflows(false);
+                  });
               } else {
                 workflow.addVersion(workflow_version, true);
                 this.subjectWorkflows.next(this._workflows);
@@ -737,35 +745,33 @@ export class AppService {
       );
   }
 
-  public deleteWorkflow(
-    workflow: Workflow
-  ): Observable<{ uuid: string; }> {
+  public deleteWorkflow(workflow: Workflow): Observable<{ uuid: string }> {
     if (!workflow) return;
     this.setLoadingWorkflows(true);
-    return this.api
-      .deleteWorkflow(workflow.uuid)
-      .pipe(
-        map((wd: { uuid: string; }) => {
-          const workflowIndex = this.workflows.findIndex((w) => w.uuid === workflow.uuid);
-          this.logger.debug('Version index: ', workflowIndex);
-          if (workflowIndex > -1) {
-            this._workflows.splice(workflowIndex, 1);
-            this.subjectWorkflows.next(this._workflows);
-            this.logger.debug('Workflow removed');
-          } else {
-            this.logger.warn("Workflow not found", workflow);
-          }
-          return wd;
-        }),
-        catchError((err) => {
-          this.logger.debug('Error when deleting workflow', err);
-          this.setLoadingWorkflows(false);
-          throw err;
-        }),
-        finalize(() => {
-          this.setLoadingWorkflows(false);
-        })
-      );
+    return this.api.deleteWorkflow(workflow.uuid).pipe(
+      map((wd: { uuid: string }) => {
+        const workflowIndex = this.workflows.findIndex(
+          (w) => w.uuid === workflow.uuid
+        );
+        this.logger.debug('Version index: ', workflowIndex);
+        if (workflowIndex > -1) {
+          this._workflows.splice(workflowIndex, 1);
+          this.subjectWorkflows.next(this._workflows);
+          this.logger.debug('Workflow removed');
+        } else {
+          this.logger.warn('Workflow not found', workflow);
+        }
+        return wd;
+      }),
+      catchError((err) => {
+        this.logger.debug('Error when deleting workflow', err);
+        this.setLoadingWorkflows(false);
+        throw err;
+      }),
+      finalize(() => {
+        this.setLoadingWorkflows(false);
+      })
+    );
   }
 
   public updateWorkflowName(w: WorkflowVersion): Observable<any> {
