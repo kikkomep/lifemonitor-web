@@ -231,6 +231,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value ? value.replace('SEARCH_KEY###', '') : '';
     this.editModeEnabled = false;
+    this.refreshDataTable();
   }
 
   public get isLoading(): Observable<boolean> {
@@ -546,7 +547,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
           searchPlaceholder: 'Filter your dashboard',
           decimal: '',
           emptyTable:
-            this.updatingDataTable === true
+            this.appService.isLoadingWorkflows() === true
               ? 'Loading workflows...'
               : this.workflowNameFilter && this.workflowNameFilter.length > 0
               ? 'No matching workflows'
