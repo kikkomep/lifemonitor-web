@@ -481,15 +481,22 @@ export class AppService {
     version: string = 'latest',
     status: boolean = false
   ): Observable<WorkflowVersion> {
-    return this.api.get_workflow_version(w.uuid, version, true, true, true, status).pipe(
-      map((workflow_version: WorkflowVersion) => {
-        this.logger.debug('Loaded data:', workflow_version);
-        //w.update(wdata);
-        //w.suites = wdata.suites;
-        this.logger.debug('Workflow data updated!');
-        return workflow_version;
+    return this.api
+      .get_workflow_version(w.uuid, version, {
+        previous_versions: true,
+        ro_crate: true,
+        load_status: status,
+        load_suites: true,
       })
-    );
+      .pipe(
+        map((workflow_version: WorkflowVersion) => {
+          this.logger.debug('Loaded workflow version data:', workflow_version);
+          //w.update(wdata);
+          //w.suites = wdata.suites;
+          this.logger.debug('Workflow data updated!');
+          return workflow_version;
+        })
+      );
   }
 
   public selectWorkflowVersion(uuid: string, version: string = 'latest') {
@@ -508,16 +515,23 @@ export class AppService {
       this._selectWorkflowVersion(this._workflow);
     } else if (!this._workflow_versions) {
       this.api
-        .get_workflow_version(uuid, version, true, true, true, true)
-        .subscribe((w: WorkflowVersion) => {
-          this._selectWorkflowVersion(w);
-        },
+        .get_workflow_version(uuid, version, {
+          previous_versions: true,
+          ro_crate: true,
+          load_status: true,
+          load_suites: true,
+        })
+        .subscribe(
+          (w: WorkflowVersion) => {
+            this._selectWorkflowVersion(w);
+          },
           (error) => {
-            this.logger.error("Error", error);
+            this.logger.error('Error', error);
             if (error.status === 404) {
               this.selectWorkflowVersion(uuid, 'latest');
             }
-          });
+          }
+        );
     } else {
       w = this._workflow_versions.find(
         (w: WorkflowVersion) =>
@@ -525,7 +539,12 @@ export class AppService {
       );
       if (!w || !w.suites) {
         this.api
-          .get_workflow_version(uuid, version, true, true, true, true)
+          .get_workflow_version(uuid, version, {
+            previous_versions: true,
+            ro_crate: true,
+            load_status: true,
+            load_suites: true,
+          })
           .subscribe((w: WorkflowVersion) => {
             this._selectWorkflowVersion(w);
           });
@@ -559,9 +578,17 @@ export class AppService {
         map((data) => {
           this.logger.debug('Data of registered workflow', data);
           this.api
-            .get_workflow_version(data['uuid'], version, false, true)
+            .get_workflow_version(data['uuid'], version, {
+              previous_versions: false,
+              ro_crate: true,
+              load_status: true,
+              load_suites: true,
+            })
             .subscribe((workflow_version: WorkflowVersion) => {
-              this.logger.debug('Registered Workflow RO-Crate:', workflow_version);
+              this.logger.debug(
+                'Registered Workflow RO-Crate:',
+                workflow_version
+              );
               this._workflow_versions.push(workflow_version);
               this.logger.debug('Workflow data loaded!');
               let workflow: Workflow = this.findWorkflow(uuid);
@@ -609,7 +636,12 @@ export class AppService {
         map((data) => {
           this.logger.debug('Data of registered workflow', data);
           this.api
-            .get_workflow_version(data['uuid'], version, false, true)
+            .get_workflow_version(data['uuid'], version, {
+              previous_versions: false,
+              ro_crate: true,
+              load_status: true,
+              load_suites: true,
+            })
             .subscribe((workflow_version: WorkflowVersion) => {
               this.logger.debug('Registered Workflow RO-Crate:', workflow_version);
               this._workflow_versions.push(workflow_version);

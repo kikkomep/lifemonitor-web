@@ -438,19 +438,26 @@ export class ApiService {
 
   get_workflow_version(
     uuid: string,
-    version: string = "latest",
-    previous_versions = false,
-    ro_crate = false,
-    load_suites = true,
-    load_status = true
+    version: string = 'latest',
+    options: {
+      previous_versions: boolean;
+      ro_crate: boolean;
+      load_suites: boolean;
+      load_status: boolean;
+    } = {
+      previous_versions: false,
+      ro_crate: false,
+      load_suites: true,
+      load_status: true,
+    }
   ): Observable<WorkflowVersion> {
     this.logger.debug('Request login');
     const workflow = this.http.get<WorkflowVersion>(
       this.apiBaseUrl + '/workflows/' + uuid + '/versions/' + version,
       this.get_http_options({
         // TODO: remove previoius versions
-        previous_versions: previous_versions,
-        ro_crate: ro_crate,
+        previous_versions: options.previous_versions,
+        ro_crate: options.ro_crate,
       })
     );
 
