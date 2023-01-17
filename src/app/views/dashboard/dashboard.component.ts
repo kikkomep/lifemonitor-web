@@ -552,19 +552,17 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
           searchPlaceholder: 'Filter your dashboard',
           decimal: '',
           emptyTable:
-            // this.updatingDataTable ? "" :
-            this.workflowNameFilter && this.workflowNameFilter.length > 0
-              ? this.updatingDataTable
-                ? 'Loading workflows...'
-                : 'No matching workflows'
-              : this.updatingDataTable
+            this.updatingDataTable === true
               ? 'Loading workflows...'
+              : this.workflowNameFilter && this.workflowNameFilter.length > 0
+              ? 'No matching workflows'
               : "<h4 class='mt-3'>No workflow found</h4>." +
                 (this.isUserLogged()
                   ? '<div class="m-2"> Click on ' +
                     '<a class=\'add-wf\' href="/dashboard;add=true"><i class="fas fa-plus-circle"></i> ' +
-                    'to add a new workflow</a> ' +
-                    '<br>or use the main search box <br>to find and subscribe to existing workflows</div>'
+                    'to register a workflow</a>' +
+                    '<br>or use the main search box to find and subscribe ' +
+                    '<br>to workflows registered by others in the community</div>'
                   : ''),
           info: 'Showing _START_ to _END_ of _TOTAL_ workflows',
           infoEmpty: 'Showing 0 to 0 of 0 workflows',
