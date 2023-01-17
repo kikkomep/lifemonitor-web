@@ -480,8 +480,10 @@ export class AppService {
           return stats;
         }),
         finalize(() => {
-          if (this._workflows && this._workflows.length == 0)
+          if (this._workflows && this._workflows.length == 0) {
             this.setLoadingWorkflows(false);
+            this.subjectWorkflows.next(this._workflows);
+          }
         })
       );
   }
