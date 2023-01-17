@@ -613,8 +613,5 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       this.queryParamsSubscription.unsubscribe();
     if (this.userLoggedSubscription) this.userLoggedSubscription.unsubscribe();
     this.logger.debug('Destroying dashboard component');
-
-    // Do not forget to unsubscribe the event
-    if (this.dtTrigger) this.dtTrigger.unsubscribe();
   }
 }
