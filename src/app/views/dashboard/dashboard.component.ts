@@ -7,18 +7,16 @@ import {
   NgZone,
   OnChanges,
   OnInit,
-  SimpleChanges,
-  ViewChild,
+  SimpleChanges
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataTableDirective } from 'angular-datatables';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  AggregatedTestStatusMap,
+  AggregatedTestStatusMap
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
@@ -57,10 +55,6 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   _browseButtonEnabled: boolean = false;
 
   private statsFilter = new StatsFilterPipe();
-
-  dtTrigger: Subject<any> = new Subject();
-  @ViewChild(DataTableDirective, { static: false })
-  dtElement: DataTableDirective;
 
   // Reference to the dataTable instance
   private workflowDataTable: any = null;
