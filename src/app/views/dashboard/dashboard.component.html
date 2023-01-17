@@ -1,4 +1,4 @@
-<app-loader [enabled]="(isLoading|async)!==false"></app-loader>
+<app-loader [enabled]="(isLoading|async)!==false" [marginTop]="500"></app-loader>
 
 <app-workflow-uploader></app-workflow-uploader>
 
@@ -30,15 +30,22 @@
     <!-- *ngIf="workflows && (isLoading|async)===false -->
     <ng-container>
       <h2 class="text-primary font-weight-light p-2">
-        <span *ngIf="!isUserLogged()">Workflows</span>
-        <span *ngIf="isUserLogged() && !searchModeEnabled" data-toggle="tooltip" data-placement="right" data-html="true"
-          title="The dashboard collects your subscribed workflows">
-          Dashboard
-        </span>
-        <div *ngIf="isUserLogged() && searchModeEnabled">
-          <ng-container *ngIf="(isLoading|async)!==false; then searchingForWorkflows; else searchResults;">
+        <div>
+          <span *ngIf="((isLoading|async)!==false) && !workflowNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
+            title="The dashboard collects your subscribed workflows">
+            {{ "Loading " + (isUserLogged() ? "Dashboard" : "Workflows") + "....."}}
+          </span>
+          <span *ngIf="(isLoading|async)===false && (!workflowNameFilter || workflowNameFilter.length==0)" data-toggle="tooltip" data-placement="right" data-html="true"
+            title="The dashboard collects your subscribed workflows">
+            {{ isUserLogged() ? "Dashboard" : "Workflows" }}
+          </span>
+        </div>
+        <div *ngIf="workflowNameFilter && workflowNameFilter.length>0">
+          <ng-container *ngIf="(isLoading|async)===true; then searchingForWorkflows; else searchResults;">
           </ng-container>
-          <ng-template #searchingForWorkflows>Searching...</ng-template>
+          <ng-template #searchingForWorkflows>
+            {{workflowNameFilter !== '______ALL_____' ? "Searching....." : "Loading....."}}
+          </ng-template>
           <ng-template #searchResults>
             <ng-container
               *ngIf="((workflows | itemFilterPipe: workflowNameFilter).length == 0); then noWorkflow; else foundWorkflows">
@@ -54,7 +61,9 @@
           <ng-template #foundWorkflows>
             <ng-container *ngIf="workflowNameFilter == '______ALL_____'; then allWorkflows; else matchingWorkflows;">
             </ng-container>
-            <ng-template #allWorkflows>Workflows found</ng-template>
+            <ng-template #allWorkflows>
+              {{ browseButtonEnabled ? 'Registered Workflows' : isUserLogged() ? "Dashboard" : "Workflows" }}              
+            </ng-template>
             <ng-template #matchingWorkflows>Workflows matching "<b>{{workflowNameFilter}}</b>"</ng-template>
           </ng-template>
         </div>
@@ -69,7 +78,7 @@
               data-placement="bottom" data-html="true"
               title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> workflows</span>">
               <!-- Loading (remove the following to stop the loading)-->
-              <div *ngIf="(isLoading|async)!==false" class="overlay dark">
+              <div *ngIf="(isLoading|async)===true" class="overlay dark">
                 <i class="fas fa-3x fa-sync-alt"></i>
               </div>
               <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_passing'"
@@ -95,7 +104,7 @@
               data-placement="bottom" data-html="true"
               title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows partially <b>passing</b></span>">
               <!-- Loading (remove the following to stop the loading)-->
-              <div *ngIf="(isLoading|async)!==false" class="overlay dark">
+              <div *ngIf="(isLoading|async)===true" class="overlay dark">
                 <i class="fas fa-3x fa-sync-alt"></i>
               </div>
               <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'some_passing'"
@@ -120,7 +129,7 @@
               data-placement="bottom" data-html="true"
               title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> workflows</span>">
               <!-- Loading (remove the following to stop the loading)-->
-              <div *ngIf="(isLoading|async)!==false" class="overlay dark">
+              <div *ngIf="(isLoading|async)===true" class="overlay dark">
                 <i class="fas fa-3x fa-sync-alt"></i>
               </div>
               <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'all_failing'"
@@ -146,7 +155,7 @@
               data-toggle="tooltip" data-placement="bottom"
               title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter workflows in <b>unknown</b> state</span>">
               <!-- Loading (remove the following to stop the loading)-->
-              <div *ngIf="(isLoading|async)!==false" class="overlay dark">
+              <div *ngIf="(isLoading|async)===true" class="overlay dark">
                 <i class="fas fa-3x fa-sync-alt"></i>
               </div>
               <div *ngIf="!(isLoading|async) && workflows && statusFilter && statusFilter != 'unknown'"
@@ -176,8 +185,9 @@
     <div class="container-fluid">
       <!-- Search Bar -->
       <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
-        [(sortingOrder)]="workflowSortingOrder" 
-        [browseButton]="true" showAllButtonName="{{isUserLogged() ? 'Dashboard': ''}}"></item-search-bar>
+        [(sortingOrder)]="workflowSortingOrder" [allowEmptySearch]="false" [searchButtonName]="'Search'"
+        (browseEnabled)="setBrowseButtonEnabled($event)" [enableBrowseButton]="isUserLogged()"
+        [goBackButtonName]="'Dashboard'"></item-search-bar>
 
       <div>
         <div class="card card-primary card-outline" [hidden]="!workflows && (isLoading|async)!==false">
@@ -298,12 +308,12 @@
                         </span>
                         <b>author<span *ngIf="w.authors.length > 1">s</span>: </b>
                         <div class="d-inline" *ngFor="let author of w.authors; index as a_index;">
-                          <div *ngIf="author.url" class="d-inline">
+                          <!-- <div *ngIf="author.url" class="d-inline">
                             <a href="{{author.url}}">{{ author.name }}</a><span class="m-0 p-0"
                               *ngIf="a_index < w.authors.length - 1">, </span>
                           </div>
                           <div *ngIf="!author.url" class="d-inline">{{ author.name }}<span class="m-0 p-0"
-                              *ngIf="a_index < w.authors.length - 1">, </span></div>
+                              *ngIf="a_index < w.authors.length - 1">, </span></div> -->
                         </div>
                       </div>
                       <div *ngIf="isUserLogged()">
@@ -359,7 +369,7 @@
                         <div class="text-muted mt-1" style="font-size: 8pt;">{{ w.type }}</div>
                       </div>
                     </td>
-                    <td class="text-center align-middle font-weight-light" style="min-width: 120px">
+                    <td class="text-center align-middle font-weight-light" style="min-width: auto;">
                       <workflow-version-selector [workflow]="w.workflow"
                         (loadingWorkflowVersion)="loadingWorkflowVersion($event)"
                         (workflow_version)="updateSelectedVersion($event)">
