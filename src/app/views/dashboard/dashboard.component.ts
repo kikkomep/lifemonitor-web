@@ -99,9 +99,10 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     );
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
       (workflows: Workflow[]) => {
-        this.logger.debug('X Loaded workflows: ', workflows);
+        this.logger.debug('Loaded workflows: ', workflows);
+        this.updatingDataTable = false;
         this.prepareTableData(workflows);
-        this.refreshDataTable();
+        this.refreshDataTable(false);
       }
     );
 
