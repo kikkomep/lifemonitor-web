@@ -1,5 +1,5 @@
 <div *ngIf="enabled" class="row">
-  <div id="loader">
+  <div id="loader" [ngStyle]="{ 'margin-top': marginTop + 'px' }">
     <div class="dot"></div>
     <div class="dot"></div>
     <div class="dot"></div>
