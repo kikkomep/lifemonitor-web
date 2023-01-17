@@ -513,7 +513,6 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       this.cdref.detectChanges();
       this.initDataTable();
       this.cdref.detectChanges();
-      $('.selectpicker').selectpicker();
       // $('#registryWorkflowSelector').selectpicker('refresh');
     } finally {
       if (resetTableStatus) this.updatingDataTable = false;
