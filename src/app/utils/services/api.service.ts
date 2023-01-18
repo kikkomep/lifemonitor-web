@@ -33,11 +33,10 @@ export class ApiService {
     this.logger.debug('API Service created');
   }
 
-  private get_http_options(params = {}, skip: boolean = false) {
+  private get_http_options(params = {}) {
     let token = JSON.parse(localStorage.getItem('token'));
     let http_headers = {
-      // 'Content-Type':  'application/json',
-      skip: String(skip),
+      'Content-Type': 'text/plain',
     };
     if (token) {
       http_headers['Authorization'] = 'Bearer ' + token['token']['value'];
@@ -827,7 +826,7 @@ export class ApiService {
     workflow: WorkflowVersion
   ): Observable<boolean> {
     return this.http
-      .head(workflow.downloadLink, this.get_http_options({}, true))
+      .head(workflow.downloadLink, this.get_http_options({}))
       .pipe(
         map((result) => {
           this.logger.debug('Result: ', result);
