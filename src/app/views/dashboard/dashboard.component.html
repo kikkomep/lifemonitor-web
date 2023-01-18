@@ -62,7 +62,7 @@
             <ng-container *ngIf="workflowNameFilter == '______ALL_____'; then allWorkflows; else matchingWorkflows;">
             </ng-container>
             <ng-template #allWorkflows>
-              {{ browseButtonEnabled ? 'Registered Workflows' : isUserLogged() ? "Dashboard" : "Workflows" }}              
+              {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' :  isUserLogged() ? "Dashboard" : "Workflows" }}              
             </ng-template>
             <ng-template #matchingWorkflows>Workflows matching "<b>{{workflowNameFilter}}</b>"</ng-template>
           </ng-template>
