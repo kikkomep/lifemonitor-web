@@ -7,7 +7,7 @@ import {
   NgZone,
   OnChanges,
   OnInit,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -16,7 +16,7 @@ import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  AggregatedTestStatusMap
+  AggregatedTestStatusMap,
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
@@ -527,7 +527,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
         paging: true,
         lengthChange: true,
         lengthMenu: [5, 10, 20, 50, 75, 100],
-        searching: true,
+        searching: false,
         ordering: true,
         order: [[1, 'asc']],
         columnDefs: [
