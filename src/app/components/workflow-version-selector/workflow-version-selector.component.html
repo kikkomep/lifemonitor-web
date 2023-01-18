@@ -17,7 +17,9 @@
             v.name +
             (v.isLatest
               ? '<span class=\'mx-2 badge badge-success\' style=\'font-size: 0.8em;\'>latest</span>'
-              : '<span style=\'color: white;\'>old</span>')
+              : '<span class=\'max-2\' style=\'display: block; min-width: ' +
+                (workflow.currentVersion.version['version'].length + 7) +
+                'ch;\'> </span>')
           "
         ></option>
       </ng-container>
