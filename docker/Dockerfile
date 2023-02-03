@@ -16,7 +16,7 @@ RUN npm install -g @angular/cli@11.2.14 && npm ci
 COPY  . .
 
 # Build front-end for production deployments
-RUN ng build --prod
+RUN ng build --configuration production
 
 
 ##############################################################
