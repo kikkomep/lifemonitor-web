@@ -45,7 +45,11 @@
               "./node_modules/datatables.net-buttons/js/buttons.print.min.js",
               "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
               "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
-            ]
+            ],
+            "webWorkerTsConfig": "tsconfig.worker.json",
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json",
+            "allowedCommonJsDependencies": ["deep-equal", "crypto-js"]
           },
           "configurations": {
             "production": {
@@ -75,6 +79,14 @@
                 }
               ]
             }
+          },
+          "development": {
+            "buildOptimizer": false,
+            "optimization": false,
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "sourceMap": true,
+            "namedChunks": true
           }
         },
         "serve": {
@@ -85,8 +97,12 @@
           "configurations": {
             "production": {
               "browserTarget": "lifemonitor:build:production"
+            },
+            "development": {
+              "browserTarget": "lifemonitor:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -103,7 +119,8 @@
             "karmaConfig": "karma.conf.js",
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "webWorkerTsConfig": "tsconfig.worker.json"
           }
         },
         "lint": {
