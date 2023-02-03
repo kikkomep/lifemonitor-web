@@ -159,6 +159,7 @@ export class AuthHandler {
 
   public async logout(notify: boolean = true) {
     await this.deleteToken();
+    this._token = null;
     this.oauth.reset();
     this._isUserLogged = false;
     if (notify) this._userLogged.next(false);
@@ -167,6 +168,7 @@ export class AuthHandler {
   public refreshToken() {
     this.deleteToken().then(() => {
       this.oauth.reset();
+      this._token = null;
       this._isUserLogged = false;
       this._userLogged.next(false);
       this.login();
