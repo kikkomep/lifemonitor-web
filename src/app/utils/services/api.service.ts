@@ -7,7 +7,7 @@ import {
   of,
   Subject,
   Subscription,
-  throwError
+  throwError,
 } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { UserNotification } from 'src/app/models/notification.model';
@@ -15,7 +15,7 @@ import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import {
   AggregatedStatusStats,
   InstanceStats,
-  Status
+  Status,
 } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { TestBuild } from 'src/app/models/testBuild.models';
@@ -248,7 +248,9 @@ export class ApiService {
 
   get_current_user_notifications(): Observable<Array<UserNotification>> {
     return (
-      this.doGet('/users/current/notifications')
+      this.doGet('/users/current/notifications', {
+        cacheEntry: 'userNotifications',
+      })
         // this.http
         //   .get(
         //     this.apiBaseUrl + '/users/current/notifications',
@@ -291,6 +293,7 @@ export class ApiService {
           for (let n of notifications) {
             n.read = readTime;
           }
+          this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
           this.logger.debug('Notifications updated');
           return notifications;
         }),
@@ -310,6 +313,7 @@ export class ApiService {
       .pipe(
         retry(3),
         tap(() => {
+          this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
           this.logger.debug('Notification deleted');
         }),
         catchError(this.handleError('Deleting notification', []))
@@ -329,6 +333,7 @@ export class ApiService {
       .pipe(
         retry(3),
         tap(() => {
+          this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
           this.logger.debug('Notifications deleted');
         }),
         catchError(this.handleError('Deleting notifications', []))
@@ -337,7 +342,10 @@ export class ApiService {
 
   getRegistries(): Observable<object> {
     return (
-      this.doGet('/registries', { cacheEntry: 'registries' })
+      this.doGet('/registries', {
+        cacheEntry: 'registries',
+        cacheTTL: 60 * 1000,
+      })
         // return this.http
         //   .get(this.apiBaseUrl + '/registries', this.get_http_options())
         .pipe(
@@ -358,6 +366,7 @@ export class ApiService {
     return (
       this.doGet('/registries/' + registry_uuid + '/index', {
         cacheEntry: 'registryWorkflows',
+        cacheTTL: 60 * 1000,
       })
         // return this.http
         //   .get(
@@ -384,7 +393,10 @@ export class ApiService {
   ): Observable<RegistryWorkflow> {
     return (
       this.doGet(
-        '/registries/' + registry_uuid + '/index/' + workflow_identifier
+        '/registries/' + registry_uuid + '/index/' + workflow_identifier,
+        {
+          cacheTTL: 60 * 1000,
+        }
       )
         // return this.http
         //   .get(
@@ -449,7 +461,6 @@ export class ApiService {
         }),
         tap((data) => {
           this.invalidateWorkflow(workflow.uuid, workflow.version['version']);
-          // this.invalidateListOfWorkflows();
           this.logger.debug('Workflow visibility changed to: ', data);
         })
       );
