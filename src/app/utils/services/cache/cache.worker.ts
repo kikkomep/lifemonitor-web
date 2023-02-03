@@ -12,6 +12,21 @@ const logger: Logger = LoggerManager.create('CacheWorker');
 
 let timer = null;
 
+export interface WorkerMessage {
+  type: string;
+  payload: object;
+}
+
+export class GenericWorkerMessage implements WorkerMessage {
+  type: string;
+  payload: object;
+
+  constructor(options: { type?: string; payload?: object }) {
+    this.type = options.type;
+    this.payload = options.payload;
+  }
+}
+
 async function serializeEntriesGroup(
   groupName: string,
   entries: {
