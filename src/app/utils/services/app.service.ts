@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
 import { forkJoin, Observable, Subject, Subscription } from 'rxjs';
 import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { UserNotification } from 'src/app/models/notification.model';
@@ -12,7 +13,7 @@ import { User } from 'src/app/models/user.modes';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor,
+  WorkflowVersionDescriptor
 } from 'src/app/models/workflow.model';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
@@ -30,6 +31,7 @@ export class AppService {
   private _registryWorkflows: { [uuid: string]: RegistryWorkflow[] } = {};
   private _workflows: Workflow[];
   private _workflow_versions: WorkflowVersion[];
+  private _workflow_stats: AggregatedStatusStats;
   private _workflow: WorkflowVersion;
   private _suite: Suite;
   private _testInstance: TestInstance;
@@ -37,6 +39,7 @@ export class AppService {
   private _currentUser: User;
 
   private loadingWorkflows = false;
+  private loadingWorkflowMap: { [uuid: string]: boolean } = {};
 
   // initialize data sources
   private subjectNotifications = new Subject<UserNotification[]>();
@@ -49,7 +52,12 @@ export class AppService {
   private subjectTestSuite = new Subject<Suite>();
   private subjectTestInstance = new Subject<TestInstance>();
   private subjectTestBuild = new Subject<TestBuild>();
+  private subjectLoadingWorkflow = new Subject<{
+    uuid: string;
+    loading: boolean;
+  }>();
   private subjectLoadingWorkflows = new Subject<boolean>();
+  private subjectWorkflowUpdate = new Subject<WorkflowVersion>();
 
   // initialize data observables
   private _observableNotifications = this.subjectNotifications.asObservable();
@@ -62,8 +70,9 @@ export class AppService {
   private _observableTestSuite = this.subjectTestSuite.asObservable();
   private _observableTestInstance = this.subjectTestInstance.asObservable();
   private _observableTestBuild = this.subjectTestBuild.asObservable();
+  private _observableLoadingWorkflow = this.subjectLoadingWorkflow.asObservable();
   private _observableLoadingWorkflows = this.subjectLoadingWorkflows.asObservable();
-
+  private _observableWorkflowUpdate = this.subjectWorkflowUpdate.asObservable();
   // Initialize logger
   private logger: Logger = LoggerManager.create('AppService');
 
@@ -99,19 +108,49 @@ export class AppService {
             this.logger.debug('Current user from APP', data);
             this._currentUser = data;
           });
-        } else {
-          // reload workflows
-          this.loadWorkflows(true, false, false).subscribe(
-            (data: AggregatedStatusStats) => {
-              // delete reference to the previous user
-              this._currentUser = null;
-              this._workflow = null;
-              this.logger.debug('Check workflows loaded: ', data);
-              this.subjectWorkflows.next(this._workflows);
-            }
+
+    this.subscriptions.push(
+      this.api.onWorkflowVersionUpdate.subscribe(
+        (workflowVersion: { uuid: string; version: string }) => {
+          this.logger.debug('Updating workflow: %r', workflowVersion);
+          this.logger.debug('Current list of workflows', this.workflows);
+          const workflow: Workflow = this.workflows.find(
+            (w) => w.uuid === workflowVersion.uuid
           );
+          const wv: WorkflowVersion = this.workflow_versions.find(
+            (v) =>
+              v.uuid === workflowVersion.uuid &&
+              v.version === workflowVersion.version
+          );
+
+          this.logger.debug('Found workflow:', workflow, wv);
+          if (workflow) {
+            this.setLoadingWorkflows(true);
+            this.loadWorkflowVersion(
+              workflow,
+              workflowVersion.version,
+              true,
+              true
+            )
+              .pipe(
+                map((wv: WorkflowVersion) => {
+                  workflow.addVersion(wv, true);
+                  if (
+                    workflow.currentVersion.version === workflowVersion.version
+                  ) {
+                    workflow.currentVersion = wv;
+                  }
+                  return wv;
+                })
+              )
+              .subscribe((wv: WorkflowVersion) => {
+                // this.subjectWorkflows.next(this._workflows);
+                this.subjectWorkflowUpdate.next(wv);
+                this.setLoadingWorkflows(false);
+              });
+          }
         }
-      })
+      )
     );
 
     // get user data if already logged
@@ -242,6 +281,17 @@ export class AppService {
 
   public get testBuilds(): TestBuild {
     return this._testBuild;
+  }
+
+  public get observableWorkflowUpdate(): Observable<WorkflowVersion> {
+    return this._observableWorkflowUpdate;
+  }
+
+  public get observableLoadingWorkflow(): Observable<{
+    uuid: string;
+    loading: boolean;
+  }> {
+    return this._observableLoadingWorkflow;
   }
 
   public get observableUserLogged(): Observable<boolean> {
@@ -493,25 +543,38 @@ export class AppService {
       );
   }
 
+  private updateLoadingStateOfWorkflow(uuid: string, loading: boolean) {
+    this.loadingWorkflowMap[uuid] = loading;
+    this.subjectLoadingWorkflow.next({ uuid: uuid, loading: loading });
+  }
+
   loadWorkflowVersion(
     w: Workflow,
     version: string = 'latest',
-    status: boolean = false
+    status: boolean = false,
+    useCache: boolean = true
   ): Observable<WorkflowVersion> {
+    this.updateLoadingStateOfWorkflow(w.uuid, true);
     return this.api
       .get_workflow_version(w.uuid, version, {
         previous_versions: true,
         ro_crate: true,
         load_status: status,
         load_suites: true,
+        use_cache: useCache,
       })
       .pipe(
         map((workflow_version: WorkflowVersion) => {
           this.logger.debug('Loaded workflow version data:', workflow_version);
-          //w.update(wdata);
-          //w.suites = wdata.suites;
+          // w.update(workflow_version);
+          // w.suites = wdata.suites;
           this.logger.debug('Workflow data updated!');
           return workflow_version;
+        }),
+        finalize(() => {
+          setTimeout(() => {
+            this.updateLoadingStateOfWorkflow(w.uuid, false);
+          }, 500);
         })
       );
   }
