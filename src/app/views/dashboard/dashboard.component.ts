@@ -242,6 +242,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.logger.debug('Browse button enabled');
     this.updatingDataTable = true;
 
+    this.editModeEnabled = false;
     this._workflowStats.clear();
     this.workflowDataTable.clear();
     this.filteredWorkflows = [];
