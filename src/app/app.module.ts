@@ -6,8 +6,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 import { ChartsModule } from 'ng2-charts';
 import { ToastrModule } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppButtonComponent } from './components/app-button/app-button.component';
@@ -21,6 +23,7 @@ import { TestInstancesComponent } from './components/test-instances/test-instanc
 import { TestSuitesComponent } from './components/test-suites/test-suites.component';
 import { WorkflowHeaderComponent } from './components/workflow-header/workflow-header.component';
 import { WorkflowUploaderComponent } from './components/workflow-uploader/workflow-uploader.component';
+import { WorkflowVersionSelectorComponent } from './components/workflow-version-selector/workflow-version-selector.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { FooterComponent } from './pages/main/footer/footer.component';
@@ -37,16 +40,13 @@ import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SortingNotificationFilterPipe } from './utils/filters/sorting-notification-filter.pipe';
 import { StatsFilterPipe } from './utils/filters/stats-filter.pipe';
+import { TrimPipe } from './utils/filters/trim.pipe';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
 import { AppConfigService } from './utils/services/config.service';
 import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
-import { WorkflowVersionSelectorComponent } from './components/workflow-version-selector/workflow-version-selector.component';
-import { TrimPipe } from './utils/filters/trim.pipe';
-
-
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -123,4 +123,4 @@ export function initConfigService(appConfig: AppConfigService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
