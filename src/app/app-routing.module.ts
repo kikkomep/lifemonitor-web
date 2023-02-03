@@ -5,8 +5,10 @@ import { AuthService } from 'src/app/utils/services/auth.service';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { MainComponent } from './pages/main/main.component';
-import { AuthGuard } from './utils/guards/auth.guard';
 import { Logger, LoggerManager } from './utils/logging';
+import { ApiService } from './utils/services/api.service';
+import { FetchError } from './utils/services/cache/cache-manager';
+import { InputDialogService } from './utils/services/input-dialog.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
@@ -64,7 +66,12 @@ export class AppRoutingModule {
 
   private logger: Logger = LoggerManager.create('AppRoutingModule');
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private apiService: ApiService,
+    private router: Router,
+    private inputDialogService: InputDialogService
+  ) {
     this.userLoggedSubscription = this.authService
       .userLoggedAsObservable()
       .subscribe((userLogged) => {
@@ -75,6 +82,44 @@ export class AppRoutingModule {
           this.logger.debug('User logged out...');
         }
       });
+
+    this.apiService.onAuthorizationError = (error: FetchError) => {
+      this.logger.warn('Authorization error detected', error);
+      this.authService.checkIsUserLogged().then((isUserLogged) => {
+        if (isUserLogged) {
+          this.authService.logout(false).then(() => {
+            this.inputDialogService.show({
+              question: 'Session Expired',
+              description: 'You need to relogin',
+              confirmText: 'Login',
+              iconClass: 'fas fa-user-clock',
+              enableCancel: true,
+              onCancel: () => {
+                window.location.reload();
+              },
+              onConfirm: () => {
+                this.router.navigateByUrl('/login');
+              },
+            });
+          });
+        }
+      });
+    };
+
+    this.apiService.onError = (error: FetchError) => {
+      this.logger.warn('Generic error detected', error);
+      this.inputDialogService.show({
+        question: 'Ops...',
+        description: 'Something went wrong!',
+        confirmText: 'Login',
+        cancelText: 'Close',
+        iconClass: 'fas fa-exclamation-triangle',
+        enableCancel: true,
+        onCancel: () => {
+          window.location.reload();
+        },
+      });
+    };
   }
 
   handleRedirect(redirectTo: string = null) {
