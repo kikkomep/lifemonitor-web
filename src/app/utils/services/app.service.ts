@@ -108,6 +108,26 @@ export class AppService {
             this.logger.debug('Current user from APP', data);
             this._currentUser = data;
           });
+        }
+        // reload workflows
+        // this.loadWorkflows(true, logged, logged).subscribe(
+        //   (data: AggregatedStatusStats) => {
+        //     alert("Logged: " + logged);
+        //     // delete reference to the previous user
+        //     this._currentUser = null;
+        //     this._workflow = null;
+        //     this.logger.debug('Check workflows loaded: ', data);
+        //     this.subjectWorkflows.next(this._workflows);
+        //   }
+        // );
+      })
+    );
+
+    // this.subscriptions.push(
+    //   this.observableLoadingWorkflow.subscribe((w) => {
+    //     this.loadingWorkflowMap[w.uuid] = w.loading;
+    //   })
+    // );
 
     this.subscriptions.push(
       this.api.onWorkflowVersionUpdate.subscribe(
@@ -416,7 +436,7 @@ export class AppService {
     filteredByUser: boolean = undefined,
     includeSubScriptions: boolean = undefined
   ): Observable<AggregatedStatusStats> {
-    // if (this.loadingWorkflows) return of({} as AggregatedStatusStats);
+    // if (this.loadingWorkflows) return of(this);
     // if (useCache && this._workflowsStats) {
     //   this.logger.debug('Using cache', this._workflowsStats);
     //   this.subjectWorkflows.next(this._workflowsStats);
@@ -426,11 +446,11 @@ export class AppService {
     this.setLoadingWorkflows(true);
     return this.api
       .get_workflows(
-        filteredByUser !== undefined ? filteredByUser : this.isUserLogged(),
-        includeSubScriptions !== undefined
-          ? includeSubScriptions
-          : this.isUserLogged(),
-        false
+        filteredByUser ?? this.isUserLogged(),
+        includeSubScriptions ?? this.isUserLogged(),
+        false,
+        true,
+        useCache
       )
       .pipe(
         map((data) => {
@@ -453,22 +473,25 @@ export class AppService {
             let workflow: Workflow = null;
             let workflow_version: WorkflowVersion = null;
             // Try to get workflow data from cache if it is enabled
-            if (useCache && this._workflow_versions) {
-              workflow_version = this._workflow_versions.find(
-                (e) => e['uuid'] === wdata['uuid']
-              );
-              this.logger.debug(
-                'Using data from cache for worklow: ',
-                workflow_version
-              );
-            }
+            // if (useCache && this._workflow_versions) {
+            //   workflow_version = this._workflow_versions.find(
+            //     (e) => e['uuid'] === wdata['uuid']
+            //   );
+            //   this.logger.debug(
+            //     'Using data from cache for worklow: ',
+            //     workflow_version
+            //   );
+            // }
             // Load the latest workflow version from the back-end
             // if cache is disabled or it has not been found
             if (!workflow_version) {
               this.setLoadingWorkflows(true);
               let versions_data = wdata['versions'];
-              workflow = new Workflow(wdata);
-              workflows.push(workflow);
+              workflow = workflows.find((e) => e['uuid'] === wdata['uuid']);
+              if (!workflow) {
+                workflow = new Workflow(wdata);
+                workflows.push(workflow);
+              }
               let vdata = versions_data
                 ? versions_data.find(
                     (v: { [x: string]: any }) => v['is_latest']
@@ -477,7 +500,12 @@ export class AppService {
               this.logger.warn('VDATA', vdata);
               this.logger.debug('Loading data of workflow ', workflow_version);
               queries.push(
-                this.loadWorkflowVersion(workflow, 'latest', true).pipe(
+                this.loadWorkflowVersion(
+                  workflow,
+                  'latest',
+                  true,
+                  useCache
+                ).pipe(
                   map((wv: WorkflowVersion) => ({
                     workflow: workflow,
                     version: wv,
@@ -487,8 +515,8 @@ export class AppService {
             }
             // Add workflow to the list of loaded workflows
             else {
-              workflow_versions.push(workflow_version);
               stats.add(workflow_version);
+              workflow_versions.push(workflow_version);
             }
           }
 
@@ -504,12 +532,16 @@ export class AppService {
                 data.map((wf) => {
                   const workflow: Workflow = wf.workflow;
                   const workflow_version: WorkflowVersion = wf.version;
+                  if (filteredByUser && includeSubScriptions)
+                    workflow_version.subscriptions = wf.workflow.getRawData()[
+                      'subscriptions'
+                    ];
                   workflow.addVersion(workflow_version, true);
                   workflow_versions.push(workflow_version);
-                  workflow.currentVersion = workflow_version;
                   stats.add(workflow_version);
                   this.logger.debug(
                     'Data loaded for workflow',
+                    workflow,
                     workflow_version.uuid,
                     workflow_versions,
                     stats
@@ -518,7 +550,7 @@ export class AppService {
                 this.setLoadingWorkflows(false);
               })
             )
-            .subscribe((data) => {
+            .subscribe(() => {
               // Update list of workflows and notify observers
               stats.update(workflow_versions);
               this._workflows = workflows;
@@ -527,10 +559,10 @@ export class AppService {
             });
 
           // Update list of workflows and notify observers
-          stats.update(workflow_versions);
           this._workflows = workflows;
           this._workflow_versions = workflow_versions;
-          // if(this._workflows && this.workflows.length>0)
+          stats.update(workflow_versions);
+          // if (this._workflows && this.workflows.length > 0)
           //   this.subjectWorkflows.next(this._workflows);
           return stats;
         }),
@@ -539,6 +571,7 @@ export class AppService {
             this.setLoadingWorkflows(false);
             this.subjectWorkflows.next(this._workflows);
           }
+          this.setLoadingWorkflows(false);
         })
       );
   }
