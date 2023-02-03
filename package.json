@@ -2,8 +2,8 @@
   "name": "lifemonitor",
   "version": "0.2.0",
   "scripts": {
-    "start": "ng build --configuration production && http-server -p 4202 --ssl -C ../lifemonitor@m1/certs/lm.crt -K ../lifemonitor@m1/certs/lm.key --host lm.mep.cloudns.cl dist/lifemonitor",
-    "start:dev": "ng serve --port 4200 --ssl --ssl-key ../lifemonitor@m1/certs/lm.key --ssl-cert ../lifemonitor@m1/certs/lm.crt --host lm.mep.cloudns.cl",
+    "start": "ng build --configuration production && http-server -p 4202 --ssl -C ./certs/lm.crt -K ./certs/lm.key --host lm dist/lifemonitor",
+    "start:dev": "ng serve --port 4200 --ssl --ssl-key ./certs/lm.key --ssl-cert ./certs/lm.crt --host lm",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
