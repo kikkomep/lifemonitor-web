@@ -7,7 +7,7 @@ import {
   NgZone,
   OnChanges,
   OnInit,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -16,7 +16,7 @@ import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  AggregatedTestStatusMap,
+  AggregatedTestStatusMap
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
@@ -39,6 +39,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   private _workflowStats: AggregatedStatusStats | null;
   // reference to the current subscriptions
   private workflowsStatsSubscription: Subscription;
+  private workflowUpdateSubscription: Subscription;
+  private workflowLoadingSubscription: Subscription;
+  private workflowsLoadingSubscription: Subscription;
   private userLoggedSubscription: Subscription;
   private internalParamsSubscription: Subscription;
   private queryParamsSubscription: Subscription;
@@ -61,7 +64,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   public updatingDataTable: boolean = false;
 
+  private loadingWorkflows: boolean = false;
   private loadingWorkflowVersions = [];
+  private loadingWorkflowVersionMap: { [uuid: string]: boolean } = {};
 
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
@@ -85,10 +90,12 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.userLoggedSubscription = this.appService.observableUserLogged.subscribe(
       (isUserLogged) => {
         this.updatingDataTable = true;
-        this._workflowStats.clear();
-        this.appService.loadWorkflows(false, false, false).subscribe((data) => {
-          this.logger.debug('Loaded workflows ', data);
-        });
+        if (this._workflowStats) this._workflowStats.clear();
+        this.appService
+          .loadWorkflows(true, isUserLogged, isUserLogged)
+          .subscribe((data) => {
+            this.logger.debug('Loaded workflows ', data);
+          });
       }
     );
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
@@ -97,6 +104,24 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
         this.updatingDataTable = false;
         this.prepareTableData(workflows);
         this.refreshDataTable(false);
+      }
+    );
+
+    this.workflowUpdateSubscription = this.appService.observableWorkflowUpdate.subscribe(
+      (wv: WorkflowVersion) => {
+        this.cdref.detectChanges();
+        this.prepareTableData();
+        this.logger.debug('Redraw');
+      }
+    );
+
+    this.workflowLoadingSubscription = this.appService.observableLoadingWorkflow.subscribe(
+      (w) => {
+        this.loadingWorkflowVersionMap[w.uuid] = w.loading;
+        this.cdref.detectChanges();
+        this.prepareTableData();
+        this.logger.debug('Loaded');
+        this.logger.warn('Loading workflow', w);
       }
     );
 
@@ -132,12 +157,14 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       this.refreshDataTable();
       this.appService.setLoadingWorkflows(false);
     } else {
-      this.appService
-        .loadWorkflows(true, this.isUserLogged(), this.isUserLogged())
-        .subscribe((data) => {
-          this.logger.debug('Loaded workflows ', data);
-          if (this.openUploader === true) this.openWorkflowUploader();
-        });
+      this.appService.checkIsUserLogged().then((isUserLogged) => {
+        this.appService
+          .loadWorkflows(true, isUserLogged, isUserLogged)
+          .subscribe((data) => {
+            this.logger.debug('Loaded workflows ', data);
+            if (this.openUploader === true) this.openWorkflowUploader();
+          });
+      });
     }
   }
 
@@ -168,7 +195,10 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       if (w.currentVersion) stats.add(w.currentVersion);
     });
     this.logger.debug('Initialized Stats', stats);
+    return this.prepareTableData2(stats);
+  }
 
+  private prepareTableData2(stats: AggregatedStatusStats) {
     this._workflowStats = this.statsFilter.transform(
       stats,
       this._workflowNameFilter
@@ -219,12 +249,12 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
     if (this.browseButtonEnabled) {
       this.appService
-        .loadWorkflows(false, false, this.isUserLogged())
-        .subscribe((data) => {});
+        .loadWorkflows(true, this.isUserLogged(), this.isUserLogged())
+        .subscribe((stats) => {});
     } else {
       this.appService
-        .loadWorkflows(false, this.isUserLogged(), this.isUserLogged())
-        .subscribe((data) => {});
+        .loadWorkflows(true, this.isUserLogged(), this.isUserLogged())
+        .subscribe((stats) => {});
     }
   }
 
@@ -239,6 +269,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   public isUserLogged(): boolean {
+    // alert("Logged" + this.appService.isUserLogged())
     return this.appService.isUserLogged();
   }
 
@@ -280,7 +311,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   public isLoadingWorkflowVersion(workflow: Workflow) {
-    return workflow && this.loadingWorkflowVersions.indexOf(workflow.uuid) >= 0;
+    // return workflow && this.loadingWorkflowVersions.indexOf(workflow.uuid) >= 0;
+    return this.loadingWorkflowVersionMap[workflow.uuid] ?? false;
   }
 
   public loadingWorkflowVersion(workflow: Workflow) {
@@ -539,6 +571,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
         info: true,
         autoWidth: false,
         responsive: true,
+        processing: this.appService.isLoadingWorkflows() === true,
         // "deferRender": true,
         // "scrollY": "520",
         stateSave: true,
@@ -547,7 +580,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
           searchPlaceholder: 'Filter your dashboard',
           decimal: '',
           emptyTable:
-            this.appService.isLoadingWorkflows() === true
+            this.appService.isLoadingWorkflows() === true ||
+            this.updatingDataTable
               ? 'Loading workflows...'
               : this.workflowNameFilter && this.workflowNameFilter.length > 0
               ? 'No matching workflows'
@@ -612,6 +646,11 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.queryParamsSubscription)
       this.queryParamsSubscription.unsubscribe();
     if (this.userLoggedSubscription) this.userLoggedSubscription.unsubscribe();
+
+    if (this.workflowLoadingSubscription)
+      this.workflowLoadingSubscription.unsubscribe();
+    if (this.workflowUpdateSubscription)
+      this.workflowUpdateSubscription.unsubscribe();
     this.logger.debug('Destroying dashboard component');
   }
 }

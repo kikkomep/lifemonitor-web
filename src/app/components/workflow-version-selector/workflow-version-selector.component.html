@@ -1,5 +1,9 @@
-<div *ngIf="workflow">
+<div class="text-muted" *ngIf="isLoading()">
+  <i class="fas fa-2x fa-sync-alt"></i>
+</div>
+<div *ngIf="!isLoading()">
   <select
+    [id]="selectorId"
     #selectPicker
     class="form-select selectpicker show-tick version-picker"
     data-width="fit"

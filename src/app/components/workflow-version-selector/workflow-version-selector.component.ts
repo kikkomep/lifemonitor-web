@@ -1,20 +1,21 @@
 import {
+  AfterViewChecked,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
-  ViewChild,
+  SimpleChanges
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor,
+  WorkflowVersionDescriptor
 } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
@@ -26,18 +27,19 @@ declare var $: any;
   styleUrls: ['./workflow-version-selector.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorkflowVersionSelectorComponent implements OnInit, OnChanges {
+export class WorkflowVersionSelectorComponent
+  implements OnInit, OnChanges, OnDestroy, AfterViewChecked {
   private _workflow: Workflow;
   private _versions_map: { [name: string]: WorkflowVersionDescriptor };
 
   private _workflow_version: WorkflowVersionDescriptor;
 
+  private _isLoadingSubcription: Subscription;
+
   versions: WorkflowVersionDescriptor[];
 
   @Output() workflow_version = new EventEmitter<WorkflowVersion>();
   @Output() loadingWorkflowVersion = new EventEmitter<Workflow>();
-
-  @ViewChild('searchInputText') selectPicker: ElementRef;
 
   // initialize logger
   private logger: Logger = LoggerManager.create(
@@ -47,13 +49,53 @@ export class WorkflowVersionSelectorComponent implements OnInit, OnChanges {
   constructor(
     private appService: AppService,
     private cdRef: ChangeDetectorRef
-  ) {}
+  ) {
+    this._isLoadingSubcription = this.appService.observableLoadingWorkflow.subscribe(
+      (w) => {
+        if (w.uuid === this.workflow.uuid) {
+          this.refresh(w.loading);
+        }
+      }
+    );
+  }
 
   ngOnInit(): void {}
 
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.debug('Change detected');
-    $('.selectpicker').selectpicker();
+    // this.cdRef.detectChanges();
+    // this.jquerySelector.selectpicker();
+  }
+
+  ngOnDestroy(): void {
+    if (this._isLoadingSubcription) this._isLoadingSubcription.unsubscribe();
+  }
+
+  ngAfterViewChecked(): void {
+    this.jquerySelector.selectpicker();
+  }
+
+  get selectorId(): string {
+    return `versionSelector-${this.workflow.uuid}`;
+  }
+
+  private get jquerySelector(): any {
+    return $(`#${this.selectorId}`);
+  }
+
+  refresh(isLoading?: boolean) {
+    const selector = this.jquerySelector;
+    const loading = isLoading ?? this.isLoading();
+    this.cdRef.detectChanges();
+    if (loading) {
+      selector.prop('disabled', true);
+      selector.addClass('disabled');
+    } else {
+      selector.prop('disabled', false);
+      selector.removeClass('disabled');
+    }
+    selector.selectpicker('refresh');
+    this.cdRef.detectChanges();
   }
 
   @Input()
@@ -71,6 +113,10 @@ export class WorkflowVersionSelectorComponent implements OnInit, OnChanges {
 
   get workflow(): Workflow {
     return this._workflow;
+  }
+
+  public isLoading(): boolean {
+    return this.appService.isLoadingWorkflow(this.workflow.uuid);
   }
 
   public selectVersion(version: string) {
@@ -91,6 +137,7 @@ export class WorkflowVersionSelectorComponent implements OnInit, OnChanges {
       this.workflow.currentVersion = wv;
       this.workflow_version.emit(wv);
       this.loadingWorkflowVersion.next(null);
+      this.refresh();
     }
   }
 }

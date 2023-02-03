@@ -31,11 +31,12 @@
     <ng-container>
       <h2 class="text-primary font-weight-light p-2">
         <div>
-          <span *ngIf="((isLoading|async)!==false) && !workflowNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
-            title="The dashboard collects your subscribed workflows">
+          <span *ngIf="((isLoading|async)!==false) && !workflowNameFilter" data-toggle="tooltip" data-placement="right"
+            data-html="true" title="The dashboard collects your subscribed workflows">
             {{ "Loading " + (isUserLogged() ? "Dashboard" : "Workflows") + "....."}}
           </span>
-          <span *ngIf="(isLoading|async)===false && (!workflowNameFilter || workflowNameFilter.length==0)" data-toggle="tooltip" data-placement="right" data-html="true"
+          <span *ngIf="(isLoading|async)===false && (!workflowNameFilter || workflowNameFilter.length==0)"
+            data-toggle="tooltip" data-placement="right" data-html="true"
             title="The dashboard collects your subscribed workflows">
             {{ isUserLogged() ? "Dashboard" : "Workflows" }}
           </span>
@@ -62,7 +63,8 @@
             <ng-container *ngIf="workflowNameFilter == '______ALL_____'; then allWorkflows; else matchingWorkflows;">
             </ng-container>
             <ng-template #allWorkflows>
-              {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' :  isUserLogged() ? "Dashboard" : "Workflows" }}              
+              {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" :
+              "Workflows" }}
             </ng-template>
             <ng-template #matchingWorkflows>Workflows matching "<b>{{workflowNameFilter}}</b>"</ng-template>
           </ng-template>
@@ -236,12 +238,14 @@
                     | itemFilterPipe: workflowNameFilter
                     | sortingFilter: workflowSortingOrder;
                   index as i;
-                  first as isFirst
-                " style="height: 160px;">
+                  first as isFirst                  
+                " [ngStyle]="{'height': '200px'}">
                     <td [ngClass]="w.class">
-                      <i class="{{ w.statusIcon }} fa-2x" style="margin-top: 29px;"></i>
+                      <div>
+                        <i class="{{ w.statusIcon }} fa-2x" style="margin-top: 29px;"></i>
+                      </div>
                     </td>
-                    <td class="align-top">
+                    <td class='align-top' style="min-width: 400px">
                       <div class="font-weight-light text-lg mt-4 mb-0" data-html="true">
                         <input *ngIf="w.editingMode" type="text" class="form-control datatable-input-no-border"
                           [(ngModel)]="w.name" aria-describedby="workflowNameInput" placeholder="Enter workflow name"
@@ -262,95 +266,101 @@
                           <b>uuid:</b> {{ w.uuid }}
                         </div>
                       </div>
-                      <div class="text-xs cut-text font-weight-light">
-                        <span class="icon-wrapper">
-                          <!-- <i class="fas fa-xs fa-cloud-upload-alt mr-1"></i> -->
-                          <i class="fas fa-xs fa-database mr-1"></i>
-                        </span>
-                        <b>origin: </b>
-                        <a href="{{ w.originLink }}" target="_blank">{{
-                          w.originLink
-                          }}
-                        </a>
-                      </div>
                       <div>
-                        <div *ngFor="let r of w.registries" class="text-xs cut-text font-weight-light">
-                          <span class="icon-wrapper">
-                            <i class="fa-xs fas fa-sitemap mr-1"></i>
-                          </span>
-                          <b>{{ r.name }}: </b>
-                          <a href="{{ w.getRegistryLink(r.identifier) }}" target="_blank">{{
-                            w.getRegistryLink(r.identifier)
-                            }}</a>
-                        </div>
-                      </div>
-                      <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
-                        <span class="icon-wrapper">
-                          <i class="fa-xs fas fa-sitemap mr-1"></i>
-                        </span>
-                        <b>registry ID: </b>
-                        <a href="{{ w.registryLink }}" target="_blank">{{
-                          w.registryLink
-                          }}
-                        </a>
-                      </div>
-                      <div *ngIf="w.version" class="text-xs cut-text font-weight-light">
-                        <span class="icon-wrapper">
-                          <i class="fas fa-xs fa-solid fa-user mr-1"></i>
-                        </span>
-                        <b>submitter: </b>
-                        <span>{{ w.version.submitter.username }}</span>
-                      </div>
-                      <div *ngIf="w.version && w.authors && w.authors.length > 0"
-                        class="text-xs font-weight-light">
-                        <span class="icon-wrapper">
-                          <i class="fas fa-xs fa-solid fa-users mr-1"></i>
-                        </span>
-                        <b>author<span *ngIf="w.authors.length > 1">s</span>: </b>
-                        <div class="d-inline" style="display: flex; flex-wrap: wrap;">
-                          <div class="d-inline" *ngFor="let author of w.authors; index as a_index;">
-                            
-                            <div *ngIf="author.name && author.url" class="d-inline">
-                              <a href="{{author.url}}" [innerHTML]="author.name">{{ author.name }}</a><span class="m-0 p-0"
-                                *ngIf="a_index < w.authors.length - 1">, </span>
+                        <!-- <div *ngIf="isLoadingWorkflowVersion(w)" class="overlay p-1" style="background: none;">
+                          <i class="fas fa-2x fa-sync-alt text-muted"></i>
+                        </div> -->
+                        <div *ngIf="!isLoadingWorkflowVersion(w)">
+                          <div class="text-xs cut-text font-weight-light">
+                            <span class="icon-wrapper">
+                              <!-- <i class="fas fa-xs fa-cloud-upload-alt mr-1"></i> -->
+                              <i class="fas fa-xs fa-database mr-1"></i>
+                            </span>
+                            <b>origin: </b>
+                            <a href="{{ w.originLink }}" target="_blank">{{
+                              w.originLink
+                              }}
+                            </a>
+                          </div>
+                          <div>
+                            <div *ngFor="let r of w.registries" class="text-xs cut-text font-weight-light">
+                              <span class="icon-wrapper">
+                                <i class="fa-xs fas fa-sitemap mr-1"></i>
+                              </span>
+                              <b>{{ r.name }}: </b>
+                              <a href="{{ w.getRegistryLink(r.identifier) }}" target="_blank">{{
+                                w.getRegistryLink(r.identifier)
+                                }}</a>
                             </div>
-                            <div *ngIf="author.name && !author.url" class="d-inline">{{ author.name }}<span class="m-0 p-0"
-                                *ngIf="a_index < w.authors.length - 1">, </span></div>
+                          </div>
+                          <div *ngIf="w.registry" class="text-xs cut-text font-weight-light">
+                            <span class="icon-wrapper">
+                              <i class="fa-xs fas fa-sitemap mr-1"></i>
+                            </span>
+                            <b>registry ID: </b>
+                            <a href="{{ w.registryLink }}" target="_blank">{{
+                              w.registryLink
+                              }}
+                            </a>
+                          </div>
+                          <div *ngIf="w.version" class="text-xs cut-text font-weight-light">
+                            <span class="icon-wrapper">
+                              <i class="fas fa-xs fa-solid fa-user mr-1"></i>
+                            </span>
+                            <b>submitter: </b>
+                            <span>{{ w.version.submitter.username }}</span>
+                          </div>
+                          <div *ngIf="w.version && w.authors && w.authors.length > 0" class="text-xs font-weight-light" 
+                               style="max-width: 400px !important">
+                            <span class="icon-wrapper">
+                              <i class="fas fa-xs fa-solid fa-users mr-1"></i>
+                            </span>
+                            <b>author<span *ngIf="w.authors.length > 1">s</span>: </b>
+                            <div class="d-inline" style="display: flex; flex-wrap: wrap;">
+                              <div class="d-inline" *ngFor="let author of w.authors; index as a_index;">
+                                <p *ngIf="author.name && author.url" class="d-inline">
+                                  <a href="{{author.url}}" [innerHTML]="author.name">{{ author.name }}</a><span
+                                    class="m-0 p-0" *ngIf="a_index < w.authors.length - 1">, </span>
+                                </p>
+                                <p *ngIf="author.name && !author.url" class="d-inline">{{ author.name }}<span
+                                    class="m-0 p-0" *ngIf="a_index < w.authors.length - 1">, </span></p>
+                              </div>
+                            </div>
+                          </div>
+                          <div *ngIf="isUserLogged()">
+                            <span *ngIf="w.subscriptions !== undefined">
+                              <a *ngIf="(searchModeEnabled || editModeEnabled || w.editingMode) && (!w.subscriptions || w.subscriptions.length == 0)"
+                                class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)" role="button"
+                                data-toggle="tooltip" data-placement="bottom" data-html="true"
+                                title="Click to subscribe to this workflow and add it to your dashboard">
+                                SUBSCRIBE
+                              </a>
+                              <div
+                                *ngIf="!(editModeEnabled || w.editingMode) && searchModeEnabled && (w.subscriptions && w.subscriptions.length > 0)"
+                                class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)"
+                                role="button" data-toggle="tooltip" data-placement="bottom" data-html="true"
+                                title="Click to unsubscribe from this workflow and remove it from your dashboard">
+                                SUBSCRIBED
+                              </div>
+                              <a *ngIf="(editModeEnabled || w.editingMode) && w.subscriptions && w.subscriptions.length > 0"
+                                class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)"
+                                role="button" data-toggle="tooltip" data-placement="bottom" data-html="true"
+                                title="Click to unsubscribe from this workflow and remove it from your dashboard">
+                                UNSUBSCRIBE
+                              </a>
+                            </span>
+                            <span *ngIf="!editModeEnabled">&nbsp;</span>
                           </div>
                         </div>
-                      </div>
-                      <div *ngIf="isUserLogged()">
-                        <span *ngIf="w.subscriptions !== undefined">
-                          <a *ngIf="(searchModeEnabled || editModeEnabled || w.editingMode) && (!w.subscriptions || w.subscriptions.length == 0)"
-                            class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(w)" role="button"
-                            data-toggle="tooltip" data-placement="bottom" data-html="true"
-                            title="Click to subscribe to this workflow and add it to your dashboard">
-                            SUBSCRIBE
-                          </a>
-                          <div
-                            *ngIf="!(editModeEnabled || w.editingMode) && searchModeEnabled && (w.subscriptions && w.subscriptions.length > 0)"
-                            class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)" role="button"
-                            data-toggle="tooltip" data-placement="bottom" data-html="true"
-                            title="Click to unsubscribe from this workflow and remove it from your dashboard">
-                            SUBSCRIBED
-                          </div>
-                          <a *ngIf="(editModeEnabled || w.editingMode) && w.subscriptions && w.subscriptions.length > 0"
-                            class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(w)" role="button"
-                            data-toggle="tooltip" data-placement="bottom" data-html="true"
-                            title="Click to unsubscribe from this workflow and remove it from your dashboard">
-                            UNSUBSCRIBE
-                          </a>
-                        </span>
-                        <span *ngIf="!editModeEnabled">&nbsp;</span>
                       </div>
 
                     </td>
                     <td class="text-center align-middle font-weight-light">
-                      <div *ngIf="w.public === undefined">
+                      <div *ngIf="isLoadingWorkflowVersion(w)">
                         <i class="fas fa-2x fa-sync-alt text-muted"></i>
                       </div>
-                      <div *ngIf="w.public !== undefined" data-html="true" data-toggle="tooltip" data-placement="top"
-                        class="mt-4 mr-3 align-top workflow-visibility-{{w.uuid}}"
+                      <div *ngIf="!isLoadingWorkflowVersion(w)" data-html="true" data-toggle="tooltip"
+                        data-placement="top" class="mt-4 mr-3 align-top workflow-visibility-{{w.uuid}}"
                         title="{{ getWorkflowVisibilityTitle(w) }}">
                         <i *ngIf="w.public" class="fas fa-lg fa-globe-americas"></i>
                         <i *ngIf="!w.public" class="fas fa-lg fa-user-lock"></i>
@@ -364,30 +374,34 @@
                     </td>
 
                     <td class="text-center align-middle">
-                      <div style="height: 100%; margin: 10% auto 0" data-html="true" data-toggle="tooltip"
-                        data-placement="top"
-                        title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
-                        <img *ngIf="w.typeIcon" src="{{ w.typeIcon }}" width="{{ w.typeIconSize }}" />
-                        <i *ngIf="!w.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
-                        <div class="text-muted mt-1" style="font-size: 8pt;">{{ w.type }}</div>
+                      <div *ngIf="isLoadingWorkflowVersion(w)" class="text-muted">
+                        <i class="fas fa-2x fa-sync-alt"></i>
+                      </div>
+                      <div *ngIf="!isLoadingWorkflowVersion(w)">
+                        <div style="height: 100%; margin: 10% auto 0" data-html="true" data-toggle="tooltip"
+                          data-placement="top"
+                          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{w.type}} workflow</span>">
+                          <img *ngIf="w.typeIcon" src="{{ w.typeIcon }}" width="{{ w.typeIconSize }}" />
+                          <i *ngIf="!w.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
+                          <div class="text-muted mt-1" style="font-size: 8pt;">{{ w.type }}</div>
+                        </div>
                       </div>
                     </td>
                     <td class="text-center align-middle font-weight-light" style="min-width: auto;">
                       <workflow-version-selector [workflow]="w.workflow"
-                        (loadingWorkflowVersion)="loadingWorkflowVersion($event)"
                         (workflow_version)="updateSelectedVersion($event)">
                       </workflow-version-selector>
                     </td>
-                    <td class="text-center align-middle font-weight-light" style="max-width: 150px;">
+                    <td class="text-center align-middle font-weight-light" style="min-width: 120px; max-width: 120px;">
                       <div *ngIf="w.suites && w.suites.all.length == 0" data-toggle="tooltip" data-placement="top"
                         data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
                       no test suite available<br/> for this workflow version</span>">
                         <i class="fas fa-ban fa-2x text-muted"></i>
                       </div>
-                      <div *ngIf="w.suites === undefined" class="text-muted">
+                      <div *ngIf="w.suites === undefined || isLoadingWorkflowVersion(w)" class="text-muted">
                         <i class="fas fa-2x fa-sync-alt"></i>
                       </div>
-                      <a *ngIf="w.suites && w.suites.all.length > 0"
+                      <a *ngIf="!isLoadingWorkflowVersion(w) && w.suites && w.suites.all.length > 0"
                         [routerLink]="['/workflow', { uuid: w.asUrlParam() }]">
                         <stats-pie-chart [stats]="w.suites"></stats-pie-chart>
                       </a>
@@ -398,10 +412,10 @@
                       no test build available<br/> for this workflow version</span>">
                         <i class="fas fa-ban fa-2x text-muted"></i>
                       </div>
-                      <div *ngIf="w.suites === undefined" class="text-muted">
+                      <div *ngIf="w.suites === undefined || isLoadingWorkflowVersion(w)" class="text-muted">
                         <i class="fas fa-2x fa-sync-alt"></i>
                       </div>
-                      <stats-bar-chart *ngIf="w.suites && w.suites.all.length > 0"
+                      <stats-bar-chart *ngIf="!isLoadingWorkflowVersion(w) && w.suites && w.suites.all.length > 0"
                         [stats]="w.getLatestBuilds() | arraySizeFilterPipe: 10"
                         (selectedItem)="selectTestBuild($event)">
                       </stats-bar-chart>
