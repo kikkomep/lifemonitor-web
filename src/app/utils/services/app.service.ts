@@ -127,6 +127,14 @@ export class AppService {
     return this.auth.isUserLogged();
   }
 
+  public async checkIsUserLogged(): Promise<boolean> {
+    return await this.auth.checkIsUserLogged();
+  }
+
+  public isLoadingWorkflow(uuid: string): boolean {
+    return this.loadingWorkflowMap[uuid] ?? false;
+  }
+
   public setLoadingWorkflows(value: boolean) {
     this.loadingWorkflows = value;
     this.subjectLoadingWorkflows.next(value);
@@ -148,8 +156,8 @@ export class AppService {
     return this.auth.authorize();
   }
 
-  public logout() {
-    return this.auth.logout();
+  public async logout() {
+    return await this.auth.logout();
   }
 
   public get currentUser(): User {
