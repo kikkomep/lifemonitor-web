@@ -26,7 +26,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
 import { AuthService } from './auth.service';
 import { FetchError } from './cache/cache-manager';
-import { CacheService } from './cache/cache.service';
 import { CachedHttpClientService } from './cache/cachedhttpclient.service';
 import { AppConfigService } from './config.service';
 
@@ -53,16 +52,15 @@ export class ApiService {
   constructor(
     private http: HttpClient,
     private config: AppConfigService,
-    private cacheService: CacheService,
     private cachedHttpClient: CachedHttpClientService,
     private authService: AuthService
   ) {
     this.logger.debug('API Service created');
-    this.subscription = this.cacheService.onWorkflowVersionUpdate.subscribe(
-      (v) => {
-        this.workflowVersionUpdateSubject.next(v);
-      }
-    );
+    // this.subscription = this.cacheService.onWorkflowVersionUpdate.subscribe(
+    //   (v) => {
+    //     this.workflowVersionUpdateSubject.next(v);
+    //   }
+    // );
 
     this.cachedHttpClient.onCacheEntriesGroupUpdated = (group: {
       groupName: string;
