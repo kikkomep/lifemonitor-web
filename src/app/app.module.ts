@@ -30,8 +30,9 @@ import { NotificationsDropdownMenuComponent } from './pages/main/header/notifica
 import { UserDropdownMenuComponent } from './pages/main/header/user-dropdown-menu/user-dropdown-menu.component';
 import { MainComponent } from './pages/main/main.component';
 import { MenuSidebarComponent } from './pages/main/menu-sidebar/menu-sidebar.component';
-import { RegisterComponent } from './pages/register/register.component';
+
 import { ArraySizeFilterPipe } from './utils/filters/array-size-filter.pipe';
+
 import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SortingNotificationFilterPipe } from './utils/filters/sorting-notification-filter.pipe';
@@ -65,7 +66,6 @@ export function initConfigService(appConfig: AppConfigService) {
     FooterComponent,
     MenuSidebarComponent,
     BlankComponent,
-    RegisterComponent,
     DashboardComponent,
     MessagesDropdownMenuComponent,
     NotificationsDropdownMenuComponent,
