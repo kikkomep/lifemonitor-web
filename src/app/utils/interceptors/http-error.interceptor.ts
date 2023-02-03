@@ -3,7 +3,7 @@ import {
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
-  HttpRequest
+  HttpRequest,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
@@ -16,7 +16,6 @@ import { AppConfigService } from '../services/config.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
-
   // initialize logger
   private logger: Logger = LoggerManager.create('HttpErrorInterceptor');
 
@@ -25,17 +24,21 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private authService: AuthService,
     private router: Router,
     private toastr: ToastrService
-  ) { }
+  ) {}
 
   private isOAuthError(error: HttpErrorResponse): boolean {
     this.logger.debug('Checking HTTP error: ', error);
     return (
       error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl']) &&
       (error.status == 401 ||
-        (error.status == 403 && !(
-          'title' in error.error && error.error['title'] === 'Rate Limit Exceeded'
-          || 'detail' in error.error && error.error['detail'] === 'User not authorized to get workflow data')
-        ) ||
+        (error.status == 403 &&
+          !(
+            ('title' in error.error &&
+              error.error['title'] === 'Rate Limit Exceeded') ||
+            ('detail' in error.error &&
+              error.error['detail'] ===
+                'User not authorized to get workflow data')
+          )) ||
         (error.status == 500 &&
           'extra_info' in error.error &&
           error.error['extra_info']['exception_type'] == 'OAuthError'))
@@ -58,21 +61,22 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         if (this.isOAuthError(error)) {
           this.logger.debug('Trying to reauthenticate user');
           // clear user session
-          this.authService.logout();
-          // force authentication process
-          return next.handle(request).pipe(
-            tap(
-              () => { },
-              (err: any) => {
-                if (err instanceof HttpErrorResponse) {
-                  if (!this.isOAuthError(err)) {
-                    return;
+          this.authService.logout().then(() => {
+            // force authentication process
+            return next.handle(request).pipe(
+              tap(
+                () => {},
+                (err: any) => {
+                  if (err instanceof HttpErrorResponse) {
+                    if (!this.isOAuthError(err)) {
+                      return;
+                    }
+                    this.router.navigateByUrl('/login');
                   }
-                  this.router.navigateByUrl('/login');
                 }
-              }
-            )
-          );
+              )
+            );
+          });
         }
         if (
           !request.headers.has('skip') ||
