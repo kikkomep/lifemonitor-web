@@ -283,7 +283,7 @@ export class CacheManager {
   ) {
     const request = entry.request;
     let response = entry.response;
-    logger.log(Date.now() - request.cacheCreatedAt, request.cacheCreatedAt);
+    logger.log("Check date", Date.now() - request.cacheCreatedAt, request.cacheCreatedAt);
     if (
       !ignoreTTL &&
       request.cacheTTL > 0 &&
