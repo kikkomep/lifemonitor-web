@@ -1,10 +1,14 @@
 /// <reference lib="webworker" />
-import { WorkerMessage } from 'src/app/workers/worker.model';
+
+import { Logger, LoggerManager } from '../../logging';
 // import { AppConfigLoader } from '../config.loader';
 import { CachedRequest, CachedResponse, CacheManager } from './cache-manager';
 
 const cache = new CacheManager('api:lm');
 // const configService = new AppConfigLoader();
+
+// initialize logger
+const logger: Logger = LoggerManager.create('CacheWorker');
 
 let timer = null;
 
@@ -109,7 +113,7 @@ cache.onCacheEntryUpdated = function (
   request: CachedRequest,
   response: CachedResponse
 ) {
-  console.log('Cache entry updated');
+  logger.log('Cache entry updated');
   response.json().then((data) => {
     postMessage({
       type: 'cacheEntryUpdated',
@@ -136,7 +140,7 @@ cache.onCacheEntryDeleted = function (key: string) {
 
 addEventListener('message', ({ data }) => {
   // const response = `worker response to ${data}`;
-  console.log('Worker has received message:', data);
+  logger.log('Worker has received message:', data);
   try {
     const message: WorkerMessage = data as WorkerMessage;
     if (message.type === 'start')
@@ -144,7 +148,7 @@ addEventListener('message', ({ data }) => {
     else if (message.type === 'stop') stop();
     else if (message.type === 'refresh') refresh();
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 });
 
@@ -153,13 +157,13 @@ postMessage({ message: 'ok' });
 function refresh() {
   try {
     const date = Date();
-    console.debug(`Refreshing data at ${date}...`);
+    logger.debug(`Refreshing data at ${date}...`);
     cache.refresh().then((data) => {
-      console.debug('Refreshed', data);
-      console.debug(`Refreshing data at ${date}... DONE`);
+      logger.debug('Refreshed', data);
+      logger.debug(`Refreshing data at ${date}... DONE`);
     });
   } catch (e) {
-    console.error(e);
+    logger.error(e);
   }
 }
 
@@ -167,13 +171,13 @@ function start(options?: { interval: number }) {
   timer = setInterval(() => {
     try {
       const date = Date();
-      console.debug(`Refreshing data at ${date}...`);
+      logger.debug(`Refreshing data at ${date}...`);
       cache.refresh().then((data) => {
-        console.debug('Refreshed', data);
-        console.debug(`Refreshing data at ${date}... DONE`);
+        logger.debug('Refreshed', data);
+        logger.debug(`Refreshing data at ${date}... DONE`);
       });
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   }, options.interval);
 }
@@ -181,9 +185,7 @@ function start(options?: { interval: number }) {
 function stop() {
   if (timer) {
     clearInterval(timer);
-    console.log('Stopped');
+    logger.log('Stopped');
     timer = null;
   }
 }
-
-
