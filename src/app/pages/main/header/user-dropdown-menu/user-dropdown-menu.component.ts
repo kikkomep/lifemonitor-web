@@ -75,8 +75,9 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout();
-    this.logger.debug('User logout... redirecting');
-    this.router.navigateByUrl('/dashboard');
+    this.authService.logout().then(() => {
+      this.logger.debug('User logout... redirecting');
+      this.router.navigateByUrl('/dashboard');
+    });
   }
 }
