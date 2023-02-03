@@ -23,6 +23,8 @@ export class InputDialogComponent implements OnInit {
   @Input() confirmText = 'Confirm';
   @Input() cancelText = 'Cancel';
   @Input() onConfirm = null;
+  @Input() enableCancel = true;
+  @Input() onCancel = null;
 
   name: string = 'inputModalDialog';
 
@@ -48,6 +50,8 @@ export class InputDialogComponent implements OnInit {
       this.confirmText = config.confirmText || this.confirmText;
       this.cancelText = config.cancelText || this.cancelText;
       this.onConfirm = config.onConfirm || null;
+      this.enableCancel = config.enableCancel || true;
+      this.onCancel = config.onCancel || null;
       this.logger.debug('shown');
     });
   }
@@ -65,6 +69,13 @@ export class InputDialogComponent implements OnInit {
       if (this.onConfirm) {
         this.onConfirm();
       }
+    } finally {
+      this.hide();
+    }
+  }
+  cancel() {
+    try {
+      if (this.onCancel) this.onCancel();
     } finally {
       this.hide();
     }

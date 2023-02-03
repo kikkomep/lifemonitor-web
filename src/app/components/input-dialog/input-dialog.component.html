@@ -26,8 +26,8 @@
       </div>
       <div class="modal-footer">
         <div class="col-md-12 text-center p-2">
-          <button type="button" class="btn btn-secondary btn-lg m-1" data-dismiss="modal" style="width: 100px;"
-            [innerHTML]="cancelText">
+          <button *ngIf="enableCancel" type="button" class="btn btn-secondary btn-lg m-1" data-dismiss="modal" style="width: 100px;"
+            [innerHTML]="cancelText" (click)="cancel()">
           </button>
           <button *ngIf="onConfirm" type="button" class="btn btn-primary btn-lg m-1" style="width: 100px;" (click)="confirm()"
             [innerHTML]="confirmText">
