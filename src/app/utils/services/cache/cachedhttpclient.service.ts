@@ -7,12 +7,11 @@ import { AuthService } from '../auth.service';
 import { AppConfigService } from '../config.service';
 import { InputDialogService } from '../input-dialog.service';
 import {
-    CachedRequest,
-    CachedRequestInit,
-    CachedResponse,
-    CacheManager
+  CachedRequest,
+  CachedRequestInit,
+  CachedResponse,
+  CacheManager,
 } from './cache-manager';
-import { CacheService } from './cache.service';
 
 declare var $: any;
 
@@ -44,7 +43,6 @@ export class CachedHttpClientService {
   constructor(
     private http: HttpClient,
     private config: AppConfigService,
-    private cacheService: CacheService,
     private dialog: InputDialogService,
     private authService: AuthService
   ) {
@@ -131,17 +129,15 @@ export class CachedHttpClientService {
           console.error(e);
         }
       };
-      this.worker.postMessage({ message: 'hello WorkerTS' });
-
-      // if (!document.hidden) {
-      //   setTimeout(() => {
-      //     this.worker.postMessage({ type: 'refresh' });
-      //   }, 20000);
-      //   this.enableBackgroundRefresh(this.syncInterval);
-      // }
-      // document.addEventListener('visibilitychange', (e) =>
-      //   this.onVisibilityChanged(e)
-      // );
+      if (!document.hidden) {
+        setTimeout(() => {
+          this.worker.postMessage({ type: 'refresh' });
+        }, 20000);
+        this.enableBackgroundRefresh(this.syncInterval);
+      }
+      document.addEventListener('visibilitychange', (e) =>
+        this.onVisibilityChanged(e)
+      );
     } else {
       // Web Workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.
@@ -268,28 +264,11 @@ export class CachedHttpClientService {
       headers: headers,
     };
 
-    // console.debug('Cache Request Init', init);
-
     return from(
       this.cache.fetch(input.toString(), init).then(async (r) => {
         const v = await r.json();
         return v as T;
       })
-      // .catch((error: FetchError) => {
-      //   this.logger.error('Detected client error X', error);
-      //   console.debug('ERROR', error.response);
-      //   if (error.status === 401 && error.statusText === 'UNAUTHORIZED') {
-      //     this.logger.warn('Authorization error detected');
-
-      //     const isUserLogged = this.authService.isUserLogged();
-      //     this.authService.logout();
-      //     if (isUserLogged) {
-      //       this.r
-      //     }
-      //   }
-
-      //   throw error;
-      // })
     );
   }
 
