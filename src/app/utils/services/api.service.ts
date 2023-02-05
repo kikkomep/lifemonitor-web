@@ -217,8 +217,6 @@ export class ApiService {
     const base_path = options.base_path ?? this.apiBaseUrl;
     const httpOptions = options.http_options ?? this.get_http_options();
     const url: string = `${base_path}${path}`;
-    // console.log('URL', url);
-    // console.debug('Check headers', httpOptions);
 
     return this.cachedHttpClient
       .get<T>(url, {

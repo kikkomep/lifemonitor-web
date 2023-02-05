@@ -246,15 +246,21 @@ export class CachedHttpClientService {
     }
 
     const input = new URL(url);
-    if (options.params instanceof HttpParams) {
-      for (let k of options.params.keys()) {
-        if (typeof options.params[k] === 'string') {
+    if (options.params) {
+      if (options.params instanceof HttpParams) {
+        for (let k of options.params.keys()) {
+          if (typeof options.params[k] === 'string') {
+            input.searchParams.append(k, options.params[k] as string);
+          } else {
+            input.searchParams.append(
+              k,
+              (options.params[k] as string[]).join(',')
+            );
+          }
+        }
+      } else {
+        for (let k in options.params) {
           input.searchParams.append(k, options.params[k] as string);
-        } else {
-          input.searchParams.append(
-            k,
-            (options.params[k] as string[]).join(',')
-          );
         }
       }
     }
