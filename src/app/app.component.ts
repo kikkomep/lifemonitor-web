@@ -18,6 +18,9 @@ export class AppComponent {
       .on('mouseout', '[data-toggle="tooltip"]', function () {
         $(this).tooltip('hide');
       })
+      .on('keyup', '[data-toggle="tooltip"]', function () {
+        $(this).tooltip('hide');
+      })
       .on('click', '[data-toggle="tooltip"]', function () {
         $(this).tooltip('hide');
       });

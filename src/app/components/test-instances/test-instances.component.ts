@@ -80,7 +80,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
       "paging": true,
       "lengthChange": true,
       "lengthMenu": [5, 10, 20, 50, 75, 100],
-      "searching": true,
+      "searching": false,
       "ordering": true,
       "order": [[1, 'asc']],
       "columnDefs": [{

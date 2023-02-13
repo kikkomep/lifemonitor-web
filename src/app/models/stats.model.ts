@@ -9,10 +9,10 @@ export const AggregatedTestStatus = [
 ];
 
 export const AggregatedTestStatusMap = {
-  'all_failing': ['failing', 'all_failing', 'allfailing'],
-  'all_passing': ['passing', 'all_passing', 'allpassing'],
-  'some_passing': ['some_passing', 'somepassing'],
-  'unknown': ['unavailable', 'unknown']
+  all_failing: ['failing', 'all_failing', 'allfailing'],
+  all_passing: ['passing', 'all_passing', 'allpassing'],
+  some_passing: ['some_passing', 'somepassing'],
+  unknown: ['unavailable', 'unknown'],
 };
 
 export const TestStatus = [
