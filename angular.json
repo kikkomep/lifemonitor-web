@@ -22,7 +22,6 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": true,
             "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               "./node_modules/chart.js/dist/Chart.min.css",
@@ -46,10 +45,16 @@
               "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
               "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
             ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true,
             "webWorkerTsConfig": "tsconfig.worker.json",
             "serviceWorker": true,
             "ngswConfigPath": "ngsw-config.json",
-            "allowedCommonJsDependencies": ["deep-equal", "crypto-js"]
+            "allowedCommonJsDependencies": ["deep-equal", "crypto-js", "chartjs"]
           },
           "configurations": {
             "production": {
@@ -80,6 +85,7 @@
               ]
             }
           },
+          "defaultConfiguration": "",
           "development": {
             "buildOptimizer": false,
             "optimization": false,
