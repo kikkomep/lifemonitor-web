@@ -54,7 +54,11 @@
             "webWorkerTsConfig": "tsconfig.worker.json",
             "serviceWorker": true,
             "ngswConfigPath": "ngsw-config.json",
-            "allowedCommonJsDependencies": ["deep-equal", "crypto-js", "chartjs"]
+            "allowedCommonJsDependencies": [
+              "deep-equal",
+              "crypto-js",
+              "chart.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -83,17 +87,17 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
           },
-          "defaultConfiguration": "",
-          "development": {
-            "buildOptimizer": false,
-            "optimization": false,
-            "vendorChunk": true,
-            "extractLicenses": false,
-            "sourceMap": true,
-            "namedChunks": true
-          }
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
