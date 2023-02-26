@@ -8,6 +8,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+import { SocketIoModule } from 'ngx-socket-io';
+
 import { ChartsModule } from 'ng2-charts';
 import { ToastrModule } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
@@ -43,6 +45,7 @@ import { SortingNotificationFilterPipe } from './utils/filters/sorting-notificat
 import { StatsFilterPipe } from './utils/filters/stats-filter.pipe';
 import { TrimPipe } from './utils/filters/trim.pipe';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
+import { ApiSocketService } from './utils/services/api-socket.service';
 import { AppConfigService } from './utils/services/config.service';
 import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
@@ -106,6 +109,7 @@ export function initConfigService(appConfig: AppConfigService) {
     }),
     ChartsModule,
     NgbModule,
+    SocketIoModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       // Register the ServiceWorker as soon as the application is stable
@@ -121,6 +125,7 @@ export function initConfigService(appConfig: AppConfigService) {
       deps: [AppConfigService],
       multi: true,
     },
+    ApiSocketService,
     {
       // interceptor for HTTP errors
       provide: HTTP_INTERCEPTORS,
@@ -130,4 +135,4 @@ export function initConfigService(appConfig: AppConfigService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

@@ -13,10 +13,11 @@ import { User } from 'src/app/models/user.modes';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor
+  WorkflowVersionDescriptor,
 } from 'src/app/models/workflow.model';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
+import { ApiSocketService } from './api-socket.service';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -88,9 +89,15 @@ export class AppService {
   constructor(
     private auth: AuthService,
     private api: ApiService,
-    private http: HttpClient
+    private http: HttpClient,
+    private socket: ApiSocketService
   ) {
     this.logger.debug('AppService created!');
+    this.socket.connect();
+    setInterval(() => {
+      this.socket.emit('message', { event: 'ping' });
+      this.logger.debug('Emitting...');
+    }, 2000);
 
     // subscribe for the current selected workflow
     this.subscriptions.push(
