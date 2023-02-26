@@ -22,10 +22,10 @@ RUN ng build --configuration production
 ##############################################################
 # target stage: serve angular app through NGINX
 ##############################################################
-FROM nginx:1.21.1
+FROM crs4/lifemonitor-web:base
 
 # comment user directive as master process is run as user in OpenShift anyhow
-RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
+# RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
 # Copy the compiled angular app from the 'frontend-build' stage
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy NGINX site configuration
