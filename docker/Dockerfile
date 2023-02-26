@@ -32,7 +32,8 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist/lifemonitor /app
 
 # Fix permissions
-RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx
+RUN mkdir -p /var/cache/nginx /var/log/nginx \
+    && chmod -R g+rwx /var/cache/nginx /var/run/ /var/log/nginx
 
 # Set the working dir
 WORKDIR /app
