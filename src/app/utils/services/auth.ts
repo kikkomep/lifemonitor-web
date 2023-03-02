@@ -47,14 +47,14 @@ export class AuthHandler {
 
   get oauth(): OAuth2AuthCodePKCE {
     if (!this._oauth) {
-      let baseUrl = this.config.getConfig()['apiBaseUrl'];
+      let baseUrl = this.config.apiBaseUrl;
       this._oauth = new OAuth2AuthCodePKCE({
         extraAuthorizationParams: {
           nonce: this.nonce(64),
         },
         authorizationUrl: baseUrl + '/oauth2/authorize',
         tokenUrl: baseUrl + '/oauth2/token',
-        clientId: this.config.getConfig()['clientId'],
+        clientId: this.config.clientId,
         scopes: [
           'openid',
           'user.profile',
@@ -198,7 +198,7 @@ export class AuthHandler {
   public isOAuthError(error: any): boolean {
     this.logger.debug('Checking HTTP error: ', error);
     return (
-      error.url.startsWith(this.config.getConfig()['apiBaseUrl']) &&
+      error.url.startsWith(this.config.apiBaseUrl) &&
       (error.status == 401 ||
         (error.status == 403 &&
           !(

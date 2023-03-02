@@ -29,7 +29,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   private isOAuthError(error: HttpErrorResponse): boolean {
     this.logger.debug('Checking HTTP error: ', error);
     return (
-      error.url.startsWith(this.appConfig.getConfig()['apiBaseUrl']) &&
+      error.url.startsWith(this.appConfig.apiBaseUrl) &&
       (error.status == 401 ||
         (error.status == 403 &&
           !(

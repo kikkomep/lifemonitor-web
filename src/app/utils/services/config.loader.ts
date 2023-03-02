@@ -46,4 +46,24 @@ export class AppConfigLoader {
   public getConfig() {
     return this.config;
   }
+
+  public get clientId(): string {
+    return this.config['clientId'];
+  }
+
+  public get productionMode(): boolean {
+    return this.config['production'];
+  }
+
+  public get developmentMode(): boolean {
+    return !this.config['production'];
+  }
+
+  public get apiBaseUrl(): string {
+    return this.config['apiBaseUrl'];
+  }
+
+  public get socketBaseUrl(): string {
+    return this.config['socketBaseUrl'];
+  }
 }

@@ -5,6 +5,6 @@ import { AppConfigService } from './config.service';
 @Injectable()
 export class ApiSocketService extends Socket {
   constructor(private configService: AppConfigService) {
-    super({ url: '/', options: {} });
+    super({ url: configService.socketBaseUrl, options: {} });
   }
 }

@@ -87,7 +87,7 @@ export class ApiService {
   }
 
   public get apiBaseUrl(): string {
-    return this.config.getConfig()['apiBaseUrl'];
+    return this.config.apiBaseUrl;
   }
 
   private handleWorkerMessage(

@@ -11,7 +11,7 @@ export class FooterComponent implements OnInit {
   public appVersion = packageInfo.version;
   public backendBaseUrl: string = null;
   constructor(private appConfig: AppConfigService) {
-    this.backendBaseUrl = this.appConfig.getConfig()['apiBaseUrl'];
+    this.backendBaseUrl = this.appConfig.apiBaseUrl;
   }
 
   ngOnInit() { }

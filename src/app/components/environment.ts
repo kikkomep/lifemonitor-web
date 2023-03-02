@@ -4,13 +4,12 @@
 
 export const environment = {
   production: false,
-  logLevel: "INFO",
   // 'apiBaseUrl': base URL of the LifeMonitor API instance
   //               (e.g., https://api.lifemonitor.eu)
   apiBaseUrl: '<LIFEMONITOR_API_BASE_URL>',
   // 'socketBaseUrl': base URL of the LifeMonitor Socket endpoint
   //               (e.g., https://api.lifemonitor.eu)
-  socketBaseUrl: '<LIFEMONITOR_SOCKET_BASE_URL>',
+  socketBaseUrl: 'LIFEMONITOR_SOCKET_BASE_URL>',
   // 'clientId': OAuth2 ClientID that can be obtained by registering
   //             an OAuth2 app with <LIFEMONITOR_API_BASE_URL>/profile -> OAuth Apps
   clientId: '<LIFEMONITOR_OAUTH2_CLIENT_ID>',
@@ -29,4 +28,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.

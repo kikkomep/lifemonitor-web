@@ -58,7 +58,7 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   public get profileUrl(): string {
-    return this.config.getConfig()['apiBaseUrl'] + '/account/profile?back=true';
+    return this.config.apiBaseUrl + '/account/profile?back=true';
   }
 
   public openProfile() {
