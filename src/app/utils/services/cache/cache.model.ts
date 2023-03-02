@@ -1,5 +1,5 @@
 import { enc, SHA256 } from 'crypto-js';
-import { Logger, LoggerManager } from 'typescript-logger';
+import { Logger, LoggerManager } from '../../logging';
 
 /** This Web Storage API interface provides access to a particular domain's session or local storage. It allows, for example, the addition, modification, or deletion of stored data items. */
 interface Storage {

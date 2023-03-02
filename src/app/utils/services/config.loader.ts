@@ -1,6 +1,6 @@
 import { from, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Config, Logger, LoggerManager } from '../logging';
+import { Logger, LoggerManager } from '../logging';
 
 export class AppConfigLoader {
   private config: any = { ...environment };
@@ -8,7 +8,7 @@ export class AppConfigLoader {
   // initialize logger
   private logger: Logger = LoggerManager.create('AppConfigService');
 
-  constructor() {}
+  constructor() { }
 
   public loadConfig(): Observable<object> {
     if (!('configFile' in environment)) {
@@ -22,8 +22,7 @@ export class AppConfigLoader {
             .json()
             .then((data) => {
               this.config = Object.assign({}, environment, data);
-              Config.init(this.config);
-              this.logger.debug(
+              this.logger.info(
                 'Configuration updated from ' + environment['configFile'],
                 this.config
               );

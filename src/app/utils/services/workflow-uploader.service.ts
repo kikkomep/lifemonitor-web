@@ -58,11 +58,11 @@ export class WorkflowUploaderService {
     if (!url) return false;
     this.httpClient.head(url).subscribe(
       (data) => {
-        this.logger.log('Data', data);
+        this.logger.debug('Data', data);
         return true;
       },
       (err) => {
-        this.logger.log('Error', err);
+        this.logger.debug('Error', err);
         return false;
       }
     );

@@ -1,5 +1,5 @@
 import * as deepEqual from 'deep-equal';
-import { Logger, LoggerManager } from 'typescript-logger';
+import { Logger, LoggerManager } from '../../logging';
 
 export interface CachedRequestInit extends RequestInit {
   cacheEntry?: string;
@@ -191,7 +191,7 @@ export class CacheManager {
 
     const cachedReq = await this.findCachedRequestByURL(url.toString(), cache);
     if (cachedReq)
-      logger.log(
+      logger.debug(
         'Check dates',
         Date.now(),
         cachedReq.cacheCreatedAt,
@@ -253,8 +253,8 @@ export class CacheManager {
       const response = fetchResponse
         ? await fetch(request.url, { ...request })
         : null;
-      // logger.log('Cache response', rq, request, response);
-      // response.headers.forEach((v) => logger.log(v));
+      // logger.debug('Cache response', rq, request, response);
+      // response.headers.forEach((v) => logger.debug(v));
       if (response) {
         response['cacheEntry'] = request.headers?.get('cache-entry');
         response['cacheGroup'] = request.headers?.get('cache-group');
@@ -283,7 +283,7 @@ export class CacheManager {
   ) {
     const request = entry.request;
     let response = entry.response;
-    logger.log("Check date", Date.now() - request.cacheCreatedAt, request.cacheCreatedAt);
+    logger.debug("Check date", Date.now() - request.cacheCreatedAt, request.cacheCreatedAt);
     if (
       !ignoreTTL &&
       request.cacheTTL > 0 &&
@@ -302,7 +302,7 @@ export class CacheManager {
       logger.debug(`Removing ${request.url} from cache`);
       await cache.delete(request.url);
     } else {
-      // logger.log('Before updating', request);
+      // logger.debug('Before updating', request);
       const updateRequest = new Request(request.url, { ...request });
       updateRequest.headers.delete('cache-created-at');
       updateRequest.headers.append(
@@ -342,8 +342,8 @@ export class CacheManager {
           response['cacheTTL'] = Number(
             request.headers?.get('cache-TTL') ?? defaultCacheTTL
           );
-          logger.log('Updating Request', request);
-          logger.log('Updating Response', response);
+          logger.debug('Updating Request', request);
+          logger.debug('Updating Response', response);
           // if (this.onCacheEntryUpdated)
           //   this.onCacheEntryUpdated(updateRequest, response);
           return true;
@@ -363,7 +363,7 @@ export class CacheManager {
     const result: { [req: string]: Response } = {};
     const cache = await caches.open(this._cacheName);
     const entriesMap = await this.getEntries();
-    // logger.log('Entries Map', entriesMap);
+    // logger.debug('Entries Map', entriesMap);
     const entries = { ...entriesMap.requests };
     const groups = entriesMap.groups;
 
@@ -430,16 +430,16 @@ export class CacheManager {
     const entriesMap = await this.getEntries(cache, false);
     const groupEntries = entriesMap.groups[grouName];
     if (groupEntries) {
-      logger.log('Found group', groupEntries);
+      logger.debug('Found group', groupEntries);
       for (let key of groupEntries) {
-        logger.log('Trying to delete', key);
+        logger.debug('Trying to delete', key);
         const entry = entriesMap.requests[key];
         await cache.delete(entry.request.url);
         logger.debug('Delete entry', entry);
         if (notifyEntryDeletion && this.onCacheEntryDeleted)
           this.onCacheEntryDeleted(key);
       }
-      logger.log('Deleted group', grouName, groupEntries);
+      logger.debug('Deleted group', grouName, groupEntries);
       if (this.onCacheEntriesGroupDeleted)
         this.onCacheEntriesGroupDeleted(grouName, groupEntries);
       return true;

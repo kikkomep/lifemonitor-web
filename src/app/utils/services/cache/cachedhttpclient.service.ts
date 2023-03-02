@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { from, Observable, Subject, Subscription } from 'rxjs';
-import { Logger, LoggerManager } from 'typescript-logger';
+import { Logger, LoggerManager } from '../../logging';
 import { AuthService } from '../auth.service';
 import { AppConfigService } from '../config.service';
 import { InputDialogService } from '../input-dialog.service';
