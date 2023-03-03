@@ -136,49 +136,121 @@ export class AppService {
     //   })
     // );
 
-    this.subscriptions.push(
-      this.api.onWorkflowVersionUpdate.subscribe(
-        (workflowVersion: { uuid: string; version: string }) => {
-          this.logger.debug('Updating workflow: %r', workflowVersion);
-          this.logger.debug('Current list of workflows', this.workflows);
-          const workflow: Workflow = this.workflows.find(
-            (w) => w.uuid === workflowVersion.uuid
-          );
-          const wv: WorkflowVersion = this.workflow_versions.find(
-            (v) =>
-              v.uuid === workflowVersion.uuid &&
-              v.version === workflowVersion.version
-          );
-
-          this.logger.debug('Found workflow:', workflow, wv);
-          if (workflow) {
-            this.setLoadingWorkflows(true);
-            this.loadWorkflowVersion(
-              workflow,
-              workflowVersion.version,
-              true,
-              true
-            )
-              .pipe(
-                map((wv: WorkflowVersion) => {
-                  workflow.addVersion(wv, true);
-                  if (
-                    workflow.currentVersion.version === workflowVersion.version
-                  ) {
-                    workflow.currentVersion = wv;
-                  }
-                  return wv;
-                })
+    this.api.onWorkflowVersionCreated.subscribe((wf) => {
+      this.logger.debug('New workflow created', wf);
+      if (
+        this.workflow_versions.find(
+          (v) =>
+            v.uuid === wf.uuid &&
+            (v.version['version'] === wf.version ||
+              (v.version['is_latest'] && wf.version === 'latest'))
+        )
+      ) {
+        this.logger.warn('Workflow version already loaded');
+        return;
+      }
+      this.api.get_workflow(wf.uuid).subscribe((workflow) => {
+        this.api
+          .get_workflow_version(wf.uuid, wf.version, {
+            previous_versions: true,
+            ro_crate: true,
+            load_status: true,
+            load_suites: true,
+          })
+          .subscribe((workflow_version: WorkflowVersion) => {
+            if (
+              !this.workflow_versions.find(
+                (v) =>
+                  v.uuid === wf.uuid &&
+                  (v.version['version'] === wf.version ||
+                    (v.version['is_latest'] && wf.version === 'latest'))
               )
-              .subscribe((wv: WorkflowVersion) => {
-                // this.subjectWorkflows.next(this._workflows);
-                this.subjectWorkflowUpdate.next(wv);
-                this.setLoadingWorkflows(false);
-              });
-          }
+            ) {
+              this.logger.debug(
+                'workflow loaded',
+                wf,
+                workflow_version.version,
+                wf.version
+              );
+              console.debug(
+                'updated workflow',
+                wf,
+                workflow_version.version,
+                wf.version
+              );
+              workflow_version.workflow = workflow;
+              workflow.currentVersion = workflow_version;
+              this.workflow_versions.push(workflow_version);
+              this.workflows.push(workflow_version.workflow);
+              this.subjectWorkflows.next(this.workflows);
+            }
+          });
+      });
+    });
+
+    this.api.onWorkflowVersionUpdate.subscribe(
+      (workflowVersion: { uuid: string; version: string }) => {
+        this.logger.debug('Updating workflow: %r', workflowVersion);
+        this.logger.debug('Current list of workflows', this.workflows);
+        const workflow: Workflow = this.workflows.find(
+          (w) => w.uuid === workflowVersion.uuid
+        );
+        const wv: WorkflowVersion = this.workflow_versions.find(
+          (v) =>
+            v.uuid === workflowVersion.uuid &&
+            v.version === workflowVersion.version
+        );
+
+        this.logger.debug('Found workflow:', workflow, wv);
+        if (workflow) {
+          this.setLoadingWorkflows(true);
+          this.loadWorkflowVersion(
+            workflow,
+            workflowVersion.version,
+            true,
+            true
+          )
+            .pipe(
+              map((wv: WorkflowVersion) => {
+                workflow.addVersion(wv, true);
+                if (
+                  workflow.currentVersion.version === workflowVersion.version
+                ) {
+                  workflow.currentVersion = wv;
+                }
+                return wv;
+              })
+            )
+            .subscribe((wv: WorkflowVersion) => {
+              // this.subjectWorkflows.next(this._workflows);
+              this.subjectWorkflowUpdate.next(wv);
+              this.setLoadingWorkflows(false);
+            });
         }
-      )
+      }
     );
+
+    this.api.onWorkflowVersionDeleted.subscribe((wf) => {
+      this.logger.debug('Searching ', wf, this.workflow_versions);
+
+      const workflow = this.workflows.find((w) => w.uuid === wf.uuid);
+      if (!workflow) {
+        this.logger.warn('Nothing to delete: workflow deleted yet', wf);
+        return;
+      }
+      if (workflow.versions.length === 1) {
+        this.workflows.splice(this.workflows.indexOf(workflow), 1);
+        this.workflow_versions.splice(
+          this.workflow_versions.findIndex((v) => v.uuid === wf.uuid)
+        );
+      } else {
+        this.workflow_versions.splice(
+          this.workflow_versions.findIndex((v) => v.uuid === wf.uuid)
+        );
+      }
+
+      this.subjectWorkflows.next(this.workflows);
+    });
 
     // get user data if already logged
     if (this.auth.isUserLogged()) {
