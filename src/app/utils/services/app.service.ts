@@ -89,15 +89,9 @@ export class AppService {
   constructor(
     private auth: AuthService,
     private api: ApiService,
-    private http: HttpClient,
-    private socket: ApiSocketService
+    private http: HttpClient
   ) {
     this.logger.debug('AppService created!');
-    this.socket.connect();
-    setInterval(() => {
-      this.socket.emit('message', { event: 'ping' });
-      this.logger.debug('Emitting...');
-    }, 2000);
 
     // subscribe for the current selected workflow
     this.subscriptions.push(
@@ -130,11 +124,6 @@ export class AppService {
       })
     );
 
-    // this.subscriptions.push(
-    //   this.observableLoadingWorkflow.subscribe((w) => {
-    //     this.loadingWorkflowMap[w.uuid] = w.loading;
-    //   })
-    // );
 
     this.api.onWorkflowVersionCreated.subscribe((wf) => {
       this.logger.debug('New workflow created', wf);
@@ -322,8 +311,8 @@ export class AppService {
     let registry_uuid = uuid
       ? uuid
       : this._registry
-      ? this._registry.uuid
-      : null;
+        ? this._registry.uuid
+        : null;
     if (!registry_uuid) return null;
     return this._registryWorkflows[registry_uuid];
   }
@@ -345,8 +334,8 @@ export class AppService {
   public findWorkflowVersion(uuid: string, version: string): WorkflowVersion {
     return this._workflow_versions
       ? this._workflow_versions.find(
-          (w) => w.uuid === uuid && w.version['version'] === version
-        )
+        (w) => w.uuid === uuid && w.version['version'] === version
+      )
       : null;
   }
 
@@ -573,8 +562,8 @@ export class AppService {
               }
               let vdata = versions_data
                 ? versions_data.find(
-                    (v: { [x: string]: any }) => v['is_latest']
-                  )
+                  (v: { [x: string]: any }) => v['is_latest']
+                )
                 : null;
               this.logger.warn('VDATA', vdata);
               this.logger.debug('Loading data of workflow ', workflow_version);

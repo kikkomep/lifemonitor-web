@@ -56,7 +56,7 @@ export class CachedHttpClientService {
       request: CachedRequest,
       response: CachedResponse
     ) => {
-      console.log('Updated entry', request, response);
+      this.logger.debug('Updated entry', request, response);
     };
 
     this.cache.onCacheEntriesGroupUpdated = (
@@ -65,18 +65,20 @@ export class CachedHttpClientService {
         [key: string]: { request: CachedRequest; response: CachedResponse };
       }
     ) => {
-      console.log('Cache group', groupName, entries);
+      this.logger.debug('Cache group', groupName, entries);
+      const data = JSON.parse(groupName);
+      this.workflowVersionUpdateSubject.next(data);
     };
 
     this.cache.onCacheEntryDeleted = (key: string) => {
-      console.log('Cache entry DELETED', key);
+      this.logger.debug('Cache entry DELETED', key);
     };
 
     this.cache.onCacheEntriesGroupDeleted = (
       groupName: string,
       entries: Array<string>
     ) => {
-      console.log('Cache group DELETED', groupName, entries);
+      this.logger.debug('Cache group DELETED', groupName, entries);
     };
 
     // $(window)
@@ -105,9 +107,11 @@ export class CachedHttpClientService {
   public startWorker() {
     if (typeof Worker !== 'undefined') {
       // Create a new
-      this.worker = new Worker('./cache.worker', {
+      this.worker = new Worker('./cache.workerx', {
         type: 'module',
       });
+
+      this.worker.postMessage({ type: 'refresh' });
 
       this.worker.onmessage = (event) => {
         console.log('received message from worker', event.data);

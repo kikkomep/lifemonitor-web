@@ -5,8 +5,6 @@ import {
   from,
   Observable,
   of,
-  Subject,
-  Subscription,
   throwError,
 } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
@@ -38,16 +36,23 @@ export class ApiService {
   // initialize logger
   private logger: Logger = LoggerManager.create('ApiService');
 
-  private workflowVersionUpdateSubject: Subject<{
+
+  public onWorkflowVersionCreated: Observable<{
     uuid: string;
     version: string;
-  }> = new Subject<{ uuid: string; version: string }>();
+  }> = this.cachedHttpClient.onWorkflowVersionCreated;
+
   public onWorkflowVersionUpdate: Observable<{
     uuid: string;
     version: string;
-  }> = this.workflowVersionUpdateSubject.asObservable();
+  }> = this.cachedHttpClient.onWorkflowVersionUpdate;
 
-  private subscription: Subscription;
+  public onWorkflowVersionDeleted: Observable<{
+    uuid: string;
+    version: string;
+  }> = this.cachedHttpClient.onWorkflowVersionDeleted;
+
+
 
   constructor(
     private http: HttpClient,
@@ -56,34 +61,8 @@ export class ApiService {
     private authService: AuthService
   ) {
     this.logger.debug('API Service created');
-    // this.subscription = this.cacheService.onWorkflowVersionUpdate.subscribe(
-    //   (v) => {
-    //     this.workflowVersionUpdateSubject.next(v);
-    //   }
-    // );
 
-    this.cachedHttpClient.onCacheEntriesGroupUpdated = (group: {
-      groupName: string;
-      entries: {
-        [key: string]: { request: string; data: object };
-      };
-    }) => {
-      console.debug('Cache Group Updated', group);
-      try {
-        const groupData = JSON.parse(group.groupName);
-        if (groupData['type'] === 'workflow') {
-          const workflow: {
-            type: string;
-            uuid: string;
-            version: string;
-          } = groupData;
-          console.debug('Updated workflow', workflow);
-          this.workflowVersionUpdateSubject.next(workflow);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
+
   }
 
   public get apiBaseUrl(): string {
@@ -111,14 +90,6 @@ export class ApiService {
     console.log('Serving update entity event', entity);
     localStorage.removeItem(entity.key);
     localStorage.setItem(entity.key, JSON.stringify(entity.data));
-  }
-
-  private workflowVersionUpdated(workflowVersion: {
-    uuid: string;
-    version: string;
-  }) {
-    console.log('Serving update workflow update', workflowVersion);
-    this.workflowVersionUpdateSubject.next(workflowVersion);
   }
 
   private get_http_options(params = {}, skip: boolean = false) {
@@ -209,10 +180,10 @@ export class ApiService {
       cacheGroup?: string;
       cacheTTL?: number;
     } = {
-      http_options: this.get_http_options(),
-      base_path: null,
-      useCache: true,
-    }
+        http_options: this.get_http_options(),
+        base_path: null,
+        useCache: true,
+      }
   ): Observable<T> {
     const base_path = options.base_path ?? this.apiBaseUrl;
     const httpOptions = options.http_options ?? this.get_http_options();
@@ -480,9 +451,9 @@ export class ApiService {
     return this.http
       .post(
         this.apiBaseUrl +
-          '/registries/' +
-          workflow.registry.uuid +
-          '/workflows',
+        '/registries/' +
+        workflow.registry.uuid +
+        '/workflows',
         data,
         this.get_http_options()
       )
@@ -650,8 +621,8 @@ export class ApiService {
       filteredByUser && includeSubScriptions
         ? 'subscribedWorkflows'
         : !filteredByUser && includeSubScriptions
-        ? 'userScopedWorkflows'
-        : 'registeredWorkflows';
+          ? 'userScopedWorkflows'
+          : 'registeredWorkflows';
     const url: string = !filteredByUser
       ? `/workflows?status=${status}&versions=${versions}`
       : `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;
@@ -719,12 +690,12 @@ export class ApiService {
       load_status: boolean;
       use_cache?: boolean;
     } = {
-      previous_versions: false,
-      ro_crate: false,
-      load_suites: true,
-      load_status: true,
-      use_cache: true,
-    }
+        previous_versions: false,
+        ro_crate: false,
+        load_suites: true,
+        load_status: true,
+        use_cache: true,
+      }
   ): Observable<WorkflowVersion> {
     this.logger.debug('Request login');
     const workflow = this.doGet<WorkflowVersion>(
@@ -776,8 +747,8 @@ export class ApiService {
           options.load_status && options.load_suites
             ? result[2]
             : options.load_suites
-            ? result[1]
-            : []
+              ? result[1]
+              : []
         );
         this.logger.debug('The complete workflow version', w);
         return w;
