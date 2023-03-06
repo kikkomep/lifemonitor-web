@@ -1,12 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  forkJoin,
-  from,
-  Observable,
-  of,
-  throwError,
-} from 'rxjs';
+import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
@@ -36,7 +30,6 @@ export class ApiService {
   // initialize logger
   private logger: Logger = LoggerManager.create('ApiService');
 
-
   public onWorkflowVersionCreated: Observable<{
     uuid: string;
     version: string;
@@ -52,8 +45,6 @@ export class ApiService {
     version: string;
   }> = this.cachedHttpClient.onWorkflowVersionDeleted;
 
-
-
   constructor(
     private http: HttpClient,
     private config: AppConfigService,
@@ -61,8 +52,6 @@ export class ApiService {
     private authService: AuthService
   ) {
     this.logger.debug('API Service created');
-
-
   }
 
   public get apiBaseUrl(): string {
@@ -180,10 +169,10 @@ export class ApiService {
       cacheGroup?: string;
       cacheTTL?: number;
     } = {
-        http_options: this.get_http_options(),
-        base_path: null,
-        useCache: true,
-      }
+      http_options: this.get_http_options(),
+      base_path: null,
+      useCache: true,
+    }
   ): Observable<T> {
     const base_path = options.base_path ?? this.apiBaseUrl;
     const httpOptions = options.http_options ?? this.get_http_options();
@@ -451,9 +440,9 @@ export class ApiService {
     return this.http
       .post(
         this.apiBaseUrl +
-        '/registries/' +
-        workflow.registry.uuid +
-        '/workflows',
+          '/registries/' +
+          workflow.registry.uuid +
+          '/workflows',
         data,
         this.get_http_options()
       )
@@ -617,12 +606,14 @@ export class ApiService {
       filteredByUser,
       includeSubScriptions
     );
+    this.logger.warn("Getting workflows", useCache);
     const cacheKey: string =
       filteredByUser && includeSubScriptions
         ? 'subscribedWorkflows'
         : !filteredByUser && includeSubScriptions
-          ? 'userScopedWorkflows'
-          : 'registeredWorkflows';
+        ? 'userScopedWorkflows'
+        : 'registeredWorkflows';
+    this.logger.warn("Getting workflows", useCache, cacheKey);
     const url: string = !filteredByUser
       ? `/workflows?status=${status}&versions=${versions}`
       : `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;
@@ -630,7 +621,7 @@ export class ApiService {
       useCache: useCache,
       cacheKey: cacheKey,
       cacheEntry: cacheKey,
-      cacheTTL: 5,
+      // cacheTTL: 0,
     }).pipe(
       retry(3),
       tap((data) => this.logger.debug('Loaded workflows TAP: ', data)),
@@ -690,12 +681,12 @@ export class ApiService {
       load_status: boolean;
       use_cache?: boolean;
     } = {
-        previous_versions: false,
-        ro_crate: false,
-        load_suites: true,
-        load_status: true,
-        use_cache: true,
-      }
+      previous_versions: false,
+      ro_crate: false,
+      load_suites: true,
+      load_status: true,
+      use_cache: true,
+    }
   ): Observable<WorkflowVersion> {
     this.logger.debug('Request login');
     const workflow = this.doGet<WorkflowVersion>(
@@ -747,8 +738,8 @@ export class ApiService {
           options.load_status && options.load_suites
             ? result[2]
             : options.load_suites
-              ? result[1]
-              : []
+            ? result[1]
+            : []
         );
         this.logger.debug('The complete workflow version', w);
         return w;
