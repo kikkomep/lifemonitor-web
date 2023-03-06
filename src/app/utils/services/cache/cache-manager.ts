@@ -126,6 +126,7 @@ export class CacheManager {
     cache?: Cache
   ): Promise<CachedRequest> {
     cache = cache ?? (await caches.open(this._cacheName));
+    logger.debug('Searching request on cache...', url, cache);
     for (let req of await cache.keys()) {
       if (req.url === url) {
         req['cacheEntry'] = req.headers.get('cache-entry');
@@ -134,9 +135,11 @@ export class CacheManager {
           req.headers.get('cache-ttl') ?? defaultCacheTTL
         );
         req['cacheCreatedAt'] = Number(req.headers.get('cache-created-at'));
+        logger.debug('Searching request on cache: found', url, req);
         return req;
       }
     }
+    logger.debug('Searching request on cache: not found', url, cache);
     return null;
   }
 
@@ -181,6 +184,14 @@ export class CacheManager {
     };
   }
 
+  private static isExpired(cachedReq: CachedRequest): boolean {
+    return (
+      cachedReq &&
+      cachedReq.cacheTTL > 0 &&
+      Date.now() - cachedReq.cacheCreatedAt >= cachedReq.cacheTTL
+    );
+  }
+
   public async fetch(
     url: string | URL,
     init?: CachedRequestInit
@@ -190,24 +201,17 @@ export class CacheManager {
     let response = await cache.match(request.url);
 
     const cachedReq = await this.findCachedRequestByURL(url.toString(), cache);
+    logger.debug('Check cache entry:', response, cachedReq);
+    const isExpired = CacheManager.isExpired(cachedReq);
     if (cachedReq)
-      logger.debug(
-        'Check dates',
-        Date.now(),
-        cachedReq.cacheCreatedAt,
-        Date.now() - cachedReq.cacheCreatedAt
-      );
-    if (
-      !response ||
-      response.status === 0 ||
-      (cachedReq &&
-        cachedReq.cacheTTL > 0 &&
-        Date.now() - cachedReq.cacheCreatedAt >= cachedReq.cacheTTL)
-    ) {
+      logger.debug('Check cache entry expiration: expired? ', isExpired);
+
+    if (!response || response.status === 0 || isExpired) {
+      logger.debug(`Cache miss for url ${url}`);
       const oldResponse = response ? response.clone() : null;
       try {
         response = await fetch(request);
-        logger.debug('Check response', response);
+        logger.debug('Request fetch result: ', response);
         if (response && response.status >= 400 && response.status < 600)
           throw Error(`${response.status}: ${response.statusText}`);
       } catch (error) {
@@ -240,6 +244,8 @@ export class CacheManager {
           init.cacheGroup
         );
       }
+    } else {
+      logger.debug(`Cache hit for url ${url}`);
     }
     return response;
   }
@@ -249,9 +255,7 @@ export class CacheManager {
     cache = cache ?? (await caches.open(this._cacheName));
     for (const rq of await cache.keys()) {
       const request = await this.getCachedRequest(rq);
-      const response = fetchResponse
-        ? await cache.match(request.url)
-        : null;
+      const response = fetchResponse ? await cache.match(request.url) : null;
       // logger.debug('Cache response', rq, request, response);
       // response.headers.forEach((v) => logger.debug(v));
       if (response) {
@@ -282,12 +286,9 @@ export class CacheManager {
   ) {
     const request = entry.request;
     let response = entry.response;
-    logger.debug("Check date", Date.now() - request.cacheCreatedAt, request.cacheCreatedAt);
-    if (
-      !ignoreTTL &&
-      request.cacheTTL > 0 &&
-      Date.now() - request.cacheCreatedAt < request.cacheTTL
-    ) {
+    const isExpired = CacheManager.isExpired(entry.request);
+    logger.debug(`Check request expiration: expired? ${isExpired}`);
+    if (!ignoreTTL && !isExpired) {
       logger.debug('TTL not expired for request', request);
       return;
     }
@@ -296,8 +297,9 @@ export class CacheManager {
       response.status === 0 ||
       (response.status >= 400 && response.status < 600)
     ) {
-      logger.error('Error', response);
-      logger.debug(`${response.status}: ${response.statusText}`);
+      if (response) {
+        logger.error(`${response.status}: ${response.statusText}`, response);
+      }
       logger.debug(`Removing ${request.url} from cache`);
       await cache.delete(request.url);
     } else {
