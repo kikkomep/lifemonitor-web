@@ -404,6 +404,42 @@ export class CacheManager {
     return result;
   }
 
+  public async refreshCacheEntriesGroup(
+    grouName: string,
+    notifyEntryGroupUpdate: boolean = true
+  ): Promise<boolean> {
+    const cache = await caches.open(this._cacheName);
+    const entriesMap = await this.getEntries(cache, false);
+    const groupEntries = entriesMap.groups[grouName];
+    const updatedEntries: {
+      [key: string]: {
+        request: CachedRequest;
+        response: CachedResponse;
+      };
+    } = {};
+    if (groupEntries) {
+      logger.debug('Found group', groupEntries);
+      for (let key of groupEntries) {
+        logger.debug('Trying to delete', key);
+        const entry = entriesMap.requests[key];
+        if (entry) {
+          updatedEntries[key] = entry;
+          // await cache.delete(entry.request.url);
+          // logger.debug('Delete entry', entry);
+          this.refreshEntry(cache, entry);
+          logger.debug('Updated entry', entry);
+        }
+      }
+      logger.debug('Updated group', grouName, groupEntries);
+      if (this.onCacheEntriesGroupUpdated && notifyEntryGroupUpdate)
+        this.onCacheEntriesGroupUpdated(grouName, updatedEntries);
+      return true;
+    } else {
+      logger.debug(`Group ${grouName} not found`);
+    }
+    return false;
+  }
+
   public async deleteCacheEntryByURL(url: string): Promise<boolean> {
     const cache = await caches.open(this._cacheName);
     const result = await cache.delete(url);
