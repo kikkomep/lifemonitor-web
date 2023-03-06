@@ -1,9 +1,7 @@
-import { Level } from "./level";
-import { LoggerManager } from "./loggerManager";
-
+import { Level } from './level';
+import { LoggerManager } from './loggerManager';
 
 export class Display {
-
   /**
    * Method that acts as a proxy to the *console*
    * @param message The initial string after the *moduleName*; this will be enclosed in a rectangular border of the corresponding color
@@ -13,16 +11,20 @@ export class Display {
    * @param level Type of log (i.e. DEBUG, INFO, etc...)
    * @param moduleWidth Width of the logger name. If the *moduleName* is less than this spaces will be added as padding.
    */
-  static msg(message: string,
+  static msg(
+    message: string,
     params: any[],
     moduleName: string,
     moduleColor: string,
     level: Level,
-    moduleWidth: number) {
-    if (LoggerManager.isProductionMode() ||
+    moduleWidth: number
+  ) {
+    if (
+      LoggerManager.isProductionMode() ||
       !LoggerManager.isLevelAllowed(level) ||
       LoggerManager.isMuted(moduleName)
-    ) return;
+    )
+      return;
     let color: string;
     switch (level) {
       case Level.DEBUG:
@@ -51,8 +53,20 @@ export class Display {
       }
     }
 
-    let a1 = '%c ' + moduleName + '  %c ' + message + ' ';
-    let a2 = 'background: ' + moduleColor + ';color:white; border: 1px solid ' + moduleColor + '; ';
+    let a1 =
+      '%c ' +
+      moduleName +
+      '  %c ' +
+      new Date().toUTCString() +
+      ' ' +
+      message +
+      ' ';
+    let a2 =
+      'background: ' +
+      moduleColor +
+      ';color:white; border: 1px solid ' +
+      moduleColor +
+      '; ';
     let a3 = 'border: 1px solid ' + color + '; ';
     params = params[0];
     params.unshift(a3);
