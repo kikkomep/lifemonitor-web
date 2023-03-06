@@ -24,7 +24,7 @@ export class CachedHttpClientService {
   private httpOptions: object = null;
 
   // initialize logger
-  private logger: Logger = LoggerManager.create('CachedHttoClient');
+  private logger: Logger = LoggerManager.create('CachedHttpClient');
 
   private workflowVersionUpdateSubject: Subject<{
     uuid: string;

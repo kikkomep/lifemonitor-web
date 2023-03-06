@@ -57,7 +57,7 @@ export class FetchError extends Error {
 
 const defaultCacheTTL = 0; //5 * 60 * 1000;
 
-const logger: Logger = LoggerManager.create('CachedManager');
+const logger: Logger = LoggerManager.create('CacheManager');
 
 export class CacheManager {
   private _cacheName: string;
