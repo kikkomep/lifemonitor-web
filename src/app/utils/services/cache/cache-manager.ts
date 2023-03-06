@@ -55,7 +55,7 @@ export class FetchError extends Error {
   }
 }
 
-const defaultCacheTTL = -1; //5 * 60 * 1000;
+const defaultCacheTTL = 0; //5 * 60 * 1000;
 
 const logger: Logger = LoggerManager.create('CachedManager');
 
@@ -201,9 +201,8 @@ export class CacheManager {
       !response ||
       response.status === 0 ||
       (cachedReq &&
-        (cachedReq.cacheTTL === 0 ||
-          (cachedReq.cacheTTL > 0 &&
-            Date.now() - cachedReq.cacheCreatedAt >= cachedReq.cacheTTL)))
+        cachedReq.cacheTTL > 0 &&
+        Date.now() - cachedReq.cacheCreatedAt >= cachedReq.cacheTTL)
     ) {
       const oldResponse = response ? response.clone() : null;
       try {
