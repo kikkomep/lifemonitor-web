@@ -47,7 +47,7 @@ export class LoggerManager {
         LoggerManager.FIXED_WIDTH
       );
       LoggerManager.instances[name] = logger;
-      LoggerManager.mute(name, LoggerManager.isPresent(name) ? LoggerManager.isMuted(name) : LoggerManager.MUTE_ON_CREATE);
+      LoggerManager.mute(name, LoggerManager.MUTE_ON_CREATE);
       this.saveState();
     } else {
       logger = LoggerManager.instances[name];
@@ -77,12 +77,14 @@ export class LoggerManager {
   }
 
   static unMuteAllModules() {
+    LoggerManager.MUTE_ON_CREATE = false;
     for (let moduleName in LoggerManager.instances) {
       LoggerManager.mute(moduleName, false);
     }
   }
 
   static muteAllModules() {
+    LoggerManager.MUTE_ON_CREATE = true;
     for (let moduleName in LoggerManager.instances) {
       LoggerManager.mute(moduleName, true);
     }
