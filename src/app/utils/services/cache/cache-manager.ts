@@ -251,7 +251,7 @@ export class CacheManager {
     for (const rq of await cache.keys()) {
       const request = await this.getCachedRequest(rq);
       const response = fetchResponse
-        ? await fetch(request.url, { ...request })
+        ? await cache.match(request.url)
         : null;
       // logger.debug('Cache response', rq, request, response);
       // response.headers.forEach((v) => logger.debug(v));
