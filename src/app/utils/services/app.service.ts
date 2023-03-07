@@ -124,7 +124,6 @@ export class AppService {
       })
     );
 
-
     this.api.onWorkflowVersionCreated.subscribe((wf) => {
       this.logger.debug('New workflow created', wf);
       if (
@@ -147,6 +146,18 @@ export class AppService {
             load_suites: true,
           })
           .subscribe((workflow_version: WorkflowVersion) => {
+            let current_workflow = this.workflows.find(
+              (w) => w.uuid === wf.uuid
+            );
+            if (!current_workflow) {
+              current_workflow = workflow;
+              this.logger.debug(
+                `Adding workflow ${workflow.uuid} to the list of workflows`
+              );
+              this.workflows.push(workflow);
+            } else {
+              this.logger.debug('The workflow already exists');
+            }
             if (
               !this.workflow_versions.find(
                 (v) =>
@@ -156,22 +167,20 @@ export class AppService {
               )
             ) {
               this.logger.debug(
-                'workflow loaded',
+                'Workflow version loaded',
                 wf,
                 workflow_version.version,
                 wf.version
               );
-              console.debug(
-                'updated workflow',
-                wf,
-                workflow_version.version,
-                wf.version
-              );
-              workflow_version.workflow = workflow;
-              workflow.currentVersion = workflow_version;
+              workflow_version.workflow = current_workflow;
+              current_workflow.currentVersion = workflow_version;
               this.workflow_versions.push(workflow_version);
-              this.workflows.push(workflow_version.workflow);
               this.subjectWorkflows.next(this.workflows);
+              this.logger.warn('Current list of workflows', this.workflows);
+              this.logger.warn(
+                'Current list of workflow versions',
+                this.workflow_versions
+              );
             }
           });
       });
@@ -234,8 +243,16 @@ export class AppService {
         );
       } else {
         this.workflow_versions.splice(
-          this.workflow_versions.findIndex((v) => v.uuid === wf.uuid)
+          this.workflow_versions.findIndex(
+            (v) => v.uuid === wf.uuid && v.version['version'] === wf.version
+          )
         );
+        workflow.versions.splice(
+          workflow.versions.findIndex(
+            (v) => v.version['version'] === wf.version
+          )
+        );
+        workflow.currentVersion = workflow.versions[0];
       }
 
       this.subjectWorkflows.next(this.workflows);
@@ -311,8 +328,8 @@ export class AppService {
     let registry_uuid = uuid
       ? uuid
       : this._registry
-        ? this._registry.uuid
-        : null;
+      ? this._registry.uuid
+      : null;
     if (!registry_uuid) return null;
     return this._registryWorkflows[registry_uuid];
   }
@@ -334,8 +351,8 @@ export class AppService {
   public findWorkflowVersion(uuid: string, version: string): WorkflowVersion {
     return this._workflow_versions
       ? this._workflow_versions.find(
-        (w) => w.uuid === uuid && w.version['version'] === version
-      )
+          (w) => w.uuid === uuid && w.version['version'] === version
+        )
       : null;
   }
 
@@ -540,6 +557,9 @@ export class AppService {
             let wdata = data['items'][wdata_index];
             let workflow: Workflow = null;
             let workflow_version: WorkflowVersion = null;
+            // console.error("Workflow loaded XXX", wdata);
+            // alert("Check me");
+            // alert("Stop");
             // Try to get workflow data from cache if it is enabled
             // if (useCache && this._workflow_versions) {
             //   workflow_version = this._workflow_versions.find(
@@ -562,8 +582,8 @@ export class AppService {
               }
               let vdata = versions_data
                 ? versions_data.find(
-                  (v: { [x: string]: any }) => v['is_latest']
-                )
+                    (v: { [x: string]: any }) => v['is_latest']
+                  )
                 : null;
               this.logger.warn('VDATA', vdata);
               this.logger.debug('Loading data of workflow ', workflow_version);
