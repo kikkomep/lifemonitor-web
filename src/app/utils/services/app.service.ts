@@ -570,7 +570,7 @@ export class AppService {
               queries.push(
                 this.loadWorkflowVersion(
                   workflow,
-                  'latest',
+                  wdata['latest_version'],
                   true,
                   useCache
                 ).pipe(
