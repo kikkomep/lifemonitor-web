@@ -292,41 +292,42 @@ export class CacheManager {
       logger.debug('TTL not expired for request', request);
       return;
     }
-    if (
-      !response ||
-      response.status === 0 ||
-      (response.status >= 400 && response.status < 600)
-    ) {
-      if (response) {
-        logger.error(`${response.status}: ${response.statusText}`, response);
-      }
-      logger.debug(`Removing ${request.url} from cache`);
-      await cache.delete(request.url);
-    } else {
-      // logger.debug('Before updating', request);
-      const updateRequest = new Request(request.url, { ...request });
-      updateRequest.headers.delete('cache-created-at');
-      updateRequest.headers.append(
-        'cache-created-at',
-        String(Number(Date.now()))
+
+    const updateRequest = new Request(request.url, { ...request });
+    updateRequest.headers.delete('cache-created-at');
+    updateRequest.headers.append(
+      'cache-created-at',
+      String(Number(Date.now()))
+    );
+    try {
+      const updatedResponse = await fetch(request.url, { ...updateRequest });
+      await cache.put(updateRequest, updatedResponse.clone());
+      logger.debug('Check response', updatedResponse);
+      if (
+        updatedResponse &&
+        updatedResponse.status >= 400 &&
+        updatedResponse.status < 600
+      )
+        throw Error(`${updatedResponse.status}: ${updatedResponse.statusText}`);
+
+      const dataOld = response ? await response.clone().json() : {};
+      const dataNew = await updatedResponse.clone().json();
+
+      entry.request = updateRequest;
+
+      entry.response = updatedResponse.clone();
+      response = updatedResponse.clone();
+      response['cacheEntry'] = request.headers?.get('cache-entry');
+      response['cacheGroup'] = request.headers?.get('cache-group');
+      response['cacheTTL'] = Number(
+        request.headers?.get('cache-TTL') ?? defaultCacheTTL
       );
-      // response = await fetch(updateRequest);
-      try {
-        const updatedResponse = await fetch(request.url, { ...updateRequest });
-        await cache.put(updateRequest, updatedResponse.clone());
-        logger.debug('Check response', updatedResponse);
-        if (
-          updatedResponse &&
-          updatedResponse.status >= 400 &&
-          updatedResponse.status < 600
-        )
-          throw Error(
-            `${updatedResponse.status}: ${updatedResponse.statusText}`
-          );
 
-        const dataOld = await response.clone().json();
-        const dataNew = await updatedResponse.clone().json();
+      await cache.put(entry.request, entry.response);
+      logger.debug('Updated Request', request);
+      logger.debug('Updated Response', response);
 
+      if (this.onCacheEntryUpdated) {
         logger.debug(
           'Comparing objects',
           dataOld,
@@ -334,29 +335,17 @@ export class CacheManager {
           deepEqual(dataOld, dataNew)
         );
         if (!deepEqual(dataOld, dataNew)) {
-          entry.request = updateRequest;
-
-          entry.response = updatedResponse.clone();
-          response = updatedResponse.clone();
-          response['cacheEntry'] = request.headers?.get('cache-entry');
-          response['cacheGroup'] = request.headers?.get('cache-group');
-          response['cacheTTL'] = Number(
-            request.headers?.get('cache-TTL') ?? defaultCacheTTL
-          );
-          logger.debug('Updating Request', request);
-          logger.debug('Updating Response', response);
-          // if (this.onCacheEntryUpdated)
-          //   this.onCacheEntryUpdated(updateRequest, response);
+          this.onCacheEntryUpdated(updateRequest, response);
           return true;
         } else {
           logger.debug('Entry unchanged (not refreshed)', request.url);
           return false;
         }
-      } catch (error) {
-        logger.debug('Refresh entry failed', request.url);
-        await cache.delete(request.url);
-        logger.debug('Cache entry removed', request.url);
       }
+    } catch (error) {
+      logger.debug('Refresh entry failed', request.url);
+      await cache.delete(request.url);
+      logger.debug('Cache entry removed', request.url);
     }
   }
 
@@ -409,7 +398,7 @@ export class CacheManager {
     notifyEntryGroupUpdate: boolean = true
   ): Promise<boolean> {
     const cache = await caches.open(this._cacheName);
-    const entriesMap = await this.getEntries(cache, false);
+    const entriesMap = await this.getEntries(cache, true);
     const groupEntries = entriesMap.groups[grouName];
     const updatedEntries: {
       [key: string]: {
@@ -420,13 +409,13 @@ export class CacheManager {
     if (groupEntries) {
       logger.debug('Found group', groupEntries);
       for (let key of groupEntries) {
-        logger.debug('Trying to delete', key);
+        logger.debug('Trying to update', key);
         const entry = entriesMap.requests[key];
         if (entry) {
           updatedEntries[key] = entry;
           // await cache.delete(entry.request.url);
           // logger.debug('Delete entry', entry);
-          this.refreshEntry(cache, entry);
+          await this.refreshEntry(cache, entry, true);
           logger.debug('Updated entry', entry);
         }
       }
@@ -486,3 +475,15 @@ export class CacheManager {
     return false;
   }
 }
+
+// if (typeof Worker !== 'undefined') {
+//   // Create a new
+//   const worker = new Worker(new URL('./cache.worker', import.meta.url));
+//   worker.onmessage = ({ data }) => {
+//     console.log(`page got message: ${data}`);
+//   };
+//   worker.postMessage('hello');
+// } else {
+//   // Web Workers are not supported in this environment.
+//   // You should add a fallback so that your program still executes correctly.
+// }
