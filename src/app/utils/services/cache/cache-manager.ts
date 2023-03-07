@@ -250,7 +250,7 @@ export class CacheManager {
     return response;
   }
 
-  private async getEntries(cache?: Cache, fetchResponse: boolean = true) {
+  public async getEntries(cache?: Cache, fetchResponse: boolean = true) {
     const result: CacheEntriesMap = { requests: {}, groups: {} };
     cache = cache ?? (await caches.open(this._cacheName));
     for (const rq of await cache.keys()) {
