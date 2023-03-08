@@ -763,7 +763,7 @@ export class AppService {
     name: string = null,
     is_public: boolean = false,
     authorization: string = null
-  ): Observable<object> {
+  ): Observable<WorkflowVersion> {
     this.setLoadingWorkflows(true);
     return this.api
       .registerWorkflowRoCrate(
