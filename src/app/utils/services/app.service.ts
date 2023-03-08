@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { forkJoin, Observable, Subject, Subscription } from 'rxjs';
-import { catchError, finalize, map, tap } from 'rxjs/operators';
+import { catchError, finalize, map, mergeMap, tap } from 'rxjs/operators';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
