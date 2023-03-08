@@ -776,45 +776,41 @@ export class AppService {
         authorization
       )
       .pipe(
-        map((data) => {
+        mergeMap((data) => {
           this.logger.debug('Data of registered workflow', data);
-          this.api
+          return this.api
             .get_workflow_version(data['uuid'], version, {
               previous_versions: false,
               ro_crate: true,
               load_status: true,
               load_suites: true,
             })
-            .subscribe((workflow_version: WorkflowVersion) => {
-              this.logger.debug(
-                'Registered Workflow RO-Crate:',
-                workflow_version
-              );
-              this._workflow_versions.push(workflow_version);
-              this.logger.debug('Workflow data loaded!');
-              let workflow: Workflow = this.findWorkflow(uuid);
-              if (!workflow) {
-                this.api.get_workflow(uuid).subscribe((workflow: Workflow) => {
+            .pipe(
+              map((workflow_version: WorkflowVersion) => {
+                this.logger.debug(
+                  'Registered Workflow RO-Crate:',
+                  workflow_version
+                );
+                this._workflow_versions.push(workflow_version);
+                this.logger.debug('Workflow data loaded!');
+                let workflow: Workflow = this.findWorkflow(uuid);
+                if (!workflow) {
+                  this.api
+                    .get_workflow(uuid)
+                    .subscribe((workflow: Workflow) => {
+                      workflow.addVersion(workflow_version, true);
+                      this._workflows.push(workflow);
+                      this.subjectWorkflows.next(this._workflows);
+                      this.setLoadingWorkflows(false);
+                    });
+                } else {
                   workflow.addVersion(workflow_version, true);
-                  this._workflows.push(workflow);
                   this.subjectWorkflows.next(this._workflows);
                   this.setLoadingWorkflows(false);
-                });
-              } else {
-                workflow.addVersion(workflow_version, true);
-                this.subjectWorkflows.next(this._workflows);
-                this.setLoadingWorkflows(false);
-              }
-            });
-          return data;
-        }),
-        catchError((err) => {
-          this.logger.debug('Error when registering workflow', err);
-          this.setLoadingWorkflows(false);
-          throw err;
-        }),
-        finalize(() => {
-          // this.setLoadingWorkflows(false);
+                }
+                return workflow_version;
+              })
+            );
         })
       );
   }
