@@ -112,41 +112,23 @@ export class ApiService {
     return JSON.parse(groupName);
   }
 
-  private invalidateWorkflow(uuid: string, version: string) {
-    this.cachedHttpClient
-      .deleteCacheEntriesGroup(this.workflowToCacheGroup(uuid, version))
-      .then((invalidated) => {
-        this.logger.debug(
-          'Workflow cache invalidated',
-          uuid,
-          version,
-          invalidated
-        );
-        if (!invalidated) {
-          this.cachedHttpClient
-            .deleteCacheEntriesGroup(this.workflowToCacheGroup(uuid, 'latest'))
-            .then((invalidated) => {
-              this.logger.debug(
-                'Workflow cache invalidated',
-                uuid,
-                'latest',
-                invalidated
-              );
-            });
-        }
-      });
+  private async refreshWorkflow(uuid: string, version: string) {
+    await this.cachedHttpClient.refreshCacheEntriesGroup(
+      {
+        type: 'workflow',
+        uuid: uuid,
+        version: version,
+      },
+      false
+    );
   }
 
-  private invalidateListOfWorkflows() {
-    this.cachedHttpClient
-      .deleteCacheEntriesByKeys([
-        'registeredWorkflows',
-        'subscribedWorkflows',
-        'userScopedWorkflows',
-      ])
-      .then((invalidated: boolean[]) => {
-        this.logger.debug('List of workflows invalidated', invalidated);
-      });
+  private async refreshListOfWorkflows() {
+    await this.cachedHttpClient.refreshCacheEntriesByKeys([
+      'registeredWorkflows',
+      'subscribedWorkflows',
+      // 'userScopedWorkflows',
+    ]);
   }
 
   public onAuthorizationError = (error: FetchError) => {
@@ -388,12 +370,16 @@ export class ApiService {
       .pipe(
         retry(3),
         map((data) => {
-          workflow.public = !workflow.public;
-          this.logger.debug('Changed workflow name to:' + workflow.name);
+          this.refreshWorkflow(workflow.uuid, workflow.version['version']).then(
+            () => {
+              this.refreshListOfWorkflows().then(() => {
+                this.logger.debug('Changed workflow name to:' + workflow.name);
+              });
+            }
+          );
         }),
         tap((data) => {
           this.logger.debug('Check workflowVersion', workflow);
-          this.invalidateWorkflow(workflow.uuid, workflow.version['version']);
           this.logger.debug('Workflow name changed to: ', data);
         })
       );
@@ -413,12 +399,19 @@ export class ApiService {
         retry(3),
         map((data) => {
           workflow.public = !workflow.public;
+          this.refreshWorkflow(workflow.uuid, workflow.version['version']).then(
+            () => {
+              this.refreshListOfWorkflows().then(() => {
+                this.logger.debug('Changed workflow name to:' + workflow.name);
+              });
+            }
+          );
+
           this.logger.debug(
             'Changed workflow visibility: public=' + workflow.public
           );
         }),
         tap((data) => {
-          this.invalidateWorkflow(workflow.uuid, workflow.version['version']);
           this.logger.debug('Workflow visibility changed to: ', data);
         })
       );
@@ -450,7 +443,7 @@ export class ApiService {
         retry(3),
         map((wf_data) => {
           this.logger.debug('Workflow registered', wf_data);
-          this.invalidateListOfWorkflows();
+          this.refreshListOfWorkflows().then(() => {});
           return wf_data;
         })
       );
@@ -487,7 +480,7 @@ export class ApiService {
         retry(3),
         map((wf_data) => {
           this.logger.debug('Workflow registered', wf_data);
-          this.invalidateListOfWorkflows();
+          this.refreshListOfWorkflows().then(() => {});
           return wf_data;
         })
       );
@@ -506,7 +499,7 @@ export class ApiService {
         retry(3),
         map(() => {
           this.logger.debug('Workflow deleted');
-          this.invalidateListOfWorkflows();
+          this.refreshListOfWorkflows().then(() => {});
           return { uuid: uuid, version: version };
         })
       );
@@ -519,7 +512,7 @@ export class ApiService {
         retry(3),
         map(() => {
           this.logger.debug('Workflow deleted');
-          this.invalidateListOfWorkflows();
+          this.refreshListOfWorkflows().then(() => {});
           return { uuid: uuid };
         })
       );
@@ -560,8 +553,9 @@ export class ApiService {
           return workflow;
         }),
         tap((data) => {
-          this.invalidateWorkflow(workflow.uuid, workflow.version['version']);
-          this.invalidateListOfWorkflows();
+          this.refreshListOfWorkflows().then(() => {
+            this.logger.debug('Invalidated cache of workflows list');
+          });
           this.logger.debug('Workflow visibility changed to: ', data);
         })
       );
@@ -587,8 +581,9 @@ export class ApiService {
           return workflow;
         }),
         tap((data) => {
-          this.invalidateWorkflow(workflow.uuid, workflow.version['version']);
-          this.invalidateListOfWorkflows();
+          this.refreshListOfWorkflows().then(() => {
+            this.logger.debug('Invalidated cache of workflows list');
+          });
           this.logger.debug('Workflow visibility changed to: ', data);
         })
       );
@@ -606,25 +601,28 @@ export class ApiService {
       filteredByUser,
       includeSubScriptions
     );
-    this.logger.warn("Getting workflows", useCache);
+    this.logger.warn('Getting workflows', useCache);
     const cacheKey: string =
       filteredByUser && includeSubScriptions
         ? 'subscribedWorkflows'
         : !filteredByUser && includeSubScriptions
         ? 'userScopedWorkflows'
         : 'registeredWorkflows';
-    this.logger.warn("Getting workflows", useCache, cacheKey);
+    this.logger.warn('Getting workflows', useCache, cacheKey);
     const url: string = !filteredByUser
       ? `/workflows?status=${status}&versions=${versions}`
       : `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;
+    this.logger.debug('Getting workflows URL: ', url);
     return this.doGet<object>(url, {
       useCache: useCache,
       cacheKey: cacheKey,
       cacheEntry: cacheKey,
-      // cacheTTL: 0,
+      cacheTTL: 10,
     }).pipe(
       retry(3),
-      tap((data) => this.logger.debug('Loaded workflows TAP: ', data)),
+      tap((data) => {
+        this.logger.debug('Loaded workflows TAP: ', data);
+      }),
       catchError(this.handleError('get_workflows', []))
     );
   }
@@ -653,6 +651,7 @@ export class ApiService {
       `/workflows/${uuid}/versions`,
       {
         cacheMeta: { uuid: uuid },
+        cacheEntry: `${uuid}-versions`,
         cacheGroup: this.workflowToCacheGroup(uuid),
       }
     );
@@ -925,7 +924,6 @@ export class ApiService {
             return suite;
           })
         );
-        //return s;
       }),
       tap((result) => {
         this.logger.debug('Loaded suite', result);
@@ -950,8 +948,9 @@ export class ApiService {
         }),
         tap((data) => {
           this.logger.debug('Suite name changed to: ', data);
-          // this.invalidateWorkflow(workflow.uuid, workflow.version['version']);
-          // this.invalidateListOfWorkflows();
+          this.refreshListOfWorkflows().then(() => {
+            this.logger.debug('Invalidated cache of workflows list');
+          });
         })
       );
   }
