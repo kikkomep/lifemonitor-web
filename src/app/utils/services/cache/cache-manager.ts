@@ -279,29 +279,70 @@ export class CacheManager {
     return result;
   }
 
-  private async refreshEntry(
-    cache: Cache,
+  public async refreshEntryByKey(
+    entryKey: string,
+    options: {
+      cache?: Cache;
+      ignoreTTL?: boolean;
+    } = {
+      ignoreTTL: false,
+    }
+  ): Promise<boolean> {
+    const cache = options.cache ?? (await caches.open(this._cacheName));
+    const request = await this.findCachedRequestByKey(entryKey, cache);
+    if (request) {
+      const response = await cache.match(request.url);
+      logger.debug(`Cache entry ${entryKey} deleted (url: ${request.url})`);
+      return await this.refreshEntry(
+        {
+          request: request,
+          response: response,
+        },
+        options
+      );
+    } else {
+      logger.error(`Entry ${entryKey} not found`);
+      return false;
+    }
+  }
+
+  public async refreshEntry(
     entry: { request: CachedRequest; response: CachedResponse },
-    ignoreTTL: boolean = false
+    options: {
+      cache?: Cache;
+      ignoreTTL?: boolean;
+    } = {
+      ignoreTTL: false,
+    }
   ) {
     const request = entry.request;
     let response = entry.response;
     const isExpired = CacheManager.isExpired(entry.request);
+    const ignoreTTL = options.ignoreTTL ?? false;
     logger.debug(`Check request expiration: expired? ${isExpired}`);
     if (!ignoreTTL && !isExpired) {
       logger.debug('TTL not expired for request', request);
       return;
     }
 
-    const updateRequest = new Request(request.url, { ...request });
+    const updateRequest = entry.request.clone();
+    logger.debug('Check request-response', updateRequest, entry.response);
     updateRequest.headers.delete('cache-created-at');
     updateRequest.headers.append(
       'cache-created-at',
       String(Number(Date.now()))
     );
+
+    const cache = options.cache ?? (await caches.open(this._cacheName));
+
     try {
-      const updatedResponse = await fetch(request.url, { ...updateRequest });
-      await cache.put(updateRequest, updatedResponse.clone());
+      const updatedResponse = await fetch(
+        updateRequest.clone ? updateRequest.clone() : updateRequest
+      );
+      await cache.put(
+        updateRequest.clone ? updateRequest.clone() : updateRequest,
+        updatedResponse.clone()
+      );
       logger.debug('Check response', updatedResponse);
       if (
         updatedResponse &&
@@ -313,19 +354,8 @@ export class CacheManager {
       const dataOld = response ? await response.clone().json() : {};
       const dataNew = await updatedResponse.clone().json();
 
-      entry.request = updateRequest;
-
-      entry.response = updatedResponse.clone();
-      response = updatedResponse.clone();
-      response['cacheEntry'] = request.headers?.get('cache-entry');
-      response['cacheGroup'] = request.headers?.get('cache-group');
-      response['cacheTTL'] = Number(
-        request.headers?.get('cache-TTL') ?? defaultCacheTTL
-      );
-
-      await cache.put(entry.request, entry.response);
-      logger.debug('Updated Request', request);
-      logger.debug('Updated Response', response);
+      logger.debug('Updated Request', updateRequest);
+      logger.debug('Updated Response', updatedResponse);
 
       if (this.onCacheEntryUpdated) {
         logger.debug(
@@ -366,7 +396,8 @@ export class CacheManager {
       for (const entryKey of groups[groupKey]) {
         const entry: { request: CachedRequest; response: CachedResponse } =
           entries[entryKey];
-        if (await this.refreshEntry(cache, entry)) groupUpdated = true;
+        if (await this.refreshEntry(entry, { cache: cache }))
+          groupUpdated = true;
         result[entryKey] = entry.response;
         delete entries[entryKey];
         groupEntries[entryKey] = entry;
@@ -385,7 +416,7 @@ export class CacheManager {
     for (const entryKey of Object.keys(entries)) {
       const entry: { request: CachedRequest; response: CachedResponse } =
         entries[entryKey];
-      await this.refreshEntry(cache, entry);
+      await this.refreshEntry(entry, { cache: cache });
       result[entryKey] = entry.response;
       if (this.onCacheEntryUpdated)
         this.onCacheEntryUpdated(entry.request, entry.response.clone());
@@ -415,7 +446,7 @@ export class CacheManager {
           updatedEntries[key] = entry;
           // await cache.delete(entry.request.url);
           // logger.debug('Delete entry', entry);
-          await this.refreshEntry(cache, entry, true);
+          await this.refreshEntry(entry, { cache: cache, ignoreTTL: true });
           logger.debug('Updated entry', entry);
         }
       }
@@ -466,7 +497,7 @@ export class CacheManager {
           this.onCacheEntryDeleted(key);
       }
       logger.debug('Deleted group', grouName, groupEntries);
-      if (this.onCacheEntriesGroupDeleted)
+      if (notifyEntryDeletion && this.onCacheEntriesGroupDeleted)
         this.onCacheEntriesGroupDeleted(grouName, groupEntries);
       return true;
     } else {
