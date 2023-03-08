@@ -7,7 +7,7 @@ import {
   NgZone,
   OnChanges,
   OnInit,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -16,7 +16,7 @@ import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  AggregatedTestStatusMap
+  AggregatedTestStatusMap,
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
@@ -110,7 +110,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.workflowUpdateSubscription = this.appService.observableWorkflowUpdate.subscribe(
       (wv: WorkflowVersion) => {
         this.cdref.detectChanges();
-        this.prepareTableData();
+        this.prepareTableData(null, false);
         this.logger.debug('Redraw');
       }
     );
@@ -119,7 +119,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       (w) => {
         this.loadingWorkflowVersionMap[w.uuid] = w.loading;
         this.cdref.detectChanges();
-        this.prepareTableData();
+        // this.prepareTableData();
         this.logger.debug('Loaded');
         this.logger.warn('Loading workflow', w);
       }
@@ -183,7 +183,10 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-  private prepareTableData(workflows: Workflow[] = null) {
+  private prepareTableData(
+    workflows: Workflow[] = null,
+    resetTableStatus = true
+  ) {
     workflows = workflows || this._workflows;
     if (!workflows) return;
     this.logger.debug('Loaded workflows: ', workflows);
@@ -195,10 +198,13 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       if (w.currentVersion) stats.add(w.currentVersion);
     });
     this.logger.debug('Initialized Stats', stats);
-    return this.prepareTableData2(stats);
+    return this.prepareTableData2(stats, resetTableStatus);
   }
 
-  private prepareTableData2(stats: AggregatedStatusStats) {
+  private prepareTableData2(
+    stats: AggregatedStatusStats,
+    resetTableStatus = true
+  ) {
     this._workflowStats = this.statsFilter.transform(
       stats,
       this._workflowNameFilter
@@ -216,7 +222,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
             );
     }
 
-    this.refreshDataTable();
+    this.refreshDataTable(resetTableStatus);
   }
 
   public get workflowNameFilter(): string {
@@ -308,7 +314,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   public updateSelectedVersion(workflow_version: WorkflowVersion) {
     this.logger.debug('Updated workflow version', workflow_version);
-    this.prepareTableData();
+    // this.prepareTableData();
   }
 
   public isLoadingWorkflowVersion(workflow: Workflow) {
@@ -383,7 +389,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
         : this._workflowStats.all.filter(
             (v) => v.subscriptions && v.subscriptions.length > 0
           );
-      if (!this.searchModeEnabled) this.refreshDataTable();
+      if (!this.searchModeEnabled) this.refreshDataTable(false);
     });
   }
 
@@ -471,7 +477,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   public selectTestBuild(testBuild: TestBuild) {
     this.logger.debug('Test Build selected', testBuild);
-    window.open(testBuild.externalLink, '_blank');
+    if (testBuild.externalLink)
+      window.open(testBuild.externalLink as string, '_blank');
   }
 
   public get workflowStats(): AggregatedStatusStats {
@@ -583,7 +590,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
           emptyTable:
             this.appService.isLoadingWorkflows() === true ||
             this.updatingDataTable
-              ? 'Loading workflows...'
+              ? `Loading workflows...`
               : this.workflowNameFilter && this.workflowNameFilter.length > 0
               ? 'No matching workflows'
               : "<h4 class='mt-3'>No workflow found</h4>." +

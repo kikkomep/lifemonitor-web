@@ -9,13 +9,13 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor
+  WorkflowVersionDescriptor,
 } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
