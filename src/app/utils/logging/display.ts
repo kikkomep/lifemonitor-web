@@ -58,7 +58,7 @@ export class Display {
       moduleName +
       '  %c ' +
       new Date().toUTCString() +
-      ' ' +
+      ' | ' +
       message +
       ' ';
     let a2 =
