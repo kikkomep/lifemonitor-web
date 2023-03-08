@@ -199,7 +199,7 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
   public get type(): string {
     if (!this._type) {
       if (this._rawData && 'type' in this._rawData) {
-        this._type = this._rawData['type'];
+        this._type = this._rawData['type'] as string;
       } else {
         let crate: RoCrate = this.roCrateMetadata;
         if (crate) {
