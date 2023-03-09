@@ -95,12 +95,12 @@ export class AuthHandler {
     return text;
   }
 
-  public authorize() {
+  public async authorize() {
     this.logger.debug('Getting authorization code...');
-    this.oauth.fetchAuthorizationCode();
+    return await this.oauth.fetchAuthorizationCode();
   }
 
-  public login() {
+  public async login() {
     this.logger.debug('Is authorized: ', this.oauth.isAuthorized());
     this.logger.debug('Is expired: ', this.oauth.isAccessTokenExpired());
 

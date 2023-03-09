@@ -1,11 +1,10 @@
-import { AppService } from 'src/app/utils/services/app.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { AppService } from 'src/app/utils/services/app.service';
 
-import { AuthService } from '../../utils/services/auth.service';
-import { Subscription } from 'rxjs';
 import { ActiveToast, ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 @Component({
@@ -25,7 +24,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private renderer: Renderer2,
     private toastr: ToastrService,
-    private authService: AuthService,
     private appService: AppService,
     private activatedRoute: ActivatedRoute
   ) {}
@@ -34,26 +32,30 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.renderer.addClass(document.querySelector('app-root'), 'login-page');
     this.activatedRoute.queryParams.subscribe((params) => {
       let callback = params['callback'];
-      this.logger.debug('Callback... ', callback, !callback, callback == 'undefined');
+      this.logger.debug(
+        'Callback... ',
+        callback,
+        !callback,
+        callback == 'undefined'
+      );
       if (typeof callback === 'undefined') {
-        this.previousToast = this.toastr.info('Authorizing...');
-        this.appService.authorize();
+        this.appService.authorize().then(() => {
+          this.toastr.clear();
+          this.previousToast = this.toastr.info('Authorizing...');
+        });
       } else {
-        this.previousToast = this.toastr.info('Logging in...');
-        this.appService.login();
+        this.appService.login().then((user) => {
+          this.previousToast = this.toastr.success(
+            'You have successfully <b>logged in</b>',
+            `Hi, ${user.username}`,
+            {
+              enableHtml: true,
+              timeOut: 4000,
+            }
+          );
+        });
       }
     });
-
-    this.userLoggedSubscription = this.authService
-      .userLoggedAsObservable()
-      .subscribe((userLogged) => {
-        if (this.previousToast) this.toastr.remove(this.previousToast.toastId);
-        if (userLogged) {
-          this.toastr.success('Logging OK');
-        } else {
-          this.toastr.success('Logged out');
-        }
-      });
   }
 
   ngOnDestroy() {

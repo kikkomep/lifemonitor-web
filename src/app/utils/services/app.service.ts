@@ -1,7 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { forkJoin, Observable, Subject, Subscription } from 'rxjs';
+import {
+  BehaviorSubject,
+  forkJoin,
+  Observable,
+  Subject,
+  Subscription,
+} from 'rxjs';
 import { catchError, finalize, map, mergeMap, tap } from 'rxjs/operators';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
@@ -43,6 +49,7 @@ export class AppService {
   private loadingWorkflowMap: { [uuid: string]: boolean } = {};
 
   // initialize data sources
+  private subjectUser = new BehaviorSubject<User>(null);
   private subjectNotifications = new Subject<UserNotification[]>();
   private subjectRegistry = new Subject<Registry>();
   private subjectRegistries = new Subject<Registry[]>();
@@ -61,6 +68,7 @@ export class AppService {
   private subjectWorkflowUpdate = new Subject<WorkflowVersion>();
 
   // initialize data observables
+  private _observableUser = this.subjectUser.asObservable();
   private _observableNotifications = this.subjectNotifications.asObservable();
   private _observableRegistry = this.subjectRegistry.asObservable();
   private _observableRegistries = this.subjectRegistries.asObservable();
@@ -108,6 +116,7 @@ export class AppService {
           this.api.get_current_user().subscribe((data) => {
             this.logger.debug('Current user from APP', data);
             this._currentUser = data;
+            this.subjectUser.next(data);
           });
         }
         // reload workflows
@@ -263,12 +272,17 @@ export class AppService {
       this.api.get_current_user().subscribe((data) => {
         this.logger.debug('Current user from APP', data);
         this._currentUser = data;
+        this.subjectUser.next(data);
       });
     }
   }
 
   public isUserLogged(): boolean {
     return this.auth.isUserLogged();
+  }
+
+  public get observableUser(): Observable<User> {
+    return this._observableUser;
   }
 
   public async checkIsUserLogged(): Promise<boolean> {
@@ -292,12 +306,13 @@ export class AppService {
     return this._observableLoadingWorkflows;
   }
 
-  public login() {
-    return this.auth.login();
+  public async login(): Promise<User> {
+    await this.auth.login();
+    return this.api.get_current_user().toPromise();
   }
 
-  public authorize() {
-    return this.auth.authorize();
+  public async authorize() {
+    return await this.auth.authorize();
   }
 
   public async logout() {

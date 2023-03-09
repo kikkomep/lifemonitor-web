@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Router, RouterModule, Routes } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { HomeComponent } from './pages/home/home.component';
@@ -70,7 +71,8 @@ export class AppRoutingModule {
     private authService: AuthService,
     private apiService: ApiService,
     private router: Router,
-    private inputDialogService: InputDialogService
+    private inputDialogService: InputDialogService,
+    private toastr: ToastrService
   ) {
     this.userLoggedSubscription = this.authService
       .userLoggedAsObservable()
@@ -80,6 +82,10 @@ export class AppRoutingModule {
           this.handleRedirect('/dashboard');
         } else {
           this.logger.debug('User logged out...');
+          this.toastr.clear();
+          this.toastr.success('You have successfully logged out', '', {
+            timeOut: 4000,
+          });
         }
       });
 

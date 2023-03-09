@@ -3,10 +3,9 @@ import {
   EventEmitter,
   OnInit,
   Output,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Observable } from 'rxjs';
 
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { UserDropdownMenuComponent } from './user-dropdown-menu/user-dropdown-menu.component';
@@ -38,7 +37,7 @@ export class HeaderComponent implements OnInit {
     this.dropdownMenu.openProfile();
   }
 
-  logout() {
+  public logout() {
     this.appService.logout().then(() => {});
   }
 }
