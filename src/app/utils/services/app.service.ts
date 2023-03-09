@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
 import {
   BehaviorSubject,
@@ -23,7 +24,6 @@ import {
 } from 'src/app/models/workflow.model';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
-import { ApiSocketService } from './api-socket.service';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -97,7 +97,8 @@ export class AppService {
   constructor(
     private auth: AuthService,
     private api: ApiService,
-    private http: HttpClient
+    private http: HttpClient,
+    private toastService: ToastrService
   ) {
     this.logger.debug('AppService created!');
 
@@ -190,6 +191,11 @@ export class AppService {
                 'Current list of workflow versions',
                 this.workflow_versions
               );
+              this.toastService.info(
+                `${workflow_version.name} added`,
+                'Workflows update',
+                { timeOut: 3000 }
+              );
             }
           });
       });
@@ -232,6 +238,11 @@ export class AppService {
               // this.subjectWorkflows.next(this._workflows);
               this.subjectWorkflowUpdate.next(wv);
               this.setLoadingWorkflows(false);
+              this.toastService.info(
+                `${wv.name} updated`,
+                'Workflows update',
+                { timeOut: 3000 }
+              );
             });
         }
       }
@@ -265,6 +276,13 @@ export class AppService {
       }
 
       this.subjectWorkflows.next(this.workflows);
+      this.toastService.info(
+        `${workflow.name} deleted`,
+        'Workflows update',
+        {
+          timeOut: 3000,
+        }
+      );
     });
 
     // get user data if already logged
