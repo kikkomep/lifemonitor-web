@@ -119,9 +119,10 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       (w) => {
         this.loadingWorkflowVersionMap[w.uuid] = w.loading;
         this.cdref.detectChanges();
-        // this.prepareTableData();
+        this.prepareTableData(null, false);
         this.logger.debug('Loaded');
         this.logger.warn('Loading workflow', w);
+        this.logger.debug("The current list of workflows", this._workflows);
       }
     );
 
@@ -314,7 +315,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   public updateSelectedVersion(workflow_version: WorkflowVersion) {
     this.logger.debug('Updated workflow version', workflow_version);
-    // this.prepareTableData();
+    this.prepareTableData(null, false);
   }
 
   public isLoadingWorkflowVersion(workflow: Workflow) {
