@@ -51,6 +51,15 @@ import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
+import { DataTablesModule } from 'angular-datatables';
+// import { DataTablesModule } from 'angular-datatables';
+
+// PrimeNG Modules
+// import { ChartModule } from 'primeng/chart';
+import { TableModule } from 'primeng/table';
+import { DropdownModule } from 'primeng/dropdown';
+import { DataViewModule } from 'primeng/dataview';
+import { ButtonModule } from 'primeng/button';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -96,6 +105,14 @@ export function initConfigService(appConfig: AppConfigService) {
     WorkflowVersionSelectorComponent,
   ],
   imports: [
+    // PrimeNg Modules
+    // ChartModule,
+    DropdownModule,
+    DataViewModule,
+    TableModule,
+    ButtonModule,
+    // DataTable (old)
+    DataTablesModule,
     FormsModule,
     BrowserModule,
     AppRoutingModule,
