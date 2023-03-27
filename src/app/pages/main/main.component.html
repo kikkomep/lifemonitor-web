@@ -1,7 +1,6 @@
 <app-loader [enabled]="!user || !user.picture"></app-loader>
 
-<div class="wrapper">
-
+<div class="wrapper" style="background: #f4f6f9;">
   <app-input-dialog></app-input-dialog>
 
   <app-header (toggleMenuSidebar)="toggleMenuSidebar()"></app-header>
@@ -10,11 +9,12 @@
     (mainSidebarHeight)="mainSidebarHeight($event)"
   ></app-menu-sidebar>-->
 
-  <div #contentWrapper class="content-wrapper">
+  <div #contentWrapper class="content-wrapper" >
     <router-outlet></router-outlet>
   </div>
 
-  <app-footer></app-footer>
   <!--<aside class="control-sidebar control-sidebar-dark"></aside>
   <div id="sidebar-overlay" (click)="toggleMenuSidebar()"></div>-->
+
+  <app-footer></app-footer>
 </div>
