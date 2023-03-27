@@ -1,4 +1,8 @@
-<div [ngClass]="enableBrowseButton ? 'input-group p-5 ml-5' : 'input-group p-5'">
+<div
+  [ngClass]="
+    enableBrowseButton ? 'input-group mt-4 mb-5 p-md-4' : 'input-group mt-4 mb-5 p-md-4'
+  "
+>
   <div class="input-group-prepend">
     <span class="input-group-text"><i class="fas fa-angle-right"></i></span>
   </div>
@@ -70,10 +74,12 @@
     (click)="onKeyUpEnter()"
   >
     <i class="fas fa-search mx-2"></i>
-    <span>{{ actualFilterValue ? 'Search' : searchButtonName }}</span>
+    <span class="d-none d-md-inline-flex">{{
+      actualFilterValue ? 'Search' : searchButtonName
+    }}</span>
   </button>
 
-  <div *ngIf="enableBrowseButton" class="mx-2 mr-4">
+  <div *ngIf="enableBrowseButton" class="ml-2">
     <button
       #browseButton
       type="button"
@@ -83,7 +89,7 @@
         'browse-enabled': browseButtonEnabled
       }"
       [hidden]="!enableBrowseButton"
-      style="min-width: 132px"
+      style="height: 38px"
       class="btn btn-primary"
       type="button"
       (click)="onBrowseButtonClick($event)"
@@ -98,7 +104,7 @@
         title="Go back to the {{ goBackButtonName }}"
       >
         <i class="fas fa-list mx-2"></i>
-        <span>{{goBackButtonName}}</span>
+        <span class="d-none d-md-inline-flex">{{ goBackButtonName }}</span>
       </div>
       <div
         *ngIf="!browseButtonEnabled"
@@ -110,7 +116,7 @@
         title="Browse registered {{ elementType }}"
       >
         <i class="far fa-folder-open mx-2"></i>
-        <span>Browse</span>
+        <span class="d-none d-md-inline-flex">Browse</span>
       </div>
     </button>
   </div>
