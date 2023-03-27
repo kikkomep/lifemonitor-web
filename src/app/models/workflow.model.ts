@@ -62,8 +62,12 @@ export class Workflow extends Model {
     }
   }
 
-  public addVersion(v: WorkflowVersion, setAsCurrent: boolean = false) {
-    if (v && v.workflow == null) {
+  public addVersion(
+    v: WorkflowVersion,
+    setAsCurrent: boolean = false,
+    setAsLatest?: boolean
+  ) {
+    if (v) {
       this._versions[v.version['version']] = v;
       v.workflow = this;
       if (setAsCurrent) this.currentVersion = v;
@@ -71,14 +75,19 @@ export class Workflow extends Model {
         let data = { ...v.version };
         delete data['links'];
         delete data['name'];
-        this.logger.debug('Data VERSION: ', v.version, data);
+        this.logger.debug('Data VERSION: ', v.version, data, this);
         this.addVersionDescriptor(data);
       }
     }
   }
 
-  public removeVersion(v: WorkflowVersion, removeDescriptor: boolean = true) {
-    if (v.workflow == this) {
+  public removeVersion(
+    version: WorkflowVersion | string,
+    removeDescriptor: boolean = true
+  ) {
+    const v: WorkflowVersion =
+      version instanceof WorkflowVersion ? version : this.getVersion(version);
+    if (v && v.workflow == this) {
       delete this._versions[v.version['version']];
       v.workflow = null;
       if (removeDescriptor && this._version_descriptors) {
@@ -172,7 +181,7 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
     this.setName(rawData);
   }
 
-  private setName(data: Object) {
+  public setName(data: Object) {
     let rocIdentifier = this.rocIdentifier;
     this.setNameFromProperty(
       data,

@@ -110,6 +110,8 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
       ) {
         status = this.status as string;
       }
+    } else if (this['version'] && this['version']['status']) {
+      return this['version']['status']['aggregate_test_status'];
     }
     return status == 'unavailable' ? 'unknown' : status;
   }
@@ -195,6 +197,21 @@ export class AbstractStats extends Model {
 
     // notify updates
     this.notifyChanges();
+  }
+
+  public getStatsLength(
+    items: StatsItem[],
+    filter: string
+  ): number {
+    if (!items) return 0;
+    if (filter && filter !== '______ALL_____') {
+      items = items.filter(
+        (v) =>
+          v.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0 ||
+          v.uuid.toLowerCase().indexOf(filter.toLowerCase()) >= 0
+      );
+    }
+    return items.length;
   }
 
   public clear(): void {
