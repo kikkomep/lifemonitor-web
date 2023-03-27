@@ -796,7 +796,7 @@ export class AppService {
     name: string = null,
     is_public: boolean = false,
     authorization: string = null
-  ): Observable<WorkflowVersion> {
+  ): Observable<any> {
     this.setLoadingWorkflows(true);
     return this.api
       .registerWorkflowRoCrate(
@@ -809,41 +809,43 @@ export class AppService {
         authorization
       )
       .pipe(
-        mergeMap((data) => {
-          this.logger.debug('Data of registered workflow', data);
-          return this.api
-            .get_workflow_version(data['uuid'], version, {
-              previous_versions: false,
-              ro_crate: true,
-              load_status: true,
-              load_suites: true,
-            })
-            .pipe(
-              map((workflow_version: WorkflowVersion) => {
-                this.logger.debug(
-                  'Registered Workflow RO-Crate:',
-                  workflow_version
-                );
-                this._workflow_versions.push(workflow_version);
-                this.logger.debug('Workflow data loaded!');
-                let workflow: Workflow = this.findWorkflow(uuid);
-                if (!workflow) {
-                  this.api
-                    .get_workflow(uuid)
-                    .subscribe((workflow: Workflow) => {
-                      workflow.addVersion(workflow_version, true);
-                      this._workflows.push(workflow);
-                      this.subjectWorkflows.next(this._workflows);
-                      this.setLoadingWorkflows(false);
-                    });
-                } else {
-                  workflow.addVersion(workflow_version, true);
-                  this.subjectWorkflows.next(this._workflows);
-                  this.setLoadingWorkflows(false);
-                }
-                return workflow_version;
-              })
-            );
+        map((data) => {
+          return data;
+          // return this.api
+          //   .get_workflow_version(data['uuid'], version, {
+          //     previous_versions: false,
+          //     ro_crate: true,
+          //     load_status: true,
+          //     load_suites: true,
+          //   })
+          //   .pipe(
+          //     map((workflow_version: WorkflowVersion) => {
+          //       this.logger.debug(
+          //         'Registered Workflow RO-Crate:',
+          //         workflow_version
+          //       );
+          //       this.setLoadingWorkflows(false);
+          //       return workflow_version;
+          //       // this._workflow_versions.push(workflow_version);
+          //       // this.logger.debug('Workflow data loaded!');
+          //       // let workflow: Workflow = this.findWorkflow(uuid);
+          //       // if (!workflow) {
+          //       //   this.api
+          //       //     .get_workflow(uuid)
+          //       //     .subscribe((workflow: Workflow) => {
+          //       //       workflow.addVersion(workflow_version, true);
+          //       //       this._workflows.push(workflow);
+          //       //       this.subjectWorkflows.next(this._workflows);
+          //       //       this.setLoadingWorkflows(false);
+          //       //     });
+          //       // } else {
+          //       //   workflow.addVersion(workflow_version, true);
+          //       //   this.subjectWorkflows.next(this._workflows);
+          //       //   this.setLoadingWorkflows(false);
+          //       // }
+          //       // return workflow_version;
+          //     })
+          //   );
         })
       );
   }
@@ -854,7 +856,7 @@ export class AppService {
     name: string = null,
     is_public: boolean = false
   ): Observable<object> {
-    this.setLoadingWorkflows(true);
+    // this.setLoadingWorkflows(true);
     return this.api
       .registerRegistryWorkflow(
         workflow,
@@ -865,36 +867,37 @@ export class AppService {
       .pipe(
         map((data) => {
           this.logger.debug('Data of registered workflow', data);
-          this.api
-            .get_workflow_version(data['uuid'], version, {
-              previous_versions: false,
-              ro_crate: true,
-              load_status: true,
-              load_suites: true,
-            })
-            .subscribe((workflow_version: WorkflowVersion) => {
-              this.logger.debug(
-                'Registered Workflow RO-Crate:',
-                workflow_version
-              );
-              this._workflow_versions.push(workflow_version);
-              this.logger.debug('Workflow data loaded!');
-              let workflow: Workflow = this.findWorkflow(workflow_version.uuid);
-              if (!workflow) {
-                this.api
-                  .get_workflow(workflow_version.uuid)
-                  .subscribe((workflow: Workflow) => {
-                    workflow.addVersion(workflow_version, true);
-                    this._workflows.push(workflow);
-                    this.subjectWorkflows.next(this._workflows);
-                    this.setLoadingWorkflows(false);
-                  });
-              } else {
-                workflow.addVersion(workflow_version, true);
-                this.subjectWorkflows.next(this._workflows);
-                this.setLoadingWorkflows(false);
-              }
-            });
+          return data;
+          // this.api
+          //   .get_workflow_version(data['uuid'], version, {
+          //     previous_versions: false,
+          //     ro_crate: true,
+          //     load_status: true,
+          //     load_suites: true,
+          //   })
+          //   .subscribe((workflow_version: WorkflowVersion) => {
+          //     this.logger.debug(
+          //       'Registered Workflow RO-Crate:',
+          //       workflow_version
+          //     );
+          //     this._workflow_versions.push(workflow_version);
+          //     this.logger.debug('Workflow data loaded!');
+          //     let workflow: Workflow = this.findWorkflow(workflow_version.uuid);
+          //     if (!workflow) {
+          //       this.api
+          //         .get_workflow(workflow_version.uuid)
+          //         .subscribe((workflow: Workflow) => {
+          //           workflow.addVersion(workflow_version, true);
+          //           this._workflows.push(workflow);
+          //           this.subjectWorkflows.next(this._workflows);
+          //           this.setLoadingWorkflows(false);
+          //         });
+          //     } else {
+          //       workflow.addVersion(workflow_version, true);
+          //       this.subjectWorkflows.next(this._workflows);
+          //       this.setLoadingWorkflows(false);
+          //     }
+          //   });
           return data;
         }),
         catchError((err) => {
