@@ -1,7 +1,257 @@
 .cut-text {
   text-overflow: ellipsis;
   overflow: hidden;
-  width: 100%;
+  width: 90%;
   height: 1.2em;
   white-space: nowrap;
+}
+
+:host ::ng-deep {
+  .p-dropdown {
+    width: 14rem;
+    font-weight: normal;
+  }
+
+  .instance-name {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: black;
+
+    a {
+      color: black;
+    }
+
+    input {
+      text-align: center;
+    }
+  }
+
+  .instance-uuid,
+  .instance-url {
+    font-size: small;
+    font-weight: 200;
+  }
+
+  .instance-description {
+    margin: 0 0 1rem 0;
+  }
+
+  .instance-category-icon {
+    vertical-align: middle;
+    margin-right: 0.5rem;
+  }
+
+  .instance-category {
+    font-weight: 600;
+    vertical-align: middle;
+  }
+
+  .instance-list-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    width: 100%;
+
+    .instance-list-item-engine-type {
+      text-align: center;
+      img {
+        width: 100px !important;
+      }
+
+      i {
+        padding: 2rem;
+      }
+    }
+
+    .instance-list-item-service-type {
+      text-align: center;
+      img {
+        width: 100px !important;
+        height: auto !important;
+      }
+
+      i {
+        padding: 2rem;
+      }
+    }
+
+    .instance-name {
+      a {
+        color: black;
+      }
+
+      input {
+        text-align: left;
+      }
+    }
+
+    .instance-list-item-instances-chart {
+      width: 8rem;
+      margin: auto;
+    }
+
+    .instance-list-item-builds-chart {
+      width: 18rem;
+      margin: auto;
+    }
+
+    .instance-list-detail {
+      flex: 1 1 0;
+    }
+
+    .instance-list-action {
+      display: flex;
+      flex-direction: column;
+    }
+
+    // .p-button {
+    //   margin-bottom: 0.5rem;
+    // }
+  }
+
+  .instance-grid-item {
+    margin: 0.5em;
+    border: 1px solid #dee2e6;
+
+    .instance-grid-item-top {
+      display: flex;
+      margin: auto;
+      width: max-content;
+      text-align: right;
+      padding: 1rem;
+      position: absolute;
+      right: 10px;
+    }
+
+    .instance-grid-item-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .instance-grid-item-engine {
+      .instance-grid-item-engine-type {
+        img {
+          width: 100px !important;
+          height: auto !important;
+        }
+      }
+    }
+
+    .instance-grid-item-edit-action {
+      text-align: right;
+      align-items: right;
+    }
+
+    .instance-grid-item-bottom {
+      margin: auto;
+      padding: 2rem;
+      width: 100%;
+
+      button {
+        margin: auto;
+      }
+    }
+
+    .instance-grid-item-status {
+      margin-top: 2rem;
+    }
+
+    .instance-grid-item-engine {
+      padding: 2rem;
+      font-weight: 500;
+      vertical-align: middle;
+    }
+
+    .instance-grid-item-engine-type {
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    .instance-grid-item-service-type {
+      text-align: center;
+      padding: 0.5rem;
+      img {
+        width: 100px !important;
+        height: auto !important;
+      }
+
+      i {
+        padding: 2rem;
+      }
+    }
+
+    .instance-grid-item-instances {
+      width: 100%;
+      text-align: center;
+      font-weight: 500;
+      font-size: larger;
+      padding: 1rem;
+    }
+
+    .instance-grid-item-instances-chart {
+      width: 10rem;
+      margin: 0.5rem auto;
+    }
+
+    .instance-grid-item-builds {
+      width: 100%;
+      text-align: center;
+      font-weight: 500;
+      font-size: larger;
+      padding: 1rem;
+    }
+
+    .instance-grid-item-builds-chart {
+      width: 18rem;
+      margin: 0.5rem auto;
+    }
+
+    img {
+      width: 100px !important;
+    }
+
+    .instance-grid-item-content {
+      text-align: center;
+    }
+  }
+}
+
+@media screen and (max-width: 576px) {
+  :host ::ng-deep .instance-list-item {
+    flex-direction: column;
+    align-items: center;
+
+    .card {
+      margin: 0;
+      padding: 0;
+    }
+
+    img {
+      width: 75%;
+      margin: 2rem 0;
+    }
+
+    .instance-list-detail {
+      text-align: center;
+    }
+
+    .instance-list-action {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .instance-grid-item {
+      margin: 0;
+      padding: 0;
+    }
+
+    .instance-list-action {
+      margin-top: 2rem;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+  }
 }
