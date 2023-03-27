@@ -32,7 +32,7 @@
 
 <section *ngIf="workflow && suites" class="content mx-lg-4 p-2">
   <!-- <div class="container-fluid"> -->
-  <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">    
+  <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">
     <h3 style="color: var(--primary)">
       <span *ngIf="!suiteNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
         title="The dashboard collects test suites for the workflow '{{workflow.name}}'">
@@ -45,8 +45,7 @@
           </ng-container>
         </ng-container>
         <ng-template #noSuite>
-          <ng-container
-            *ngIf="suiteNameFilter == '______ALL_____'; then noSuiteFound; else noMatchingSuite;">
+          <ng-container *ngIf="suiteNameFilter == '______ALL_____'; then noSuiteFound; else noMatchingSuite;">
           </ng-container>
           <ng-template #noSuiteFound>No test suite found</ng-template>
           <ng-template #noMatchingSuite>No test suite matching "<b>{{suiteNameFilter}}</b>"</ng-template>
@@ -73,7 +72,7 @@
           <div *ngIf="suites && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
-              {{ workflow.suites ? workflow.suites.all_passing.length : 0 }}
+              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.all_passing, suiteNameFilter) : 0 }}
             </h3>
             <p>Passing</p>
           </div>
@@ -98,7 +97,7 @@
           <div *ngIf="suites && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
-              {{ workflow.suites ? workflow.suites.some_passing.length : 0 }}
+              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.some_passing, suiteNameFilter) : 0 }}
             </h3>
 
             <p>Some passing</p>
@@ -124,7 +123,7 @@
           <div *ngIf="suites && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
-              {{ workflow.suites ? workflow.suites.all_failing.length : 0 }}
+              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.all_failing, suiteNameFilter) : 0 }}
             </h3>
             <p>Failing</p>
           </div>
@@ -149,7 +148,9 @@
           </div>
           <div *ngIf="suites && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
           <div class="inner">
-            <h3>{{ workflow.suites ? workflow.suites.unknown.length : 0 }}</h3>
+            <h3>
+              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.unknown, suiteNameFilter) : 0 }}
+            </h3>
             <p>Unavailable</p>
           </div>
           <div class="icon">
@@ -167,9 +168,8 @@
   </div>
 
   <!-- Search Bar -->
-  <item-search-bar elementType="suites"
-        [(filterValue)]="suiteNameFilter"
-        [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
+  <item-search-bar elementType="suites" [(filterValue)]="suiteNameFilter"
+    [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
 
   <test-suites [suites]="
       suites

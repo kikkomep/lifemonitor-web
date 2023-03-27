@@ -14,7 +14,8 @@
               <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
             </li>
             <li class="breadcrumb-item active">
-              <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid, version: suite.workflow.version['version'] }]">
+              <a
+                [routerLink]="['/workflow', { uuid: suite.workflow.uuid, version: suite.workflow.version['version'] }]">
                 <i class="fas fa-cogs p-1"></i>Workflow
               </a>
             </li>
@@ -79,7 +80,7 @@
             <div *ngIf="suite.instances && statusFilter && statusFilter != 'passed'" class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.passed.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.passed, instanceNameFilter) : 0 }}
               </h3>
               <p>Passed</p>
             </div>
@@ -104,7 +105,7 @@
             <div *ngIf="suite.instances && statusFilter && statusFilter != 'error'" class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.error.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.error, instanceNameFilter) : 0 }}
               </h3>
               <p>Error</p>
             </div>
@@ -131,7 +132,7 @@
               " class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.failed.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.failed, instanceNameFilter) : 0 }}
               </h3>
               <p>Failed</p>
             </div>
@@ -159,7 +160,7 @@
               " class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.waiting.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.waiting, instanceNameFilter) : 0 }}
               </h3>
 
               <p>Waiting</p>
@@ -237,9 +238,8 @@
     </div>
 
     <!-- Search Bar -->
-    <item-search-bar elementType="instances"
-          [(filterValue)]="instanceNameFilter"
-          [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
+    <item-search-bar elementType="instances" [(filterValue)]="instanceNameFilter"
+      [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
 
     <test-instances [workflow]="suite.workflow" [testInstances]="
         instances
