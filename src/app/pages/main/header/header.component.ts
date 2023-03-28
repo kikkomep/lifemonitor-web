@@ -27,6 +27,7 @@ export class HeaderComponent implements OnInit {
     this.searchForm = new FormGroup({
       search: new FormControl(null),
     });
+    this.appService.checkIsUserLogged().then(() => {});
   }
 
   public get isUserLogged(): boolean {
