@@ -202,8 +202,8 @@
           <p-dataView #workflowsDataView [value]="workflows | itemFilterPipe: workflowNameFilter " [paginator]="true"
             [rows]="5" layout="list">
             <ng-template pTemplate="header">
-              <div class="d-flex align-items-center justify-content-sm-center justify-content-md-end">
-                <div *ngIf="isUserLogged()" class="d-inline-block mx-3">
+              <div class="d-flex align-items-center justify-content-center justify-content-lg-end">
+                <div *ngIf="isUserLogged()" class="d-none d-lg-inline-block mx-3">
                   <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
                     <i class="fas fa-plus-circle"></i> add
                   </a>
@@ -216,7 +216,7 @@
                     <i class="far fa-window-close"></i> done
                   </a>
                 </div>
-                <p-dataViewLayoutOptions class="d-line-block">
+                <p-dataViewLayoutOptions class="d-none d-lg-block d-line-block">
                 </p-dataViewLayoutOptions>
               </div>
 
