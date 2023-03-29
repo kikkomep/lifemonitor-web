@@ -200,7 +200,7 @@
         <!-- Loading (remove the following to stop the loading)-->
         <div class="card-body box-profile p-0">
           <p-dataView #workflowsDataView [value]="workflows | itemFilterPipe: workflowNameFilter " [paginator]="true"
-            [rows]="5" layout="list">
+            filterBy="Workflow" [rows]="5" layout="list" [sortField]="sortField" [sortOrder]="sortOrder">
             <ng-template pTemplate="header">
               <div class="d-flex align-items-center justify-content-center justify-content-lg-end">
                 <div *ngIf="isUserLogged()" class="d-none d-lg-inline-block mx-3">
@@ -216,6 +216,23 @@
                     <i class="far fa-window-close"></i> done
                   </a>
                 </div>
+                <div class="d-inline-block mx-3">
+                  <p-dropdown [options]="sortOptions" [(ngModel)]="sortCriterion" placeholder="Sort By"
+                    (onChange)="onSortChangeEvent($event)" style="height: 37.7px !important;">
+                    <ng-template let-c pTemplate="selectedItem">
+                      <span class="mx-1">
+                        <i class="{{c.iconClass}}" [pTooltip]="c.description"></i>
+                      </span>
+                      {{ c.label }}
+                    </ng-template>
+                    <ng-template let-c pTemplate="item">
+                      <div [pTooltip]="c.description" tooltipPosition="right">
+                        <span class=""><i class="{{c.iconClass}}" style="font: 0.7rem;"></i></span>
+                        {{ c.label }}
+                      </div>
+                    </ng-template>
+                  </p-dropdown>
+                </div>
                 <p-dataViewLayoutOptions class="d-none d-lg-block d-line-block">
                 </p-dataViewLayoutOptions>
               </div>
@@ -223,9 +240,34 @@
               <div class="d-flex mt-3 d-none d-sm-block" *ngIf="layout === 'list'">
                 <div class="d-inline-flex row workflow-list-item-header">
                   <div class="col-1 workflow-list-item-status m-0 p-0"></div>
-                  <div class="col-5">Workflow</div>
+                  <div [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
+                    <span *ngIf="!sortField || sortField !== 'name'" (click)="onSortChange({field: 'name', order: 1})">
+                      <i class="fas fa-sort-amount-up-alt text-muted"></i>
+                    </span>
+                    <span *ngIf="sortField === 'name' && sortOrder === 1"
+                      (click)="onSortChange({field: 'name', order: -1})">
+                      <i class="fas fa-sort-amount-up-alt"></i>
+                    </span>
+                    <span *ngIf="sortField === 'name' && sortOrder === -1"
+                      (click)="onSortChange({field: 'modified', order: -1})">
+                      <i class="fas fa-sort-amount-down-alt"></i>
+                    </span>
+                  </div>
                   <div class="col-1 text-center">Visibility</div>
-                  <div class="col-1 text-center">Type</div>
+                  <div [ngClass]="{'col-1': true, 'text-center': true, 'text-primary': sortField === 'type'}">Type
+                    <span *ngIf="!sortField || sortField !== 'type'"
+                      (click)="onSortChange({field: 'type', order: 1})">
+                      <i class="fas fa-sort-amount-up-alt text-muted"></i>
+                    </span>
+                    <span *ngIf="sortField === 'type' && sortOrder === 1"
+                      (click)="onSortChange({field: 'type', order: -1})">
+                      <i class="fas fa-sort-amount-up-alt"></i>
+                    </span>
+                    <span *ngIf="sortField === 'type' && sortOrder === -1"
+                      (click)="onSortChange({field: 'modified', order: -1})">
+                      <i class="fas fa-sort-amount-down-alt"></i>
+                    </span>
+                  </div>
                   <div class="col-1 text-center">Version</div>
                   <div class="col-1 text-center">Suites</div>
                   <div class="col-2 text-center">Latest Test Builds</div>

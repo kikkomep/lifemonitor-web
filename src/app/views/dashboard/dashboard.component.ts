@@ -74,6 +74,50 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
+  // Sort configuration
+  sortField: string = 'modified';
+  sortOrder: number = -1;
+  sortKey: string;
+  sortCriterion: { field: string; order: number };
+  sortOptions = [
+    {
+      label: 'Name (asc)',
+      value: { field: 'name', order: 1 },
+      iconClass: 'fas fa-align-left',
+      description: 'order by name (ascending order)',
+    },
+    {
+      label: 'Name (desc)',
+      value: { field: 'name', order: -1 },
+      iconClass: 'fas fa-align-right',
+      description: 'order by name (descending order)',
+    },
+    {
+      label: 'Creation time (asc)',
+      value: { field: 'created', order: 1 },
+      iconClass: 'pi pi-clock',
+      description: 'order by creation time (ascending order)',
+    },
+    {
+      label: 'Creation time (desc)',
+      value: { field: 'created', order: -1 },
+      iconClass: 'pi pi-clock',
+      description: 'order by creation time (descending order)',
+    },
+    {
+      label: 'Modification time (asc)',
+      value: { field: 'modified', order: 1 },
+      iconClass: 'pi pi-stopwatch',
+      description: 'order by modification time (ascending order)',
+    },
+    {
+      label: 'Modification time (desc)',
+      value: { field: 'modified', order: -1 },
+      iconClass: 'pi pi-stopwatch',
+      description: 'order by modification time (descending order)',
+    },
+  ];
+
   // initialize logger
   private logger: Logger = LoggerManager.create('DashboardComponent');
 
@@ -197,6 +241,24 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     });
 
     this.updateLayout();
+  }
+
+  onSortChangeEvent(event: any) {
+    return this.onSortChange(event.value);
+  }
+
+  onSortChange(criterion: { field: string; order: number }) {
+    this.sortCriterion = criterion;
+    this.sortField = criterion.field;
+    this.sortOrder = criterion.order;
+    this.logger.debug('Update sort criterion', criterion);
+  }
+
+  getCriterionDescription() {
+    const criterion = this.sortOptions.find(
+      (c) => c.value === this.sortCriterion
+    );
+    return criterion?.description;
   }
 
   private updateLayout(): void {
