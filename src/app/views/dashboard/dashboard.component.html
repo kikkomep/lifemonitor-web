@@ -192,7 +192,7 @@
         [goBackButtonName]="'Dashboard'"></item-search-bar>
 
       <!-- <div class="py-4"> -->
-      <div class="card card-primary card-outline p-0 m-0" [hidden]="!workflows && (isLoading|async)!==false">
+      <div class="card card-primary card-outline p-0 m-0" [hidden]="!workflows || (isLoading|async)">
         <div *ngIf="updatingDataTable" class="overlay">
           <i class="fas fa-3x fa-sync-alt text-primary"></i>
         </div>
