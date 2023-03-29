@@ -8,6 +8,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { MainComponent } from './pages/main/main.component';
 import { Logger, LoggerManager } from './utils/logging';
 import { ApiService } from './utils/services/api.service';
+import { AppService } from './utils/services/app.service';
 import { FetchError } from './utils/services/cache/cache-manager';
 import { InputDialogService } from './utils/services/input-dialog.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
@@ -70,16 +71,17 @@ export class AppRoutingModule {
   constructor(
     private authService: AuthService,
     private apiService: ApiService,
+    private appService: AppService,
     private router: Router,
     private inputDialogService: InputDialogService,
     private toastr: ToastrService
   ) {
-    this.userLoggedSubscription = this.authService
-      .userLoggedAsObservable()
-      .subscribe((userLogged) => {
+    this.userLoggedSubscription = this.appService.observableUser.subscribe(
+      (userLogged) => {
         if (userLogged) {
           this.logger.debug('User logged... redirecting');
-          this.handleRedirect('/dashboard');
+          // alert(`Current route: ${this.router.url}`);
+          // this.handleRedirect('/dashboard');
         } else {
           this.logger.debug('User logged out...');
           this.toastr.clear();
@@ -87,7 +89,8 @@ export class AppRoutingModule {
             timeOut: 4000,
           });
         }
-      });
+      }
+    );
 
     this.apiService.onAuthorizationError = (error: FetchError) => {
       this.logger.warn('Authorization error detected', error);
