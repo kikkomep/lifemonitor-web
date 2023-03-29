@@ -3,11 +3,11 @@ import {
   EventEmitter,
   OnInit,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { AppService } from 'src/app/utils/services/app.service';
 
-import { AuthService } from 'src/app/utils/services/auth.service';
 import { UserDropdownMenuComponent } from './user-dropdown-menu/user-dropdown-menu.component';
 
 @Component({
@@ -27,7 +27,6 @@ export class HeaderComponent implements OnInit {
     this.searchForm = new FormGroup({
       search: new FormControl(null),
     });
-    this.appService.checkIsUserLogged().then(() => {});
   }
 
   public get isUserLogged(): boolean {

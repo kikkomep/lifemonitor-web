@@ -21,6 +21,7 @@ import {
   AggregatedTestStatusMap,
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
+import { User } from 'src/app/models/user.modes';
 import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
@@ -93,16 +94,22 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   ngOnInit() {
     this.logger.debug('Dashboard Created!!');
-
-    this.userLoggedSubscription = this.appService.observableUserLogged.subscribe(
-      (isUserLogged) => {
-        this.updatingDataTable = true;
-        if (this._workflowStats) this._workflowStats.clear();
-        this.appService
-          .loadWorkflows(false, isUserLogged, isUserLogged)
-          .subscribe((data) => {
-            this.logger.debug('Loaded workflows ', data);
-          });
+    // alert('Initializing Dashboard...');
+    this.userLoggedSubscription = this.appService.observableUser.subscribe(
+      (user: User) => {
+        const isUserLogged = user !== null;
+        if (!this.appService.isLoadingWorkflows()) {
+          // alert('Notify user changed ' + isUserLogged);
+          if (this._workflowStats) this._workflowStats.clear();
+          this.updatingDataTable = true;
+          this.appService
+            .loadWorkflows(false, isUserLogged, isUserLogged)
+            .subscribe((data) => {
+              this.logger.debug('Loaded workflows ', data);
+              // alert('Loading from user logged ' + user);
+            });
+        }
+        // else alert('Skpping reload');
       }
     );
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
@@ -156,15 +163,15 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       this.prepareTableData();
     } else {
       this.appService.checkIsUserLogged().then((isUserLogged) => {
-        if (isUserLogged) {
-          if (this.openUploader === true) this.openWorkflowUploader();
-        } else
+        this.updatingDataTable = true;
+        if (this._workflowStats) this._workflowStats.clear();
+        if (this.openUploader === true) this.openWorkflowUploader();
+        if (!this.appService.isLoadingWorkflows())
           this.appService
-            .loadWorkflows(true, isUserLogged, isUserLogged)
-            .pipe(tap((data) => {}))
+            .loadWorkflows(false, isUserLogged, isUserLogged)
             .subscribe((data) => {
               this.logger.debug('Loaded workflows ', data);
-              if (this.openUploader === true) this.openWorkflowUploader();
+              // alert('Loaded workflows from dashboard init');
             });
       });
     }

@@ -25,6 +25,7 @@ import {
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
 import { ApiService } from './api.service';
+import { AppConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -49,7 +50,7 @@ export class AppService {
   private loadingWorkflowMap: { [uuid: string]: boolean } = {};
 
   // initialize data sources
-  private subjectUser = new BehaviorSubject<User>(null);
+  private subjectUser: Subject<User> = new Subject<User>();
   private subjectNotifications = new Subject<UserNotification[]>();
   private subjectRegistry = new Subject<Registry>();
   private subjectRegistries = new Subject<Registry[]>();
@@ -95,6 +96,7 @@ export class AppService {
   private TEST_BUILD_ID = 'test_build_id';
 
   constructor(
+    private config: AppConfigService,
     private auth: AuthService,
     private api: ApiService,
     private http: HttpClient,
@@ -119,6 +121,9 @@ export class AppService {
             this._currentUser = data;
             this.subjectUser.next(data);
           });
+        } else {
+          this._currentUser = null;
+          this.subjectUser.next(null);
         }
         // reload workflows
         // this.loadWorkflows(true, logged, logged).subscribe(
@@ -286,13 +291,18 @@ export class AppService {
     });
 
     // get user data if already logged
-    if (this.auth.isUserLogged()) {
-      this.api.get_current_user().subscribe((data) => {
-        this.logger.debug('Current user from APP', data);
-        this._currentUser = data;
-        this.subjectUser.next(data);
-      });
-    }
+    this.config.onLoad.subscribe((loaded) => {
+      if (loaded) {
+        this.checkIsUserLogged().then((logged) => {
+          if (logged) {
+            this.api.get_current_user().subscribe((data) => {
+              this.logger.debug('Current user from APP', data);
+              this._currentUser = data;
+            });
+          }
+        });
+      }
+    });
   }
 
   public isUserLogged(): boolean {
@@ -300,7 +310,7 @@ export class AppService {
   }
 
   public get observableUser(): Observable<User> {
-    return this._observableUser;
+    return this.subjectUser.asObservable();
   }
 
   public async checkIsUserLogged(): Promise<boolean> {
