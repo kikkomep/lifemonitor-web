@@ -584,6 +584,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.updatingDataTable = false;
 
     this.checkWindowSize();
+
+    this.cdref.detectChanges();
   }
 
   public get layout(): string {
