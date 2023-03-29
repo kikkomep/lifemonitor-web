@@ -539,7 +539,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   private prepareTableData(workflows: Workflow[] = null) {
     workflows = workflows || this._workflows;
-    if (!workflows) return;
+    if (!workflows || typeof workflows === 'undefined') return;
 
     this.logger.debug('Loaded workflows: ', workflows);
     // Initialize workflow stats
@@ -550,7 +550,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
         if (
           !this.appService.isUserLogged() ||
           this._browseButtonEnabled ||
-          w.currentVersion.subscriptions.length > 0
+          (w.currentVersion.subscriptions &&
+            w.currentVersion.subscriptions.length > 0)
         )
           stats.add(w.currentVersion);
       }
