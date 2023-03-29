@@ -21,7 +21,7 @@ export class HeaderComponent implements OnInit {
 
   public searchForm: FormGroup;
 
-  constructor(private appService: AuthService) {}
+  constructor(private appService: AppService) {}
 
   ngOnInit() {
     this.searchForm = new FormGroup({
