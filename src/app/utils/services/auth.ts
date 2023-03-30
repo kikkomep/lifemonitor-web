@@ -160,6 +160,8 @@ export class AuthHandler {
     await this.deleteToken();
     this._token = null;
     this.oauth.reset();
+    localStorage.clear();
+    sessionStorage.clear();
     this._isUserLogged = false;
     if (notify) this._userLogged.next(false);
   }
