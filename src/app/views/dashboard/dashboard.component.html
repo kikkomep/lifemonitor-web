@@ -218,16 +218,19 @@
                 </div>
                 <div class="d-inline-block mx-3">
                   <p-dropdown [options]="sortOptions" [(ngModel)]="sortCriterion" placeholder="Sort By"
-                    (onChange)="onSortChangeEvent($event)" style="height: 37.7px !important;">
+                    (onChange)="onSortChangeEvent($event)">
                     <ng-template let-c pTemplate="selectedItem">
-                      <span class="mx-1">
-                        <i class="{{c.iconClass}}" [pTooltip]="c.description"></i>
+                      <span class="mx-2">
+                        <i class="{{c.iconClass}}" [pTooltip]="c.description" style="position: absolute; top: 10px;"></i>
                       </span>
+                      <span style="margin-left: 17px"></span>
                       {{ c.label }}
                     </ng-template>
                     <ng-template let-c pTemplate="item">
                       <div [pTooltip]="c.description" tooltipPosition="right">
-                        <span class=""><i class="{{c.iconClass}}" style="font: 0.7rem;"></i></span>
+                        <span class="mx-1">
+                          <i class="{{c.iconClass}}" style="font: 0.7rem;"></i>
+                        </span>
                         {{ c.label }}
                       </div>
                     </ng-template>

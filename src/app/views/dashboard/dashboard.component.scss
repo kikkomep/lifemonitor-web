@@ -33,6 +33,25 @@
 // }
 
 :host ::ng-deep {
+  p-dropdown {
+    .p-dropdown,
+    .p-element {
+      border-radius: 2px;
+      height: 37px !important;
+    }
+    .p-dropdown-label {
+      font-size: 0.8rem !important;
+    }
+
+    .p-inputtext {
+      font-size: 0.9rem !important;
+    }
+
+    .ng-star-inserted {
+      font-size: 0.8rem !important;
+    }
+  }
+
   .item-label {
     font-weight: bold;
     margin-right: 0.1rem;
