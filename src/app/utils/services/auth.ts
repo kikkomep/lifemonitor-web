@@ -36,7 +36,6 @@ export class AuthHandler {
       console.log('Current token', token);
       if (token && 'token' in token) {
         this._token = token;
-        this._userLogged.next(true);
         this._isUserLogged = true;
         this.logger.debug('This is the access token: ', token);
         return true;
