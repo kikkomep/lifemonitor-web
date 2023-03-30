@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
@@ -100,7 +99,6 @@ export class AppService {
     private config: AppConfigService,
     private auth: AuthService,
     private api: ApiService,
-    private http: HttpClient,
     private toastService: ToastrService
   ) {
     this.logger.debug('AppService created!');
@@ -360,6 +358,15 @@ export class AppService {
     });
   }
 
+  public loadUserProfile(): Observable<User> {
+    return this.api.get_current_user().pipe(
+      map((data) => {
+        this._currentUser = data;
+        return data;
+      })
+    );
+  }
+
   public isUserLogged(): boolean {
     return this.auth.isUserLogged();
   }
@@ -389,9 +396,11 @@ export class AppService {
     return this._observableLoadingWorkflows;
   }
 
-  public async login(): Promise<User> {
-    await this.auth.login();
-    return this.api.get_current_user().toPromise();
+  public login(
+    callback: CallableFunction = null,
+    catchError: CallableFunction = null
+  ): void {
+    return this.auth.login(callback, catchError);
   }
 
   public async authorize() {
@@ -399,7 +408,7 @@ export class AppService {
   }
 
   public async logout() {
-    return await this.auth.logout();
+    return await this.api.logout();
   }
 
   public get currentUser(): User {

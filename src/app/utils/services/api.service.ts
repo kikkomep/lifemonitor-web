@@ -172,6 +172,12 @@ export class ApiService {
     // return this.http.get<T>(url, httpOptions);
   }
 
+  logout() {
+    this.authService.logout(false).then(() => {
+      document.location.href = '/api/account/logout';
+    });
+  }
+
   get_current_user(): Observable<User> {
     return (
       this.doGet('/users/current', { cacheEntry: 'userProfile' })

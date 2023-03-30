@@ -6,6 +6,7 @@ import { AppService } from 'src/app/utils/services/app.service';
 import { ActiveToast, ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
+import { User } from 'src/app/models/user.modes';
 
 @Component({
   selector: 'app-login',
@@ -45,16 +46,18 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.previousToast = this.toastr.info('Authorizing...');
         });
       } else {
-        this.appService.login().then((user) => {
-          this.router.navigateByUrl('/dashboard');
-          this.previousToast = this.toastr.success(
-            'You have successfully <b>logged in</b>',
-            `Hi, ${user.username}`,
-            {
-              enableHtml: true,
-              timeOut: 4000,
-            }
-          );
+        this.appService.login(() => {
+          this.appService.loadUserProfile().subscribe((user: User) => {
+            this.router.navigateByUrl('/dashboard');
+            this.previousToast = this.toastr.success(
+              'You have successfully <b>logged in</b>',
+              `Hi, ${user.username}`,
+              {
+                enableHtml: true,
+                timeOut: 4000,
+              }
+            );
+          });
         });
       }
     });
