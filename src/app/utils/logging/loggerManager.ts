@@ -9,13 +9,13 @@ export class LoggerManager {
   /**
    * Mutes the log when created
    */
-  public static MUTE_ON_CREATE = false;
+  public static MUTE_ON_CREATE = true;
   /**
    * Sets a fixed with for the module name. (0 if not set)
    */
   public static FIXED_WIDTH = 0;
 
-  private static DEV_MODE = true;
+  private static DEV_MODE = false;
   private static instances = {};
   private static instancesStateMap = {};
   private static levels: Level[] = [];
@@ -92,7 +92,18 @@ export class LoggerManager {
 
   static setProductionMode() {
     LoggerManager.DEV_MODE = false;
-    const _window = self["window"];
+    LoggerManager.MUTE_ON_CREATE = true;
+    const _window = self['window'];
+    if (_window) {
+      delete _window['LoggerManager'];
+    }
+  }
+
+  static setDevelopmentMode() {
+    LoggerManager.DEV_MODE = true;
+    LoggerManager.MUTE_ON_CREATE = false;
+    LoggerManager.unMuteAllModules();
+    const _window = self['window'];
     if (_window) {
       delete _window['LoggerManager'];
     }

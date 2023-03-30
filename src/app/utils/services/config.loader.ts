@@ -1,14 +1,20 @@
-import { from, Observable, of } from 'rxjs';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Logger, LoggerManager } from '../logging';
 
 export class AppConfigLoader {
   private config: any = { ...environment };
 
+  private subject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  );
+
   // initialize logger
   private logger: Logger = LoggerManager.create('AppConfigService');
 
-  constructor() { }
+  constructor() {}
+
+  public onLoad: Observable<boolean> = this.subject.asObservable();
 
   public loadConfig(): Observable<object> {
     if (!('configFile' in environment)) {
@@ -26,6 +32,13 @@ export class AppConfigLoader {
                 'Configuration updated from ' + environment['configFile'],
                 this.config
               );
+              if (environment.production) {
+                LoggerManager.setProductionMode();
+              } else {
+                LoggerManager.setDevelopmentMode();
+              }
+
+              this.subject.next(true);
               return this.config;
             })
             .catch((error) => {
