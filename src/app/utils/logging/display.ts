@@ -55,8 +55,10 @@ export class Display {
 
     let a1 =
       '%c ' +
+      Level[level] +
+      '@' +
       moduleName +
-      '  %c ' +
+      ' %c ' +
       new Date().toUTCString() +
       ' | ' +
       message +
