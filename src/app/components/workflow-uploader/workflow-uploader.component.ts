@@ -10,12 +10,16 @@ import {
 } from '@angular/core';
 import Stepper from 'bs-stepper';
 import { UrlValue } from 'src/app/models/common.models';
-import { Config, WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
+import {
+  Config,
+  WorkflowUploaderService,
+} from 'src/app/utils/services/workflow-uploader.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { Subscription } from 'rxjs';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { WorkflowVersion } from 'src/app/models/workflow.model';
+import { ToastrService } from 'ngx-toastr';
 
 declare var $: any;
 
@@ -36,7 +40,7 @@ export class WorkflowUploaderComponent
   @Input() iconClass = 'fas fa-cogs';
   @Input() iconClassSize = 'fa-7x';
   @Input() iconImage = null;
-  @Input() iconImageSize = "120";
+  @Input() iconImageSize = '120';
   @Input() question = 'Are you sure?';
   @Input() description = 'Would you like to confirm?';
   @Input() confirmText = 'Register';
@@ -79,8 +83,9 @@ export class WorkflowUploaderComponent
     private httpClient: HttpClient,
     private appService: AppService,
     private service: WorkflowUploaderService,
-    private cdref: ChangeDetectorRef
-  ) { }
+    private cdref: ChangeDetectorRef,
+    private toastService: ToastrService
+  ) {}
 
   ngOnInit(): void {
     $('#' + this.name).on('hide.bs.modal', () => {
@@ -135,13 +140,15 @@ export class WorkflowUploaderComponent
     );
 
     this._subscriptions.push(
-      this.appService.observableRegistryWorkflow.subscribe((w: RegistryWorkflow) => {
-        this._selectedRegistryWorkflow = w;
-        this.logger.debug('Loaded registry workflow', w);
-        // Set defauls
-        this._workflowName = w.name;
-        this._workflowVersion = w.latest_version;
-      })
+      this.appService.observableRegistryWorkflow.subscribe(
+        (w: RegistryWorkflow) => {
+          this._selectedRegistryWorkflow = w;
+          this.logger.debug('Loaded registry workflow', w);
+          // Set defauls
+          this._workflowName = w.name;
+          this._workflowVersion = w.latest_version;
+        }
+      )
     );
 
     this._subscriptions.push(
@@ -156,12 +163,12 @@ export class WorkflowUploaderComponent
     modal.on('shown.bs.modal', () => {
       this.logger.debug('shown');
       this.appService.loadRegistries().subscribe((registries: Registry[]) => {
-        this.logger.debug("data registries....", registries);
+        this.logger.debug('data registries....', registries);
       });
     });
   }
 
-  ngAfterViewInit(): void { }
+  ngAfterViewInit(): void {}
 
   ngAfterViewChecked() {
     this.cdref.detectChanges();
@@ -172,13 +179,12 @@ export class WorkflowUploaderComponent
     this.iconClass = 'fas fa-cogs';
     this.iconClassSize = 'fa-7x';
     this.iconImage = null;
-    this.iconImageSize = "120";
+    this.iconImageSize = '120';
     this.question = 'Are you sure?';
     this.description = 'Would you like to confirm?';
     this.confirmText = 'Register';
     this.cancelText = 'Cancel';
     this.onConfirm = null;
-
   }
 
   public get workflowUUID(): string {
@@ -188,7 +194,9 @@ export class WorkflowUploaderComponent
   public set workflowUUID(value: string) {
     this._workflowUUID = value;
     let valid = this.checkIfValidUUID(value);
-    this.logger.debug('Setting workflow UUID: ' + value + ' (valid: ' + valid + ')');
+    this.logger.debug(
+      'Setting workflow UUID: ' + value + ' (valid: ' + valid + ')'
+    );
     this._setError('uuid', valid ? null : 'Not valid UUID');
   }
 
@@ -266,7 +274,7 @@ export class WorkflowUploaderComponent
     this.logger.debug(document.getElementById('roCrateInputFile')['files']);
     let input = document.getElementById('roCrateInputFile');
     this.roCrateFile = input;
-    this.logger.debug("RoCreate file", this.roCrateFile);
+    this.logger.debug('RoCreate file', this.roCrateFile);
     var fReader = new FileReader();
     fReader.readAsDataURL(input['files'][0]);
     fReader.onloadend = (event) => {
@@ -278,7 +286,7 @@ export class WorkflowUploaderComponent
 
   public updateRoCrateUrl(event: any) {
     let input = document.getElementById('roCrateUrl');
-    this.logger.debug("RoCrate Input URL", input);
+    this.logger.debug('RoCrate Input URL', input);
     this.roCrateURL.url = input['value'];
     if (!this.roCrateURL.isValid) {
       input.classList.add('is-invalid');
@@ -323,8 +331,8 @@ export class WorkflowUploaderComponent
   public patchRegistryName(name: string): string {
     // TODO: remove this when the back-end will support
     // the name/title attribute for registries
-    if (name === 'wfhubdev') return "WorkflowHub (dev)";
-    if (name === 'wfhub') return "WorkflowHub";
+    if (name === 'wfhubdev') return 'WorkflowHub (dev)';
+    if (name === 'wfhub') return 'WorkflowHub';
     return name;
   }
 
@@ -334,25 +342,36 @@ export class WorkflowUploaderComponent
       .find('option')
       .remove()
       .end()
-      .append('<option value=\'\'></option>')
+      .append("<option value=''></option>")
       .val('');
     if (registries) {
       for (let r of registries) {
-        $('#registrySelector').append('<option value="' + r.uuid + '" '
-          + 'data-content="'
-          + '<span class=\'larger\'>' + this.patchRegistryName(r.name) + '</span>'
-          + '<span class=\'ml-1 text-muted small\'><a href=\'' + r.uri + '\'>' + r.uri + '</a></span>'
-          + '<div class=\'mr-4 text-muted\'>'
-          + '<span class=\'badge badge-primary mr-1\'>LifeMonitor ID</span>'
-          + '<span class=\'small\'>' + r.uuid + '</span>'
-          + '</div>">'
-          + '</option>');
+        $('#registrySelector').append(
+          '<option value="' +
+            r.uuid +
+            '" ' +
+            'data-content="' +
+            "<span class='larger'>" +
+            this.patchRegistryName(r.name) +
+            '</span>' +
+            "<span class='ml-1 text-muted small'><a href='" +
+            r.uri +
+            "'>" +
+            r.uri +
+            '</a></span>' +
+            "<div class='mr-4 text-muted'>" +
+            "<span class='badge badge-primary mr-1'>LifeMonitor ID</span>" +
+            "<span class='small'>" +
+            r.uuid +
+            '</span>' +
+            '</div>">' +
+            '</option>'
+        );
       }
     }
     this.cdref.detectChanges();
     $('#registryWorkflowSelector').selectpicker('refresh');
   }
-
 
   public selectRegistry(value: any) {
     this.logger.debug('Selecting registry....', value);
@@ -363,7 +382,7 @@ export class WorkflowUploaderComponent
   }
 
   public selectRegistryWorkflow(workflow_identifier: string) {
-    this.logger.debug("Selecting RegistryWorkflow", workflow_identifier);
+    this.logger.debug('Selecting RegistryWorkflow', workflow_identifier);
     if (workflow_identifier && workflow_identifier.length > 0) {
       this.appService.selectRegistryWorkflow(workflow_identifier);
     } else {
@@ -379,7 +398,7 @@ export class WorkflowUploaderComponent
       .find('option')
       .remove()
       .end()
-      .append('<option value=\'\'></option>')
+      .append("<option value=''></option>")
       .val('');
     // append new options
     if (!this.registryWorkflows || this.registryWorkflows.length === 0) {
@@ -387,16 +406,22 @@ export class WorkflowUploaderComponent
     } else {
       for (let w of this.registryWorkflows) {
         $('#registryWorkflowSelector').append(
-          '<option value="' + w.identifier
-          + '" data-content="'
-          + w.name
-          + '<div>'
-          + '<span class=\'badge badge-primary mr-1\'>'
-          + w.registry.type + ' ID' + '</span>'
-          + '<span class=\'small text-muted\'><a href=\'' + w.links['origin'] + '\'>'
-          + w.links['origin'] + '</a></span>'
-          + '</div>'
-          + '"></option>'
+          '<option value="' +
+            w.identifier +
+            '" data-content="' +
+            w.name +
+            '<div>' +
+            "<span class='badge badge-primary mr-1'>" +
+            w.registry.type +
+            ' ID' +
+            '</span>' +
+            "<span class='small text-muted'><a href='" +
+            w.links['origin'] +
+            "'>" +
+            w.links['origin'] +
+            '</a></span>' +
+            '</div>' +
+            '"></option>'
         );
       }
       $('#registryWorkflowSelector').prop('disabled', false);
@@ -405,7 +430,6 @@ export class WorkflowUploaderComponent
     this.cdref.detectChanges();
     $('#registryWorkflowSelector').selectpicker('refresh');
   }
-
 
   public confirm() {
     try {
@@ -432,15 +456,28 @@ export class WorkflowUploaderComponent
           this.authorizationHeader
         );
       } else if (this.source === 'registry') {
-        this.logger.debug("Selected registry workflow: ", this.selectRegistryWorkflow);
+        this.logger.debug(
+          'Selected registry workflow: ',
+          this.selectRegistryWorkflow
+        );
         let existingWorkflow = this.appService.workflow_versions.find(
-          (w: WorkflowVersion) => w.version
-            && 'links' in w.version
-            && 'origin' in w.version['links']
-            && w.version['links']['origin'] == this.selectedRegistryWorkflow.links['origin']);
-        this.logger.debug("Found registry workflow? => ", existingWorkflow !== null, existingWorkflow);
+          (w: WorkflowVersion) =>
+            w.version &&
+            'links' in w.version &&
+            'origin' in w.version['links'] &&
+            w.version['links']['origin'] ==
+              this.selectedRegistryWorkflow.links['origin']
+        );
+        this.logger.debug(
+          'Found registry workflow? => ',
+          existingWorkflow !== null,
+          existingWorkflow
+        );
         if (!existingWorkflow) {
-          this.logger.debug("Trying to register the registry workflow", this.selectedRegistryWorkflow);
+          this.logger.debug(
+            'Trying to register the registry workflow',
+            this.selectedRegistryWorkflow
+          );
           request = this.appService.registerRegistryWorkflow(
             this.selectedRegistryWorkflow,
             this.workflowVersion,
@@ -450,9 +487,10 @@ export class WorkflowUploaderComponent
         } else {
           this._registrationError = {
             code: 401,
-            title: "Conflict",
-            message: `The workflow ${this.selectedRegistryWorkflow.name}`
-              + ` (id.${this.selectedRegistryWorkflow.identifier}) already registered`,
+            title: 'Conflict',
+            message:
+              `The workflow ${this.selectedRegistryWorkflow.name}` +
+              ` (id.${this.selectedRegistryWorkflow.identifier}) already registered`,
           } as RegistrationError;
         }
       }
@@ -463,12 +501,25 @@ export class WorkflowUploaderComponent
           (data: any) => {
             this.logger.debug('Workflow registered (from uploader)', data);
             this.hide();
+            this.toastService.clear();
+            this.toastService.info(
+              `Please Wait, Loading...`,
+              `${this.workflowName ?? 'Workflow'} (ver. ${
+                this.workflowVersion
+              }) added`,
+              { timeOut: 60000 }
+            );
             this._processing = false;
           },
           (err: HttpErrorResponse) => {
             this.logger.debug('Error', err);
             this._handleError(err);
             this._processing = false;
+            this.toastService.error(
+              `Unable to register workflow '${this.workflowName}' (ver. ${this.workflowVersion})`,
+              `Oops, something went wrong...`,
+              { timeOut: 4000 }
+            );
           }
         );
       }
@@ -496,21 +547,27 @@ export class WorkflowUploaderComponent
       this.selectedRegistryWorkflow
     )
       return true;
-    else
-      return false;
+    else return false;
   }
 
   public validateWorkflowDetails(): boolean {
     if (this.errors.length != 0 || !this.workflowVersion) return false;
     if (this.source === 'localRoCrate' && !this.roCrateFile) return false;
-    if (this.source === 'remoteRoCrate'
-      && (!this.roCrateURL || !this.roCrateURL.isValid)) return false;
-    if (!this.workflowUUID
-      && (this.source === 'localRoCrate' || this.source === 'remoteRoCrate')) {
+    if (
+      this.source === 'remoteRoCrate' &&
+      (!this.roCrateURL || !this.roCrateURL.isValid)
+    )
+      return false;
+    if (
+      !this.workflowUUID &&
+      (this.source === 'localRoCrate' || this.source === 'remoteRoCrate')
+    ) {
       return false;
     }
-    if (this.source === 'registry'
-      && (this.selectedRegistry === null || this.selectedRegistryWorkflow === null))
+    if (
+      this.source === 'registry' &&
+      (this.selectedRegistry === null || this.selectedRegistryWorkflow === null)
+    )
       return false;
     return true;
   }
@@ -554,17 +611,16 @@ export class WorkflowUploaderComponent
     this._workflowROCrate = null;
     this.roCrateURL = new UrlValue(this.httpClient);
     this._registrationError = null;
-    $("#roCrateInputFile").val("");
-    $("#radioPrimary1").prop("checked", true);
-    $("#radioPrimary2").prop("checked", false);
-    $("#radioPrimary3").prop("checked", false);
+    $('#roCrateInputFile').val('');
+    $('#radioPrimary1').prop('checked', true);
+    $('#radioPrimary2').prop('checked', false);
+    $('#radioPrimary3').prop('checked', false);
     // reset file selector
     let input = document.getElementById('roCrateUrl');
     if (input) {
       input['value'] = null;
     }
   }
-
 
   private _handleError(err: HttpErrorResponse) {
     this.logger.debug('Processing error', err);
