@@ -1015,7 +1015,7 @@ export class AppService {
     );
   }
 
-  public updateWorkflowName(w: WorkflowVersion): Observable<any> {
+  public updateWorkflowName(w: Workflow): Observable<any> {
     return this.api.updateWorkflowName(w);
   }
 
