@@ -497,6 +497,13 @@ export class WorkflowUploaderComponent
 
       if (request) {
         this._processing = true;
+        this.toastService.info(
+          `Please Wait...`,
+          `Checking Workflow ${this.workflowName ?? 'Workflow'} (ver. ${
+            this.workflowVersion
+          })`,
+          { timeOut: 60000 }
+        );
         request.subscribe(
           (data: any) => {
             this.logger.debug('Workflow registered (from uploader)', data);
