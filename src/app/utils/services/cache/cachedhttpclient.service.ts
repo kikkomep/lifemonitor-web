@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { from, Observable, Subject, Subscription } from 'rxjs';
 import { Logger, LoggerManager } from '../../logging';
+import { ApiSocket } from '../../shared/api-socket';
 import { AuthService } from '../auth.service';
 import { AppConfigService } from '../config.service';
 import { InputDialogService } from '../input-dialog.service';
@@ -52,6 +53,8 @@ export class CachedHttpClientService {
 
     this.startWorker();
 
+
+        this.socket = new ApiSocket(this.config);
     this.cache.onCacheEntryUpdated = (
       request: CachedRequest,
       response: CachedResponse
