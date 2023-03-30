@@ -8,17 +8,16 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  AggregatedTestStatusMap,
+  AggregatedTestStatusMap
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { User } from 'src/app/models/user.modes';
@@ -75,7 +74,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
   // Sort configuration
-  sortField: string ;
+  sortField: string;
   sortOrder: number;
   sortKey: string;
   sortCriterion: { field: string; order: number };
@@ -641,6 +640,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
     this._workflowStats = stats;
     this._workflows = workflows;
+
+    document['workflows'] = workflows;
 
     //
     this.updatingDataTable = false;
