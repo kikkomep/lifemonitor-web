@@ -39,29 +39,30 @@ import { MenuSidebarComponent } from './pages/main/menu-sidebar/menu-sidebar.com
 
 import { ArraySizeFilterPipe } from './utils/filters/array-size-filter.pipe';
 
+import { DataTablesModule } from 'angular-datatables';
 import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
+import { OrderByPipe } from './utils/filters/orderby.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SortingNotificationFilterPipe } from './utils/filters/sorting-notification-filter.pipe';
 import { StatsFilterPipe } from './utils/filters/stats-filter.pipe';
 import { TrimPipe } from './utils/filters/trim.pipe';
-import { OrderByPipe } from './utils/filters/orderby.pipe';
 import { WorkflowOrderByPipe } from './utils/filters/workflow-orderby.pipe';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
-import { ApiSocketService } from './utils/services/api-socket.service';
 import { AppConfigService } from './utils/services/config.service';
 import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
-import { DataTablesModule } from 'angular-datatables';
 // import { DataTablesModule } from 'angular-datatables';
 
 // PrimeNG Modules
 // import { ChartModule } from 'primeng/chart';
-import { TableModule } from 'primeng/table';
-import { DropdownModule } from 'primeng/dropdown';
-import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
+import { DataViewModule } from 'primeng/dataview';
+import { DropdownModule } from 'primeng/dropdown';
+import { PaginatorModule } from 'primeng/paginator';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -115,6 +116,8 @@ export function initConfigService(appConfig: AppConfigService) {
     DataViewModule,
     TableModule,
     ButtonModule,
+    PaginatorModule,
+    TooltipModule,
     // DataTable (old)
     DataTablesModule,
     FormsModule,
@@ -146,7 +149,7 @@ export function initConfigService(appConfig: AppConfigService) {
       deps: [AppConfigService],
       multi: true,
     },
-    ApiSocketService,
+    // ApiSocketService,
     {
       // interceptor for HTTP errors
       provide: HTTP_INTERCEPTORS,
@@ -156,4 +159,4 @@ export function initConfigService(appConfig: AppConfigService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
