@@ -1,5 +1,5 @@
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { Logger, LoggerManager } from '../logging';
 import IndexedDb from '../shared/indexdb';
 import { AppConfigService } from './config.service';
@@ -13,9 +13,8 @@ export interface Token {
 }
 
 export class AuthHandler {
-  private _user: object = new Subject<boolean>();
-
-  private _userLogged = new Subject<boolean>();
+  private _user: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _userLogged: Subject<boolean> = new Subject<boolean>();
   private _isUserLogged: boolean = false;
 
   private _token: Token;
