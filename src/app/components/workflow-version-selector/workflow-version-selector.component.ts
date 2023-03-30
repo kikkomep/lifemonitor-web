@@ -9,13 +9,13 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor,
+  WorkflowVersionDescriptor
 } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
@@ -124,20 +124,13 @@ export class WorkflowVersionSelectorComponent
     this._workflow_version = this._versions_map[version];
     this.logger.debug('Selected workflow version:', this._workflow_version);
     this.loadingWorkflowVersion.next(this._workflow);
-    let wv = this.workflow.getVersion(version);
-    if (!wv) {
-      this.appService
-        .loadWorkflowVersion(this.workflow, version, true)
-        .subscribe((v: WorkflowVersion) => {
-          this.workflow.addVersion(v, true);
-          this.workflow_version.emit(v);
-          this.loadingWorkflowVersion.next(null);
-        });
-    } else {
-      this.workflow.currentVersion = wv;
-      this.workflow_version.emit(wv);
-      this.loadingWorkflowVersion.next(null);
-      this.refresh();
-    }
+    this.appService
+      .loadWorkflowVersion(this.workflow, version, true)
+      .subscribe((v: WorkflowVersion) => {
+        this.workflow.addVersion(v, true);
+        this.loadingWorkflowVersion.next(null);
+        this.workflow_version.emit(v);
+        this.refresh();
+      });
   }
 }
