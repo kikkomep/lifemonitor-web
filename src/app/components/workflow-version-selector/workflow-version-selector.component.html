@@ -5,7 +5,7 @@
   <select
     [id]="selectorId"
     #selectPicker
-    class="form-select selectpicker show-tick version-picker"
+    class="form-select selectpicker show-tick version-picker text-center"
     data-width="fit"
     data-style="version"
     aria-label="Select workflow version"
@@ -16,7 +16,7 @@
         <option
           [value]="v.name"
           [selected]="v.name == workflow.currentVersion.version['version']"
-          class="version-option"
+          class="version-option text-center"
           [attr.data-content]="
             v.name +
             (v.isLatest
