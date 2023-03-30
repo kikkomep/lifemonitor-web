@@ -818,7 +818,6 @@ export class AppService {
     is_public: boolean = false,
     authorization: string = null
   ): Observable<any> {
-    this.setLoadingWorkflows(true);
     return this.api
       .registerWorkflowRoCrate(
         uuid,
@@ -937,7 +936,6 @@ export class AppService {
   ): Observable<{ uuid: string; version: string }> {
     if (!workflow_version) return;
     let workflow: Workflow = workflow_version.workflow;
-    this.setLoadingWorkflows(true);
     return this.api
       .deleteWorkflowVersion(
         workflow_version.uuid,
@@ -959,10 +957,9 @@ export class AppService {
                 nextVersionDescriptor.name
               ).subscribe(
                 (wv: WorkflowVersion) => {
-                  workflow.addVersion(wv, true);
                   workflow.removeVersion(workflow_version);
+                  workflow.addVersion(wv, true); //, true);
                   this.subjectWorkflows.next(this._workflows);
-                  this.setLoadingWorkflows(false);
                 },
                 catchError((e) => {
                   this.setLoadingWorkflows(false);
