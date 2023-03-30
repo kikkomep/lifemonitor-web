@@ -4052,6 +4052,7 @@ p-treeselect.ng-invalid.ng-dirty > .p-treeselect {
 }
 
 .p-tooltip .p-tooltip-text {
+  font-size: 0.8rem;
   background: #495057;
   color: #ffffff;
   padding: 0.5rem 0.5rem;
