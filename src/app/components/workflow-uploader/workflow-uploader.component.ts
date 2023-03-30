@@ -522,6 +522,7 @@ export class WorkflowUploaderComponent
             this.logger.debug('Error', err);
             this._handleError(err);
             this._processing = false;
+            this.toastService.clear();
             this.toastService.error(
               `Unable to register workflow '${this.workflowName}' (ver. ${this.workflowVersion})`,
               `Oops, something went wrong...`,
