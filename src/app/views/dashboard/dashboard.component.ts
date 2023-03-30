@@ -75,8 +75,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
   // Sort configuration
-  sortField: string = 'modified';
-  sortOrder: number = -1;
+  sortField: string ;
+  sortOrder: number;
   sortKey: string;
   sortCriterion: { field: string; order: number };
   sortOptions = [
