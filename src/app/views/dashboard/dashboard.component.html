@@ -199,7 +199,7 @@
 
         <!-- Loading (remove the following to stop the loading)-->
         <div class="card-body box-profile p-0">
-          <p-dataView #workflowsDataView [value]="workflows | itemFilterPipe: workflowNameFilter | orderBy:'modified':'desc'" [paginator]="true"
+          <p-dataView #workflowsDataView [value]="workflows | itemFilterPipe: workflowNameFilter | workflowOrderBy:'modified':'desc'" [paginator]="true"
             filterBy="Workflow" [rows]="5" layout="list" [sortField]="sortField" [sortOrder]="sortOrder">
             <ng-template pTemplate="header">
               <div class="d-flex align-items-center justify-content-center justify-content-lg-end">

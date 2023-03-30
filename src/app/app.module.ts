@@ -44,6 +44,8 @@ import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SortingNotificationFilterPipe } from './utils/filters/sorting-notification-filter.pipe';
 import { StatsFilterPipe } from './utils/filters/stats-filter.pipe';
 import { TrimPipe } from './utils/filters/trim.pipe';
+import { OrderByPipe } from './utils/filters/orderby.pipe';
+import { WorkflowOrderByPipe } from './utils/filters/workflow-orderby.pipe';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
 import { ApiSocketService } from './utils/services/api-socket.service';
 import { AppConfigService } from './utils/services/config.service';
@@ -90,6 +92,8 @@ export function initConfigService(appConfig: AppConfigService) {
     TestSuitesComponent,
     SuiteComponent,
     TestInstancesComponent,
+    OrderByPipe,
+    WorkflowOrderByPipe,
     StatsFilterPipe,
     ItemFilterPipe,
     SortingNotificationFilterPipe,
