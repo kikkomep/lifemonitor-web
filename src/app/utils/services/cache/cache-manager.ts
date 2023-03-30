@@ -8,6 +8,7 @@ export interface CachedRequestInit extends RequestInit {
 }
 
 export interface CachedRequest extends Request {
+  request?: Request;
   cacheEntry?: string;
   cacheGroup?: string;
   cacheTTL?: number;
@@ -24,7 +25,15 @@ export interface CacheEntriesMap {
   requests: {
     [key: string]: { request: CachedRequest; response: CachedResponse };
   };
+  namedEntries: {
+    [key: string]: { request: CachedRequest; response: CachedResponse };
+  };
   groups: { [key: string]: Array<string> };
+  createdAt?: { [key: string]: number };
+}
+
+export function getTimeStamp(date?: Date): number {
+  return Math.floor((date ?? new Date()).getTime());
 }
 
 export class FetchError extends Error {
@@ -107,7 +116,7 @@ export class CacheManager {
   ): CachedRequest {
     // logger.debug("The HEADERS", init.headers);
     const headers: Headers = new Headers({ ...init.headers });
-    const createdAt = Number(Date.now());
+    const createdAt = getTimeStamp();
     if (init.cacheEntry) headers.append('cache-entry', init.cacheEntry);
     if (init.cacheGroup) headers.append('cache-group', init.cacheGroup);
     headers.append('cache-created-at', String(createdAt));
@@ -174,12 +183,13 @@ export class CacheManager {
       headers.append(k, v);
     });
     return {
-      ...request,
+      ...request.clone(),
+      request: request.clone(),
       url: request.url,
       headers: headers,
       cacheEntry: headers.get('cache-entry'),
       cacheGroup: headers.get('cache-group'),
-      cacheCreatedAt: Number(headers.get('cache-created-at') ?? Date.now()),
+      cacheCreatedAt: Number(headers.get('cache-created-at') ?? getTimeStamp()),
       cacheTTL: Number(headers.get('cache-ttl') ?? defaultCacheTTL),
     };
   }
@@ -188,13 +198,14 @@ export class CacheManager {
     return (
       cachedReq &&
       cachedReq.cacheTTL > 0 &&
-      Date.now() - cachedReq.cacheCreatedAt >= cachedReq.cacheTTL
+      getTimeStamp() - cachedReq.cacheCreatedAt >= cachedReq.cacheTTL
     );
   }
 
   public async fetch(
     url: string | URL,
-    init?: CachedRequestInit
+    init?: CachedRequestInit,
+    notifyUpdates: boolean = true
   ): Promise<Response> {
     const request = CacheManager.getRequest(url, init);
     const cache = await caches.open(this._cacheName);
@@ -204,23 +215,38 @@ export class CacheManager {
     logger.debug('Check cache entry:', response, cachedReq);
     const isExpired = CacheManager.isExpired(cachedReq);
     if (cachedReq)
-      logger.debug('Check cache entry expiration: expired? ', isExpired);
+      logger.debug(
+        `Check cache entry ${url} expiration: expired? ${isExpired}`
+      );
 
-    if (!response || response.status === 0 || isExpired) {
+    if (
+      !response ||
+      response.status === 0 ||
+      (response.status >= 400 && response.status < 600) ||
+      isExpired
+    ) {
       logger.debug(`Cache miss for url ${url}`);
       const oldResponse = response ? response.clone() : null;
-      try {
-        response = await fetch(request);
-        logger.debug('Request fetch result: ', response);
-        if (response && response.status >= 400 && response.status < 600)
-          throw Error(`${response.status}: ${response.statusText}`);
-      } catch (error) {
-        logger.error('Detected error', response, error);
-        if (response && response.status >= 400 && response.status < 600) {
-          if (response.status === 404) {
-            await cache.delete(request.url);
+
+      let retry = 3;
+      while (retry > 0) {
+        try {
+          response = await fetch(request);
+          logger.debug('Request fetch result: ', response);
+          if (response && response.status >= 400 && response.status < 600)
+            throw Error(`${response.status}: ${response.statusText}`);
+          break;
+        } catch (error) {
+          logger.error('Detected error', response, error);
+          if (retry > 0) retry -= 1;
+          else {
+            if (response && response.status >= 400 && response.status < 600) {
+              if (response.status === 404) {
+                await cache.delete(request.url);
+              }
+              throw new FetchError(error, response);
+            }
           }
-          throw new FetchError(error, response);
         }
       }
 
@@ -234,7 +260,7 @@ export class CacheManager {
         !oldResponse ||
         !deepEqual(await oldResponse.json(), await response.clone().json())
       ) {
-        if (this.onCacheEntryUpdated)
+        if (this.onCacheEntryUpdated && notifyUpdates)
           this.onCacheEntryUpdated(request, response.clone());
       } else {
         logger.debug(
@@ -251,22 +277,38 @@ export class CacheManager {
   }
 
   public async getEntries(cache?: Cache, fetchResponse: boolean = true) {
-    const result: CacheEntriesMap = { requests: {}, groups: {} };
+    const result: CacheEntriesMap = {
+      requests: {},
+      groups: {},
+      namedEntries: {},
+      createdAt: {},
+    };
     cache = cache ?? (await caches.open(this._cacheName));
     for (const rq of await cache.keys()) {
       const request = await this.getCachedRequest(rq);
       const response = fetchResponse ? await cache.match(request.url) : null;
       // logger.debug('Cache response', rq, request, response);
       // response.headers.forEach((v) => logger.debug(v));
+      result.createdAt[rq.url] =
+        Number(request.headers?.get('cache-created-at')) ?? 0;
       if (response) {
-        response['cacheEntry'] = request.headers?.get('cache-entry');
+        const entryName: string = request.headers?.get('cache-entry');
+
+        response['cacheEntry'] = entryName;
         response['cacheGroup'] = request.headers?.get('cache-group');
         response['cacheTTL'] = Number(
           request.headers?.get('cache-ttl') ?? defaultCacheTTL
         );
         response['cacheCreatedAt'] = Number(
-          request.headers?.get('cache-created-at') ?? Date.now()
+          request.headers?.get('cache-created-at') ?? getTimeStamp()
         );
+
+        if (entryName) {
+          result.namedEntries[entryName] = {
+            request: request,
+            response: response,
+          };
+        }
       }
       result.requests[request.url] = { request: request, response: response };
       if (request.cacheGroup) {
@@ -274,6 +316,15 @@ export class CacheManager {
         if (!result.groups[request.cacheGroup])
           result.groups[request.cacheGroup] = groupEntries;
         groupEntries.push(request.url);
+        const leastRecentGroupEntry = groupEntries.reduce((prev, next) => {
+          const rp = result.requests[prev];
+          const rn = result.requests[next];
+          return rp.request.cacheCreatedAt < rn.request.cacheCreatedAt
+            ? prev
+            : next;
+        });
+        result.createdAt[request.cacheGroup] =
+          result.requests[leastRecentGroupEntry].request.cacheCreatedAt;
       }
     }
     return result;
@@ -287,12 +338,12 @@ export class CacheManager {
     } = {
       ignoreTTL: false,
     }
-  ): Promise<boolean> {
+  ): Promise<{ request: CachedRequest; response: CachedResponse } | null> {
     const cache = options.cache ?? (await caches.open(this._cacheName));
     const request = await this.findCachedRequestByKey(entryKey, cache);
     if (request) {
       const response = await cache.match(request.url);
-      logger.debug(`Cache entry ${entryKey} deleted (url: ${request.url})`);
+      logger.debug(`Refreshing cache entry ${entryKey} (url: ${request.url})`);
       return await this.refreshEntry(
         {
           request: request,
@@ -302,7 +353,7 @@ export class CacheManager {
       );
     } else {
       logger.error(`Entry ${entryKey} not found`);
-      return false;
+      return null;
     }
   }
 
@@ -311,10 +362,12 @@ export class CacheManager {
     options: {
       cache?: Cache;
       ignoreTTL?: boolean;
+      notifyUpdates?: boolean;
     } = {
       ignoreTTL: false,
+      notifyUpdates: false,
     }
-  ) {
+  ): Promise<{ request: CachedRequest; response: CachedResponse }> {
     const request = entry.request;
     let response = entry.response;
     const isExpired = CacheManager.isExpired(entry.request);
@@ -325,13 +378,14 @@ export class CacheManager {
       return;
     }
 
-    const updateRequest = entry.request.clone();
+    const updateRequest = entry.request.clone
+      ? entry.request.clone()
+      : entry.request.request
+      ? entry.request.request.clone()
+      : entry.request;
     logger.debug('Check request-response', updateRequest, entry.response);
     updateRequest.headers.delete('cache-created-at');
-    updateRequest.headers.append(
-      'cache-created-at',
-      String(Number(Date.now()))
-    );
+    updateRequest.headers.append('cache-created-at', String(getTimeStamp()));
 
     const cache = options.cache ?? (await caches.open(this._cacheName));
 
@@ -357,7 +411,7 @@ export class CacheManager {
       logger.debug('Updated Request', updateRequest);
       logger.debug('Updated Response', updatedResponse);
 
-      if (this.onCacheEntryUpdated) {
+      if (this.onCacheEntryUpdated && options.notifyUpdates) {
         logger.debug(
           'Comparing objects',
           dataOld,
@@ -366,16 +420,16 @@ export class CacheManager {
         );
         if (!deepEqual(dataOld, dataNew)) {
           this.onCacheEntryUpdated(updateRequest, response);
-          return true;
         } else {
           logger.debug('Entry unchanged (not refreshed)', request.url);
-          return false;
         }
       }
+      return { request: updateRequest, response: updatedResponse.clone() };
     } catch (error) {
       logger.debug('Refresh entry failed', request.url);
       await cache.delete(request.url);
       logger.debug('Cache entry removed', request.url);
+      return null;
     }
   }
 
@@ -425,12 +479,12 @@ export class CacheManager {
   }
 
   public async refreshCacheEntriesGroup(
-    grouName: string,
+    groupName: string,
     notifyEntryGroupUpdate: boolean = true
   ): Promise<boolean> {
     const cache = await caches.open(this._cacheName);
     const entriesMap = await this.getEntries(cache, true);
-    const groupEntries = entriesMap.groups[grouName];
+    const groupEntries = entriesMap.groups[groupName];
     const updatedEntries: {
       [key: string]: {
         request: CachedRequest;
@@ -446,16 +500,18 @@ export class CacheManager {
           updatedEntries[key] = entry;
           // await cache.delete(entry.request.url);
           // logger.debug('Delete entry', entry);
-          await this.refreshEntry(entry, { cache: cache, ignoreTTL: true });
+          await this.refreshEntry(entry, { cache: cache, ignoreTTL: true , notifyUpdates: false});
           logger.debug('Updated entry', entry);
         }
       }
-      logger.debug('Updated group', grouName, groupEntries);
-      if (this.onCacheEntriesGroupUpdated && notifyEntryGroupUpdate)
-        this.onCacheEntriesGroupUpdated(grouName, updatedEntries);
+      logger.debug('Updated group', groupName, groupEntries);
+      if (this.onCacheEntriesGroupUpdated && notifyEntryGroupUpdate){
+        // if(self['alert']) self['alert']("Notifying");
+        this.onCacheEntriesGroupUpdated(groupName, updatedEntries);
+      }
       return true;
     } else {
-      logger.debug(`Group ${grouName} not found`);
+      logger.debug(`Group ${groupName} not found`);
     }
     return false;
   }
@@ -480,12 +536,12 @@ export class CacheManager {
   }
 
   public async deleteCacheEntriesGroup(
-    grouName: string,
+    groupName: string,
     notifyEntryDeletion: boolean = true
   ): Promise<boolean> {
     const cache = await caches.open(this._cacheName);
     const entriesMap = await this.getEntries(cache, false);
-    const groupEntries = entriesMap.groups[grouName];
+    const groupEntries = entriesMap.groups[groupName];
     if (groupEntries) {
       logger.debug('Found group', groupEntries);
       for (let key of groupEntries) {
@@ -496,12 +552,12 @@ export class CacheManager {
         if (notifyEntryDeletion && this.onCacheEntryDeleted)
           this.onCacheEntryDeleted(key);
       }
-      logger.debug('Deleted group', grouName, groupEntries);
+      logger.debug('Deleted group', groupName, groupEntries);
       if (notifyEntryDeletion && this.onCacheEntriesGroupDeleted)
-        this.onCacheEntriesGroupDeleted(grouName, groupEntries);
+        this.onCacheEntriesGroupDeleted(groupName, groupEntries);
       return true;
     } else {
-      logger.debug(`Group ${grouName} not found`);
+      logger.debug(`Group ${groupName} not found`);
     }
     return false;
   }

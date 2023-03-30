@@ -1,5 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Socket } from 'ngx-socket-io';
 
 import { from, Observable, Subject, Subscription } from 'rxjs';
 import { Logger, LoggerManager } from '../../logging';
@@ -16,6 +17,12 @@ import {
 
 declare var $: any;
 
+// max age (in msecs) of received messages
+const MAX_AGE = 10 * 1000;
+
+// reference to the active cache worker
+let worker: Worker = null;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -27,6 +34,15 @@ export class CachedHttpClientService {
   // initialize logger
   private logger: Logger = LoggerManager.create('CachedHttpClient');
 
+  private workflowVersionCreatedSubject: Subject<{
+    uuid: string;
+    version: string;
+  }> = new Subject<{ uuid: string; version: string }>();
+  public onWorkflowVersionCreated: Observable<{
+    uuid: string;
+    version: string;
+  }> = this.workflowVersionCreatedSubject.asObservable();
+
   private workflowVersionUpdateSubject: Subject<{
     uuid: string;
     version: string;
@@ -36,25 +52,64 @@ export class CachedHttpClientService {
     version: string;
   }> = this.workflowVersionUpdateSubject.asObservable();
 
+  private workflowVersionDeleteSubject: Subject<{
+    uuid: string;
+    version: string;
+  }> = new Subject<{ uuid: string; version: string }>();
+  public onWorkflowVersionDeleted: Observable<{
+    uuid: string;
+    version: string;
+  }> = this.workflowVersionDeleteSubject.asObservable();
+
   private subscription: Subscription;
   private cache: CacheManager = new CacheManager('api:lm');
 
   private worker: Worker;
+  private socket: Socket;
+  isOnline: boolean;
 
   constructor(
     private http: HttpClient,
     private config: AppConfigService,
     private dialog: InputDialogService,
-    private authService: AuthService
+    private authService: AuthService // private socket: ApiSocketService
   ) {
     // this.syncInterval = Number(this.config.getConfig()['syncInterval']);
-    this.apiBaseUrl = this.config.getConfig()['apiBaseUrl'];
-    this.logger.debug('API Service created');
+    this.apiBaseUrl = this.config.apiBaseUrl;
+    this.logger.debug(`API Service created: ${this.apiBaseUrl}`);
 
     this.startWorker();
 
+    this.cache.getEntries().then((value) => {
+      this.logger.debug('Current groups', value);
+    });
 
+    this.config.onLoad.subscribe((loaded) => {
+      if (loaded) {
         this.socket = new ApiSocket(this.config);
+        this.socket.fromEvent('message').subscribe((data) => {
+          const mDate = new Date(data['timestamp'] * 1000);
+          const rDate = new Date().getTime();
+          const mAge = rDate - mDate.getTime();
+          this.logger.info(
+            `Received message @ ${new Date(
+              rDate
+            ).toUTCString()} (published at ${mDate} - age: ${mAge} msecs)`,
+            data
+          );
+          if (mAge <= MAX_AGE) {
+            if (data && data['payload'] && data['payload']['type']) {
+              worker.postMessage(data['payload']);
+            }
+          } else {
+            this.logger.warn(`Message skipped: too old (age ${mAge} msecs)`);
+          }
+        });
+
+        this.socket.connect();
+      }
+    });
+
     this.cache.onCacheEntryUpdated = (
       request: CachedRequest,
       response: CachedResponse
@@ -82,72 +137,62 @@ export class CachedHttpClientService {
       entries: Array<string>
     ) => {
       this.logger.debug('Cache group DELETED', groupName, entries);
+      const data = JSON.parse(groupName);
+      this.workflowVersionDeleteSubject.next(data);
     };
+  }
 
-    // $(window)
-    //   .on(
-    //     'beforeunload',
-    //     (evt: Event) => {
-    //       evt.preventDefault();
-    //       this.dialog.show({
-    //         description: 'Confirm',
-    //       });
-    //       return false;
-    //     },
-    //     { capture: true }
-    //   )
-    //   .on('load', (evt) => {
-    //     if (performance.navigation.type == 1) {
-    //       alert('This page is reloaded');
-    //     } else {
-    //       console.info(
-    //         'This page is not reloaded or just called with empty cache'
-    //       );
-    //     }
-    //   });
+  private setupNetworkListener() {
+    this.isOnline = navigator.onLine;
+    window.addEventListener('offline', () => {
+      alert('Offline');
+      this.isOnline = false;
+    });
+    window.addEventListener('online', () => {
+      alert('OnLine');
+      this.isOnline = true;
+    });
   }
 
   public startWorker() {
-    if (typeof Worker !== 'undefined') {
-      // Create a new
-      this.worker = new Worker('./cache.workerx', {
-        type: 'module',
-      });
-
-      this.worker.postMessage({ type: 'refresh' });
-
-      this.worker.onmessage = (event) => {
-        console.log('received message from worker', event.data);
+    if (worker) {
+      worker.onmessage = (event) => {
+        this.logger.debug('received message from worker', event.data);
+        const message: {
+          type: string;
+          data: object;
+        } = event.data;
         try {
-          if (!event.data || !('type' in event.data)) {
-            console.warn(
+          if (!event.data || !event.data['type']) {
+            this.logger.warn(
               "Invalid worker message: unable to find the 'type' property"
             );
             return;
           }
-          console.log('received message from worker', event.data['type']);
-          const fnName =
-            'on' +
-            event.data['type'][0].toUpperCase() +
-            event.data['type'].slice(1);
-          console.log('Function name:', fnName);
-          this[fnName](event.data['payload']);
+          if (message.type === 'echo' || message.type === 'pong') {
+            this.logger.debug(
+              `Received an "${message.type}" message from worker`,
+              message.data
+            );
+          } else {
+            this.logger.debug(
+              'received message from worker',
+              event.data['type']
+            );
+            const fnName =
+              'on' +
+              event.data['type'][0].toUpperCase() +
+              event.data['type'].slice(1);
+            this.logger.debug('Function name:', fnName);
+            if (this[fnName]) this[fnName](event.data['payload']);
+            else {
+              this.logger.warn(`${fnName} is not a function`);
+            }
+          }
         } catch (e) {
           console.error(e);
         }
       };
-      if (!document.hidden) {
-        setTimeout(() => {
-          this.worker.postMessage({ type: 'refresh' });
-        }, 20000);
-        this.enableBackgroundRefresh(this.syncInterval);
-      }
-      document.addEventListener('visibilitychange', (e) =>
-        this.onVisibilityChanged(e)
-      );
-    } else {
-      // Web Workers are not supported in this environment.
-      // You should add a fallback so that your program still executes correctly.
     }
   }
 
@@ -170,6 +215,7 @@ export class CachedHttpClientService {
     };
   }) {
     this.logger.debug('onCacheEntriesGroupCreated', group);
+    this.workflowVersionCreatedSubject.next(JSON.parse(group.groupName));
   }
 
   public onCacheEntriesGroupUpdated(group: {
@@ -180,6 +226,7 @@ export class CachedHttpClientService {
   }) {
     this.logger.debug('onCacheEntriesGroupUpdated', group);
     this.logger.debug('Cache group updated', group);
+    this.workflowVersionUpdateSubject.next(JSON.parse(group.groupName));
   }
 
   public onCacheEntriesGroupDeleted(group: {
@@ -187,6 +234,7 @@ export class CachedHttpClientService {
     entries: Array<string>;
   }) {
     this.logger.debug('onCacheEntriesGroupDeleted', group);
+    this.workflowVersionDeleteSubject.next(JSON.parse(group.groupName));
   }
 
   private enableBackgroundRefresh(interval: number = 5 * 60 * 1000) {
@@ -234,13 +282,14 @@ export class CachedHttpClientService {
       cacheEntry?: string;
       cacheGroup?: string;
       cacheTTL?: number;
+      cacheNotifyUpdates?: boolean;
     }
   ): Observable<T> {
     // console.debug('HEADERS input', options);
     const headers = {};
     if (options.headers instanceof HttpHeaders) {
       for (let k of options.headers.keys()) {
-        // console.log('HEADERS...', k, options.headers[k]);
+        // this.logger.debug('HEADERS...', k, options.headers[k]);
         headers[k] = options.headers[k];
       }
     } else {
@@ -279,7 +328,7 @@ export class CachedHttpClientService {
     };
     this.logger.debug('Cache request headers', init);
     return from(
-      this.cache.fetch(input.toString(), init).then(async (r) => {
+      this.cache.fetch(input.toString(), init, false).then(async (r) => {
         const v = await r.json();
         return v as T;
       })
@@ -359,11 +408,49 @@ export class CachedHttpClientService {
     return result;
   }
 
+  public async refreshCacheEntriesByKeys(keys: string[]): Promise<boolean[]> {
+    const result: Array<boolean> = [];
+    for (let k of keys) {
+      result[k] = await this.cache.refreshEntryByKey(k, { ignoreTTL: true });
+    }
+    return result;
+  }
+
   public async deleteCacheEntriesGroup(
-    group: string | object
+    group: string | object,
+    notifyEntryDeletion: boolean = true
   ): Promise<boolean> {
     const groupKey: string =
       typeof group === 'string' ? group : JSON.stringify(group);
-    return await this.cache.deleteCacheEntriesGroup(groupKey);
+    return await this.cache.deleteCacheEntriesGroup(
+      groupKey,
+      notifyEntryDeletion
+    );
   }
+
+  public async refreshCacheEntriesGroup(
+    group: string | object,
+    notifyEntryGroupUpdate: boolean = true
+  ) {
+    const groupKey: string =
+      typeof group === 'string' ? group : JSON.stringify(group);
+    this.logger.error('The Group Key', groupKey, group);
+    return await this.cache.refreshCacheEntriesGroup(
+      groupKey,
+      notifyEntryGroupUpdate
+    );
+  }
+}
+
+if (typeof Worker !== 'undefined') {
+  // Create a new
+  worker = new Worker(new URL('./cache.worker', import.meta.url));
+  worker.onmessage = ({ data }) => {
+    console.debug(`page got message: ${data}`);
+  };
+  worker.postMessage({ type: 'ping' });
+} else {
+  // Web Workers are not supported in this environment.
+  // You should add a fallback so that your program still executes correctly.
+  console.warn('Workers are not supported on this environment');
 }
