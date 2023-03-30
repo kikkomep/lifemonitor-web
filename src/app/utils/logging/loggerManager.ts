@@ -1,5 +1,5 @@
-import { Logger } from "./logger";
-import { Level } from "./level";
+import { Logger } from './logger';
+import { Level } from './level';
 
 export class LoggerManager {
   /**
@@ -21,8 +21,8 @@ export class LoggerManager {
   private static levels: Level[] = [];
 
   private static initializationBlock = ((() => {
-    if (self["window"]) {
-      const _window: any = self["window"];
+    if (self['window']) {
+      const _window: any = self['window'];
       _window['LoggerManager'] = {
         onlyLevel: LoggerManager.onlyLevels,
         onlyModules: LoggerManager.onlyModules,
@@ -30,7 +30,7 @@ export class LoggerManager {
         unmute: LoggerManager.unmute,
         unMuteAllModules: LoggerManager.unMuteAllModules,
         muteAllModules: LoggerManager.muteAllModules,
-        showConfig: LoggerManager.showConfig
+        showConfig: LoggerManager.showConfig,
       };
     }
 
@@ -64,7 +64,7 @@ export class LoggerManager {
     if (modules.length === 0) return;
     LoggerManager.muteAllModules();
 
-    modules.forEach(m => LoggerManager.mute(m, false));
+    modules.forEach((m) => LoggerManager.mute(m, false));
   }
 
   static mute(moduleName: string, mute = true) {
@@ -122,13 +122,15 @@ export class LoggerManager {
   }
 
   static isLevelAllowed(level: Level) {
-    return LoggerManager.levels.length == 0 || LoggerManager.levels.includes(level);
+    return (
+      LoggerManager.levels.length == 0 || LoggerManager.levels.includes(level)
+    );
   }
 
   static showConfig() {
     return {
       modulesState: LoggerManager.instancesStateMap,
-      levels: LoggerManager.levels
+      levels: LoggerManager.levels,
     };
   }
 
@@ -138,7 +140,7 @@ export class LoggerManager {
   }
 
   private static getStorage(): any {
-    return self["localStorage"];
+    return self['localStorage'];
   }
 
   private static saveState() {
@@ -148,7 +150,7 @@ export class LoggerManager {
     }
     const state = {
       map: LoggerManager.instancesStateMap,
-      levels: LoggerManager.levels
+      levels: LoggerManager.levels,
     };
     storage.setItem(LoggerManager.STORAGE_KEY, JSON.stringify(state));
   }
