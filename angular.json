@@ -22,13 +22,19 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
-              "./node_modules/chart.js/dist/Chart.min.css",
+              "./node_modules/primeicons/primeicons.css",
+              "./node_modules/primeng/resources/primeng.min.css",
               "./node_modules/bs-stepper/dist/css/bs-stepper.min.css",
               "./node_modules/bootstrap-select/dist/css/bootstrap-select.min.css",
               "./node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css",
               "./node_modules/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css",
+              "src/ngstyles.css",
               "src/styles.scss"
             ],
             "scripts": [
@@ -43,7 +49,8 @@
               "./node_modules/datatables.net-buttons/js/buttons.html5.min.js",
               "./node_modules/datatables.net-buttons/js/buttons.print.min.js",
               "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
-              "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
+              "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js",
+              "./node_modules/chart.js/dist/Chart.js"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -127,7 +134,11 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
             "styles": ["src/styles.scss"],
             "scripts": [],
             "webWorkerTsConfig": "tsconfig.worker.json"
