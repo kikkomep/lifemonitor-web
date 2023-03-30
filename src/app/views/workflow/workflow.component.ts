@@ -80,7 +80,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
 
     this.queryParamsSubscription = this.route.queryParams
       .subscribe(params => {
-        console.debug("Query params: ", params);
+        this.logger.debug("Query params: ", params);
         if ('status' in params) {
           // Parse and normalize status filter
           let status: string = params['status'].toLowerCase();

@@ -115,13 +115,12 @@ export class CacheEntry implements ICacheEntry {
     this.response = response;
     this.meta = options?.meta;
     this.valid = options?.valid ?? true;
-    this.created_at = options.create_at ?? Date.now();
+    this.created_at = options.create_at ?? new Date().getTime();
   }
 
   public get key(): string {
     if (!this._key) {
-      if (this.request.userCacheKey)
-        this._key = this.request.userCacheKey;
+      if (this.request.userCacheKey) this._key = this.request.userCacheKey;
       else this._key = CacheEntry.makeKey(this.request);
     }
     return this._key;
@@ -206,7 +205,7 @@ export class CacheGroup {
     if (!meta) throw Error('meta cannot be null');
     this.meta = meta;
     this._entries = {};
-    this.create_at = Date.now();
+    this.create_at = new Date().getTime();
     this.logger = console;
     // LoggerManager.create('MetaMapItem: ' + this.key);
   }
@@ -437,7 +436,6 @@ export class CacheMap {
     const cacheMap = new CacheMap();
     Object.keys(data).forEach((key) => {
       const entry = CacheEntry.fromJSON(data[key]);
-      console.log("Check entry", entry);
       cacheMap.addEntry(entry);
     });
     return cacheMap;

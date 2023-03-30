@@ -61,7 +61,7 @@ export class ApiService {
   private handleWorkerMessage(
     event: MessageEvent<{ type: string; payload: object }>
   ) {
-    console.log(`Received message from worker: ${event.data.type}`);
+    this.logger.debug(`Received message from worker: ${event.data.type}`);
     if (this[event.data.type]) {
       this[event.data.type](event.data.payload);
     }
@@ -76,7 +76,7 @@ export class ApiService {
       meta: object;
     };
   }) {
-    console.log('Serving update entity event', entity);
+    this.logger.debug('Serving update entity event', entity);
     localStorage.removeItem(entity.key);
     localStorage.setItem(entity.key, JSON.stringify(entity.data));
   }

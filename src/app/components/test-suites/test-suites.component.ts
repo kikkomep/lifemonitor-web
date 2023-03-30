@@ -64,7 +64,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     event.target.innerWidth;
-    console.log('Resize', event.target.innerWidth);
+    this.logger.debug('Resize', event.target.innerWidth);
     if (event.target.innerWidth < 1200) {
       this.dataView.layout = 'grid';
       this.cdr.detectChanges();

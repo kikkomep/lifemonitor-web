@@ -1,8 +1,11 @@
 import { IDBPDatabase, openDB } from 'idb';
+import { Logger, LoggerManager } from '../logging';
 
 export class IndexedDb {
   private database: string;
   private db: any;
+
+  private logger: Logger = LoggerManager.create('IndexedDB');
 
   constructor(database: string) {
     this.database = database;
@@ -32,7 +35,7 @@ export class IndexedDb {
     const tx = this.db.transaction(objectStoreName, 'readonly');
     const store = tx.objectStore(objectStoreName);
     const result = await store.get(id);
-    console.log('Get Data ', JSON.stringify(result));
+    this.logger.debug('Get Data ', JSON.stringify(result));
     return result;
   }
 
@@ -40,7 +43,7 @@ export class IndexedDb {
     const tx = this.db.transaction(objectStoreName, 'readonly');
     const store = tx.objectStore(objectStoreName);
     const result = await store.getAll();
-    console.log('Get All Data', JSON.stringify(result));
+    this.logger.debug('Get All Data', JSON.stringify(result));
     return result;
   }
 
@@ -48,7 +51,7 @@ export class IndexedDb {
     const tx = this.db.transaction(objectStoreName, 'readwrite');
     const store = tx.objectStore(objectStoreName);
     const result = await store.put(value);
-    console.log('Put Data ', JSON.stringify(result));
+    this.logger.debug('Put Data ', JSON.stringify(result));
     return result;
   }
 
@@ -57,7 +60,7 @@ export class IndexedDb {
     const store = tx.objectStore(objectStoreName);
     for (const value of values) {
       const result = await store.put(value);
-      console.log('Put Bulk Data ', JSON.stringify(result));
+      this.logger.debug('Put Bulk Data ', JSON.stringify(result));
     }
     return this.getAllValue(objectStoreName);
   }
@@ -67,11 +70,11 @@ export class IndexedDb {
     const store = tx.objectStore(objectStoreName);
     const result = await store.get(id);
     if (!result) {
-      console.log('Id not found', id);
+      this.logger.debug('Id not found', id);
       return result;
     }
     await store.delete(id);
-    console.log('Deleted Data', id);
+    this.logger.debug('Deleted Data', id);
     return id;
   }
 }

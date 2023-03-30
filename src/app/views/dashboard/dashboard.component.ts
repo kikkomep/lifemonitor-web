@@ -177,7 +177,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
     this.queryParamsSubscription = this.route.queryParams.subscribe(
       (params) => {
-        console.debug('Query params: ', params);
+        this.logger.debug('Query params: ', params);
         if ('status' in params) {
           // Parse and normalize status filter
           let status: string = params['status'].toLowerCase();
@@ -276,7 +276,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     event.target.innerWidth;
-    console.log('Resize', event.target.innerWidth);
+    this.logger.debug('Resize', event.target.innerWidth);
     if (event.target.innerWidth < 1200) {
       this.dataView.layout = 'grid';
       this.cdref.detectChanges();

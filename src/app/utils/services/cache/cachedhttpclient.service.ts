@@ -65,7 +65,7 @@ export class CachedHttpClientService {
         [key: string]: { request: CachedRequest; response: CachedResponse };
       }
     ) => {
-      this.logger.debug('Cache group', groupName, entries);
+      this.logger.debug('Cache group updated', groupName, entries);
       const data = JSON.parse(groupName);
       this.workflowVersionUpdateSubject.next(data);
     };
@@ -149,15 +149,15 @@ export class CachedHttpClientService {
   }
 
   public onCacheEntryCreated(entry: { request: string; data: object }) {
-    console.log('onCacheEntryCreated', entry);
+    this.logger.debug('onCacheEntryCreated', entry);
   }
 
   public onCacheEntryUpdated(entry: { request: string; data: object }) {
-    console.log('onCacheEntryUpdated', entry);
+    this.logger.debug('onCacheEntryUpdated', entry);
   }
 
   public onCacheEntryDeleted(entry: { key: string }) {
-    console.log('onCacheEntryDeleted', entry);
+    this.logger.debug('onCacheEntryDeleted', entry);
   }
 
   public onCacheEntriesGroupCreated(group: {
@@ -166,7 +166,7 @@ export class CachedHttpClientService {
       [key: string]: { request: string; data: object };
     };
   }) {
-    console.log('onCacheEntriesGroupCreated', group);
+    this.logger.debug('onCacheEntriesGroupCreated', group);
   }
 
   public onCacheEntriesGroupUpdated(group: {
@@ -175,14 +175,15 @@ export class CachedHttpClientService {
       [key: string]: { request: string; data: object };
     };
   }) {
-    console.log('onCacheEntriesGroupUpdated', group);
+    this.logger.debug('onCacheEntriesGroupUpdated', group);
+    this.logger.debug('Cache group updated', group);
   }
 
   public onCacheEntriesGroupDeleted(group: {
     groupName: string;
     entries: Array<string>;
   }) {
-    console.log('onCacheEntriesGroupDeleted', group);
+    this.logger.debug('onCacheEntriesGroupDeleted', group);
   }
 
   private enableBackgroundRefresh(interval: number = 5 * 60 * 1000) {
@@ -273,7 +274,7 @@ export class CachedHttpClientService {
       ...options,
       headers: headers,
     };
-
+    this.logger.debug('Cache request headers', init);
     return from(
       this.cache.fetch(input.toString(), init).then(async (r) => {
         const v = await r.json();

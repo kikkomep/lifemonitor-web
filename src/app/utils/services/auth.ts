@@ -32,7 +32,7 @@ export class AuthHandler {
 
   public async checkIsUserLogged(): Promise<boolean> {
     return this.getToken().then((token) => {
-      console.log('Current token', token);
+      this.logger.debug('Current token', token);
       if (token && 'token' in token) {
         this._token = token;
         this._isUserLogged = true;
