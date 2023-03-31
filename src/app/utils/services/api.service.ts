@@ -363,7 +363,7 @@ export class ApiService {
     );
   }
 
-  updateWorkflowName(workflow: WorkflowVersion): Observable<any> {
+  updateWorkflowName(workflow: Workflow): Observable<any> {
     let body = {
       name: workflow.name,
     };
