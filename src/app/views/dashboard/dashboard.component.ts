@@ -8,7 +8,7 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +17,7 @@ import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
-  AggregatedTestStatusMap
+  AggregatedTestStatusMap,
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { User } from 'src/app/models/user.modes';
@@ -152,7 +152,6 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
               // alert('Loading from user logged ' + user);
             });
         }
-        // else alert('Skpping reload');
       }
     );
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
@@ -216,6 +215,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
               this.logger.debug('Loaded workflows ', data);
               // alert('Loaded workflows from dashboard init');
             });
+        // else alert('Already loading workflows');
       });
     }
   }
