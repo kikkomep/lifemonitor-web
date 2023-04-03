@@ -10,6 +10,7 @@ import {
   tap,
   toArray,
 } from 'rxjs/operators';
+import { Job } from 'src/app/models/job.model';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
@@ -361,6 +362,10 @@ export class AppService {
         });
       }
     });
+  }
+
+  public get job$(): Observable<Job> {
+    return this.api.jobs$;
   }
 
   public loadUserProfile(): Observable<User> {

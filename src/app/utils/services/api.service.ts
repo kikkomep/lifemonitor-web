@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
+import { Job } from 'src/app/models/job.model';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import {
@@ -65,6 +66,11 @@ export class ApiService {
     if (this[event.data.type]) {
       this[event.data.type](event.data.payload);
     }
+  }
+
+
+  public get jobs$(): Observable<Job> {
+    return this.cachedHttpClient.jobs$;
   }
 
   private entityUpdated(entity: {

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 
 import { from, Observable, Subject, Subscription } from 'rxjs';
+import { Job } from 'src/app/models/job.model';
 import { Logger, LoggerManager } from '../../logging';
 import { ApiSocket } from '../../shared/api-socket';
 import { AuthService } from '../auth.service';
@@ -30,6 +31,8 @@ export class CachedHttpClientService {
   private apiBaseUrl: string = null;
   private syncInterval: number = 5 * 60 * 1000;
   private httpOptions: object = null;
+
+  private jobSubject: Subject<Job> = new Subject<Job>();
 
   // initialize logger
   private logger: Logger = LoggerManager.create('CachedHttpClient');
@@ -152,6 +155,16 @@ export class CachedHttpClientService {
       alert('OnLine');
       this.isOnline = true;
     });
+  }
+
+
+  public get jobs$(): Observable<Job> {
+    return this.jobSubject.asObservable();
+  }
+
+  public onJobUpdate(oayload: object) {
+    this.logger.debug('The job', oayload);
+    this.jobSubject.next(oayload['data']);
   }
 
   public startWorker() {
