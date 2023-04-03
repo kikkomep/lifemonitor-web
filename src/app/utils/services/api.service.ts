@@ -385,13 +385,14 @@ export class ApiService {
       .pipe(
         retry(3),
         map((data) => {
-          this.refreshWorkflow(workflow.uuid, workflow.version['version']).then(
-            () => {
-              this.refreshListOfWorkflows().then(() => {
-                this.logger.debug('Changed workflow name to:' + workflow.name);
-              });
-            }
-          );
+          this.refreshListOfWorkflows().then(() => {
+            this.refreshWorkflow(
+              workflow.uuid,
+              workflow.currentVersion.version['version']
+            ).then(() => {
+              this.logger.debug('Changed workflow name to:' + workflow.name);
+            });
+          });
         }),
         tap((data) => {
           this.logger.debug('Check workflowVersion', workflow);
