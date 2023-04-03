@@ -304,6 +304,11 @@ export class AppService {
         this.workflow_versions.splice(
           this.workflow_versions.findIndex((v) => v.uuid === wf.uuid)
         );
+        this.logger.debug('Check workflows after deletion', this.workflows);
+        this.subjectWorkflows.next(this.workflows);
+        this.toastService.error(``, `Workflow ${workflow.name} deleted`, {
+          timeOut: 3000,
+        });
       } else {
         // Update array of version descriptors
         const nextVersion = workflow.pickVersion([wf.version]);
@@ -332,7 +337,7 @@ export class AppService {
 
           this.logger.debug('Check workflows after deletion', this.workflows);
           this.subjectWorkflows.next(this.workflows);
-          this.toastService.success(
+          this.toastService.error(
             ``,
             `Workflow ${workflow.name} (ver.${wf.version}) deleted`,
             {
