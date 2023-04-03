@@ -139,7 +139,9 @@ function getCacheKey(data: { uuid: string; version?: string }): string {
     uuid: data.uuid,
   };
   if (data.version) toSerialize['version'] = data.version;
-  return JSON.stringify(toSerialize);
+  const sKey = JSON.stringify(toSerialize);
+  logger.debug('Serialized data key: ', toSerialize, sKey);
+  return sKey;
 }
 
 function decodeCacheKey(
@@ -340,9 +342,11 @@ async function onSync(
 async function onDelete(
   rawData: [{ uuid: string; version: string; lastUpdate: number }]
 ) {
-  logger.info('New Synchronization started...', rawData);
+  logger.info('Processing delete event...', rawData);
   for (const w of rawData) {
-    await cache.deleteCacheEntriesGroup(getCacheKey(w));
+    const groupKey = getCacheKey(w);
+    logger.debug(`Processing workflow version deletion (key: ${groupKey})`, w);
+    await cache.deleteCacheEntriesGroup(groupKey);
   }
 }
 
