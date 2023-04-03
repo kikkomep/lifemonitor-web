@@ -459,7 +459,7 @@ export class ApiService {
       .pipe(
         map((wf_data) => {
           this.logger.debug('Workflow registered', wf_data);
-          this.refreshListOfWorkflows().then(() => {});
+          // this.refreshListOfWorkflows().then(() => {});
           return wf_data;
         })
       );
@@ -496,8 +496,19 @@ export class ApiService {
       .pipe(
         map((wf_data) => {
           this.logger.debug('Workflow registered', wf_data);
-          this.refreshListOfWorkflows().then(() => {});
+          // this.refreshListOfWorkflows().then(() => {});
           return wf_data;
+          // return from(
+          //   this.refreshListOfWorkflows().then(() => {
+          //     setTimeout(() => {
+          //       this.workflowVersionCreated.next({
+          //         uuid: wf_data['uuid'],
+          //         version: wf_data['version'],
+          //       });
+          //     }, 1000);
+          //     return wf_data;
+          //   })
+          // );
         })
       );
   }
