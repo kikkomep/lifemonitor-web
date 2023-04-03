@@ -98,7 +98,10 @@ export class AuthHandler {
     return await this.oauth.fetchAuthorizationCode();
   }
 
-  public async login() {
+  public login(
+    callback: CallableFunction = null,
+    catchError: CallableFunction = null
+  ) {
     this.logger.debug('Is authorized: ', this.oauth.isAuthorized());
     this.logger.debug('Is expired: ', this.oauth.isAccessTokenExpired());
 
@@ -116,6 +119,8 @@ export class AuthHandler {
             this._isUserLogged = true;
             this._userLogged.next(true);
 
+            if (callback) callback();
+
             // setTimeout(() => {
             //   this.saveToken({
             //     ...token,
@@ -129,6 +134,7 @@ export class AuthHandler {
           if (potentialError) {
             this.logger.debug(potentialError);
           }
+          if (catchError) catchError(potentialError);
         });
     } else {
       this.getToken().then((token) => {
