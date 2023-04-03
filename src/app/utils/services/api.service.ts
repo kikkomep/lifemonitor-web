@@ -120,9 +120,11 @@ export class ApiService {
 
   private workflowToCacheGroup(
     uuid: string,
-    version: string = 'latest'
+    version?: string // = 'latest'
   ): string {
-    return JSON.stringify({ type: 'workflow', uuid: uuid, version: version });
+    const obj = { type: 'workflow', uuid: uuid };
+    if (version) obj['version'] = version;
+    return JSON.stringify(obj);
   }
 
   private workflowFromCacheGroup(
