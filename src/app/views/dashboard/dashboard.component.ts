@@ -393,7 +393,11 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
           .deleteWorkflowVersion(w)
           .subscribe((wd: { uuid: string; version: string }) => {
             this.logger.debug('Workflow deleted', wd);
-            // this.refreshDataTable(false);
+            this.toastService.error(
+              '',
+              `${w.name} (ver. ${w.version['version']}) deleted`,
+              { timeOut: 5000 }
+            );
           });
       },
     });
@@ -410,6 +414,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
           .deleteWorkflow(w)
           .subscribe((wd: { uuid: string; version: string }) => {
             this.logger.debug('Workflow deleted', wd);
+            this.toastService.error('', `${w.name} (${w.uuid}) deleted`, {
+              timeOut: 5000,
+            });
           });
       },
     });
