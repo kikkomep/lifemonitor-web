@@ -176,10 +176,12 @@ export class ApiService {
       cacheEntry?: string;
       cacheGroup?: string;
       cacheTTL?: number;
+      cacheNotifyUpdates?: boolean;
     } = {
       http_options: this.get_http_options(),
       base_path: null,
       useCache: true,
+      cacheNotifyUpdates: false,
     }
   ): Observable<T> {
     const base_path = options.base_path ?? this.apiBaseUrl;
