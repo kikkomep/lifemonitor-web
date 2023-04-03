@@ -456,7 +456,6 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
         map((wf_data) => {
           this.logger.debug('Workflow registered', wf_data);
           this.refreshListOfWorkflows().then(() => {});
@@ -493,7 +492,6 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
         map((wf_data) => {
           this.logger.debug('Workflow registered', wf_data);
           this.refreshListOfWorkflows().then(() => {});
