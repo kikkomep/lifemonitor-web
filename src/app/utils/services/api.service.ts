@@ -1,6 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
 import { Socket } from 'ngx-socket-io';
+import { forkJoin, from, Observable, of, Subject, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { Job } from 'src/app/models/job.model';
 import { UserNotification } from 'src/app/models/notification.model';
@@ -31,10 +33,14 @@ export class ApiService {
   // initialize logger
   private logger: Logger = LoggerManager.create('ApiService');
 
+  private workflowVersionCreated = new Subject<{
+    uuid: string;
+    version: string;
+  }>();
   public onWorkflowVersionCreated: Observable<{
     uuid: string;
     version: string;
-  }> = this.cachedHttpClient.onWorkflowVersionCreated;
+  }> = this.workflowVersionCreated.asObservable();
 
   public onWorkflowVersionUpdate: Observable<{
     uuid: string;
@@ -53,6 +59,10 @@ export class ApiService {
     private authService: AuthService
   ) {
     this.logger.debug('API Service created');
+    // propagate cache events
+    this.cachedHttpClient.onWorkflowVersionCreated.subscribe((w) => {
+      this.workflowVersionCreated.next(w);
+    });
   }
 
   public get apiBaseUrl(): string {
