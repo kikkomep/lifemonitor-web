@@ -15,6 +15,7 @@ export interface InputDialogConfig {
   onConfirm?: any;
   enableCancel?: boolean;
   onCancel?: any;
+  enableClose?: boolean;
 }
 
 @Injectable({
