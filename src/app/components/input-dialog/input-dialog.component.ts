@@ -50,7 +50,7 @@ export class InputDialogComponent implements OnInit {
       this.confirmText = config.confirmText || this.confirmText;
       this.cancelText = config.cancelText || this.cancelText;
       this.onConfirm = config.onConfirm || null;
-      this.enableCancel = config.enableCancel || true;
+      this.enableCancel = config.enableCancel ?? true;
       this.onCancel = config.onCancel || null;
       this.logger.debug('shown');
     });
