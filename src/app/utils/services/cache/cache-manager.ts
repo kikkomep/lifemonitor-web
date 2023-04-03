@@ -500,12 +500,16 @@ export class CacheManager {
           updatedEntries[key] = entry;
           // await cache.delete(entry.request.url);
           // logger.debug('Delete entry', entry);
-          await this.refreshEntry(entry, { cache: cache, ignoreTTL: true , notifyUpdates: false});
+          await this.refreshEntry(entry, {
+            cache: cache,
+            ignoreTTL: true,
+            notifyUpdates: false,
+          });
           logger.debug('Updated entry', entry);
         }
       }
       logger.debug('Updated group', groupName, groupEntries);
-      if (this.onCacheEntriesGroupUpdated && notifyEntryGroupUpdate){
+      if (this.onCacheEntriesGroupUpdated && notifyEntryGroupUpdate) {
         // if(self['alert']) self['alert']("Notifying");
         this.onCacheEntriesGroupUpdated(groupName, updatedEntries);
       }
