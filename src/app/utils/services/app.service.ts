@@ -289,7 +289,7 @@ export class AppService {
 
     this.api.onWorkflowVersionDeleted.subscribe((wf) => {
       this.logger.debug(
-        'on workflow version deleteted ',
+        'on workflow version deleted ',
         wf,
         this.workflow_versions
       );
