@@ -445,6 +445,7 @@ export class ApiService {
       version: version,
       public: is_public,
       uuid: uuidv4(),
+      async: true,
     };
     return this.http
       .post(
@@ -476,6 +477,7 @@ export class ApiService {
     let data = {
       uuid: uuid,
       version: version,
+      async: true,
     };
     if (url && rocrate) {
       throw Error('Only one of [url,rocrate] can be specified');
