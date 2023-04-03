@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, from, Observable, of, throwError } from 'rxjs';
+import { Socket } from 'ngx-socket-io';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { Job } from 'src/app/models/job.model';
 import { UserNotification } from 'src/app/models/notification.model';
@@ -68,6 +68,9 @@ export class ApiService {
     }
   }
 
+  public get socketIO(): Socket {
+    return this.cachedHttpClient.socketIO;
+  }
 
   public get jobs$(): Observable<Job> {
     return this.cachedHttpClient.jobs$;
