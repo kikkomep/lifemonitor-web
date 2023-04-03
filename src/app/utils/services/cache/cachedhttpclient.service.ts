@@ -164,6 +164,9 @@ export class CachedHttpClientService {
     });
   }
 
+  public get socketIO(): Socket {
+    return this.socket;
+  }
 
   public get jobs$(): Observable<Job> {
     return this.jobSubject.asObservable();
