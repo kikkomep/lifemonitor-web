@@ -41,7 +41,6 @@ export class InputDialogComponent implements OnInit {
 
     $('#' + this.name).on('show.bs.modal', () => {
       let config: InputDialogConfig = this.service.getConfig();
-      alert('Enable close ' + config.enableClose);
       this.title = config.title || this.title;
       this.iconClass = config.iconClass || this.iconClass;
       this.iconClassSize = config.iconClassSize || this.iconClassSize;
