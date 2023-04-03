@@ -100,9 +100,16 @@ export class CachedHttpClientService {
             ).toUTCString()} (published at ${mDate} - age: ${mAge} msecs)`,
             data
           );
+          // alert(data['payload']['type']);
           if (mAge <= MAX_AGE) {
             if (data && data['payload'] && data['payload']['type']) {
-              worker.postMessage(data['payload']);
+              const methodName =
+                'on' + this.titleCaseWord(data['payload']['type']);
+              if (this[methodName]) this[methodName](data['payload']);
+              else {
+                this.logger.debug('Posting message top worker', data);
+                worker.postMessage(data['payload']);
+              }
             }
           } else {
             this.logger.warn(`Message skipped: too old (age ${mAge} msecs)`);
@@ -197,8 +204,9 @@ export class CachedHttpClientService {
               event.data['type'][0].toUpperCase() +
               event.data['type'].slice(1);
             this.logger.debug('Function name:', fnName);
-            if (this[fnName]) this[fnName](event.data['payload']);
-            else {
+            if (this[fnName]) {
+              this[fnName](event.data['payload']);
+            } else {
               this.logger.warn(`${fnName} is not a function`);
             }
           }
@@ -452,6 +460,11 @@ export class CachedHttpClientService {
       groupKey,
       notifyEntryGroupUpdate
     );
+  }
+
+  private titleCaseWord(word: string) {
+    if (!word) return word;
+    return word[0].toUpperCase() + word.substr(1);
   }
 }
 
