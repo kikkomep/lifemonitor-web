@@ -120,8 +120,17 @@ export class AppService {
             this.logger.debug('Current user from APP', data);
             this._currentUser = data;
             this.subjectUser.next(data);
+            this.api.socketIO.emit('message', {
+              type: 'join',
+              data: { user: data.id },
+            });
           });
         } else {
+          if (this._currentUser !== null)
+            this.api.socketIO.emit('message', {
+              type: 'leave',
+              data: { user: this._currentUser.id },
+            });
           this._currentUser = null;
           this.subjectUser.next(null);
         }
@@ -357,6 +366,10 @@ export class AppService {
             this.api.get_current_user().subscribe((data) => {
               this.logger.debug('Current user from APP', data);
               this._currentUser = data;
+              this.api.socketIO.emit('message', {
+                type: 'join',
+                data: { user: data.id },
+              });
             });
           }
         });
