@@ -121,7 +121,14 @@ export class ApiService {
     return JSON.parse(groupName);
   }
 
-  private async refreshWorkflow(uuid: string, version: string) {
+  public async refreshWorkflow(uuid: string, version: string) {
+    await this.cachedHttpClient.refreshCacheEntriesGroup(
+      {
+        type: 'workflow',
+        uuid: uuid,
+      },
+      false
+    );
     await this.cachedHttpClient.refreshCacheEntriesGroup(
       {
         type: 'workflow',
@@ -132,7 +139,7 @@ export class ApiService {
     );
   }
 
-  private async refreshListOfWorkflows() {
+  public async refreshListOfWorkflows() {
     await this.cachedHttpClient.refreshCacheEntriesByKeys([
       'registeredWorkflows',
       'subscribedWorkflows',
