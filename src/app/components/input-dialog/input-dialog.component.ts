@@ -25,6 +25,7 @@ export class InputDialogComponent implements OnInit {
   @Input() onConfirm = null;
   @Input() enableCancel = true;
   @Input() onCancel = null;
+  @Input() enableClose = true;
 
   name: string = 'inputModalDialog';
 
@@ -40,6 +41,7 @@ export class InputDialogComponent implements OnInit {
 
     $('#' + this.name).on('show.bs.modal', () => {
       let config: InputDialogConfig = this.service.getConfig();
+      alert('Enable close ' + config.enableClose);
       this.title = config.title || this.title;
       this.iconClass = config.iconClass || this.iconClass;
       this.iconClassSize = config.iconClassSize || this.iconClassSize;
@@ -52,6 +54,7 @@ export class InputDialogComponent implements OnInit {
       this.onConfirm = config.onConfirm || null;
       this.enableCancel = config.enableCancel ?? true;
       this.onCancel = config.onCancel || null;
+      this.enableClose = config.enableClose ?? true;
       this.logger.debug('shown');
     });
   }
