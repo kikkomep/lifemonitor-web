@@ -1,4 +1,3 @@
-import { AppService } from 'src/app/utils/services/app.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {
   AfterViewChecked,
@@ -9,17 +8,19 @@ import {
   OnInit,
 } from '@angular/core';
 import Stepper from 'bs-stepper';
+import { ActiveToast, ToastrService } from 'ngx-toastr';
+import { Subscription } from 'rxjs';
 import { UrlValue } from 'src/app/models/common.models';
+import { Job } from 'src/app/models/job.model';
+import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
+import { WorkflowVersion } from 'src/app/models/workflow.model';
+import { Logger, LoggerManager } from 'src/app/utils/logging';
+import { AppService } from 'src/app/utils/services/app.service';
 import {
   Config,
   WorkflowUploaderService,
 } from 'src/app/utils/services/workflow-uploader.service';
 import { v4 as uuidv4 } from 'uuid';
-import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
-import { Subscription } from 'rxjs';
-import { Logger, LoggerManager } from 'src/app/utils/logging';
-import { WorkflowVersion } from 'src/app/models/workflow.model';
-import { ToastrService } from 'ngx-toastr';
 
 declare var $: any;
 
@@ -68,6 +69,8 @@ export class WorkflowUploaderComponent
   private _registryWorkflows: RegistryWorkflow[] = [];
   private _selectedRegistry: Registry = null;
   private _selectedRegistryWorkflow: RegistryWorkflow = null;
+
+  private _lastActiveToast: ActiveToast<any> = null;
 
   // subscriptions
   private _subscriptions: Subscription[] = [];
@@ -165,6 +168,29 @@ export class WorkflowUploaderComponent
       this.appService.loadRegistries().subscribe((registries: Registry[]) => {
         this.logger.debug('data registries....', registries);
       });
+    });
+
+    this.appService.job$.subscribe((job: Job) => {
+      this.logger.warn('Check job update', job);
+      if (job.type === 'workflow_registration') {
+        // this.toastService.clear();
+        if (job.status === 'error') {
+          this.toastService.error(
+            `${job.error.title}: ${job.error.detail}`,
+            `Registration of ${job.data['name'] ?? 'Workflow'} (ver. ${
+              job.data['version']
+            }) failed`,
+            { timeOut: 60000 }
+          );
+        } else {
+          const message = `Please wait, registering workflow... ${job.status}`;
+          this._lastActiveToast = this.toastService.info(
+            message,
+            `${job.data['name'] ?? 'Workflow'} (ver. ${job.data['version']})`,
+            { timeOut: job.status !== 'completed' ? 4000 : 6000 }
+          );
+        }
+      }
     });
   }
 
@@ -497,9 +523,10 @@ export class WorkflowUploaderComponent
 
       if (request) {
         this._processing = true;
+        this.toastService.clear();
         this.toastService.info(
           `Please Wait...`,
-          `Checking Workflow ${this.workflowName ?? 'Workflow'} (ver. ${
+          `Registering ${this.workflowName ?? 'Workflow'} (ver. ${
             this.workflowVersion
           })`,
           { timeOut: 60000 }
@@ -508,21 +535,21 @@ export class WorkflowUploaderComponent
           (data: any) => {
             this.logger.debug('Workflow registered (from uploader)', data);
             this.hide();
-            this.toastService.clear();
-            this.toastService.info(
-              `Please Wait, Loading...`,
-              `${this.workflowName ?? 'Workflow'} (ver. ${
-                this.workflowVersion
-              }) added`,
-              { timeOut: 60000 }
-            );
+            // this.toastService.clear();
+            // this.toastService.info(
+            //   `Please Wait...`,
+            //   `Registering ${this.workflowName ?? 'Workflow'} (ver. ${
+            //     this.workflowVersion
+            //   })`,
+            //   { timeOut: 60000 }
+            // );
             this._processing = false;
           },
           (err: HttpErrorResponse) => {
             this.logger.debug('Error', err);
             this._handleError(err);
             this._processing = false;
-            this.toastService.clear();
+            // this.toastService.clear();
             this.toastService.error(
               `Unable to register workflow '${this.workflowName}' (ver. ${this.workflowVersion})`,
               `Oops, something went wrong...`,
