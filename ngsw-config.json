@@ -31,7 +31,13 @@
   "dataGroups": [
     {
       "name": "api",
-      "urls": ["/api/**", "/account/**", "/oauth2/**", "/socket.io/**"],
+      "urls": [
+        "/api/**",
+        "/account/**",
+        "/oauth2/**",
+        "/jobs/**",
+        "/socket.io/**"
+      ],
       "cacheConfig": {
         "strategy": "freshness",
         "maxSize": 1000,
