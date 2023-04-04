@@ -12,6 +12,8 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
+externalServerName: 'localhost'
+
 # Setting for the LifeMonitor Backend API
 backend:
   apiUrl: ""
