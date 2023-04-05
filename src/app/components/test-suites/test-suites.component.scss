@@ -107,8 +107,13 @@
 
     .suite-grid-item-bottom {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      margin-bottom: 1rem;
+      padding: 1rem;
+
+      button {
+        margin: 5rem auto .4rem;
+      }
     }
 
     .suite-grid-item-engine {
@@ -124,15 +129,7 @@
       align-items: right;
     }
 
-    .suite-grid-item-bottom {
-      margin: auto;
-      padding: 2rem;
-      width: 100%;
 
-      button {
-        margin: auto;
-      }
-    }
 
     .suite-grid-item-status {
       margin-top: 2rem;
@@ -210,6 +207,7 @@
     .suite-grid-item {
       margin: 0;
       padding: 0;
+      height: 100vh;
     }
 
     .suite-list-action {

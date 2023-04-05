@@ -114,6 +114,9 @@
   .instance-grid-item {
     margin: 0.5em;
     border: 1px solid #dee2e6;
+    justify-content: space-between;
+    flex-direction: column;
+    display: flex;
 
     .instance-grid-item-top {
       display: flex;
@@ -127,8 +130,13 @@
 
     .instance-grid-item-bottom {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      margin-bottom: 1rem;
+      padding: 1rem;
+
+      button {
+        margin: 5rem auto .4rem;
+      }
     }
 
     .instance-grid-item-engine {
@@ -143,16 +151,6 @@
     .instance-grid-item-edit-action {
       text-align: right;
       align-items: right;
-    }
-
-    .instance-grid-item-bottom {
-      margin: auto;
-      padding: 2rem;
-      width: 100%;
-
-      button {
-        margin: auto;
-      }
     }
 
     .instance-grid-item-status {

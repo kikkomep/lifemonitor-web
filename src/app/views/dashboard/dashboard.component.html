@@ -201,7 +201,7 @@
         <div class="card-body box-profile p-0">
           <p-dataView #workflowsDataView
             [value]="workflows | itemFilterPipe: workflowNameFilter | workflowOrderBy:'modified':'desc'"
-            [paginator]="true" filterBy="Workflow" [rows]="5" layout="list" [sortField]="sortField"
+            [paginator]="true" filterBy="Workflow" [rows]="6" layout="list" [sortField]="sortField"
             [sortOrder]="sortOrder">
             <ng-template pTemplate="header">
               <div class="d-flex align-items-center justify-content-center justify-content-lg-end">
@@ -521,8 +521,8 @@
 
               <!-- </div> -->
             </ng-template>
-            <ng-template let-item pTemplate="gridItem" class="dashboard-grid-layout">
-              <div class="col-xl-4 col-lg-6 col-md-12 d-inline-block">
+            <ng-template let-item pTemplate="gridItem" class="dashboard-grid-layout ">
+              <div class="d-inline-flex w-100 col-xl-4 col-lg-6 col-md-12">
                 <div class="workflow-grid-item">
                   <div class="workflow-grid-item-top">
                     <div class="workflow-grid-item-edit-action"
