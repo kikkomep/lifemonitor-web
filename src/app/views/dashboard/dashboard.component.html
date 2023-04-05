@@ -529,10 +529,10 @@
                       <i class="{{ item.statusIcon }} fa-2x"></i>
                     </div>
 
-                    <div class="workflow-list-item-description">
+                    <div class="workflow-grid-item-description text-center">
                       <!-- Workflow Name -->
                       <div class="item-name" [class.large-font]="item.workflow.name">
-                        <input *ngIf="item.editingMode" type="text" class="form-control datatable-input-no-border"
+                        <input *ngIf="item.editingMode" type="text" class="form-control datatable-input-no-border text-center"
                           [(ngModel)]="item.workflow.name" aria-describedby="workflowNameInput"
                           placeholder="Enter workflow name" (keyup.enter)="updateWorkflowName(item)"
                           (keyup.esc)="restoreWorkflowName(item)" autofocus>
