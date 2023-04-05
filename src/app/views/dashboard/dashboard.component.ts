@@ -463,6 +463,10 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
+  public isEnabledWorkflowEditMode(w: WorkflowVersion): boolean {
+    return w && w['editingMode'];
+  }
+
   public enableWorkflowEditMode(w: WorkflowVersion) {
     this.clickHandler.doubleClick(() => {
       if (this.isUserLogged() && this.isEditable(w)) {
@@ -477,7 +481,10 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.logger.debug('Updating workflow name', w);
     this.appService.updateWorkflowName(w.workflow).subscribe(
       () => {
-        this.toastService.success('Workflow updated!', '', { timeOut: 2500 });
+        this.toastService.info('Updating workflow...', '', {
+          timeOut: 2500,
+          progressBar: true,
+        });
         w['editingMode'] = false;
       },
       (error) => {

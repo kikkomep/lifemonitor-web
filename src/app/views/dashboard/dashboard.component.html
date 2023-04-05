@@ -518,8 +518,11 @@
               <div class="col-xl-4 col-lg-6 col-md-12 d-inline-block">
                 <div class="workflow-grid-item">
                   <div class="workflow-grid-item-top">
-                    <div class="workflow-grid-item-edit-action" *ngIf="isEditable(item)">
+                    <div class="workflow-grid-item-edit-action" *ngIf="isEditable(item) && !isEnabledWorkflowEditMode(item)">
                       <i class="far fa-edit" aria-hidden="true" (click)="enableWorkflowEditMode(item)"></i>
+                    </div>
+                    <div class="workflow-grid-item-edit-action" *ngIf="isEditable(item) && isEnabledWorkflowEditMode(item)">
+                      <i class="far fa-window-close" (click)="updateWorkflowName(item)"></i>
                     </div>
                   </div>
 
