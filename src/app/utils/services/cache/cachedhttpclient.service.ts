@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 
-import { from, Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, from, Observable, Subject, Subscription } from 'rxjs';
 import { Job } from 'src/app/models/job.model';
 import { Logger, LoggerManager } from '../../logging';
 import { ApiSocket } from '../../shared/api-socket';
@@ -18,11 +18,8 @@ import {
 
 declare var $: any;
 
-// max age (in msecs) of received messages
-const MAX_AGE = 10 * 1000;
-
-// reference to the active cache worker
-let worker: Worker = null;
+// Reference to subject worker: always notify the last inizialited worker
+const workerSubject = new BehaviorSubject<Worker>(null);
 
 @Injectable({
   providedIn: 'root',
@@ -81,42 +78,17 @@ export class CachedHttpClientService {
     this.apiBaseUrl = this.config.apiBaseUrl;
     this.logger.debug(`API Service created: ${this.apiBaseUrl}`);
 
-    this.startWorker();
-
     this.cache.getEntries().then((value) => {
       this.logger.debug('Current groups', value);
     });
 
     this.config.onLoad.subscribe((loaded) => {
       if (loaded) {
-        this.socket = new ApiSocket(this.config);
-        this.socket.fromEvent('message').subscribe((data) => {
-          const mDate = new Date(data['timestamp'] * 1000);
-          const rDate = new Date().getTime();
-          const mAge = rDate - mDate.getTime();
-          this.logger.info(
-            `Received message @ ${new Date(
-              rDate
-            ).toUTCString()} (published at ${mDate} - age: ${mAge} msecs)`,
-            data
-          );
-          // alert(data['payload']['type']);
-          if (mAge <= MAX_AGE) {
-            if (data && data['payload'] && data['payload']['type']) {
-              const methodName =
-                'on' + this.titleCaseWord(data['payload']['type']);
-              if (this[methodName]) this[methodName](data['payload']);
-              else {
-                this.logger.debug('Posting message top worker', data);
-                worker.postMessage(data['payload']);
-              }
-            }
-          } else {
-            this.logger.warn(`Message skipped: too old (age ${mAge} msecs)`);
-          }
+        workerSubject.subscribe((worker: Worker) => {
+          this.setUpWorkerMessageHandler(worker);
+          this.socket = new ApiSocket(this.config, this, worker);
+          this.socket.connect();
         });
-
-        this.socket.connect();
       }
     });
 
@@ -175,49 +147,6 @@ export class CachedHttpClientService {
   public onJobUpdate(oayload: object) {
     this.logger.debug('The job', oayload);
     this.jobSubject.next(oayload['data']);
-  }
-
-  public startWorker() {
-    if (worker) {
-      worker.onmessage = (event) => {
-        this.logger.debug('received message from worker', event.data);
-        const message: {
-          type: string;
-          data: object;
-        } = event.data;
-        try {
-          if (!event.data || !event.data['type']) {
-            this.logger.warn(
-              "Invalid worker message: unable to find the 'type' property"
-            );
-            return;
-          }
-          if (message.type === 'echo' || message.type === 'pong') {
-            this.logger.debug(
-              `Received an "${message.type}" message from worker`,
-              message.data
-            );
-          } else {
-            this.logger.debug(
-              'received message from worker',
-              event.data['type']
-            );
-            const fnName =
-              'on' +
-              event.data['type'][0].toUpperCase() +
-              event.data['type'].slice(1);
-            this.logger.debug('Function name:', fnName);
-            if (this[fnName]) {
-              this[fnName](event.data['payload']);
-            } else {
-              this.logger.warn(`${fnName} is not a function`);
-            }
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      };
-    }
   }
 
   public onCacheEntryCreated(entry: { request: string; data: object }) {
@@ -469,14 +398,57 @@ export class CachedHttpClientService {
     if (!word) return word;
     return word[0].toUpperCase() + word.substr(1);
   }
+
+  private setUpWorkerMessageHandler(worker: Worker) {
+    if (!worker) return;
+
+    worker.onmessage = (event) => {
+      this.logger.debug('received message from worker', event.data);
+      const message: {
+        type: string;
+        data: object;
+      } = event.data;
+      try {
+        if (!event.data || !event.data['type']) {
+          this.logger.warn(
+            "Invalid worker message: unable to find the 'type' property"
+          );
+          return;
+        }
+        if (message.type === 'echo' || message.type === 'pong') {
+          this.logger.debug(
+            `Received an "${message.type}" message from worker`,
+            message.data
+          );
+        } else {
+          this.logger.debug('received message from worker', event.data['type']);
+          const fnName =
+            'on' +
+            event.data['type'][0].toUpperCase() +
+            event.data['type'].slice(1);
+          this.logger.debug('Function name:', fnName);
+          if (this[fnName]) {
+            this[fnName](event.data['payload']);
+          } else {
+            this.logger.warn(`${fnName} is not a function`);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+  }
 }
 
+// reference to the active cache worker
+let worker: Worker = null;
 if (typeof Worker !== 'undefined') {
   // Create a new
   worker = new Worker(new URL('./cache.worker', import.meta.url));
   worker.onmessage = ({ data }) => {
     console.debug(`page got message: ${data}`);
   };
+  workerSubject.next(worker);
   worker.postMessage({ type: 'ping' });
 } else {
   // Web Workers are not supported in this environment.
