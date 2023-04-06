@@ -205,13 +205,13 @@
             [sortOrder]="sortOrder">
             <ng-template pTemplate="header">
               <div class="d-flex align-items-center justify-content-center justify-content-lg-end">
-                <div *ngIf="isUserLogged()" class="d-none d-lg-block mx-3">
+                <div *ngIf="isUserLogged()" class="d-none d-xl-block mx-3">
                   <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
-                    <i class="fas fa-plus-circle mx-1"></i><span class="d-none d-lg-inline-block">add</span>
+                    <i class="fas fa-plus-circle mx-1"></i><span class="d-none d-xl-inline-block">add</span>
                   </a>
                   <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="editModeToggle()">
                     <span *ngIf="workflows && workflows.length > 0">
-                      <i class="far fa-edit mx-1"></i><span class="d-none d-lg-inline-block">edit</span>
+                      <i class="far fa-edit mx-1"></i><span class="d-none d-xl-inline-block">edit</span>
                     </span>
                   </a>
                   <a *ngIf="editModeEnabled" class="btn btn-sm active" (click)="editModeToggle()">
@@ -239,12 +239,12 @@
                     </ng-template>
                   </p-dropdown>
                 </div>
-                <p-dataViewLayoutOptions class="d-none d-lg-block d-line-block">
+                <p-dataViewLayoutOptions class="d-none d-xl-block d-line-block">
                 </p-dataViewLayoutOptions>
 
-                <div *ngIf="isUserLogged()" class="d-inline-block d-lg-none mx-3">
+                <div *ngIf="isUserLogged()" class="d-inline-block d-xl-none mx-3">
                   <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
-                    <i class="fas fa-plus-circle fa-2x text-muted"></i><span class="d-none d-lg-inline-block">add</span>
+                    <i class="fas fa-plus-circle fa-2x text-muted"></i><span class="d-none d-xl-inline-block">add</span>
                   </a>
                 </div>
               </div>
