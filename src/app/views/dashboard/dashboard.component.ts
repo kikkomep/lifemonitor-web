@@ -222,7 +222,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   ngAfterViewChecked() {
     // alert("After view checked")
-    // this.checkWindowSize();
+    this.checkWindowSize();
   }
 
   isSmallScreen: boolean = false;
