@@ -120,17 +120,11 @@ export class AppService {
             this.logger.debug('Current user from APP', data);
             this._currentUser = data;
             this.subjectUser.next(data);
-            this.api.socketIO.emit('message', {
-              type: 'join',
-              data: { user: data.id },
-            });
+            this.api.socketIO.join(data);
           });
         } else {
           if (this._currentUser !== null)
-            this.api.socketIO.emit('message', {
-              type: 'leave',
-              data: { user: this._currentUser.id },
-            });
+            this.api.socketIO.leave(this._currentUser);
           this._currentUser = null;
           this.subjectUser.next(null);
         }
@@ -366,14 +360,30 @@ export class AppService {
             this.api.get_current_user().subscribe((data) => {
               this.logger.debug('Current user from APP', data);
               this._currentUser = data;
-              this.api.socketIO.emit('message', {
-                type: 'join',
-                data: { user: data.id },
-              });
+              this.api.socketIO.join(data);
             });
           }
         });
       }
+    });
+  }
+
+  private setupNetworkListener() {
+    window.addEventListener('offline', () => {
+      this.logger.warn('Offline mode enabled');
+    });
+    window.addEventListener('online', () => {
+      this.logger.warn('OnLine mode enabled');
+      this.api.socketIO.connect();
+      this.checkIsUserLogged().then((logged) => {
+        if (!logged) {
+          this.logger.debug('No user logged');
+        } else {
+          this.api.get_current_user().subscribe((user) => {
+            this.api.socketIO.join(user);
+          });
+        }
+      });
     });
   }
 

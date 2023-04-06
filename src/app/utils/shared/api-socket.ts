@@ -1,6 +1,7 @@
 import { Socket } from 'ngx-socket-io';
 import { Logger, LoggerManager } from '../logging';
 import { AppConfigService } from '../services/config.service';
+import { User } from 'src/app/models/user.modes';
 
 // max age (in msecs) of received messages
 export const MAX_AGE = 10 * 1000;
@@ -44,20 +45,24 @@ export class ApiSocket extends Socket {
         ).toUTCString()} (published at ${mDate} - age: ${mAge} msecs)`,
         data
       );
-      alert(data['payload']['type']);
-      if (mAge <= MAX_AGE) {
+      this.logger.debug('Received ' + data['payload']['type']);
+      if (!mAge || mAge <= MAX_AGE) {
         if (data && data['payload'] && data['payload']['type']) {
           const methodName =
             'on' + this.capitalizeFirstLetter(data['payload']['type']);
-          alert('Method name ' + methodName);
+          if (this[methodName]) {
+            this.logger.debug(`Handling method ${methodName} locally`);
+            this[methodName](data['payload']);
+          }
           if (this.messageHandler[methodName]) {
-            alert('Method name');
+            this.logger.debug(
+              `Handling method ${methodName} through messageHandler`
+            );
             this.messageHandler[methodName](data['payload']);
           } else {
             this.logger.debug('Posting message top worker', data);
             if (!this.worker) {
               this.logger.warn('Worker not defined');
-              alert("Not defined");
             } else {
               this.worker.postMessage(data['payload']);
             }
@@ -75,12 +80,35 @@ export class ApiSocket extends Socket {
     this.worker = worker;
   }
 
+  public join(user: User) {
+    this.emit('message', {
+      type: 'join',
+      data: { user: user.id },
+    });
+  }
+
+  public onJoined(payload: { data: { user: string } }) {
+    this.logger.debug(`user ${payload.data.user} joined`);
+  }
+
+  public leave(user: User) {
+    alert('Leave');
+    this.emit('message', {
+      type: 'leave',
+      data: { user: user.id },
+    });
+  }
+
+  public onLeft(payload: { data: { user: string } }) {
+    this.logger.debug(`user ${payload.data.user} left`);
+  }
+
   onConnect() {
-    alert('Connected');
+    this.logger.info('WS connection established');
   }
 
   onDisconnect() {
-    alert('Disconnected');
+    this.logger.info('WS connection interrupted');
   }
 
   private capitalizeFirstLetter(str: string): string {

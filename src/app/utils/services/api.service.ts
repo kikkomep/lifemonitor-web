@@ -23,6 +23,7 @@ import { AuthService } from './auth.service';
 import { FetchError } from './cache/cache-manager';
 import { CachedHttpClientService } from './cache/cachedhttpclient.service';
 import { AppConfigService } from './config.service';
+import { ApiSocket } from '../shared/api-socket';
 
 @Injectable({
   providedIn: 'root',
@@ -78,7 +79,7 @@ export class ApiService {
     }
   }
 
-  public get socketIO(): Socket {
+  public get socketIO(): ApiSocket {
     return this.cachedHttpClient.socketIO;
   }
 

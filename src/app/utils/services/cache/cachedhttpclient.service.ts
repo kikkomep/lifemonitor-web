@@ -65,7 +65,7 @@ export class CachedHttpClientService {
   private cache: CacheManager = new CacheManager('api:lm');
 
   private worker: Worker;
-  private socket: Socket;
+  private socket: ApiSocket;
   isOnline: boolean;
 
   constructor(
@@ -136,7 +136,7 @@ export class CachedHttpClientService {
     });
   }
 
-  public get socketIO(): Socket {
+  public get socketIO(): ApiSocket {
     return this.socket;
   }
 
