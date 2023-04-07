@@ -1,11 +1,9 @@
 #loader {
-  bottom: 400px;
-  height: 175px;
   left: 0;
   margin: auto;
   position: absolute;
   right: 0;
-  top: 0;
+  top: calc(100% / 2 - 43.75px);
   width: 175px;
 }
 
