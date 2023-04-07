@@ -205,7 +205,7 @@
             [sortOrder]="sortOrder">
             <ng-template pTemplate="header">
               <div class="d-flex align-items-center justify-content-center justify-content-lg-end">
-                <div *ngIf="isUserLogged()" class="d-none d-xl-block mx-3">
+                <div *ngIf="isUserLogged() && false" class="d-none d-xl-block mx-3">
                   <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
                     <i class="fas fa-plus-circle mx-1"></i><span class="d-none d-xl-inline-block">add</span>
                   </a>
@@ -283,7 +283,14 @@
                   <div class="col-1 text-center">Suites</div>
                   <div class="col-2 text-center">Latest Test Builds</div>
                 </div>
-                <div class="d-inline-flex flex-column workflow-list-item-actions-header"></div>
+                <div class="d-inline-flex flex-column workflow-list-item-actions-header">
+                  <div *ngIf="isUserLogged()" class="d-inline-block workflow-list-item-add-action">
+                    <a *ngIf="!editModeEnabled && isUserLogged()" class="text-center" (click)="openWorkflowUploader()">
+                      <i class="fas fa-plus-circle" style="margin-left: 5px;"></i>
+                      <div class="d-block text-sm">add</div>
+                    </a>
+                  </div>
+                </div>
               </div>
             </ng-template>
             <ng-template let-item pTemplate="listItem">
@@ -489,28 +496,45 @@
                 </div>
 
                 <div class="d-inline-flex workflow-list-item-actions flex-column">
-                  <div *ngIf="editModeEnabled && isEditable(item)">
+
+                  <div *ngIf="!isEnabledWorkflowEditMode(item) && isEditable(item)">
+                    <a class="btn" (click)="enableWorkflowEditMode(item)">
+                      <span *ngIf="workflows && workflows.length > 0">
+                        <i class="fas fa-edit mx-1 text-muted workflow-list-edit-action"></i>
+                        <span class="d-none">edit</span>
+                      </span>
+                    </a>
+                  </div>
+
+                  <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
                     <a class="btn btn-sm" (click)="openWorkflowVersionUploader(item.workflow)" data-toggle="tooltip"
                       data-placement="top" data-html="true"
-                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>add new version</span>">
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>add version</span>">
                       <!-- <i class="far fa-code-branch"></i> -->
-                      <i class="fas fa-plus-circle"></i>
+                      <i class="fas fa-plus-circle text-muted"></i>
                       <!-- <img src="assets/icons/branch-add.png" width="50px"> -->
                     </a>
                   </div>
-                  <div *ngIf="editModeEnabled && isEditable(item)">
+                  <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
                     <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflowVersion(item)" data-toggle="tooltip"
                       data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete version</span>">
-                      <i class="fas fa-minus-circle"></i>
+                      <i class="fas fa-minus-circle text-muted"></i>
                       <!-- <img src="assets/icons/branch-delete.png" width="50px"> -->
                     </a>
                   </div>
-                  <div *ngIf="editModeEnabled && isEditable(item)">
+                  <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
                     <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflow(item.workflow)" data-toggle="tooltip"
                       data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete workflow</span>">
-                      <i class="fas fa-trash-alt"></i>
+                      <i class="fas fa-trash-alt text-muted"></i>
+                    </a>
+                  </div>
+                  <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
+                    <a class="btn btn-sm active" (click)="disableWorkflowEditMode(item)"
+                      data-toggle="tooltip" data-placement="top" data-html="true"
+                      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>close edit mode</span>">
+                      <i class="fas fa-times-circle text-muted"></i>
                     </a>
                   </div>
                 </div>

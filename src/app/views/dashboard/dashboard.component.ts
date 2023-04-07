@@ -477,6 +477,14 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
+  public disableWorkflowEditMode(w: WorkflowVersion) {
+    if (this.isUserLogged() && this.isEditable(w)) {
+      w['oldNameValue'] = w.name;
+      w['clickOnInputBox'] = false;
+      w['editingMode'] = false;
+    }
+  }
+
   public updateWorkflowName(w: WorkflowVersion) {
     this.logger.debug('Updating workflow name', w);
     this.appService.updateWorkflowName(w.workflow).subscribe(

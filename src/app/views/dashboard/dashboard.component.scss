@@ -127,17 +127,28 @@
 }
 
 .workflow-list-item-actions-header {
-  min-width: 50px;
+  width: 80px;
+  display: flex;
+  align-items: center;
+
+  .workflow-list-item-add-action {
+    margin: 0 0 0 42px;
+    padding: 0;
+  }
 }
 
 .workflow-list-item-actions {
-  min-width: 50px;
+  min-width: 80px;
   align-items: center;
   vertical-align: middle;
   margin: auto;
+
+  .workflow-list-edit-action {
+    font-size: 1rem !important;
+  }
 }
 
-.workflow-list-item-description  {
+.workflow-list-item-description {
   flex-grow: 1;
 }
 
@@ -183,14 +194,14 @@
     display: flex;
     align-items: center;
     padding: 1rem 0 0;
-    width: calc(100% - 50px);
+    width: calc(100% - 80px);
   }
 
   .workflow-list-item {
     display: flex;
     align-items: center;
     padding: 1rem;
-    width: calc(100% - 50px);
+    width: calc(100% - 80px);
     min-height: 14rem;
 
     .workflow-list-item-status {
@@ -405,7 +416,7 @@
       height: auto !important;
     }
 
-    .workflow-grid-item-bottom {
+    .workflow-grid-item-bottom  {
       margin-top: 50px !important;
     }
   }
