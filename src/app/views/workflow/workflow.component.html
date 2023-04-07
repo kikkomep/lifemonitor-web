@@ -1,4 +1,4 @@
-<app-loader [enabled]="!workflow || !suites"></app-loader>
+<app-loader [enabled]="!workflow || !suites" loadingText="... loading ..."></app-loader>
 
 <div *ngIf="workflow && suites" class="content-header">
   <div class="container-fluid">
