@@ -276,6 +276,10 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
     return this._rawData['meta']['modified'];
   }
 
+  public set modified(m: number) {
+    this._rawData['meta']['modified'] = m;
+  }
+
   public asUrlParam() {
     return this.uuid;
   }
