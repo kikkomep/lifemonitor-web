@@ -206,7 +206,7 @@ export class AppService {
               this.toastService.success(
                 `${workflow_version.name} (ver.${workflow_version.version['version']}) loaded!`,
                 'Workflow added',
-                { timeOut: 3000 }
+                { closeButton: true, timeOut: 2000 }
               );
             }
           });
@@ -354,7 +354,8 @@ export class AppService {
             ``,
             `Workflow ${workflow.name} (ver.${wf.version}) deleted`,
             {
-              timeOut: 3000,
+              closeButton: true,
+              timeOut: 2000,
             }
           );
         });
