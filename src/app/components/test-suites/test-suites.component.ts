@@ -20,6 +20,8 @@ import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
 
+const minWidthForListLayout: number = 768;
+
 @Component({
   selector: 'test-suites',
   templateUrl: './test-suites.component.html',
@@ -46,14 +48,16 @@ export class TestSuitesComponent implements OnInit, OnChanges {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    if (window.innerWidth < 1200) {
-      this.dataView.layout = 'grid';
-    }
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit() {
-    this.initDataTable();
+    this.checkWindowSize();
+  }
+
+  private checkWindowSize() {
+    if (window.innerWidth < minWidthForListLayout) {
+      this.dataView.layout = 'grid';
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -65,7 +69,7 @@ export class TestSuitesComponent implements OnInit, OnChanges {
   onResize(event) {
     event.target.innerWidth;
     this.logger.debug('Resize', event.target.innerWidth);
-    if (event.target.innerWidth < 1200) {
+    if (event.target.innerWidth < minWidthForListLayout) {
       this.dataView.layout = 'grid';
       this.cdr.detectChanges();
     }

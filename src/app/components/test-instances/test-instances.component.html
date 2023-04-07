@@ -10,17 +10,17 @@
 
   <p-dataView #instancesDataView [value]="testInstances" [paginator]="true" [rows]="10" layout="list">
     <ng-template pTemplate="header">
-      <div class="d-none d-lg-block">
+      <div class="d-none d-md-block">
         <div class="text-sm-center text-md-right">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
         </div>
         <div>
           <div class="row-12 instance-list-item p-0 m-0 mt-4" *ngIf="dataView && dataView.layout === 'list'">
             <div class="col-1 d-inline-block text-center m-0 p-0"></div>
-            <div class="col-5 d-inline-block">Test Instance</div>
-            <div class="col-1 d-inline-block text-center">Engine</div>
-            <div class="col-2 d-inline-block text-center">Testing Service</div>
-            <div class="col-3 d-inline-block text-center">Latest Test Builds</div>
+            <div class="col-7 col-lg-5 col-xl-5 d-inline-block">Test Instance</div>
+            <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">Engine</div>
+            <div class="col-xl-2 d-none d-xl-inline-block text-center">Testing Service</div>
+            <div class="col-4 col-lg-4 col-xl-3 d-inline-block text-center">Latest Test Builds</div>
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@
             <i class="{{ instance.statusIcon }} fa-2x"></i>
           </div>
         </div>
-        <div class="col-5 d-inline-block">
+        <div class="col-7 col-lg-5 col-xl-5 d-inline-block">
           <div class="instance-name">
             <input *ngIf="instance.editingMode" type="text" [(ngModel)]="instance.name"
               class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
@@ -57,7 +57,7 @@
             <b>url:</b> {{ instance.externalLink }}
           </div>
         </div>
-        <div class="col-1 d-inline-block">
+        <div class="col-2 col-xl-1 d-none d-lg-inline-block">
           <div class="text-center instance-list-item-engine-type" data-html="true" data-toggle="tooltip"
             data-placement="top"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</span>">
@@ -67,7 +67,7 @@
               class="far fa-question-circle fa-2x mr-3 text-muted"></i>
           </div>
         </div>
-        <div class="col-2 d-inline-block">
+        <div class="col-xl-2 d-none d-xl-inline-block text-center">
           <div class="text-center instance-list-item-service-type" data-html="true" data-toggle="tooltip"
             data-placement="top"
             title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
@@ -76,7 +76,7 @@
             </a>
           </div>
         </div>
-        <div class="col-3 d-inline-block">
+        <div class="col-4 col-lg-4 col-xl-3 d-inline-block">
           <div class="instance-list-item-builds-chart">
             <stats-bar-chart [stats]="instance.getLatestBuilds() | arraySizeFilterPipe: 10"
               (selectedItem)="selectTestBuild($event)"></stats-bar-chart>

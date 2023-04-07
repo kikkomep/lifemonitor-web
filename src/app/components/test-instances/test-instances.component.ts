@@ -21,6 +21,8 @@ import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
 
+const minWidthForListLayout: number = 768;
+
 @Component({
   selector: 'test-instances',
   templateUrl: './test-instances.component.html',
@@ -48,7 +50,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    if (window.innerWidth < 1200) {
+    if (window.innerWidth < minWidthForListLayout) {
       this.dataView.layout = 'grid';
     }
   }
@@ -66,7 +68,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   onResize(event) {
     event.target.innerWidth;
     this.logger.debug('Resize', event.target.innerWidth);
-    if (event.target.innerWidth < 1200) {
+    if (event.target.innerWidth < minWidthForListLayout) {
       this.dataView.layout = 'grid';
       this.cdr.detectChanges();
     }
