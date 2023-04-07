@@ -271,7 +271,7 @@
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
-    height: 1000px;
+    min-height: 1130px;
 
     .workflow-grid-item-top {
       display: flex;
@@ -286,13 +286,17 @@
     .workflow-grid-item-bottom {
       display: flex;
       justify-content: center;
-      margin-top: auto;
+      margin-top: 50px;
       margin-bottom: 1rem;
       padding: 1rem;
 
       button {
         margin-bottom: 5rem auto 0.4rem;
       }
+    }
+
+    .workflow-grid-item-description {
+      height: 260px;
     }
 
     .workflow-grid-item-engine {
@@ -393,9 +397,16 @@
 }
 
 @media screen and (max-width: 576px) {
-  :host ::ng-deep .suite-list-item {
-    .workflow-grid-item {
+  :host ::ng-deep .workflow-grid-item {
+    min-height: auto !important;
+    height: auto !important;
+
+    .workflow-grid-item-description {
       height: auto !important;
+    }
+
+    .workflow-grid-item-bottom {
+      margin-top: 50px !important;
     }
   }
 }
