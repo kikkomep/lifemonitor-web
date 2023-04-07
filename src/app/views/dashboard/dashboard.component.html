@@ -3,7 +3,7 @@
 
 <app-workflow-uploader></app-workflow-uploader>
 
-<div style="background: #f4f6f9;">
+<div style="background: #f4f6f9;" data-swipe-threshold="300" data-swipe-timeout="2000">
   <div class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
@@ -205,55 +205,74 @@
             [paginator]="true" filterBy="Workflow" [rows]="6" layout="list" [sortField]="sortField"
             [sortOrder]="sortOrder">
             <ng-template pTemplate="header">
-              <div class="d-flex align-items-center justify-content-center justify-content-lg-end">
-                <div *ngIf="isUserLogged() && false" class="d-none d-xl-block mx-3">
-                  <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
-                    <i class="fas fa-plus-circle mx-1"></i><span class="d-none d-xl-inline-block">add</span>
-                  </a>
-                  <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="editModeToggle()">
-                    <span *ngIf="workflows && workflows.length > 0">
-                      <i class="far fa-edit mx-1"></i><span class="d-none d-xl-inline-block">edit</span>
-                    </span>
-                  </a>
-                  <a *ngIf="editModeEnabled" class="btn btn-sm active" (click)="editModeToggle()">
-                    <i class="far fa-window-close"></i> done
-                  </a>
+              <div class="d-flex py-4 align-items-center justify-content-center">
+                <div class="flex-lg-fill align-items-center justify-content-center justify-content-lg-start">
+                  <div *ngIf="currentLayout === 'grid'" class="d-inline-block mx-3 mx-lg-0 flex-grow">
+                    <a class="btn btn-sm" (click)="refreshDashboard()">
+                      <i class="fas fa-sync fa-lg text-primary"></i>
+                    </a>
+                  </div>
                 </div>
-                <div class="d-inline-block mx-lg-3">
-                  <p-dropdown [options]="sortOptions" [(ngModel)]="sortCriterion" placeholder="Sort By"
-                    (onChange)="onSortChangeEvent($event)">
-                    <ng-template let-c pTemplate="selectedItem">
-                      <span class="mx-2">
-                        <i class="{{c.iconClass}}" [pTooltip]="c.description"
-                          style="position: absolute; top: 10px;"></i>
+                <div
+                  class="d-inline-flex flex-lg-fill align-items-center justify-content-center justify-content-lg-end">
+                  <div *ngIf="isUserLogged() && false" class="d-none d-xl-block mx-3">
+                    <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
+                      <i class="fas fa-plus-circle mx-1"></i><span class="d-none d-xl-inline-block">add</span>
+                    </a>
+                    <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="editModeToggle()">
+                      <span *ngIf="workflows && workflows.length > 0">
+                        <i class="far fa-edit mx-1"></i><span class="d-none d-xl-inline-block">edit</span>
                       </span>
-                      <span style="margin-left: 17px"></span>
-                      {{ c.label }}
-                    </ng-template>
-                    <ng-template let-c pTemplate="item">
-                      <div [pTooltip]="c.description" tooltipPosition="right">
-                        <span class="mx-1">
-                          <i class="{{c.iconClass}}" style="font: 0.7rem;"></i>
+                    </a>
+                    <a *ngIf="editModeEnabled" class="btn btn-sm active" (click)="editModeToggle()">
+                      <i class="far fa-window-close"></i> done
+                    </a>
+                  </div>
+                  <div *ngIf="isUserLogged() && currentLayout=== 'grid'" class="d-none d-xl-block mx-3 mx-xs-4 mx-lg-0">
+                    <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
+                      <i class="fas fa-plus-circle fa-lg text-primary mx-1"></i>
+                    </a>
+                  </div>
+                  <div class="d-inline-block mx-lg-3">
+                    <p-dropdown [options]="sortOptions" [(ngModel)]="sortCriterion" placeholder="Sort By"
+                      (onChange)="onSortChangeEvent($event)">
+                      <ng-template let-c pTemplate="selectedItem">
+                        <span class="mx-2">
+                          <i class="{{c.iconClass}}" [pTooltip]="c.description"
+                            style="position: absolute; top: 10px;"></i>
                         </span>
+                        <span style="margin-left: 17px"></span>
                         {{ c.label }}
-                      </div>
-                    </ng-template>
-                  </p-dropdown>
-                </div>
-                <p-dataViewLayoutOptions class="d-none d-xl-block d-line-block">
-                </p-dataViewLayoutOptions>
+                      </ng-template>
+                      <ng-template let-c pTemplate="item">
+                        <div [pTooltip]="c.description" tooltipPosition="right">
+                          <span class="mx-1">
+                            <i class="{{c.iconClass}}" style="font: 0.7rem;"></i>
+                          </span>
+                          {{ c.label }}
+                        </div>
+                      </ng-template>
+                    </p-dropdown>
+                  </div>
+                  <p-dataViewLayoutOptions class="d-none d-xl-block d-line-block">
+                  </p-dataViewLayoutOptions>
 
-                <div *ngIf="isUserLogged()" class="d-inline-block d-xl-none mx-3">
-                  <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
-                    <i class="fas fa-plus-circle fa-2x text-primary"></i><span
-                      class="d-none d-xl-inline-block">add</span>
-                  </a>
+                  <div *ngIf="isUserLogged()" class="d-inline-block d-xl-none mx-3 mx-lg-0">
+                    <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
+                      <i class="fas fa-plus-circle fa-lg text-primary"></i><span
+                        class="d-none d-xl-inline-block">add</span>
+                    </a>
+                  </div>
                 </div>
               </div>
 
               <div class="d-flex mt-3 d-none d-sm-block" *ngIf="layout === 'list'">
                 <div class="d-inline-flex row workflow-list-item-header">
-                  <div class="col-1 workflow-list-item-status m-0 p-0"></div>
+                  <div class="col-1 workflow-list-item-status m-0 p-0 text-center">
+                    <a class="btn btn-sm" (click)="refreshDashboard()">
+                      <i class="fas fa-sync fa-lg text-primary"></i>
+                    </a>
+                  </div>
                   <div [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
                     <span *ngIf="!sortField || sortField !== 'name'" (click)="onSortChange({field: 'name', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
@@ -288,8 +307,8 @@
                 <div class="d-inline-flex flex-column workflow-list-item-actions-header">
                   <div *ngIf="isUserLogged()" class="d-inline-block workflow-list-item-add-action">
                     <a *ngIf="!editModeEnabled && isUserLogged()" class="text-center" (click)="openWorkflowUploader()">
-                      <i class="fas fa-plus-circle" style="margin-left: 5px;"></i>
-                      <div class="d-block text-sm">add</div>
+                      <i class="fas fa-plus-circle fa-lg" style="margin-left: 5px;"></i>
+                      <!-- <div class="d-block text-sm">Add</div> -->
                     </a>
                   </div>
                 </div>

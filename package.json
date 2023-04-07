@@ -68,6 +68,7 @@
     "rxjs": "6.6.6",
     "socket.io": "^4.6.0",
     "strip-ansi": "~7.0.0",
+    "swiped-events": "^1.1.7",
     "tslib": "^2.0.3",
     "zone.js": "~0.11.4"
   },

@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, fromEvent } from 'rxjs';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
@@ -218,6 +218,15 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
         // else alert('Already loading workflows');
       });
     }
+    // Reload page when the swipe-down event is detected
+    document.addEventListener('swiped-down', (e: any) => {
+      this.refreshDashboard();
+    });
+  }
+
+  refreshDashboard(): void {
+    window.location.reload();
+    this.logger.debug('Refreshing dashboard...');
   }
 
   ngAfterViewChecked() {
@@ -258,6 +267,10 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
       (c) => c.value === this.sortCriterion
     );
     return criterion?.description;
+  }
+
+  get currentLayout(): string {
+    return this.dataView?.layout;
   }
 
   private updateLayout(): void {
