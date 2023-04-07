@@ -104,6 +104,8 @@ export class AppService {
   ) {
     this.logger.debug('AppService created!');
 
+    this.setupNetworkListener();
+
     // subscribe for the current selected workflow
     this.subscriptions.push(
       this._observableWorkflow.subscribe((w: WorkflowVersion) => {
@@ -1064,7 +1066,9 @@ export class AppService {
     );
   }
 
-  public updateWorkflowName(w: Workflow): Observable<any> {
+  public updateWorkflowName(
+    w: Workflow
+  ): Observable<{ meta: { modified: number } }> {
     return this.api.updateWorkflowName(w);
   }
 
