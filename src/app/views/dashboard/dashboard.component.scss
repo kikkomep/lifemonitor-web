@@ -291,7 +291,7 @@
       padding: 1rem;
 
       button {
-        margin-bottom: 5rem auto .4rem;
+        margin-bottom: 5rem auto 0.4rem;
       }
     }
 
@@ -389,5 +389,13 @@
     //     margin: auto;
     //   }
     // }
+  }
+}
+
+@media screen and (max-width: 576px) {
+  :host ::ng-deep .suite-list-item {
+    .workflow-grid-item {
+      height: auto !important;
+    }
   }
 }
