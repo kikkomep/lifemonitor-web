@@ -394,7 +394,9 @@ export class ApiService {
     );
   }
 
-  updateWorkflowName(workflow: Workflow): Observable<any> {
+  updateWorkflowName(
+    workflow: Workflow
+  ): Observable<{ meta: { modified: number } }> {
     let body = {
       name: workflow.name,
     };
@@ -406,15 +408,15 @@ export class ApiService {
       )
       .pipe(
         retry(3),
-        map((data) => {
-          this.refreshListOfWorkflows().then(() => {
-            this.refreshWorkflow(
-              workflow.uuid,
-              workflow.currentVersion.version['version']
-            ).then(() => {
-              this.logger.debug('Changed workflow name to:' + workflow.name);
-            });
+        map((data: { meta: { modified: number } }) => {
+          this.refreshWorkflow(
+            workflow.uuid,
+            workflow.currentVersion.version['version']
+          ).then(() => {
+            this.logger.debug('Changed workflow name to:' + workflow.name);
           });
+          workflow.currentVersion.modified = data.meta.modified;
+          return data;
         }),
         tap((data) => {
           this.logger.debug('Check workflowVersion', workflow);

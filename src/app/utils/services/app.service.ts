@@ -218,16 +218,20 @@ export class AppService {
         const workflow: Workflow = this.workflows.find(
           (w) => w.uuid === workflowVersion.uuid
         );
-        const cwv: WorkflowVersion = this.workflow_versions.find(
+        const cwv_index = this.workflow_versions.findIndex(
           (v) =>
             v.uuid === workflowVersion.uuid &&
             v.version['version'] === workflowVersion.version
         );
+        const cwv: WorkflowVersion = this.workflow_versions[cwv_index];
         this.logger.error('Found workflow:', workflow, cwv);
         if (!workflow) {
           this.logger.warn('Workflow not found');
           return;
         }
+
+        const oldTimestamp = cwv.modified;
+        this.logger.debug('Old timestamp', oldTimestamp, cwv);
 
         this.api
           .get_workflow(workflowVersion.uuid)
@@ -236,7 +240,6 @@ export class AppService {
               workflow.currentVersion &&
               workflow.currentVersion.version['version'] ===
                 workflowVersion.version;
-
             this.logger.warn('Workflow updated', workflow, updatedWorkflow);
             workflow.name = updatedWorkflow.name;
             workflow['public'] = updatedWorkflow['public'];
@@ -257,37 +260,41 @@ export class AppService {
                   let updated_workflow_version = workflow.getVersion(
                     workflowVersion.version
                   );
+                  this.logger.debug(
+                    'New timestamp',
+                    updated_workflow_version,
+                    updated_workflow_version.modified,
+                    wv,
+                    wv.modified
+                  );
+                  const outdated = wv.modified > oldTimestamp;
                   workflow.addVersion(wv, isCurrentVersion);
-                  if (!updated_workflow_version) {
-                    workflow.addVersion(wv, isCurrentVersion);
-                    updated_workflow_version = wv;
-                  } else {
-                    // updated_workflow_version.update(wv);
-                    // updated_workflow_version
-                    this.logger.warn(
-                      'Check updated workflow',
-                      wv,
-                      updated_workflow_version,
-                      workflow
-                    );
-                  }
                   wv.name = workflow.name;
-                  return workflow.getVersion(workflowVersion.version);
+                  this.workflow_versions[cwv_index] = wv;
+                  // return the new workflow version only if more recent
+                  // than the previous one
+                  return outdated
+                    ? workflow.getVersion(workflowVersion.version)
+                    : null;
                 })
               )
               .subscribe((wv: WorkflowVersion) => {
                 this.setLoadingWorkflows(false);
-                this.subjectWorkflowUpdate.next(wv);
-                this.toastService.success(
-                  `${wv.name} (ver.${wv.version['version']}) reloaded!`,
-                  'Workflow updated',
-                  {
-                    timeOut: 3000,
-                  }
-                );
+                if (!wv) {
+                  this.logger.warn('Workflow version not outdated');
+                } else {
+                  this.subjectWorkflowUpdate.next(wv);
+                  this.toastService.success(
+                    `${wv.name} (ver.${wv.version['version']}) reloaded!`,
+                    'Workflow updated',
+                    {
+                      closeButton: true,
+                      timeOut: 2000,
+                    }
+                  );
+                }
               });
           });
-        // });
       }
     );
 

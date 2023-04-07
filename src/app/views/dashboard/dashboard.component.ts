@@ -480,11 +480,14 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   public updateWorkflowName(w: WorkflowVersion) {
     this.logger.debug('Updating workflow name', w);
     this.appService.updateWorkflowName(w.workflow).subscribe(
-      () => {
-        this.toastService.info('Updating workflow...', '', {
-          timeOut: 2500,
-          progressBar: true,
-        });
+      (data) => {
+        this.toastService.success(
+          `Workflow ${w.uuid} (ver. ${w.version['version']}) updated!`,
+          '',
+          {
+            timeOut: 2500,
+          }
+        );
         w['editingMode'] = false;
       },
       (error) => {
