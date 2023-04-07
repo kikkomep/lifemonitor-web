@@ -245,7 +245,8 @@
 
                 <div *ngIf="isUserLogged()" class="d-inline-block d-xl-none mx-3">
                   <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
-                    <i class="fas fa-plus-circle fa-2x text-primary"></i><span class="d-none d-xl-inline-block">add</span>
+                    <i class="fas fa-plus-circle fa-2x text-primary"></i><span
+                      class="d-none d-xl-inline-block">add</span>
                   </a>
                 </div>
               </div>
@@ -532,8 +533,8 @@
                     </a>
                   </div>
                   <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
-                    <a class="btn btn-sm active" (click)="disableWorkflowEditMode(item)"
-                      data-toggle="tooltip" data-placement="top" data-html="true"
+                    <a class="btn btn-sm active" (click)="disableWorkflowEditMode(item)" data-toggle="tooltip"
+                      data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>close edit mode</span>">
                       <i class="fas fa-times-circle" style="color: var(--eosc-brown)"></i>
                     </a>
