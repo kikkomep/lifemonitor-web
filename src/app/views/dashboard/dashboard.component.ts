@@ -30,6 +30,8 @@ import { StatsFilterPipe } from './../../utils/filters/stats-filter.pipe';
 
 declare var $: any;
 
+const minWidthForListLayout: number = 768;
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -290,14 +292,14 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   onResize(event) {
     event.target.innerWidth;
     this.logger.debug('Resize', event.target.innerWidth);
-    if (event.target.innerWidth < 1200) {
+    if (event.target.innerWidth < minWidthForListLayout) {
       this.dataView.layout = 'grid';
       this.cdref.detectChanges();
     }
   }
 
   private checkWindowSize() {
-    if (this.dataView && window.innerWidth < 1200) {
+    if (this.dataView && window.innerWidth < minWidthForListLayout) {
       this.dataView.layout = 'grid';
     }
   }

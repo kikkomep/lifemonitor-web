@@ -233,7 +233,7 @@
                       <i class="fas fa-plus-circle fa-lg text-primary mx-1"></i>
                     </a>
                   </div>
-                  <div class="d-inline-block mx-lg-3">
+                  <div class="d-inline-block mx-md-3">
                     <p-dropdown [options]="sortOptions" [(ngModel)]="sortCriterion" placeholder="Sort By"
                       (onChange)="onSortChangeEvent($event)">
                       <ng-template let-c pTemplate="selectedItem">
@@ -254,10 +254,10 @@
                       </ng-template>
                     </p-dropdown>
                   </div>
-                  <p-dataViewLayoutOptions class="d-none d-xl-block d-line-block">
+                  <p-dataViewLayoutOptions class="d-none d-md-block d-line-block">
                   </p-dataViewLayoutOptions>
 
-                  <div *ngIf="isUserLogged()" class="d-inline-block d-xl-none mx-3 mx-lg-0">
+                  <div *ngIf="isUserLogged() && currentLayout === 'grid'" class="d-inline-block d-xl-none mx-3 mx-lg-0">
                     <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
                       <i class="fas fa-plus-circle fa-lg text-primary"></i><span
                         class="d-none d-xl-inline-block">add</span>
@@ -273,7 +273,7 @@
                       <i class="fas fa-sync fa-lg text-primary"></i>
                     </a>
                   </div>
-                  <div [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
+                  <div class="col-6 col-xl-5" [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
                     <span *ngIf="!sortField || sortField !== 'name'" (click)="onSortChange({field: 'name', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
                     </span>
@@ -286,8 +286,8 @@
                       <i class="fas fa-sort-amount-down-alt"></i>
                     </span>
                   </div>
-                  <div class="col-1 text-center">Visibility</div>
-                  <div [ngClass]="{'col-1': true, 'text-center': true, 'text-primary': sortField === 'type'}">Type
+                  <div class="col-1 d-none d-xl-block text-center">Visibility</div>
+                  <div class="col-1 d-none d-xl-block text-center" [ngClass]="{'text-primary': sortField === 'type'}">Type
                     <span *ngIf="!sortField || sortField !== 'type'" (click)="onSortChange({field: 'type', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
                     </span>
@@ -300,9 +300,9 @@
                       <i class="fas fa-sort-amount-down-alt"></i>
                     </span>
                   </div>
-                  <div class="col-1 text-center">Version</div>
-                  <div class="col-1 text-center">Suites</div>
-                  <div class="col-2 text-center">Latest Test Builds</div>
+                  <div class="col-2 col-xl-1 text-center">Version</div>
+                  <div class="col-1 d-none d-xl-block text-center">Suites</div>
+                  <div class="col-3 col-xl-2 text-center">Latest Test Builds</div>
                 </div>
                 <div class="d-inline-flex flex-column workflow-list-item-actions-header">
                   <div *ngIf="isUserLogged()" class="d-inline-block workflow-list-item-add-action">
@@ -323,7 +323,7 @@
                     </div>
                   </div>
 
-                  <div class="col-5">
+                  <div class="col-6 col-xl-5">
 
                     <div class="workflow-list-item-description">
                       <!-- Workflow Name -->
@@ -439,7 +439,7 @@
                   </div>
 
                   <!-- Workflow Visibility -->
-                  <div class="col-1">
+                  <div class="col-1 d-none d-xl-block">
                     <div class="workflow-list-item-visibility">
                       <div *ngIf="isLoadingWorkflowVersion(item)">
                         <i class="fas fa-2x fa-sync-alt text-muted"></i>
@@ -459,7 +459,7 @@
                     </div>
                   </div>
 
-                  <div class="col-1">
+                  <div class="col-1 d-none d-xl-block">
                     <div *ngIf="isLoadingWorkflowVersion(item)" class="text-muted">
                       <i class="fas fa-2x fa-sync-alt"></i>
                     </div>
@@ -473,7 +473,7 @@
                     </div>
                   </div>
 
-                  <div class="col-1">
+                  <div class="col-2 col-xl-1">
                     <div class="workflow-list-item-version-selector">
                       <workflow-version-selector [workflow]="item.workflow"
                         (workflow_version)="updateSelectedVersion($event)">
@@ -481,7 +481,7 @@
                     </div>
                   </div>
 
-                  <div class="col-1">
+                  <div class="col-1 d-none d-xl-block">
                     <div class="workflow-list-item-suites-chart">
                       <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
                         data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
@@ -498,7 +498,7 @@
                     </div>
                   </div>
 
-                  <div class="col-2">
+                  <div class="col-3 col-xl-2">
                     <div class="workflow-list-item-builds-chart">
                       <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
                         data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
