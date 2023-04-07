@@ -30,9 +30,9 @@ export class ApiSocket extends Socket {
     this.messageHandler = messageHandler;
 
     // Register 'connect' event listener
-    this.on('connect', this.onConnect);
+    this.on('connect', () => this.onConnect());
     // Register 'disconnect' event listener
-    this.on('disconnect', this.onDisconnect);
+    this.on('disconnect', () => this.onDisconnect());
 
     // Register 'message' event listener
     this.fromEvent('message').subscribe((data) => {
