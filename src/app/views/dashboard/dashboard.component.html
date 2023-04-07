@@ -511,7 +511,7 @@
                       data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>add version</span>">
                       <!-- <i class="far fa-code-branch"></i> -->
-                      <i class="fas fa-plus-circle text-muted"></i>
+                      <i class="fas fa-plus-circle" style="color: var(--eosc-green)"></i>
                       <!-- <img src="assets/icons/branch-add.png" width="50px"> -->
                     </a>
                   </div>
@@ -519,7 +519,7 @@
                     <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflowVersion(item)" data-toggle="tooltip"
                       data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete version</span>">
-                      <i class="fas fa-minus-circle text-muted"></i>
+                      <i class="fas fa-minus-circle" style="color: var(--eosc-yellow)"></i>
                       <!-- <img src="assets/icons/branch-delete.png" width="50px"> -->
                     </a>
                   </div>
@@ -527,14 +527,14 @@
                     <a class="btn btn-sm" [routerLink]="" (click)="deleteWorkflow(item.workflow)" data-toggle="tooltip"
                       data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>delete workflow</span>">
-                      <i class="fas fa-trash-alt text-muted"></i>
+                      <i class="fas fa-trash-alt" style="color: var(--danger)"></i>
                     </a>
                   </div>
                   <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
                     <a class="btn btn-sm active" (click)="disableWorkflowEditMode(item)"
                       data-toggle="tooltip" data-placement="top" data-html="true"
                       title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>close edit mode</span>">
-                      <i class="fas fa-times-circle text-muted"></i>
+                      <i class="fas fa-times-circle" style="color: var(--eosc-brown)"></i>
                     </a>
                   </div>
                 </div>
