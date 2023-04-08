@@ -1,4 +1,4 @@
-<app-loader [enabled]="!workflow || !suites" loadingText="... loading ..."></app-loader>
+<app-loader [enabled]="!workflow || !suites" loadingText="... loading ..." marginTop="-300"></app-loader>
 
 <div *ngIf="workflow && suites" class="content-header">
   <div class="container-fluid">
@@ -97,7 +97,8 @@
           <div *ngIf="suites && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
           <div class="inner">
             <h3>
-              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.some_passing, suiteNameFilter) : 0 }}
+              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.some_passing, suiteNameFilter) : 0
+              }}
             </h3>
 
             <p>Some passing</p>

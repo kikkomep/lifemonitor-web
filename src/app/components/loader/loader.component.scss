@@ -3,7 +3,7 @@
   margin: auto;
   position: absolute;
   right: 0;
-  top: calc(100% / 2);
+  top: calc((100% - 460px) / 2);
   width: calc(100% / 1.2);
 }
 
@@ -105,10 +105,11 @@
 #loader .loading {
   background-position: 50% 50%;
   background-repeat: no-repeat;
-  position: absolute;
-width: 100%;
-  margin-top: -25px;
-  height: 60px;
+  // position: absolute;
+  width: 100%;
+  // margin-top: -25px;
+  margin: auto;
+  // height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
