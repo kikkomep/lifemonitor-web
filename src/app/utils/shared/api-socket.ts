@@ -45,6 +45,10 @@ export class ApiSocket extends Socket {
         ).toUTCString()} (published at ${mDate} - age: ${mAge} msecs)`,
         data
       );
+      if (!('payload' in data)) {
+        this.logger.warn('incompatible message', data);
+        return;
+      }
       this.logger.debug('Received ' + data['payload']['type']);
       if (!mAge || mAge <= MAX_AGE) {
         if (data && data['payload'] && data['payload']['type']) {
