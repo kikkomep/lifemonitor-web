@@ -84,39 +84,39 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   sortCriterion: { field: string; order: number };
   sortOptions = [
     {
-      label: 'Name (asc)',
+      label: 'name',
       value: { field: 'name', order: 1 },
-      iconClass: 'fas fa-align-left',
+      iconClass: 'fas fa-sort-amount-up-alt', //'fas fa-align-left',
       description: 'order by name (ascending order)',
     },
     {
-      label: 'Name (desc)',
+      label: 'name',
       value: { field: 'name', order: -1 },
-      iconClass: 'fas fa-align-right',
+      iconClass: 'fas fa-sort-amount-down-alt', //'fas fa-align-right',
       description: 'order by name (descending order)',
     },
     {
-      label: 'Creation time (asc)',
+      label: 'creation time',
       value: { field: 'created', order: 1 },
-      iconClass: 'pi pi-clock',
+      iconClass: 'fas fa-sort-amount-up-alt', //'pi pi-clock',
       description: 'order by creation time (ascending order)',
     },
     {
-      label: 'Creation time (desc)',
+      label: 'creation time',
       value: { field: 'created', order: -1 },
-      iconClass: 'pi pi-clock',
+      iconClass: 'fas fa-sort-amount-down-alt', //'pi pi-clock',
       description: 'order by creation time (descending order)',
     },
     {
-      label: 'Modification time (asc)',
+      label: 'modification time',
       value: { field: 'modified', order: 1 },
-      iconClass: 'pi pi-stopwatch',
+      iconClass: 'fas fa-sort-amount-up-alt', //'fas fa-sort-amount-up-alt', //'pi pi-stopwatch',
       description: 'order by modification time (ascending order)',
     },
     {
-      label: 'Modification time (desc)',
+      label: 'modification time',
       value: { field: 'modified', order: -1 },
-      iconClass: 'pi pi-stopwatch',
+      iconClass: 'fas fa-sort-amount-down-alt', //'pi pi-stopwatch',
       description: 'order by modification time (descending order)',
     },
   ];
@@ -238,17 +238,22 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.checkWindowSize();
   }
 
-  isSmallScreen: boolean = false;
+  get sortOptionsStyle(): any {
+    return "\"{'width': '100px'}\"";
+    return '{' + (this.isSmallScreen ? "'width': '100px'" : '') + '}';
+  }
+
+  get isSmallScreen(): boolean {
+    return window.matchMedia('(max-width: 576px)').matches;
+  }
+
   ngAfterViewInit(): void {
     $('[data-toggle="tooltip"]', function () {
       $(this).tooltip('hide');
     });
 
-    this.isSmallScreen = window.matchMedia('(max-width: 576px)').matches;
-
     const mediaQuery = window.matchMedia('(max-width: 576px)');
     mediaQuery.addEventListener('change', (e) => {
-      this.isSmallScreen = e.matches;
       this.updateLayout();
     });
 

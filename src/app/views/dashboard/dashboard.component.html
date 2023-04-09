@@ -233,9 +233,9 @@
                       <i class="fas fa-plus-circle fa-lg text-primary mx-1"></i>
                     </a>
                   </div>
-                  <div class="d-inline-block mx-md-3">
+                  <div class="d-inline-flex mx-md-3">
                     <p-dropdown [options]="sortOptions" [(ngModel)]="sortCriterion" placeholder="Sort By"
-                      (onChange)="onSortChangeEvent($event)">
+                      (onChange)="onSortChangeEvent($event)" autoWidth="false" [style]="{'width': '140px'}">
                       <ng-template let-c pTemplate="selectedItem">
                         <span class="mx-2">
                           <i class="{{c.iconClass}}" [pTooltip]="c.description"
@@ -257,10 +257,10 @@
                   <p-dataViewLayoutOptions class="d-line-block mx-1">
                   </p-dataViewLayoutOptions>
 
-                  <div *ngIf="isUserLogged() && currentLayout === 'grid'" class="d-inline-block d-xl-none mx-3 mx-lg-0">
+                  <div *ngIf="isUserLogged() && currentLayout === 'grid'"
+                    class="d-inline-block d-xl-none mx-md-3 mx-lg-0">
                     <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()">
-                      <i class="fas fa-plus-circle fa-lg text-primary"></i><span
-                        class="d-none d-xl-inline-block">add</span>
+                      <i class="fas fa-plus-circle fa-lg text-primary"></i>
                     </a>
                   </div>
                 </div>
@@ -273,7 +273,8 @@
                       <i class="fas fa-sync fa-lg text-primary"></i>
                     </a>
                   </div>
-                  <div class="col-10 col-md-6 col-xl-5" [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
+                  <div class="col-10 col-md-6 col-xl-5"
+                    [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
                     <span *ngIf="!sortField || sortField !== 'name'" (click)="onSortChange({field: 'name', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
                     </span>
@@ -287,7 +288,8 @@
                     </span>
                   </div>
                   <div class="col-1 d-none d-xl-block text-center">Visibility</div>
-                  <div class="col-1 d-none d-xl-block text-center" [ngClass]="{'text-primary': sortField === 'type'}">Type
+                  <div class="col-1 d-none d-xl-block text-center" [ngClass]="{'text-primary': sortField === 'type'}">
+                    Type
                     <span *ngIf="!sortField || sortField !== 'type'" (click)="onSortChange({field: 'type', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
                     </span>
@@ -304,7 +306,7 @@
                   <div class="col-1 d-none d-xl-block text-center">Suites</div>
                   <div class="col-3 col-xl-2 d-none d-md-block text-center">Latest Test Builds</div>
                 </div>
-                <div class="d-inline-flex flex-column workflow-list-item-actions-header">
+                <div class="d-inline-flex flex-column workflow-list-item-actions-header justify-content-center my-md-3">
                   <div *ngIf="isUserLogged()" class="d-inline-block workflow-list-item-add-action">
                     <a *ngIf="!editModeEnabled && isUserLogged()" class="text-center" (click)="openWorkflowUploader()">
                       <i class="fas fa-plus-circle fa-lg" style="margin-left: 5px;"></i>

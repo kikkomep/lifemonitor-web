@@ -52,6 +52,9 @@
     }
   }
 
+  .sort-options {
+  }
+
   .item-label {
     font-weight: bold;
     margin-right: 0.1rem;
@@ -419,5 +422,11 @@
     .workflow-grid-item-bottom  {
       margin-top: 50px !important;
     }
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .sort-options .p-dropdown {
+    width: 100px !important;
   }
 }
