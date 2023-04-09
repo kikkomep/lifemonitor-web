@@ -337,6 +337,10 @@ export class CachedHttpClientService {
     return this.http.delete<T>(url, options);
   }
 
+  public startSync() {
+    return this.socketIO?.sync();
+  }
+
   public async refresh(): Promise<{ [req: string]: Response }> {
     return await this.cache.refresh();
   }
