@@ -36,6 +36,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   @ViewChild('instancesDataView')
   dataView: any;
 
+  private enableAutoLayoutSwitch: boolean = false;
   private suiteInstancesDataTable: any;
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
@@ -50,8 +51,10 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    if (window.innerWidth < minWidthForListLayout) {
-      this.dataView.layout = 'grid';
+    if (this.enableAutoLayoutSwitch) {
+      if (window.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+      }
     }
   }
 
@@ -66,11 +69,12 @@ export class TestInstancesComponent implements OnInit, OnChanges {
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    event.target.innerWidth;
-    this.logger.debug('Resize', event.target.innerWidth);
-    if (event.target.innerWidth < minWidthForListLayout) {
-      this.dataView.layout = 'grid';
-      this.cdr.detectChanges();
+    if (this.enableAutoLayoutSwitch) {
+      this.logger.debug('Resize', event.target.innerWidth);
+      if (event.target.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+        this.cdr.detectChanges();
+      }
     }
   }
 
@@ -83,7 +87,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
     if (testBuild) {
       this.logger.debug('Test Build selected', testBuild);
       // this.suiteSelected.emit(testBuild);
-      window.open(testBuild.externalLink, '_blank');
+      window.open(testBuild.externalLink as string, '_blank');
       this.appService.selectWorkflowVersion(
         testBuild.testInstance.suite.workflow.uuid
       );

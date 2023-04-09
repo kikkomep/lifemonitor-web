@@ -1,4 +1,4 @@
-<app-loader [enabled]="(isLoading|async)===true" [marginTop]="100" loadingText=""
+<app-loader [enabled]="(isLoading|async)===true" [marginTop]="180" loadingText=""
   loadingTextAlt="...loading<br/><span class='ml-5'>workflows ...</span>"></app-loader>
 
 <app-workflow-uploader></app-workflow-uploader>
@@ -254,7 +254,7 @@
                       </ng-template>
                     </p-dropdown>
                   </div>
-                  <p-dataViewLayoutOptions class="d-none d-md-block d-line-block">
+                  <p-dataViewLayoutOptions class="d-line-block mx-1">
                   </p-dataViewLayoutOptions>
 
                   <div *ngIf="isUserLogged() && currentLayout === 'grid'" class="d-inline-block d-xl-none mx-3 mx-lg-0">
@@ -268,12 +268,12 @@
 
               <div class="d-flex mt-3 d-none d-sm-block" *ngIf="layout === 'list'">
                 <div class="d-inline-flex row workflow-list-item-header">
-                  <div class="col-1 workflow-list-item-status m-0 p-0 text-center">
+                  <div class="col-2 col-md-1 workflow-list-item-status m-0 p-0 text-center">
                     <a class="btn btn-sm" (click)="refreshDashboard()">
                       <i class="fas fa-sync fa-lg text-primary"></i>
                     </a>
                   </div>
-                  <div class="col-6 col-xl-5" [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
+                  <div class="col-10 col-md-6 col-xl-5" [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
                     <span *ngIf="!sortField || sortField !== 'name'" (click)="onSortChange({field: 'name', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
                     </span>
@@ -300,9 +300,9 @@
                       <i class="fas fa-sort-amount-down-alt"></i>
                     </span>
                   </div>
-                  <div class="col-2 col-xl-1 text-center">Version</div>
+                  <div class="col-2 col-xl-1 d-none d-md-block text-center">Version</div>
                   <div class="col-1 d-none d-xl-block text-center">Suites</div>
-                  <div class="col-3 col-xl-2 text-center">Latest Test Builds</div>
+                  <div class="col-3 col-xl-2 d-none d-md-block text-center">Latest Test Builds</div>
                 </div>
                 <div class="d-inline-flex flex-column workflow-list-item-actions-header">
                   <div *ngIf="isUserLogged()" class="d-inline-block workflow-list-item-add-action">
@@ -317,13 +317,13 @@
             <ng-template let-item pTemplate="listItem">
               <div class="d-flex">
                 <div class="d-inline-flex row workflow-list-item">
-                  <div class="col-1 text-center workflow-list-item-status m-0 p-0">
+                  <div class="col-2 col-md-1 text-center workflow-list-item-status m-0 p-0">
                     <div class="workflow-list-item-status" [ngClass]="item.class">
                       <i class="{{ item.statusIcon }} fa-2x"></i>
                     </div>
                   </div>
 
-                  <div class="col-6 col-xl-5">
+                  <div class="col-10 col-md-6 col-xl-5">
 
                     <div class="workflow-list-item-description">
                       <!-- Workflow Name -->
@@ -473,7 +473,7 @@
                     </div>
                   </div>
 
-                  <div class="col-2 col-xl-1">
+                  <div class="col-2 col-xl-1 d-none d-md-block">
                     <div class="workflow-list-item-version-selector">
                       <workflow-version-selector [workflow]="item.workflow"
                         (workflow_version)="updateSelectedVersion($event)">
@@ -498,7 +498,7 @@
                     </div>
                   </div>
 
-                  <div class="col-3 col-xl-2">
+                  <div class="col-3 col-xl-2 d-none d-md-block">
                     <div class="workflow-list-item-builds-chart">
                       <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
                         data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>

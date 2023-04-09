@@ -10,79 +10,83 @@
 
   <p-dataView #instancesDataView [value]="testInstances" [paginator]="true" [rows]="10" layout="list">
     <ng-template pTemplate="header">
-      <div class="d-none d-md-block">
-        <div class="text-sm-center text-md-right">
+      <div class="d-block">
+        <div class="text-sm-center text-md-right p-4">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
         </div>
-        <div>
-          <div class="row-12 instance-list-item p-0 m-0 mt-4" *ngIf="dataView && dataView.layout === 'list'">
-            <div class="col-1 d-inline-block text-center m-0 p-0"></div>
-            <div class="col-7 col-lg-5 col-xl-5 d-inline-block">Test Instance</div>
-            <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">Engine</div>
-            <div class="col-xl-2 d-none d-xl-inline-block text-center">Testing Service</div>
-            <div class="col-4 col-lg-4 col-xl-3 d-inline-block text-center">Latest Test Builds</div>
+        <div class="d-flex">
+          <div class="d-inline row instance-list-item mt-4" *ngIf="dataView && dataView.layout === 'list'">
+            <div class="col-3 col-sm-1 col-lg-1 d-inline-block instance-list-item-header"></div>
+            <div class="col-9 col-sm-11 col-md-6 col-lg-5 d-inline-block instance-list-item-header text-left">Test
+              Instance</div>
+            <div class="col-2 col-xl-1 d-none d-lg-inline-block instance-list-item-header">Engine</div>
+            <div class="col-2 d-none d-xl-inline-block instance-list-item-header">Testing Service</div>
+            <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block instance-list-item-header">Latest Test Builds
+            </div>
           </div>
         </div>
       </div>
     </ng-template>
     <ng-template let-instance pTemplate="listItem">
-      <div class="row-12 instance-list-item">
-        <div class="col-1 d-inline-block text-center m-0 p-0">
-          <div class="instance-grid-item-status" [ngClass]="instance.class">
-            <i class="{{ instance.statusIcon }} fa-2x"></i>
+      <div class="d-flex">
+        <div class="d-inline-flex row instance-list-item">
+          <div class="col-2 col-sm-1 col-lg-1 d-inline-block text-center">
+            <div class="instance-grid-item-status" [ngClass]="instance.class">
+              <i class="{{ instance.statusIcon }} fa-2x"></i>
+            </div>
           </div>
-        </div>
-        <div class="col-7 col-lg-5 col-xl-5 d-inline-block">
-          <div class="instance-name">
-            <input *ngIf="instance.editingMode" type="text" [(ngModel)]="instance.name"
-              class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
-              placeholder="Enter suite name" (keyup.enter)="updateTestInstance(instance)"
-              (keyup.esc)="restoreTestInstance(instance)" autofocus>
-            <a *ngIf="!instance.editingMode" style="color: black; font-size: larger"
-              (click)="showTestInstanceDetails(instance)" (dblclick)="enableTestInstanceEditing(instance)"
-              data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
+          <div class="col-10 col-sm-11 col-md-6 col-lg-5 d-inline-block">
+            <div class="instance-name">
+              <input *ngIf="instance.editingMode" type="text" [(ngModel)]="instance.name"
+                class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
+                placeholder="Enter suite name" (keyup.enter)="updateTestInstance(instance)"
+                (keyup.esc)="restoreTestInstance(instance)" autofocus>
+              <a *ngIf="!instance.editingMode" style="color: black; font-size: larger"
+                (click)="showTestInstanceDetails(instance)" (dblclick)="enableTestInstanceEditing(instance)"
+                data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
                     <i class='fas fa-question-circle mx-1'></i>
                     see on <b>{{instance.service.type}}</b>
                     <i class='fas fa-external-link-alt mx-1'></i>
                     {{ isEditable(instance) ? '<br/>or double click to edit' : ''}}</span>">
-              <div>{{ instance.name }}</div>
-            </a>
+                <div>{{ instance.name }}</div>
+              </a>
+            </div>
+            <div class="instance-uuid text-sm">
+              <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
+              <b>uuid:</b> {{ instance.uuid }}
+            </div>
+            <div class="instance-url text-sm cut-text">
+              <i class="fas fa-xs fa-external-link-alt mr-1"></i>
+              <b>url:</b> {{ instance.externalLink }}
+            </div>
           </div>
-          <div class="instance-uuid text-sm">
-            <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
-            <b>uuid:</b> {{ instance.uuid }}
+          <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">
+            <div class="text-center instance-list-item-engine-type" data-html="true" data-toggle="tooltip"
+              data-placement="top"
+              title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</span>">
+              <img *ngIf="instance.suite && instance.suite.engineIcon" src="{{ instance.suite.engineIcon }}"
+                width="100" />
+              <i *ngIf="!(instance.suite && instance.suite.engineIcon)"
+                class="far fa-question-circle fa-2x mr-3 text-muted"></i>
+            </div>
           </div>
-          <div class="instance-url text-sm cut-text">
-            <i class="fas fa-xs fa-external-link-alt mr-1"></i>
-            <b>url:</b> {{ instance.externalLink }}
+          <div class="col-2 d-none d-xl-inline-block text-center">
+            <div class="text-center instance-list-item-service-type" data-html="true" data-toggle="tooltip"
+              data-placement="top"
+              title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
+              <a href="{{ instance.service.url }}">
+                <img src="{{ instance.platformIcon }}" height="60px" />
+              </a>
+            </div>
           </div>
-        </div>
-        <div class="col-2 col-xl-1 d-none d-lg-inline-block">
-          <div class="text-center instance-list-item-engine-type" data-html="true" data-toggle="tooltip"
-            data-placement="top"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</span>">
-            <img *ngIf="instance.suite && instance.suite.engineIcon" src="{{ instance.suite.engineIcon }}"
-              width="100" />
-            <i *ngIf="!(instance.suite && instance.suite.engineIcon)"
-              class="far fa-question-circle fa-2x mr-3 text-muted"></i>
+          <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block">
+            <div class="instance-list-item-builds-chart">
+              <stats-bar-chart [stats]="instance.getLatestBuilds() | arraySizeFilterPipe: 10"
+                (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+            </div>
           </div>
-        </div>
-        <div class="col-xl-2 d-none d-xl-inline-block text-center">
-          <div class="text-center instance-list-item-service-type" data-html="true" data-toggle="tooltip"
-            data-placement="top"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
-            <a href="{{ instance.service.url }}">
-              <img src="{{ instance.platformIcon }}" height="60px" />
-            </a>
-          </div>
-        </div>
-        <div class="col-4 col-lg-4 col-xl-3 d-inline-block">
-          <div class="instance-list-item-builds-chart">
-            <stats-bar-chart [stats]="instance.getLatestBuilds() | arraySizeFilterPipe: 10"
-              (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
-          </div>
-        </div>
 
+        </div>
       </div>
     </ng-template>
     <ng-template let-instance pTemplate="gridItem">

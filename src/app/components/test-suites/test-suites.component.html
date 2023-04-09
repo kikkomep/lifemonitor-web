@@ -11,67 +11,70 @@
   </div>
   <p-dataView #suitesDataView [value]="suites" [paginator]="true" [rows]="10" layout="list">
     <ng-template pTemplate="header">
-      <div class="d-none d-md-block">
-        <div class="text-sm-center text-md-right">
+      <div class="d-block">
+        <div class="text-center text-md-right p-4">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
         </div>
-        <div>
-          <div class="row-12 suite-list-item p-0 m-0 mt-4" *ngIf="dataView && dataView.layout === 'list'">
-            <div class="col-1 d-inline-block text-center m-0 p-0"></div>
-            <div class="col-7 col-lg-5 col-xl-5 d-inline-block">Workflow</div>
-            <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">Engine</div>
-            <div class="col-xl-2 d-none d-xl-inline-block text-center">Test Instances</div>
-            <div class="col-4 col-lg-4 col-xl-3 d-inline-block text-center">Latest Test Builds</div>
+        <div class="d-flex">
+          <div class="d-inline row suite-list-item mt-4"
+            *ngIf="dataView && dataView.layout === 'list'">
+            <div class="col-3 col-sm-1 col-lg-1 d-inline-block suite-list-item-header"></div>
+            <div class="col-9 col-sm-11 col-md-6 col-lg-5 d-inline-block suite-list-item-header text-left">Workflow</div>
+            <div class="col-2 col-xl-1 d-none d-lg-inline-block suite-list-item-header">Engine</div>
+            <div class="col-2 d-none d-xl-inline-block suite-list-item-header">Test Instances</div>
+            <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block suite-list-item-header">Latest Test Builds</div>
           </div>
         </div>
       </div>
     </ng-template>
     <ng-template let-suite pTemplate="listItem">
-      <div class="row-12 suite-list-item">
-        <div class="col-1 d-inline-block text-center m-0 p-0">
-          <div class="suite-grid-item-status" [ngClass]="suite.class">
-            <i class="{{ suite.statusIcon }} fa-2x"></i>
+      <div class="d-flex">
+        <div class="d-inline-flex row suite-list-item">
+          <div class="col-3 col-sm-1 col-lg-1 d-inline-block text-center">
+            <div class="suite-list-item-status" [ngClass]="suite.class">
+              <i class="{{ suite.statusIcon }} fa-2x"></i>
+            </div>
           </div>
-        </div>
-        <div class="col-7 col-lg-5 col-xl-5 d-inline-block">
-          <div class="suite-name">
-            <input *ngIf="suite.editingMode" type="text" [(ngModel)]="suite.name" autofocus
-              class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
-              placeholder="Enter suite name" (keyup.enter)="updateSuite(suite)" (keyup.esc)="restoreSuite(suite)">
-            <a *ngIf="!suite.editingMode" (click)="showSuiteDetails(suite)" (dblclick)="enableSuiteEditing(suite)"
-              data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
+          <div class="col-9 col-sm-11 col-md-6 col-lg-5 d-inline-block">
+            <div class="suite-name">
+              <input *ngIf="suite.editingMode" type="text" [(ngModel)]="suite.name" autofocus
+                class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
+                placeholder="Enter suite name" (keyup.enter)="updateSuite(suite)" (keyup.esc)="restoreSuite(suite)">
+              <a *ngIf="!suite.editingMode" (click)="showSuiteDetails(suite)" (dblclick)="enableSuiteEditing(suite)"
+                data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
                   <i class='fas fa-question-circle mx-1'></i>
                   click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i>
                   {{ isEditable(suite) ? '<br/>or double click to edit' : ''}}</span>">
-              {{suite.name}}
-            </a>
+                {{suite.name}}
+              </a>
+            </div>
+            <div class="suite-uuid text-sm">
+              <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
+              <b>uuid:</b> {{ suite.uuid }}
+            </div>
           </div>
-          <div class="suite-uuid text-sm">
-            <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
-            <b>uuid:</b> {{ suite.uuid }}
+          <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">
+            <!-- <div class="text-sm">engine</div> -->
+            <div class="suite-list-item-engine-type">
+              <img *ngIf="suite.engineIcon" src="{{ suite.engineIcon }}" />
+              <i *ngIf="!suite.engineIcon" class="far fa-question-circle fa-2x text-muted"></i>
+            </div>
           </div>
-        </div>
-        <div class="col-2 col-xl-1 d-none d-lg-inline-block">
-          <!-- <div class="text-sm">engine</div> -->
-          <div class="suite-list-item-engine-type">
-            <img *ngIf="suite.engineIcon" src="{{ suite.engineIcon }}" />
-            <i *ngIf="!suite.engineIcon" class="far fa-question-circle fa-2x text-muted"></i>
+          <div class="col-2 d-none d-xl-inline-block text-center">
+            <div class="suite-list-item-instances-chart">
+              <a [routerLink]="['/suite', { s: suite.asUrlParam() }]">
+                <stats-pie-chart [stats]="suite.instances"></stats-pie-chart>
+              </a>
+            </div>
           </div>
-        </div>
-        <div class="col-xl-2 d-none d-xl-inline-block text-center">
-          <div class="suite-list-item-instances-chart">
-            <a [routerLink]="['/suite', { s: suite.asUrlParam() }]">
-              <stats-pie-chart [stats]="suite.instances"></stats-pie-chart>
-            </a>
+          <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block">
+            <div class="suite-list-item-builds-chart">
+              <stats-bar-chart [stats]="suite.getLatestBuilds() | arraySizeFilterPipe: 10"
+                (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+            </div>
           </div>
-        </div>
-        <div class="col-4 col-lg-4 col-xl-3 d-inline-block">
-          <div class="suite-list-item-builds-chart">
-            <stats-bar-chart [stats]="suite.getLatestBuilds() | arraySizeFilterPipe: 10"
-              (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
-          </div>
-        </div>
 
+        </div>
       </div>
     </ng-template>
     <ng-template let-suite pTemplate="gridItem">

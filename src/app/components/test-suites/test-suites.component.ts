@@ -41,6 +41,8 @@ export class TestSuitesComponent implements OnInit, OnChanges {
 
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
+  private enableAutoLayoutSwitch: boolean = false;
+
   constructor(
     private appService: AppService,
     private toastService: ToastrService,
@@ -55,8 +57,10 @@ export class TestSuitesComponent implements OnInit, OnChanges {
   }
 
   private checkWindowSize() {
-    if (window.innerWidth < minWidthForListLayout) {
-      this.dataView.layout = 'grid';
+    if (this.enableAutoLayoutSwitch) {
+      if (window.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+      }
     }
   }
 
@@ -67,11 +71,12 @@ export class TestSuitesComponent implements OnInit, OnChanges {
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    event.target.innerWidth;
-    this.logger.debug('Resize', event.target.innerWidth);
-    if (event.target.innerWidth < minWidthForListLayout) {
-      this.dataView.layout = 'grid';
-      this.cdr.detectChanges();
+    if (this.enableAutoLayoutSwitch) {
+      this.logger.debug('Resize', event.target.innerWidth);
+      if (event.target.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+        this.cdr.detectChanges();
+      }
     }
   }
 

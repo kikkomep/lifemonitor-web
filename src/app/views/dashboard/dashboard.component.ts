@@ -69,6 +69,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   public updatingDataTable: boolean = false;
 
+  private enableAutoLayoutSwitch: boolean = false;
+
   private loadingWorkflows: boolean = false;
   private loadingWorkflowVersions = [];
   private loadingWorkflowVersionMap: { [uuid: string]: boolean } = {};
@@ -276,9 +278,11 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   private updateLayout(): void {
-    if (this.dataView) {
-      this.dataView.layout = this.isSmallScreen ? 'grid' : 'list';
-      this.cdref.detectChanges();
+    if (this.enableAutoLayoutSwitch) {
+      if (this.dataView) {
+        this.dataView.layout = this.isSmallScreen ? 'grid' : 'list';
+        this.cdref.detectChanges();
+      }
     }
   }
 
@@ -290,17 +294,20 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    event.target.innerWidth;
-    this.logger.debug('Resize', event.target.innerWidth);
-    if (event.target.innerWidth < minWidthForListLayout) {
-      this.dataView.layout = 'grid';
-      this.cdref.detectChanges();
+    if (this.enableAutoLayoutSwitch) {
+      this.logger.debug('Resize', event.target.innerWidth);
+      if (event.target.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+        this.cdref.detectChanges();
+      }
     }
   }
 
   private checkWindowSize() {
-    if (this.dataView && window.innerWidth < minWidthForListLayout) {
-      this.dataView.layout = 'grid';
+    if (this.enableAutoLayoutSwitch) {
+      if (this.dataView && window.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+      }
     }
   }
 

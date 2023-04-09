@@ -32,11 +32,28 @@
     vertical-align: middle;
   }
 
+  .p-dataview-header {
+    padding: 0;
+  }
+
   .suite-list-item {
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 1rem;
     width: 100%;
+
+    .suite-list-item-header {
+      // padding: 0;
+      // margin: 0;
+      text-align: center;
+    }
+
+    .suite-item-list-item-status {
+      max-width: 6rem !important;
+      margin: 0;
+      padding: 0;
+    }
 
     .suite-uuid {
       font-size: small;
@@ -112,7 +129,7 @@
       padding: 1rem;
 
       button {
-        margin: 5rem auto .4rem;
+        margin: 5rem auto 0.4rem;
       }
     }
 
@@ -128,8 +145,6 @@
       text-align: right;
       align-items: right;
     }
-
-
 
     .suite-grid-item-status {
       margin-top: 2rem;
