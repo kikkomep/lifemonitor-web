@@ -565,4 +565,12 @@ export class CacheManager {
     }
     return false;
   }
+
+  public async clear() {
+    const cache = await caches.open(this._cacheName);
+    const entries = await cache.keys();
+    for (let entry of entries) {
+      await cache.delete(entry);
+    }
+  }
 }

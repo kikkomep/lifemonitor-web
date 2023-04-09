@@ -124,6 +124,10 @@ export class CachedHttpClientService {
     };
   }
 
+  public async clear() {
+    return await this.cache.clear();
+  }
+
   private setupNetworkListener() {
     this.isOnline = navigator.onLine;
     window.addEventListener('offline', () => {
