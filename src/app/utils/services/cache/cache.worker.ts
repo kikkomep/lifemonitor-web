@@ -220,7 +220,7 @@ async function requestReponseWorkflowListToMap(
 async function onSync(
   rawData: [{ uuid: string; version: string; lastUpdate: number }]
 ) {
-  logger.warn('New Synchronization started...');
+  logger.info('New Synchronization started...');
 
   // map rawData into a structered set
   const workflowVersionsUdates: CachedWorkflowItemsMap = mapToCachedEntries(
@@ -325,14 +325,14 @@ async function onSync(
             ).toLocaleString()} outdated: ${outdated} (age: ${mAge} msecs)`
         );
         if (outdated) {
-          logger.error(`Outdated: ${key} (age: ${mAge} msecs)`);
+          logger.debug(`Outdated: ${key} (age: ${mAge} msecs)`);
           await cache.refreshCacheEntriesGroup(
             getCacheKey({ uuid: value.uuid }),
             false
           );
           await cache.refreshCacheEntriesGroup(key, true);
         } else {
-          logger.error(`Not outdated: ${key} (age: ${mAge} msecs)`);
+          logger.debug(`Not outdated: ${key} (age: ${mAge} msecs)`);
         }
       }
     }

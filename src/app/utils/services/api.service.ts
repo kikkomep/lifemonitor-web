@@ -652,14 +652,14 @@ export class ApiService {
       filteredByUser,
       includeSubScriptions
     );
-    this.logger.warn('Getting workflows', useCache);
+    this.logger.debug('Getting workflows', useCache);
     const cacheKey: string =
       filteredByUser && includeSubScriptions
         ? 'subscribedWorkflows'
         : !filteredByUser && includeSubScriptions
         ? 'userScopedWorkflows'
         : 'registeredWorkflows';
-    this.logger.warn('Getting workflows', useCache, cacheKey);
+    this.logger.debug('Getting workflows', useCache, cacheKey);
     const url: string = !filteredByUser
       ? `/workflows?status=${status}&versions=${versions}`
       : `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;

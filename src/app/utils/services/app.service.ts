@@ -716,7 +716,7 @@ export class AppService {
           let vdata = versions_data
             ? versions_data.find((v: { [x: string]: any }) => v['is_latest'])
             : null;
-          this.logger.warn('VDATA', vdata);
+          this.logger.debug('VDATA', vdata);
           return this.loadWorkflowVersion(
             workflow,
             wdata['latest_version'],
