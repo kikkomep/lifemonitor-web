@@ -970,7 +970,7 @@ export class AppService {
           //       this.setLoadingWorkflows(false);
           //     }
           //   });
-          return data;
+          // return data;
         }),
         catchError((err) => {
           this.logger.debug('Error when registering workflow', err);

@@ -238,11 +238,6 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.checkWindowSize();
   }
 
-  get sortOptionsStyle(): any {
-    return "\"{'width': '100px'}\"";
-    return '{' + (this.isSmallScreen ? "'width': '100px'" : '') + '}';
-  }
-
   get isSmallScreen(): boolean {
     return window.matchMedia('(max-width: 576px)').matches;
   }
