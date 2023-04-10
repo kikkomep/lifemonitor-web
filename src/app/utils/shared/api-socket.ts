@@ -96,7 +96,6 @@ export class ApiSocket extends Socket {
   }
 
   public leave(user: User) {
-    alert('Leave');
     this.emit('message', {
       type: 'leave',
       data: { user: user.id },
