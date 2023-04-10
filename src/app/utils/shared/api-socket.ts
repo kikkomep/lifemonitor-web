@@ -35,7 +35,7 @@ export class ApiSocket extends Socket {
     this.on('disconnect', () => this.onDisconnect());
 
     // Register 'message' event listener
-    this.fromEvent('message').subscribe((data) => {
+    this.fromEvent('message').subscribe((data: any) => {
       const mDate = new Date(data['timestamp'] * 1000);
       const rDate = new Date().getTime();
       const mAge = rDate - mDate.getTime();
