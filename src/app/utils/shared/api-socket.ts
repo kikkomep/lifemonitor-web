@@ -91,6 +91,12 @@ export class ApiSocket extends Socket {
     });
   }
 
+  public sync() {
+    this.emit('message', {
+      type: 'sync',
+    });
+  }
+
   public onJoined(payload: { data: { user: string } }) {
     this.logger.debug(`user ${payload.data.user} joined`);
   }
@@ -108,6 +114,7 @@ export class ApiSocket extends Socket {
 
   onConnect() {
     this.logger.info('WS connection established');
+    this.sync();
   }
 
   onDisconnect() {
