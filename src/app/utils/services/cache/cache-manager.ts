@@ -70,9 +70,11 @@ const logger: Logger = LoggerManager.create('CacheManager');
 
 export class CacheManager {
   private _cacheName: string;
+  private _maxRetries: number = 1;
 
-  constructor(cacheName: string) {
+  constructor(cacheName: string, maxRetries: number = 1) {
     this._cacheName = cacheName;
+    this._maxRetries = maxRetries;
   }
 
   public get cacheName(): string {
@@ -228,7 +230,7 @@ export class CacheManager {
       logger.debug(`Cache miss for url ${url}`);
       const oldResponse = response ? response.clone() : null;
 
-      let retry = 3;
+      let retry = this._maxRetries;
       while (retry > 0) {
         try {
           response = await fetch(request);

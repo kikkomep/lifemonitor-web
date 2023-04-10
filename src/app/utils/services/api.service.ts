@@ -25,6 +25,8 @@ import { CachedHttpClientService } from './cache/cachedhttpclient.service';
 import { AppConfigService } from './config.service';
 import { ApiSocket } from '../shared/api-socket';
 
+const MAX_RETRIES = 1;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -198,7 +200,7 @@ export class ApiService {
         cacheGroup: options.cacheGroup,
         cacheTTL: options.cacheTTL,
       })
-      .pipe(catchError(this.handleError<T>(url)));
+      .pipe(retry(MAX_RETRIES), catchError(this.handleError<T>(url)));
 
     // return this.http.get<T>(url, httpOptions);
   }
@@ -215,7 +217,7 @@ export class ApiService {
         // this.http
         //   .get(this.apiBaseUrl + '/users/current', this.get_http_options())
         .pipe(
-          retry(3),
+          retry(MAX_RETRIES),
           map((data) => {
             return new User(data);
           })
@@ -234,7 +236,7 @@ export class ApiService {
         //     this.get_http_options()
         //   )
         .pipe(
-          retry(3),
+          retry(MAX_RETRIES),
           map((data) => {
             let result = [];
             for (let d of data['items']) {
@@ -265,7 +267,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map(() => {
           for (let n of notifications) {
             n.read = readTime;
@@ -288,7 +290,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         tap(() => {
           this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
           this.logger.debug('Notification deleted');
@@ -308,7 +310,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         tap(() => {
           this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
           this.logger.debug('Notifications deleted');
@@ -326,7 +328,7 @@ export class ApiService {
         // return this.http
         //   .get(this.apiBaseUrl + '/registries', this.get_http_options())
         .pipe(
-          retry(3),
+          retry(MAX_RETRIES),
           map((data) => {
             this.logger.debug('Data registries', data);
             let result = [];
@@ -351,7 +353,7 @@ export class ApiService {
         //     this.get_http_options()
         //   )
         .pipe(
-          retry(3),
+          retry(MAX_RETRIES),
           map((data) => {
             this.logger.debug('Data registries', data);
             let result = [];
@@ -385,7 +387,7 @@ export class ApiService {
         //     this.get_http_options()
         //   )
         .pipe(
-          retry(3),
+          retry(MAX_RETRIES),
           map((data) => {
             this.logger.debug('Data registries', data);
             return new RegistryWorkflow(data);
@@ -407,7 +409,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map((data: { meta: { modified: number } }) => {
           this.refreshWorkflow(
             workflow.uuid,
@@ -436,7 +438,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map((data) => {
           workflow.public = !workflow.public;
           this.refreshWorkflow(workflow.uuid, workflow.version['version']).then(
@@ -547,7 +549,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map(() => {
           this.logger.debug('Workflow deleted');
           this.refreshListOfWorkflows().then(() => {});
@@ -560,7 +562,7 @@ export class ApiService {
     return this.http
       .delete(this.apiBaseUrl + '/workflows/' + uuid, this.get_http_options())
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map(() => {
           this.logger.debug('Workflow deleted');
           this.refreshListOfWorkflows().then(() => {});
@@ -581,7 +583,7 @@ export class ApiService {
         responseType: 'blob',
       })
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         tap((data) => this.logger.debug('RO-Create downloaded')),
         catchError(this.handleError('download RO-Crate', []))
       );
@@ -595,7 +597,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map((subscription) => {
           this.logger.debug('Created new subscription', subscription);
           if (subscription) {
@@ -620,7 +622,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map(() => {
           this.logger.debug('Subscription to workflow deleted');
           for (let i = 0; i < workflow.subscriptions.length; i++) {
@@ -670,7 +672,7 @@ export class ApiService {
       cacheEntry: cacheKey,
       cacheTTL: 10,
     }).pipe(
-      retry(3),
+      retry(MAX_RETRIES),
       tap((data) => {
         this.logger.debug('Loaded workflows TAP: ', data);
       }),
@@ -717,7 +719,7 @@ export class ApiService {
         return workflow;
       }),
       tap((result) => this.logger.debug('Loaded workflow: ', result)),
-      retry(3)
+      retry(MAX_RETRIES)
     );
   }
 
@@ -763,7 +765,7 @@ export class ApiService {
           cacheGroup: this.workflowToCacheGroup(uuid, version),
         }
       ).pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         catchError((err) => {
           this.logger.debug('workflow status error', err);
           return throwError(err);
@@ -795,13 +797,13 @@ export class ApiService {
         return w;
       }),
       tap((result) => this.logger.debug('Loaded workflow: ', result)),
-      retry(3)
+      retry(MAX_RETRIES)
     );
   }
 
   loadSuite(suiteData: Object): Observable<Suite> {
     return this.doGet<Status>('/suites/' + suiteData['uuid'] + '/status').pipe(
-      retry(3),
+      retry(MAX_RETRIES),
       mergeMap((status: Object) => {
         let suite: Suite = new Suite({} as WorkflowVersion, suiteData);
         suite.status = new Status({
@@ -816,7 +818,7 @@ export class ApiService {
             this.doGet(`/instances/${instanceData['uuid']}/latest-builds`, {
               cacheMeta: {},
             }).pipe(
-              retry(3),
+              retry(MAX_RETRIES),
               map((instaceLatestBuildsData) => {
                 this.logger.debug(
                   'Latest builds result',
@@ -842,7 +844,7 @@ export class ApiService {
         }
 
         return forkJoin(instanceBuildsQueries).pipe(
-          retry(3),
+          retry(MAX_RETRIES),
           map((instanceLatestBuilds) => {
             return suite;
           }),
@@ -869,7 +871,7 @@ export class ApiService {
         cacheGroup: this.workflowToCacheGroup(workflow.uuid, version),
       }
     ).pipe(
-      retry(3),
+      retry(MAX_RETRIES),
       map((rawSuitesData) => {
         return rawSuitesData['items'].map((data: any) => {
           const suite = { ...data };
@@ -902,7 +904,7 @@ export class ApiService {
 
         if (!queries || queries.length == 0) return of([]);
         return forkJoin(queries).pipe(
-          retry(3),
+          retry(MAX_RETRIES),
           catchError((error) => {
             let suites: Array<Suite> = [];
             for (let suiteData of rawSuitesData) {
@@ -965,7 +967,7 @@ export class ApiService {
 
   getSuite(uuid: string): Observable<Suite> {
     return this.doGet(`/suites/${uuid}`).pipe(
-      retry(3),
+      retry(MAX_RETRIES),
       mergeMap((data) => {
         //let s = new Suite({} as Workflow, data);
         this.logger.debug('Suite data:', data);
@@ -993,7 +995,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map((data) => {
           this.logger.debug('Changed suite name to:' + suite.name);
         }),
@@ -1017,7 +1019,7 @@ export class ApiService {
         this.get_http_options()
       )
       .pipe(
-        retry(3),
+        retry(MAX_RETRIES),
         map((data) => {
           this.logger.debug('Changed instance name to:' + instance.name);
         }),
@@ -1027,7 +1029,7 @@ export class ApiService {
 
   getLatestTestInstance(uuid: string): Observable<any> {
     return this.doGet(`/suites/${uuid}/instances`).pipe(
-      retry(3),
+      retry(MAX_RETRIES),
       map((data) => {
         return data['items'];
       }),
@@ -1039,7 +1041,7 @@ export class ApiService {
 
   getLatestTestInstanceBuilds(uuid: string): Observable<any> {
     return this.doGet(`/instances/${uuid}/latest-builds`).pipe(
-      retry(3),
+      retry(MAX_RETRIES),
       map((data) => {
         return data['items'];
       }),
@@ -1053,7 +1055,7 @@ export class ApiService {
     return this.doGet(
       `/instances/${testInstanceUUID}/builds/${buildID}/logs`
     ).pipe(
-      retry(3),
+      retry(MAX_RETRIES),
       map((data) => {
         return data;
       }),
