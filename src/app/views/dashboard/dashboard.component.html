@@ -391,7 +391,7 @@
                         </div>
 
                         <!-- Workflow Submitter -->
-                        <div class="item-detail">
+                        <div *ngIf="item?.version?.submitter" class="item-detail">
                           <span class="item-icon">
                             <i class="fas fa-xs fa-solid fa-user mr-1"></i>
                           </span>
