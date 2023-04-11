@@ -873,7 +873,7 @@ export class ApiService {
     ).pipe(
       retry(MAX_RETRIES),
       map((rawSuitesData) => {
-        return rawSuitesData['items'].map((data: any) => {
+        return rawSuitesData['items']?.map((data: any) => {
           const suite = { ...data };
           if ('aggregate_test_status' in suite)
             suite['status'] = suite['aggregate_test_status'];
@@ -946,7 +946,7 @@ export class ApiService {
                   statuses[dataIndexMap[instanceData['uuid']]];
                 let instance = new TestInstance(suite, instanceData);
                 try {
-                  instance.latestBuilds = instaceLatestBuildsData['items'].map(
+                  instance.latestBuilds = instaceLatestBuildsData['items']?.map(
                     (x: object) => new TestBuild(instance, x)
                   );
                 } catch (e) {
