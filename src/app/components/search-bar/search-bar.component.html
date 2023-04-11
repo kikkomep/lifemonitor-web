@@ -20,25 +20,6 @@
       tooltipPosition="bottom">
       <i class="fas fa-window-close"></i>
     </button>
-    <!-- <button class="btn btn-outline-secondary border-left-0" type="button" (click)="changeSortingOrder()"
-      aria-haspopup="true" aria-expanded="false">
-      <i *ngIf="actualSortingOrder == 'asc'" class="fas fa-sort-amount-up"
-         data-toggle="tooltip" data-placement="top" data-html="true"
-         title="Sort {{elementType}} in ascending order"></i>
-      <i *ngIf="actualSortingOrder == 'desc'" class="fas fa-sort-amount-down"
-         data-toggle="tooltip" data-placement="top" data-html="true"
-         title="Sort {{elementType}} in descending order"></i>
-    </button> -->
-    <!-- <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
-      aria-haspopup="true" aria-expanded="false">
-      <i class="fas fa-sort-amount-up"></i> Filter
-    </button> -->
-    <!-- <div class="dropdown-menu">
-      <a class="dropdown-item">Name</a>
-      <a class="dropdown-item">UUID</a>
-      <div role="separator" class="dropdown-divider"></div>
-      <a class="dropdown-item" href="#">Separated link</a>
-    </div> -->
   </div>
   <button #searchButton [disabled]="!allowEmptySearch && !actualFilterValue" class="btn btn-primary"
     data-toggle="tooltip" data-placement="bottom" data-html="true" [pTooltip]="'<div class=\'text-center\'>' +
