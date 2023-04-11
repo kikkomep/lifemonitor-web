@@ -131,8 +131,8 @@
             <div class="instance-grid-item-engine">
               <div class="text-sm">engine</div>
               <div class="text-center instance-grid-item-engine-type" data-html="true" data-toggle="tooltip"
-                data-placement="top"
-                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</span>">
+                tooltipPosition="bottom"
+                pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</span>">
                 <img *ngIf="instance.suite && instance.suite.engineIcon" src="{{ instance.suite.engineIcon }}"
                   width="100" />
                 <i *ngIf="!(instance.suite && instance.suite.engineIcon)"
@@ -144,8 +144,8 @@
             <div class="instance-grid-item-instances">
               <div class="text-sm">platform</div>
               <div class="text-center instance-grid-item-service-type" data-html="true" data-toggle="tooltip"
-                data-placement="top"
-                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
+                tooltipPosition="bottom"
+                pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
                 <a href="{{ instance.service.url }}">
                   <img src="{{ instance.platformIcon }}" height="60px" />
                 </a>

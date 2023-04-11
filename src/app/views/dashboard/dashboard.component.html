@@ -36,13 +36,13 @@
     <ng-container>
       <h2 class="text-primary font-weight-light p-2">
         <div>
-          <span *ngIf="((isLoading|async)===true)" data-toggle="tooltip" data-placement="right" data-html="true"
+          <span *ngIf="((isLoading|async)===true)" data-toggle="tooltip" tooltipPosition="right" data-html="true"
             title="The dashboard collects your subscribed workflows">
             {{ "Loading " + (isUserLogged() ? "Dashboard" : "Workflows") + "....."}}
           </span>
           <span *ngIf="(isLoading|async)===false && (!workflowNameFilter || workflowNameFilter.length==0)"
             pTooltip="{{ isUserLogged() ? 'the dashboard collects your workflow subscriptions' : 'registered workflows' }}"
-            showDelay=2000 data-placement="right" data-html="true">
+            showDelay=2000 tooltipPosition="right" data-html="true">
             {{ isUserLogged() ? "Dashboard" : "Workflows" }}
           </span>
         </div>
@@ -345,7 +345,7 @@
                           (keyup.esc)="restoreWorkflowName(item)" autofocus>
                         <a *ngIf="!item.editingMode" (click)="showWorkflowDetails(item)"
                           style="color: black; font-size: larger" (dblclick)="enableWorkflowEditMode(item)"
-                          data-toggle="tooltip" data-placement="top" data-html="true" [showDelay]="tooltipShowDelay"
+                          data-toggle="tooltip" tooltipPosition="top" data-html="true" [showDelay]="tooltipShowDelay"
                           pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b><i class='fas fa-external-link-alt mx-1'></i>
                     {{ isEditable(item) ? 'or double click to edit' : ''}}</div>">
                           {{ item.workflow.name }}
@@ -425,20 +425,20 @@
                       <span *ngIf="item.subscriptions !== undefined">
                         <a *ngIf="(searchModeEnabled || editModeEnabled || item.editingMode) && (!item.subscriptions || item.subscriptions.length == 0)"
                           class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" data-placement="bottom" data-html="true" [showDelay]="tooltipShowDelay"
+                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
                           pTooltip="Click to subscribe to this workflow and add it to your dashboard">
                           SUBSCRIBE
                         </a>
                         <div
                           *ngIf="!(editModeEnabled || item.editingMode) && searchModeEnabled && (item.subscriptions && item.subscriptions.length > 0)"
                           class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" data-placement="bottom" data-html="true" [showDelay]="tooltipShowDelay"
+                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
                           pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
                           SUBSCRIBED
                         </div>
                         <a *ngIf="(editModeEnabled || item.editingMode) && item.subscriptions && item.subscriptions.length > 0"
                           class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" data-placement="bottom" data-html="true" [showDelay]="tooltipShowDelay"
+                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
                           pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
                           UNSUBSCRIBE
                         </a>
@@ -454,7 +454,7 @@
                         <i class="fas fa-2x fa-sync-alt text-muted"></i>
                       </div>
                       <div *ngIf="!isLoadingWorkflowVersion(item)" data-html="true" data-toggle="tooltip"
-                        data-placement="top" class="workflow-list-item-visibility workflow-visibility-{{item.uuid}}"
+                        tooltipPosition="top" class="workflow-list-item-visibility workflow-visibility-{{item.uuid}}"
                         pTooltip="{{ getWorkflowVisibilityTitle(item) }}" [showDelay]="tooltipShowDelay">
                         <i *ngIf="item.public" class="fas fa-lg fa-globe-americas"></i>
                         <i *ngIf="!item.public" class="fas fa-lg fa-user-lock"></i>
@@ -476,7 +476,7 @@
                     </div>
                     <div *ngIf="!isLoadingWorkflowVersion(item)">
                       <div class="workflow-list-item-type" [showDelay]="tooltipShowDelay" data-html="true"
-                        data-toggle="tooltip" data-placement="top"
+                        data-toggle="tooltip" tooltipPosition="top"
                         pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{item.type}} workflow</span>">
                         <img *ngIf="item.typeIcon" [src]="item.typeIcon" width="{{ item.typeIconSize }}" />
                         <i *ngIf="!item.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
@@ -497,7 +497,7 @@
                   <div class="col-1 d-none d-xl-block">
                     <div class="workflow-list-item-suites-chart">
                       <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
-                        data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                        data-toggle="tooltip" tooltipPosition="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
                       no test suite available<br/> for this workflow version</span>">
                         <i class="fas fa-ban fa-2x text-muted"></i>
                       </div>
@@ -514,7 +514,7 @@
                   <div class="col-3 col-xl-2 d-none d-md-block">
                     <div class="workflow-list-item-builds-chart">
                       <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
-                        data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                        data-toggle="tooltip" tooltipPosition="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
                       no test build available<br/> for this workflow version</span>">
                         <i class="fas fa-ban fa-2x text-muted"></i>
                       </div>
@@ -607,7 +607,7 @@
                           (keyup.enter)="updateWorkflowName(item)" (keyup.esc)="restoreWorkflowName(item)" autofocus>
                         <a *ngIf="!item.editingMode" (click)="showWorkflowDetails(item)"
                           style="color: black; font-size: larger" (dblclick)="enableWorkflowEditMode(item)"
-                          data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'>
+                          data-toggle="tooltip" tooltipPosition="top" data-html="true" title="<span class='text-xs'>
                     <i class='fas fa-question-circle mx-1'></i>
                     click to see <b>suites</b>
                     <i class='fas fa-external-link-alt mx-1'></i>
@@ -689,20 +689,20 @@
                       <span *ngIf="item.subscriptions !== undefined">
                         <a *ngIf="(searchModeEnabled || editModeEnabled || item.editingMode) && (!item.subscriptions || item.subscriptions.length == 0)"
                           class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" data-placement="bottom" data-html="true"
+                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true"
                           title="Click to subscribe to this workflow and add it to your dashboard">
                           SUBSCRIBE
                         </a>
                         <div
                           *ngIf="!(editModeEnabled || item.editingMode) && searchModeEnabled && (item.subscriptions && item.subscriptions.length > 0)"
                           class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" data-placement="bottom" data-html="true"
+                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true"
                           title="Click to unsubscribe from this workflow and remove it from your dashboard">
                           SUBSCRIBED
                         </div>
                         <a *ngIf="(editModeEnabled || item.editingMode) && item.subscriptions && item.subscriptions.length > 0"
                           class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" data-placement="bottom" data-html="true"
+                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true"
                           title="Click to unsubscribe from this workflow and remove it from your dashboard">
                           UNSUBSCRIBE
                         </a>
@@ -720,7 +720,7 @@
                         <i class="fas fa-2x fa-sync-alt text-muted"></i>
                       </div>
                       <div *ngIf="!isLoadingWorkflowVersion(item)" data-html="true" data-toggle="tooltip"
-                        data-placement="top" class="workflow-grid-item-visibility workflow-visibility-{{item.uuid}}"
+                        tooltipPosition="top" class="workflow-grid-item-visibility workflow-visibility-{{item.uuid}}"
                         title="{{ getWorkflowVisibilityTitle(item) }}">
                         <i *ngIf="item.public" class="fas fa-lg fa-globe-americas"></i>
                         <i *ngIf="!item.public" class="fas fa-lg fa-user-lock"></i>
@@ -751,7 +751,7 @@
                         <i class="fas fa-2x fa-sync-alt"></i>
                       </div>
                       <div *ngIf="!isLoadingWorkflowVersion(item)">
-                        <div class="workflow-grid-item-type" data-html="true" data-toggle="tooltip" data-placement="top"
+                        <div class="workflow-grid-item-type" data-html="true" data-toggle="tooltip" tooltipPosition="top"
                           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{item.type}} workflow</span>">
                           <img *ngIf="item.typeIcon" [src]="item.typeIcon" width="{{ item.typeIconSize }}" />
                           <i *ngIf="!item.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
@@ -765,7 +765,7 @@
                       <div class="workflow-grid-item-section-label">suites</div>
                       <div class="workflow-grid-item-suites-chart">
                         <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
-                          data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                          data-toggle="tooltip" tooltipPosition="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
                         no test suite available<br/> for this workflow version</span>">
                           <i class="fas fa-ban fa-2x text-muted"></i>
                         </div>
@@ -784,7 +784,7 @@
                       <div class="workflow-grid-item-section-label">latest builds</div>
                       <div class="workflow-grid-item-builds-chart">
                         <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
-                          data-toggle="tooltip" data-placement="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
+                          data-toggle="tooltip" tooltipPosition="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
                         no test build available<br/> for this workflow version</span>">
                           <i class="fas fa-ban fa-2x text-muted"></i>
                         </div>

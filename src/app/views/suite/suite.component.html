@@ -42,7 +42,7 @@
   <section *ngIf="suite.workflow" class="content mx-lg-4 p-2">
     <div *ngIf="suite.workflow && suite.workflow.suites" class="mt-5">
       <h3 style="color: var(--primary)">
-        <span *ngIf="!instanceNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
+        <span *ngIf="!instanceNameFilter" data-toggle="tooltip" tooltipPosition="right" data-html="true"
           [showDelay]="1500" pTooltip="The dashboard collects the test instances for the suite '{{suite.name}}'">
           Test instances
         </span>
