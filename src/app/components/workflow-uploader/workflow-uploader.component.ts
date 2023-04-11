@@ -184,10 +184,16 @@ export class WorkflowUploaderComponent
           );
         } else {
           const message = `Please wait, registering workflow... ${job.status}`;
+          if (this._lastActiveToast)
+            this.toastService.remove(this._lastActiveToast.toastId);
           this._lastActiveToast = this.toastService.info(
             message,
             `${job.data['name'] ?? 'Workflow'} (ver. ${job.data['version']})`,
-            { timeOut: job.status !== 'completed' ? 4000 : 6000 }
+            {
+              timeOut: 60000,
+              progressBar: true,
+              progressAnimation: 'decreasing',
+            }
           );
         }
       }
@@ -524,12 +530,12 @@ export class WorkflowUploaderComponent
       if (request) {
         this._processing = true;
         this.toastService.clear();
-        this.toastService.info(
+        this._lastActiveToast = this.toastService.info(
           `Please Wait...`,
           `Registering ${this.workflowName ?? 'Workflow'} (ver. ${
             this.workflowVersion
           })`,
-          { timeOut: 60000 }
+          { timeOut: 60000, progressBar: true, progressAnimation: 'decreasing' }
         );
         request.subscribe(
           (data: any) => {
