@@ -31,7 +31,8 @@
       <div class="d-flex">
         <div class="d-inline-flex row suite-list-item">
           <div class="col-3 col-sm-1 col-lg-1 d-inline-block text-center">
-            <div class="suite-list-item-status" [ngClass]="suite.class">
+            <div class="suite-list-item-status" [ngClass]="suite.class"
+              [pTooltip]="suite.statusText" tooltipPosition="top" showDelay="1500">
               <i class="{{ suite.statusIcon }} fa-2x"></i>
             </div>
           </div>
@@ -41,10 +42,9 @@
                 class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
                 placeholder="Enter suite name" (keyup.enter)="updateSuite(suite)" (keyup.esc)="restoreSuite(suite)">
               <a *ngIf="!suite.editingMode" (click)="showSuiteDetails(suite)" (dblclick)="enableSuiteEditing(suite)"
-                data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
-                  <i class='fas fa-question-circle mx-1'></i>
-                  click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i>
-                  {{ isEditable(suite) ? '<br/>or double click to edit' : ''}}</span>">
+                data-html="true" data-toggle="tooltip" data-placement="top" showDelay="1500"
+                pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to see <b>instances</b><i class='fas fa-external-link-alt mx-1'></i>
+                  {{ isEditable(suite) ? 'or double click to edit' : ''}}</div>">
                 {{suite.name}}
               </a>
             </div>

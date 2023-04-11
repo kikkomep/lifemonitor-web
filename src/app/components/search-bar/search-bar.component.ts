@@ -63,7 +63,7 @@ export class SearchBarComponent implements OnInit {
     const title: string = !this.actualFilterValue
       ? 'Browse registered ' + this.elementType
       : 'Search ' + this.elementType + ' by UUID or name';
-    this.searchButton.nativeElement.setAttribute('data-original-title', title);
+    // this.searchButton.nativeElement.setAttribute('data-original-title', title);
   }
 
   public onBrowseButtonClick($event) {

@@ -42,19 +42,19 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    $(document)
-      .on('mouseover', '[data-toggle="tooltip"]', function () {
-        $(this).tooltip('show');
-      })
-      .on('mouseout', '[data-toggle="tooltip"]', function () {
-        $(this).tooltip('hide');
-      })
-      .on('keyup', '[data-toggle="tooltip"]', function () {
-        $(this).tooltip('hide');
-      })
-      .on('click', '[data-toggle="tooltip"]', function () {
-        $(this).tooltip('hide');
-      });
+    // $(document)
+    //   .on('mouseover', '[data-toggle="tooltip"]', function () {
+    //     $(this).tooltip('show');
+    //   })
+    //   .on('mouseout', '[data-toggle="tooltip"]', function () {
+    //     $(this).tooltip('hide');
+    //   })
+    //   .on('keyup', '[data-toggle="tooltip"]', function () {
+    //     $(this).tooltip('hide');
+    //   })
+    //   .on('click', '[data-toggle="tooltip"]', function () {
+    //     $(this).tooltip('hide');
+    //   });
   }
 
   ngOnDestroy() {}

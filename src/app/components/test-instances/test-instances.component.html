@@ -31,7 +31,8 @@
       <div class="d-flex">
         <div class="d-inline-flex row instance-list-item">
           <div class="col-2 col-sm-1 col-lg-1 d-inline-block text-center">
-            <div class="instance-grid-item-status" [ngClass]="instance.class">
+            <div class="instance-grid-item-status" [ngClass]="instance.class" [pTooltip]="instance.statusText"
+              tooltipPosition="top" showDelay="1500">
               <i class="{{ instance.statusIcon }} fa-2x"></i>
             </div>
           </div>
@@ -43,11 +44,8 @@
                 (keyup.esc)="restoreTestInstance(instance)" autofocus>
               <a *ngIf="!instance.editingMode" style="color: black; font-size: larger"
                 (click)="showTestInstanceDetails(instance)" (dblclick)="enableTestInstanceEditing(instance)"
-                data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
-                    <i class='fas fa-question-circle mx-1'></i>
-                    see on <b>{{instance.service.type}}</b>
-                    <i class='fas fa-external-link-alt mx-1'></i>
-                    {{ isEditable(instance) ? '<br/>or double click to edit' : ''}}</span>">
+                data-html="true" data-toggle="tooltip" tooltipPosition="top" pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>see on <b>{{instance.service.type}}</b><i class='fas fa-external-link-alt mx-1'></i>
+                    {{ isEditable(instance) ? 'or double click to edit' : ''}}</div>">
                 <div>{{ instance.name }}</div>
               </a>
             </div>
@@ -62,8 +60,8 @@
           </div>
           <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">
             <div class="text-center instance-list-item-engine-type" data-html="true" data-toggle="tooltip"
-              data-placement="top"
-              title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</span>">
+              tooltipPosition="top" showDelay="2000"
+              pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</div>">
               <img *ngIf="instance.suite && instance.suite.engineIcon" src="{{ instance.suite.engineIcon }}"
                 width="100" />
               <i *ngIf="!(instance.suite && instance.suite.engineIcon)"
@@ -72,8 +70,8 @@
           </div>
           <div class="col-2 d-none d-xl-inline-block text-center">
             <div class="text-center instance-list-item-service-type" data-html="true" data-toggle="tooltip"
-              data-placement="top"
-              title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
+              tooltipPosition="top" showDelay="2000"
+              pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
               <a href="{{ instance.service.url }}">
                 <img src="{{ instance.platformIcon }}" height="60px" />
               </a>

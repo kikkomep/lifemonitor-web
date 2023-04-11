@@ -152,9 +152,8 @@
 
       <div class="xcol-xl-4 d-none d-xl-inline-block" *ngIf="firstRegistry">
         <a style="margin-top: 25px;" class="hvr-float-shadow" data-html="true" data-toggle="tooltip" target="_blank"
-          data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
-                      click to see the workflow on <b>{{firstRegistry}}</b> registry
-                      <i class='fas fa-sm fa-external-link-alt mx-1'></i>"
+          tooltipPosition="bottom"
+          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to see the workflow on <b>{{firstRegistry.name}}</b> registry<i class='fas fa-sm fa-external-link-alt mx-1'></i></div>"
           href="{{workflow.getRegistryLink(firstRegistry.identifier)}}">
           <img src="/assets/img/logo/registries/workflowhub.svg" class="p-0 m-0" height="110" />
           <div class="text-center" style="margin-top: -12px; font-size: 0.8rem;">
@@ -167,9 +166,9 @@
 
       <div *ngIf="workflow.githubOrigin" class="xcol-xl-4 d-none d-xl-inline-block">
         <a style="margin-top: 40px;" class="hvr-float-shadow" data-html="true" data-toggle="tooltip" target="_blank"
-          data-placement="left" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
-                        click to see the workflow on <b>GitHub</b>
-                        <i class='fas fa-sm fa-external-link-alt mx-1'></i>" href="{{workflow.originLink}}">
+          tooltipPosition="bottom"
+          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to see the workflow on <b>GitHub</b><i class='fas fa-sm fa-external-link-alt mx-1'></i></div>"
+          href="{{workflow.originLink}}">
           <img src="/assets/img/logo/testingServices/github.png" class="p-0 m-0" height="80" />
           <div class="text-center" style="margin-top: 0px; font-size: 0.8rem;">
             <span>see on <b>GitHub</b></span>

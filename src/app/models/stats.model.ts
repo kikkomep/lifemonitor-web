@@ -115,6 +115,10 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
     }
     return status == 'unavailable' ? 'unknown' : status;
   }
+
+  public get statusText(): string {
+    return this.aggregatedStatus.replace('_', ' ');
+  }
 }
 
 export class AbstractStats extends Model {
@@ -199,10 +203,7 @@ export class AbstractStats extends Model {
     this.notifyChanges();
   }
 
-  public getStatsLength(
-    items: StatsItem[],
-    filter: string
-  ): number {
+  public getStatsLength(items: StatsItem[], filter: string): number {
     if (!items) return 0;
     if (filter && filter !== '______ALL_____') {
       items = items.filter(
@@ -284,6 +285,10 @@ export class StatusStatsItem extends Model implements StatsItem {
     if (['aborted'].includes(this.getStatus())) return 'fas fa-ban';
     if (['running'].includes(this.getStatus())) return 'fas fa-sync';
     return 'fas fa-question-circle';
+  }
+
+  public get statusText(): string {
+    return this.getStatus()?.replace('_', ' ');
   }
 }
 

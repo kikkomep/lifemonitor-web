@@ -35,7 +35,8 @@
   <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">
     <h3 style="color: var(--primary)">
       <span *ngIf="!suiteNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
-        title="The dashboard collects test suites for the workflow '{{workflow.name}}'">
+        pTooltip="The dashboard collects test suites for the workflow '{{workflow.name}}'"
+        [showDelay]="1500">
         Suites
       </span>
       <div *ngIf="suiteNameFilter">
@@ -64,8 +65,8 @@
       <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-primary" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
-          data-placement="bottom" data-html="true"
-          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> suites</span>">
+          tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> suites</div>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
@@ -89,8 +90,8 @@
       <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-warning" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
-          data-placement="bottom" data-html="true"
-          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter partially <b>passing</b> suites</span>">
+          tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter partially <b>passing</b> suites</div>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
@@ -116,8 +117,8 @@
       <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-danger" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
-          data-placement="bottom" data-html="true"
-          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> suites</span>">
+          tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+          pTooltip="<div class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> suites</div>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>
@@ -142,8 +143,8 @@
       <div class="col-lg-3 col-6">
         <!-- small box -->
         <div class="small-box bg-gray" (click)="filterByStatus('unknown')" data-html="true" data-toggle="tooltip"
-          data-placement="bottom"
-          title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter suites in <b>unknown</b> state</span>">
+          tooltipPosition="bottom" [showDelay]="1500" tooltipPosition="bottom"
+          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter suites in <b>unknown</b> state</div>">
           <div *ngIf="!workflow.suites" class="overlay dark">
             <i class="fas fa-3x fa-sync-alt"></i>
           </div>

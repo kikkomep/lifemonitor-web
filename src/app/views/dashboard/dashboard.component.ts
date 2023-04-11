@@ -77,6 +77,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
+  tooltipShowDelay = 1500;
+
   // Sort configuration
   sortField: string;
   sortOrder: number;
@@ -243,9 +245,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    $('[data-toggle="tooltip"]', function () {
-      $(this).tooltip('hide');
-    });
+    // $('[data-toggle="tooltip"]', function () {
+    //   $(this).tooltip('hide');
+    // });
 
     const mediaQuery = window.matchMedia('(max-width: 576px)');
     mediaQuery.addEventListener('change', (e) => {
@@ -287,9 +289,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    $('[data-toggle="tooltip"]', function () {
-      $(this).tooltip('hide');
-    });
+    // $('[data-toggle="tooltip"]', function () {
+    //   $(this).tooltip('hide');
+    // });
   }
 
   @HostListener('window:resize', ['$event'])

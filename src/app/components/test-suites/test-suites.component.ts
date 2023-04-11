@@ -150,11 +150,11 @@ export class TestSuitesComponent implements OnInit, OnChanges {
       },
     });
     // Add tooltip to the SearchBox
-    $('input[type=search]')
-      .attr('data-placement', 'top')
-      .attr('data-toggle', 'tooltip')
-      .attr('data-html', 'true')
-      .attr('title', 'Filter by UUID or Name');
+    // $('input[type=search]')
+    //   .attr('data-placement', 'top')
+    //   .attr('data-toggle', 'tooltip')
+    //   .attr('data-html', 'true')
+    //   .attr('pTooltip', 'Filter by UUID or Name');
   }
 
   private destroyDataTable() {
