@@ -236,7 +236,7 @@ export class AppService {
           return;
         }
 
-        const oldTimestamp = cwv.modified;
+        const oldTimestamp = cwv?.modified ?? 0;
         this.logger.debug('Old timestamp', oldTimestamp, cwv);
 
         this.api
