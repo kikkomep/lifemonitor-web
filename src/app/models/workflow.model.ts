@@ -411,3 +411,28 @@ export class WorkflowVersionDescriptor extends Model {
       : [];
   }
 }
+
+export class WorkflowsLoadingStatus {
+  private _workflows: Array<{ uuid: string }>;
+  private _loaded: { [key: string]: boolean } = {};
+
+  constructor(workflows: Array<Workflow>) {
+    this._workflows = workflows;
+  }
+
+  public get workflows(): Array<{ uuid: string }> {
+    return this._workflows;
+  }
+
+  public setLoaded(uuid: string) {
+    this._loaded[uuid] = true;
+  }
+
+  public get loaded(): Array<{ uuid: string }> {
+    return this._workflows.filter((w) => w.uuid in this._loaded);
+  }
+
+  public get completionPercentage(): number {
+    return Math.floor(Object.keys(this._loaded).length / this._workflows.length * 100);
+  }
+}

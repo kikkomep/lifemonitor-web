@@ -15,6 +15,7 @@ import {
   CachedResponse,
   CacheManager,
 } from './cache-manager';
+import { CacheRefreshStatus } from './cache.model';
 
 declare var $: any;
 
@@ -339,6 +340,10 @@ export class CachedHttpClientService {
 
   public startSync() {
     return this.socketIO?.sync();
+  }
+
+  public get refreshProgressStatus$(): Observable<CacheRefreshStatus> {
+    return this.cache.refreshProgressStatus$;
   }
 
   public async refresh(): Promise<{ [req: string]: Response }> {

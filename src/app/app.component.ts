@@ -3,6 +3,9 @@ import { SwUpdate } from '@angular/service-worker';
 
 import { Logger, LoggerManager } from './utils/logging/index';
 import { InputDialogService } from './utils/services/input-dialog.service';
+import { CachedHttpClientService } from './utils/services/cache/cachedhttpclient.service';
+import { CacheRefreshStatus } from './utils/services/cache/cache.model';
+import { Observable } from 'rxjs';
 
 declare var $: any;
 
@@ -16,10 +19,15 @@ export class AppComponent implements OnInit, OnDestroy {
   webWorker: Worker;
   private logger: Logger = LoggerManager.create('AppComponent');
 
+  refreshStatus$: Observable<CacheRefreshStatus>;
+
   constructor(
     private inputDialog: InputDialogService,
-    private swUpdate: SwUpdate
-  ) {}
+    private swUpdate: SwUpdate,
+    private cachedHttpClient: CachedHttpClientService
+  ) {
+    this.refreshStatus$ = this.cachedHttpClient.refreshProgressStatus$;
+  }
 
   ngOnInit() {
     if (this.swUpdate.isEnabled) {

@@ -33,6 +33,10 @@
 // }
 
 :host ::ng-deep {
+  .p-progressbar {
+    border-radius: 0%;
+  }
+
   p-dropdown {
     .p-dropdown,
     .p-element {

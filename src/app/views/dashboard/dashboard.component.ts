@@ -21,7 +21,11 @@ import {
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { User } from 'src/app/models/user.modes';
-import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
+import {
+  Workflow,
+  WorkflowVersion,
+  WorkflowsLoadingStatus,
+} from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
@@ -129,6 +133,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild('workflowsDataView')
   dataView: any;
 
+  workflowsLoadingStatus$: Observable<WorkflowsLoadingStatus>;
+
   constructor(
     private location: Location,
     private cdref: ChangeDetectorRef,
@@ -139,7 +145,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     private inputDialog: InputDialogService,
     private uploaderService: WorkflowUploaderService,
     private ngZone: NgZone
-  ) {}
+  ) {
+    this.workflowsLoadingStatus$ = this.appService.observableLoadingWorkflowsStatus;
+  }
 
   ngOnInit() {
     this.logger.debug('Dashboard Created!!');

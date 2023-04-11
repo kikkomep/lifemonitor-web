@@ -1,5 +1,7 @@
 import * as deepEqual from 'deep-equal';
 import { Logger, LoggerManager } from '../../logging';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { CacheRefreshStatus } from './cache.model';
 
 export interface CachedRequestInit extends RequestInit {
   cacheEntry?: string;
@@ -435,6 +437,12 @@ export class CacheManager {
     }
   }
 
+  private refreshProgressStatus = new BehaviorSubject<CacheRefreshStatus>(null);
+
+  public get refreshProgressStatus$(): Observable<CacheRefreshStatus> {
+    return this.refreshProgressStatus.asObservable();
+  }
+
   public async refresh(): Promise<{ [req: string]: Response }> {
     const result: { [req: string]: Response } = {};
     const cache = await caches.open(this._cacheName);
@@ -442,6 +450,9 @@ export class CacheManager {
     // logger.debug('Entries Map', entriesMap);
     const entries = { ...entriesMap.requests };
     const groups = entriesMap.groups;
+
+    const status = new CacheRefreshStatus(Object.keys(entries));
+    this.refreshProgressStatus.next(status);
 
     // Update grouped entries
     for (const groupKey of Object.keys(groups)) {
@@ -457,6 +468,8 @@ export class CacheManager {
         result[entryKey] = entry.response;
         delete entries[entryKey];
         groupEntries[entryKey] = entry;
+        status.setProcessed(entryKey);
+        this.refreshProgressStatus.next(status);
       }
       if (groupUpdated) {
         logger.debug('Updated group', groupKey);
@@ -476,6 +489,8 @@ export class CacheManager {
       result[entryKey] = entry.response;
       if (this.onCacheEntryUpdated)
         this.onCacheEntryUpdated(entry.request, entry.response.clone());
+      status.setProcessed(entryKey);
+      this.refreshProgressStatus.next(status);
     }
     return result;
   }
@@ -545,25 +560,28 @@ export class CacheManager {
     groupName: string,
     notifyEntryDeletion: boolean = true
   ): Promise<boolean> {
+    console.debug(`Deleting cache group ${groupName}... START`);
     const cache = await caches.open(this._cacheName);
     const entriesMap = await this.getEntries(cache, false);
+    console.debug('EntriesMap', entriesMap);
     const groupEntries = entriesMap.groups[groupName];
+    console.debug('GroupEntries', groupEntries);
     if (groupEntries) {
-      logger.debug('Found group', groupEntries);
+      console.debug('Found group', groupEntries);
       for (let key of groupEntries) {
-        logger.debug('Trying to delete', key);
+        console.debug('Trying to delete', key);
         const entry = entriesMap.requests[key];
         await cache.delete(entry.request.url);
-        logger.debug('Delete entry', entry);
+        console.debug('Delete entry', entry);
         if (notifyEntryDeletion && this.onCacheEntryDeleted)
           this.onCacheEntryDeleted(key);
       }
-      logger.debug('Deleted group', groupName, groupEntries);
+      console.debug('Deleted group', groupName, groupEntries);
       if (notifyEntryDeletion && this.onCacheEntriesGroupDeleted)
         this.onCacheEntriesGroupDeleted(groupName, groupEntries);
       return true;
     } else {
-      logger.debug(`Group ${groupName} not found`);
+      console.debug(`Group ${groupName} not found`);
     }
     return false;
   }

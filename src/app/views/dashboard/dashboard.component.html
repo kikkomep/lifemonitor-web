@@ -1,5 +1,9 @@
-<app-loader [enabled]="(isLoading|async)===true" [marginTop]="180" loadingText=""
+<app-loader [enabled]="(isLoading|async)===true" [marginTop]="100" loadingText=""
+  [loadingProgress]="(workflowsLoadingStatus$ | async)?.completionPercentage"
   loadingTextAlt="...loading<br/><span class='ml-5'>workflows ...</span>"></app-loader>
+
+<p-progressBar *ngIf="(workflowsLoadingStatus$ | async)?.completionPercentage !== 100" mode="determinate"
+  [value]="(workflowsLoadingStatus$ | async)?.completionPercentage"></p-progressBar>
 
 <app-workflow-uploader></app-workflow-uploader>
 
@@ -188,12 +192,12 @@
     <div class="container-fluid">
       <!-- Search Bar -->
       <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
-        [(sortingOrder)]="workflowSortingOrder" [allowEmptySearch]="false" [searchButtonName]="'Search'"
-        (browseEnabled)="setBrowseButtonEnabled($event)" [enableBrowseButton]="isUserLogged()"
-        [goBackButtonName]="'Dashboard'"></item-search-bar>
+        *ngIf="workflows && (isLoading|async)!==true" [(sortingOrder)]="workflowSortingOrder" [allowEmptySearch]="false"
+        [searchButtonName]="'Search'" (browseEnabled)="setBrowseButtonEnabled($event)"
+        [enableBrowseButton]="isUserLogged()" [goBackButtonName]="'Dashboard'"></item-search-bar>
 
       <!-- <div class="py-4"> -->
-      <div class="card card-primary card-outline p-0 m-0" [hidden]="!workflows || (isLoading|async)">
+      <div class="card card-primary card-outline p-0 m-0" [hidden]="!workflows || (isLoading|async)===true">
         <div *ngIf="updatingDataTable" class="overlay">
           <i class="fas fa-3x fa-sync-alt text-primary"></i>
         </div>

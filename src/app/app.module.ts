@@ -53,7 +53,6 @@ import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
-// import { DataTablesModule } from 'angular-datatables';
 
 // PrimeNG Modules
 // import { ChartModule } from 'primeng/chart';
@@ -63,6 +62,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -118,7 +118,7 @@ export function initConfigService(appConfig: AppConfigService) {
     ButtonModule,
     PaginatorModule,
     TooltipModule,
-    // DataTable (old)
+    ProgressBarModule,
     DataTablesModule,
     FormsModule,
     BrowserModule,

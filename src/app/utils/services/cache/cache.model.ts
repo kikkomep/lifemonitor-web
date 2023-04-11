@@ -441,3 +441,39 @@ export class CacheMap {
     return cacheMap;
   }
 }
+
+export class CacheRefreshStatus {
+  _requests: Array<string>;
+  _processed: Array<string>;
+
+  constructor(requests: Array<string>) {
+    this._requests = requests;
+    this._processed = [];
+  }
+
+  public getRequests(): Array<string> {
+    return { ...this._requests };
+  }
+
+  public setProcessed(request: string, processed: boolean = true) {
+    this._processed[request] = processed;
+  }
+
+  public isProcessed(request: string) {
+    return this._processed[request];
+  }
+
+  public getProcessed(): Array<string> {
+    return { ...this._processed };
+  }
+
+  public get completionStatus(): number {
+    return Math.floor(
+      (Object.keys(this._processed).length / this._requests.length) * 100
+    );
+  }
+
+  public reset() {
+    this._processed = [];
+  }
+}

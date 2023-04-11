@@ -14,6 +14,7 @@
       <div *ngIf="loadingText" class="spinner-message text-primary font-weight-light">
         <b [outerHTML]="loadingText"></b>
       </div>
+      <div *ngIf="loadingProgress" class="spinner-message text-primary">{{ loadingProgress }}%</div>
     </div>
   </div>
 </div>

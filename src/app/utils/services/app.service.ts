@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import {
   catchError,
   finalize,
@@ -22,6 +22,7 @@ import {
   Workflow,
   WorkflowVersion,
   WorkflowVersionDescriptor,
+  WorkflowsLoadingStatus,
 } from 'src/app/models/workflow.model';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
@@ -68,6 +69,9 @@ export class AppService {
   }>();
   private subjectLoadingWorkflows = new Subject<boolean>();
   private subjectWorkflowUpdate = new Subject<WorkflowVersion>();
+  private subjectLoadingWorkflowsStatus = new BehaviorSubject<WorkflowsLoadingStatus>(
+    null
+  );
 
   // initialize data observables
   // private _observableUser = this.subjectUser.asObservable();
@@ -667,6 +671,10 @@ export class AppService {
       });
   }
 
+  public get observableLoadingWorkflowsStatus() {
+    return this.subjectLoadingWorkflowsStatus.asObservable();
+  }
+
   loadWorkflows(
     useCache = false,
     filteredByUser: boolean = undefined,
@@ -684,6 +692,8 @@ export class AppService {
     let workflows: Workflow[] = [];
     let workflow_versions: WorkflowVersion[] = [];
 
+    let workflowsStatus: WorkflowsLoadingStatus = null;
+
     this.setLoadingWorkflows(true);
     return this.api
       .get_workflows(
@@ -694,7 +704,11 @@ export class AppService {
         useCache
       )
       .pipe(
-        map((data) => data['items'] as Array<object>),
+        map((data) => {
+          const wfs = data['items'] as Array<any>;
+          workflowsStatus = new WorkflowsLoadingStatus(wfs);
+          return wfs;
+        }),
         mergeMap((w) => w),
         map((wdata) => {
           // const queries: Array<
@@ -738,7 +752,8 @@ export class AppService {
                 workflow_versions,
                 stats
               );
-
+              workflowsStatus.setLoaded(workflow.uuid);
+              this.subjectLoadingWorkflowsStatus.next(workflowsStatus);
               return {
                 workflow: workflow,
                 workflow_version: workflow_version,
