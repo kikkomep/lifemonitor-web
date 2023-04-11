@@ -10,6 +10,7 @@ import { Logger, LoggerManager } from './utils/logging';
 import { ApiService } from './utils/services/api.service';
 import { AppService } from './utils/services/app.service';
 import { FetchError } from './utils/services/cache/cache-manager';
+import { AppConfigService } from './utils/services/config.service';
 import { InputDialogService } from './utils/services/input-dialog.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
@@ -70,6 +71,7 @@ export class AppRoutingModule {
   private logger: Logger = LoggerManager.create('AppRoutingModule');
 
   constructor(
+    private configService: AppConfigService,
     private authService: AuthService,
     private apiService: ApiService,
     private appService: AppService,
@@ -118,7 +120,7 @@ export class AppRoutingModule {
 
     this.apiService.onError = (error: FetchError) => {
       this.logger.error('Generic error detected', error);
-      if (!environment.production) {
+      if (this.configService.developmentMode) {
         this.inputDialogService.show({
           question: 'Ops...',
           description: 'Something went wrong!',
