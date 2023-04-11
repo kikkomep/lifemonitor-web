@@ -117,18 +117,18 @@ export class AppRoutingModule {
     };
 
     this.apiService.onError = (error: FetchError) => {
-      this.logger.warn('Generic error detected', error);
-      this.inputDialogService.show({
-        question: 'Ops...',
-        description: 'Something went wrong!',
-        confirmText: 'Login',
-        cancelText: 'Close',
-        iconClass: 'fas fa-exclamation-triangle',
-        enableCancel: true,
-        onCancel: () => {
-          window.location.reload();
-        },
-      });
+      this.logger.error('Generic error detected', error);
+      if (!environment.production) {
+        this.inputDialogService.show({
+          question: 'Ops...',
+          description: 'Something went wrong!',
+          confirmText: '',
+          cancelText: 'Close',
+          iconClass: 'fas fa-exclamation-triangle',
+          enableCancel: false,
+          onCancel: () => {},
+        });
+      }
     };
   }
 
