@@ -873,7 +873,8 @@ export class ApiService {
     ).pipe(
       retry(MAX_RETRIES),
       map((rawSuitesData) => {
-        return rawSuitesData['items']?.map((data: any) => {
+        const items = rawSuitesData['items'] ?? [];
+        return items.map((data: any) => {
           const suite = { ...data };
           if ('aggregate_test_status' in suite)
             suite['status'] = suite['aggregate_test_status'];
@@ -881,8 +882,6 @@ export class ApiService {
         });
       }),
       mergeMap((rawSuitesData: []) => {
-        // this.logger.debug('Suites', rawSuitesData);
-
         let dataIndexMap: { [key: string]: number } = {};
         let queries = [];
         for (let suite of rawSuitesData) {
