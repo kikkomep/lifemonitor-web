@@ -25,7 +25,7 @@ import { CachedHttpClientService } from './cache/cachedhttpclient.service';
 import { AppConfigService } from './config.service';
 import { ApiSocket } from '../shared/api-socket';
 
-const MAX_RETRIES = 1;
+const MAX_RETRIES = 0;
 
 @Injectable({
   providedIn: 'root',

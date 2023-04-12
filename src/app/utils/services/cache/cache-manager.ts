@@ -72,7 +72,7 @@ const logger: Logger = LoggerManager.create('CacheManager');
 
 export class CacheManager {
   private _cacheName: string;
-  private _maxRetries: number = 1;
+  private _maxRetries: number = 0;
 
   constructor(cacheName: string, maxRetries: number = 1) {
     this._cacheName = cacheName;
