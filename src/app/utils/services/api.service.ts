@@ -872,8 +872,8 @@ export class ApiService {
       }
     ).pipe(
       retry(MAX_RETRIES),
-      map((rawSuitesData) => {
-        const items = rawSuitesData['items'] ?? [];
+      map((rawSuitesData: any) => {
+        const items = rawSuitesData?.items ?? [];
         return items.map((data: any) => {
           const suite = { ...data };
           if ('aggregate_test_status' in suite)
