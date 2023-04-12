@@ -36,7 +36,8 @@
         "/account/**",
         "/oauth2/**",
         "/jobs/**",
-        "/socket.io/**"
+        "/socket.io/**",
+        "/openapi.*"
       ],
       "cacheConfig": {
         "strategy": "freshness",
