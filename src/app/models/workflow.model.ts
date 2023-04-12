@@ -16,10 +16,10 @@ export class Workflow extends Model {
   _current_version: WorkflowVersion = null;
   private __versions: { [name: string]: WorkflowVersion };
 
-  constructor(rawData?: Object, skip?: []) {
+  constructor(rawData?: any, skip?: []) {
     super();
-    let versions: [] = rawData['versions'];
-    delete rawData['versions'];
+    let versions: [] = rawData?.versions ?? [];
+    if ('versions' in rawData) delete rawData['versions'];
     this.update(rawData);
     this.updateDescriptors(versions, true);
   }
