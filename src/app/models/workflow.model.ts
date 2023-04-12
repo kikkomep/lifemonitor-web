@@ -177,8 +177,10 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
   }
 
   public update(rawData: Object) {
-    super.update(rawData);
-    this.setName(rawData);
+    if (rawData) {
+      super.update(rawData);
+      this.setName(rawData);
+    }
   }
 
   public setName(data: Object) {
@@ -433,6 +435,8 @@ export class WorkflowsLoadingStatus {
   }
 
   public get completionPercentage(): number {
-    return Math.floor(Object.keys(this._loaded).length / this._workflows.length * 100);
+    return Math.floor(
+      (Object.keys(this._loaded).length / this._workflows.length) * 100
+    );
   }
 }
