@@ -672,6 +672,47 @@ export class ApiService {
       cacheEntry: cacheKey,
       cacheTTL: 10,
     }).pipe(
+      mergeMap(
+        (data: {
+          items: Array<{
+            uuid: string;
+            subscriptions: Array<{ resource: { uuid: string } }>;
+          }>;
+        }) => {
+          if (cacheKey === 'userScopedWorkflows') {
+            return this.doGet<object>('/users/current/subscriptions', {
+              useCache: useCache,
+              cacheKey: 'userSubscriptions',
+              cacheEntry: 'userSubscriptions',
+              cacheTTL: 10,
+            }).pipe(
+              map(
+                (subscriptions: {
+                  items: Array<{ resource: { uuid: string } }>;
+                }) => {
+                  data.items = data.items.map((w) => {
+                    if (!w.subscriptions) w.subscriptions = [];
+                    return w;
+                  });
+                  if (subscriptions && subscriptions.items) {
+                    for (const sub of subscriptions.items) {
+                      const wf = data['items'].find(
+                        (w: any) => w.uuid === sub.resource.uuid
+                      );
+                      if (wf) {
+                        wf.subscriptions.push(sub);
+                      }
+                    }
+                  }
+                  return data;
+                }
+              )
+            );
+          }
+
+          return of(data);
+        }
+      ),
       retry(MAX_RETRIES),
       tap((data) => {
         this.logger.debug('Loaded workflows TAP: ', data);
