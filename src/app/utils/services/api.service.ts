@@ -201,12 +201,15 @@ export class ApiService {
         cacheTTL: options.cacheTTL,
       })
       .pipe(retry(MAX_RETRIES), catchError(this.handleError<T>(url)));
-
-    // return this.http.get<T>(url, httpOptions);
   }
 
   logout() {
     this.authService.logout(false).then(() => {
+      this.cachedHttpClient.deleteCacheEntryByKey('userProfile');
+      this.cachedHttpClient.deleteCacheEntryByKey('userSubscriptions');
+      this.cachedHttpClient.deleteCacheEntryByKey('subscribedWorkflows');
+      this.cachedHttpClient.deleteCacheEntryByKey('userScopedWorkflows');
+      this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
       document.location.href = '/api/account/logout';
     });
   }
