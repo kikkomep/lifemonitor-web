@@ -252,7 +252,11 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
           if (this._workflowStats) this._workflowStats.clear();
           this.updatingDataTable = true;
           this.appService
-            .loadWorkflows(false, isUserLogged, isUserLogged)
+            .loadWorkflows(
+              false,
+              isUserLogged && !this._browseButtonEnabled,
+              isUserLogged
+            )
             .subscribe((data) => {
               this.logger.debug('Loaded workflows ', data);
               // alert('Loading from user logged ' + user);

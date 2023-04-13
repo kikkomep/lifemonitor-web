@@ -91,6 +91,9 @@ export class AppService {
   // Initialize logger
   private logger: Logger = LoggerManager.create('AppService');
 
+  //
+  private syncTimeout = null;
+
   // subscriptions
   private subscriptions: Subscription[] = [];
 
@@ -494,6 +497,10 @@ export class AppService {
     return true;
   }
 
+  public startSync() {
+    this.api.startSync();
+  }
+
   private reset(): void {
     this._workflow = null;
     this._workflow_stats = null;
@@ -815,6 +822,13 @@ export class AppService {
         map((result) => {
           this.logger.debug('Loaded workflows', result);
           // alert('Workflows reloaded');
+          const syncRequired: boolean = !this._workflows;
+          if (syncRequired) {
+            if (this.syncTimeout) clearTimeout(this.syncTimeout);
+            this.syncTimeout = setTimeout(() => {
+              this.api.startSync();
+            }, 10000);
+          }
           this._workflows = workflows;
           this._workflow_versions = workflow_versions;
           this.subjectWorkflows.next(this._workflows);

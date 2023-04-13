@@ -83,6 +83,12 @@ export class CacheManager {
     return this._cacheName;
   }
 
+  public async isEmpty(): Promise<boolean> {
+    const cache = await caches.open(this._cacheName);
+    const keys = await cache.keys();
+    return keys.length == 0;
+  }
+
   public onCacheEntryCreated: (
     request: CachedRequest,
     response: CachedResponse
@@ -232,7 +238,7 @@ export class CacheManager {
       logger.debug(`Cache miss for url ${url}`);
       const oldResponse = response ? response.clone() : null;
 
-      let retry = this._maxRetries;
+      let retry = this._maxRetries + 1;
       while (retry > 0) {
         try {
           response = await fetch(request);

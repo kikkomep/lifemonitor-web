@@ -114,9 +114,6 @@ export class ApiSocket extends Socket {
 
   onConnect() {
     this.logger.info('WS connection established');
-    setTimeout(() => {
-      this.sync();
-    }, 1.5 * 60 * 1000);
   }
 
   onDisconnect() {

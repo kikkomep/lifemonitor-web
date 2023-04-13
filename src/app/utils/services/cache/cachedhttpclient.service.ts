@@ -65,6 +65,8 @@ export class CachedHttpClientService {
   private subscription: Subscription;
   private _cache: CacheManager = new CacheManager('api:lm');
 
+  private _skipInitialSync: boolean = false;
+
   private worker: Worker;
   private socket: ApiSocket;
   isOnline: boolean;
@@ -78,6 +80,10 @@ export class CachedHttpClientService {
     // this.syncInterval = Number(this.config.getConfig()['syncInterval']);
     this.apiBaseUrl = this.config.apiBaseUrl;
     this.logger.debug(`API Service created: ${this.apiBaseUrl}`);
+
+    this.cache.isEmpty().then((empty) => {
+      this._skipInitialSync = empty;
+    });
 
     this.cache.getEntries().then((value) => {
       this.logger.debug('Current groups', value);
@@ -343,7 +349,13 @@ export class CachedHttpClientService {
   }
 
   public startSync() {
-    return this.socketIO?.sync();
+    if (!this._skipInitialSync) {
+      this.cache.isEmpty().then((empty) => {
+        if (!empty) return this.socketIO?.sync();
+      });
+    } else {
+      this.logger.debug('Initial sync not required');
+    }
   }
 
   public get refreshProgressStatus$(): Observable<CacheRefreshStatus> {

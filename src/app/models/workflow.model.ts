@@ -21,6 +21,7 @@ export class Workflow extends Model {
     let versions: [] = rawData?.versions ?? [];
     if ('versions' in rawData) delete rawData['versions'];
     this.update(rawData);
+    this.setNameFromProperty(rawData, 'name');
     this.updateDescriptors(versions, true);
   }
 

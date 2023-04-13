@@ -140,6 +140,10 @@ export class ApiService {
     return JSON.parse(groupName);
   }
 
+  public startSync() {
+    this.cachedHttpClient.startSync();
+  }
+
   public async refreshWorkflow(uuid: string, version: string) {
     await this.cachedHttpClient.refreshCacheEntriesGroup(
       {
@@ -738,7 +742,7 @@ export class ApiService {
   }
 
   get_workflow(uuid: string): Observable<Workflow> {
-    this.logger.debug('Request login');
+    this.logger.debug(`Getting workflow ${uuid}`);
     // const workflow_query = this.http.get<WorkflowVersion>(
     //   this.apiBaseUrl + '/workflows/' + uuid,
     //   this.get_http_options({
