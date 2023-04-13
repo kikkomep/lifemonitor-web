@@ -683,7 +683,7 @@ export class ApiService {
         : 'registeredWorkflows';
     this.logger.debug('Getting workflows', useCache, cacheKey);
     const url: string = !filteredByUser
-      ? `/workflows?status=${status}&versions=${versions}`
+      ? `/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`
       : `/users/current/workflows?status=${status}&versions=${versions}&subscriptions=${includeSubScriptions}`;
     this.logger.debug('Getting workflows URL: ', url);
     return this.doGet<object>(url, {
