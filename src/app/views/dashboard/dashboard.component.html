@@ -531,7 +531,7 @@
 
                 <div class="d-inline-flex workflow-list-item-actions flex-column">
 
-                  <div *ngIf="!isEnabledWorkflowEditMode(item) && !isEnabledWorkflowEditSubscriptionMode(item)">
+                  <div *ngIf="!isEnabledWorkflowEditMode(item) && !isEnabledWorkflowEditSubscriptionMode(item) && isUserLogged()">
                     <a class="btn" (click)="enableWorkflowEditMode(item)" [showDelay]="tooltipShowDelay"
                       pTooltip="click to edit the workflow" tooltipPosition="left">
                       <span *ngIf="workflows && workflows.length > 0">
