@@ -343,6 +343,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
         // alert('Loading from user logged ');
       });
   }
+
+  public goToFirstPage() {
+    $('.p-paginator-first').click();
   }
 
   public set workflowNameFilter(value: string) {
@@ -723,6 +726,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this.updatingDataTable = false;
 
     this.checkWindowSize();
+
+    // reset dataview paginator
+    this.goToFirstPage();
 
     this.cdref.detectChanges();
   }
