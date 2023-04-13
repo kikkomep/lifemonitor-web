@@ -422,21 +422,21 @@
                       <!-- Workflows Details -->
                     </div>
                     <div *ngIf="isUserLogged()">
-                      <span *ngIf="item.subscriptions !== undefined">
-                        <a *ngIf="(searchModeEnabled || editModeEnabled || item.editingMode) && (!item.subscriptions || item.subscriptions.length == 0)"
+                      <span *ngIf="item.subscriptions !== undefined || browseButtonEnabled">
+                        <a *ngIf="(searchModeEnabled || editModeEnabled || item.editingMode || item.editSubscription) && (!item.subscriptions || item.subscriptions.length == 0)"
                           class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(item)" role="button"
                           data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
                           pTooltip="Click to subscribe to this workflow and add it to your dashboard">
                           SUBSCRIBE
                         </a>
                         <div
-                          *ngIf="!(editModeEnabled || item.editingMode) && searchModeEnabled && (item.subscriptions && item.subscriptions.length > 0)"
+                          *ngIf="!(editModeEnabled || item.editingMode || item.editSubscription) && searchModeEnabled && (item.subscriptions && item.subscriptions.length > 0)"
                           class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
                           data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
                           pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
                           SUBSCRIBED
                         </div>
-                        <a *ngIf="(editModeEnabled || item.editingMode) && item.subscriptions && item.subscriptions.length > 0"
+                        <a *ngIf="(editModeEnabled || item.editingMode || item.editSubscription) && item.subscriptions && item.subscriptions.length > 0"
                           class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
                           data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
                           pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
@@ -531,7 +531,7 @@
 
                 <div class="d-inline-flex workflow-list-item-actions flex-column">
 
-                  <div *ngIf="!isEnabledWorkflowEditMode(item) && isEditable(item)">
+                  <div *ngIf="!isEnabledWorkflowEditMode(item) && !isEnabledWorkflowEditSubscriptionMode(item)">
                     <a class="btn" (click)="enableWorkflowEditMode(item)" [showDelay]="tooltipShowDelay"
                       pTooltip="click to edit the workflow" tooltipPosition="left">
                       <span *ngIf="workflows && workflows.length > 0">
@@ -564,7 +564,7 @@
                       <i class="fas fa-trash-alt" style="color: var(--danger)"></i>
                     </a>
                   </div>
-                  <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
+                  <div *ngIf="isEnabledWorkflowEditMode(item) || isEnabledWorkflowEditSubscriptionMode(item)">
                     <a class="btn btn-sm active" (click)="disableWorkflowEditMode(item)" data-toggle="tooltip"
                       tooltipPosition="left" data-html="true" [showDelay]="tooltipShowDelay"
                       pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>close edit mode</span>">
@@ -751,7 +751,8 @@
                         <i class="fas fa-2x fa-sync-alt"></i>
                       </div>
                       <div *ngIf="!isLoadingWorkflowVersion(item)">
-                        <div class="workflow-grid-item-type" data-html="true" data-toggle="tooltip" tooltipPosition="top"
+                        <div class="workflow-grid-item-type" data-html="true" data-toggle="tooltip"
+                          tooltipPosition="top"
                           title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{item.type}} workflow</span>">
                           <img *ngIf="item.typeIcon" [src]="item.typeIcon" width="{{ item.typeIconSize }}" />
                           <i *ngIf="!item.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>

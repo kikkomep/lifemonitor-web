@@ -504,21 +504,35 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     return w && w['editingMode'];
   }
 
+  public isEnabledWorkflowEditSubscriptionMode(w: WorkflowVersion): boolean {
+    return w && w['editSubscription'];
+  }
+
   public enableWorkflowEditMode(w: WorkflowVersion) {
     this.clickHandler.doubleClick(() => {
-      if (this.isUserLogged() && this.isEditable(w)) {
-        w['oldNameValue'] = w.name;
-        w['clickOnInputBox'] = false;
-        w['editingMode'] = true;
+      if (this.isUserLogged()) {
+        if (this.isEditable(w)) {
+          w['oldNameValue'] = w.name;
+          w['clickOnInputBox'] = false;
+          w['editingMode'] = true;
+          w['editSubscription'] = true;
+        } else {
+          w['editSubscription'] = true;
+        }
       }
     });
   }
 
   public disableWorkflowEditMode(w: WorkflowVersion) {
-    if (this.isUserLogged() && this.isEditable(w)) {
-      w['oldNameValue'] = w.name;
-      w['clickOnInputBox'] = false;
-      w['editingMode'] = false;
+    if (this.isUserLogged()) {
+      if (this.isEditable(w)) {
+        w['oldNameValue'] = w.name;
+        w['clickOnInputBox'] = false;
+        w['editingMode'] = false;
+        w['editSubscription'] = false;
+      } else {
+        w['editSubscription'] = false;
+      }
     }
   }
 
