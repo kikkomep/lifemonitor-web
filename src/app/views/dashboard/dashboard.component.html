@@ -189,6 +189,9 @@
     </ng-container>
     <!-- Main row -->
 
+    <!-- scroll top button -->
+    <app-scroll [hidden]="!(showScroll$ | async)" (scrollToTop)="scrollTop()"></app-scroll>
+
     <div class="container-fluid">
       <!-- Search Bar -->
       <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
@@ -531,7 +534,8 @@
 
                 <div class="d-inline-flex workflow-list-item-actions flex-column">
 
-                  <div *ngIf="!isEnabledWorkflowEditMode(item) && !isEnabledWorkflowEditSubscriptionMode(item) && isUserLogged()">
+                  <div
+                    *ngIf="!isEnabledWorkflowEditMode(item) && !isEnabledWorkflowEditSubscriptionMode(item) && isUserLogged()">
                     <a class="btn" (click)="enableWorkflowEditMode(item)" [showDelay]="tooltipShowDelay"
                       pTooltip="click to edit the workflow" tooltipPosition="left">
                       <span *ngIf="workflows && workflows.length > 0">
@@ -541,8 +545,8 @@
                   </div>
 
                   <div *ngIf="!isEnabledWorkflowEditMode(item) && !isEnabledWorkflowEditSubscriptionMode(item)">
-                    <a class="btn" (click)="refreshWorkflow(item)" [showDelay]="tooltipShowDelay"
-                      pTooltip="refresh" tooltipPosition="left">
+                    <a class="btn" (click)="refreshWorkflow(item)" [showDelay]="tooltipShowDelay" pTooltip="refresh"
+                      tooltipPosition="left">
                       <span *ngIf="workflows && workflows.length > 0">
                         <i class="fas fa-sync-alt fa-rotate text-muted workflow-list-edit-action mr-1"></i>
                       </span>

@@ -1,9 +1,10 @@
-import { Location } from '@angular/common';
+import { DOCUMENT, Location, ViewportScroller } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
   HostListener,
+  Inject,
   NgZone,
   OnChanges,
   OnInit,
@@ -13,6 +14,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, Subscription, fromEvent } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
@@ -144,7 +146,9 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     private route: ActivatedRoute,
     private inputDialog: InputDialogService,
     private uploaderService: WorkflowUploaderService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private readonly viewport: ViewportScroller,
+    @Inject(DOCUMENT) private readonly document: Document
   ) {
     this.workflowsLoadingStatus$ = this.appService.observableLoadingWorkflowsStatus;
   }
@@ -331,6 +335,15 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     //   $(this).tooltip('hide');
     // });
   }
+
+  scrollTop(): void {
+    this.viewport.scrollToPosition([0, 0]);
+  }
+
+  readonly showScroll$: Observable<boolean> = fromEvent(
+    this.document,
+    'scroll'
+  ).pipe(map(() => this.viewport.getScrollPosition()?.[1] > 0));
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -759,6 +772,8 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
 
     // reset dataview paginator
     this.goToFirstPage();
+
+    this.scrollTop();
 
     this.cdref.detectChanges();
   }

@@ -64,6 +64,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { LogoutComponent } from './pages/logout/logout.component';
+import { ScrollComponent } from './components/scroll/scroll.component';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -110,6 +111,7 @@ export function initConfigService(appConfig: AppConfigService) {
     WorkflowUploaderComponent,
     WorkflowVersionSelectorComponent,
     LogoutComponent,
+    ScrollComponent,
   ],
   imports: [
     // PrimeNg Modules
