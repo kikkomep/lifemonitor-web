@@ -454,8 +454,8 @@ export class AppService {
     return await this.auth.authorize();
   }
 
-  public async logout() {
-    return await this.api.logout();
+  public async logout(redirect: boolean = true) {
+    return await this.api.logout(redirect);
   }
 
   public get currentUser(): User {

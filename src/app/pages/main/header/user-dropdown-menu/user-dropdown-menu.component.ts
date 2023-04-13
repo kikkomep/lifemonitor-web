@@ -90,6 +90,6 @@ export class UserDropdownMenuComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.appService.logout();
+    this.router.navigateByUrl('/logout');
   }
 }

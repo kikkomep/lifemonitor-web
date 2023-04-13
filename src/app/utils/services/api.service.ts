@@ -203,14 +203,18 @@ export class ApiService {
       .pipe(retry(MAX_RETRIES), catchError(this.handleError<T>(url)));
   }
 
-  logout() {
-    this.authService.logout(false).then(() => {
-      this.cachedHttpClient.deleteCacheEntryByKey('userProfile');
-      this.cachedHttpClient.deleteCacheEntryByKey('userSubscriptions');
-      this.cachedHttpClient.deleteCacheEntryByKey('subscribedWorkflows');
-      this.cachedHttpClient.deleteCacheEntryByKey('userScopedWorkflows');
-      this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
-      document.location.href = '/api/account/logout';
+  logout(redirect: boolean = true) {
+    this.authService.checkIsUserLogged().then((logged) => {
+      if (logged) {
+        this.authService.logout(false).then(() => {
+          this.cachedHttpClient.deleteCacheEntryByKey('userProfile');
+          this.cachedHttpClient.deleteCacheEntryByKey('userSubscriptions');
+          this.cachedHttpClient.deleteCacheEntryByKey('subscribedWorkflows');
+          this.cachedHttpClient.deleteCacheEntryByKey('userScopedWorkflows');
+          this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
+          if (redirect) document.location.href = '/api/account/logout';
+        });
+      }
     });
   }
 
