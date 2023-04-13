@@ -481,6 +481,13 @@ export class AppService {
       JSON.stringify({
         type: 'workflow',
         uuid: workflow.uuid,
+      }),
+      false
+    );
+    await this.api.cache.refreshCacheEntriesGroup(
+      JSON.stringify({
+        type: 'workflow',
+        uuid: workflow.uuid,
         version: workflow.version,
       })
     );
