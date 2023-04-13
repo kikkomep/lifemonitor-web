@@ -192,9 +192,9 @@
     <div class="container-fluid">
       <!-- Search Bar -->
       <item-search-bar elementType="workflows" [(filterValue)]="workflowNameFilter"
-        *ngIf="workflows && (isLoading|async)!==true" [(sortingOrder)]="workflowSortingOrder" [allowEmptySearch]="false"
-        [searchButtonName]="'Search'" (browseEnabled)="setBrowseButtonEnabled($event)"
-        [enableBrowseButton]="isUserLogged()" [goBackButtonName]="'Dashboard'"></item-search-bar>
+        [hidden]="!workflows || (isLoading|async)===true" [(sortingOrder)]="workflowSortingOrder"
+        [allowEmptySearch]="false" [searchButtonName]="'Search'" [enableBrowseButton]="isUserLogged()"
+        [(browseEnabled)]="browseButtonEnabled" [goBackButtonName]="'Dashboard'"></item-search-bar>
 
       <!-- <div class="py-4"> -->
       <div class="card card-primary card-outline p-0 m-0" [hidden]="!workflows || (isLoading|async)===true">

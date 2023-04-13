@@ -337,7 +337,12 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     this._browseButtonEnabled = value;
     if (!this._browseButtonEnabled) this._workflowNameFilter = '';
     this._searchModeEnabled = this._browseButtonEnabled;
-    this.prepareTableData();
+    if (this._browseButtonEnabled)
+      this.appService.loadWorkflows(false, false, true).subscribe((data) => {
+        this.logger.debug('Loaded workflows ', data);
+        // alert('Loading from user logged ');
+      });
+  }
   }
 
   public set workflowNameFilter(value: string) {

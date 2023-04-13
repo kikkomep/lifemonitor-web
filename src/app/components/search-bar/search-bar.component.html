@@ -40,14 +40,12 @@
       }" [hidden]="!enableBrowseButton" style="height: 38px" class="btn btn-primary" type="button"
       (click)="onBrowseButtonClick($event)">
       <div *ngIf="browseButtonEnabled" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip"
-        [showDelay]="1500" tooltipPosition="bottom" data-html="true"
-        pTooltip="go back to the {{ goBackButtonName }}">
+        [showDelay]="1500" tooltipPosition="bottom" data-html="true" pTooltip="go back to the {{ goBackButtonName }}">
         <i class="fas fa-list mx-2"></i>
         <span class="d-none d-md-inline-flex">{{ goBackButtonName }}</span>
       </div>
       <div *ngIf="!browseButtonEnabled" aria-haspopup="true" aria-expanded="false" data-toggle="tooltip"
-        [showDelay]="1500" tooltipPosition="bottom" data-html="true"
-        pTooltip="browse registered {{ elementType }}">
+        [showDelay]="1500" tooltipPosition="bottom" data-html="true" pTooltip="browse registered {{ elementType }}">
         <i class="far fa-folder-open mx-2"></i>
         <span class="d-none d-md-inline-flex">Browse</span>
       </div>

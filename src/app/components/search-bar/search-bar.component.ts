@@ -29,7 +29,8 @@ export class SearchBarComponent implements OnInit {
   @Input() elementType: string;
   @Input() filterValue: string;
   @Input() sortingOrder: string;
-  @Output() browseEnabled = new EventEmitter<boolean>();
+  @Input() browseEnabled: boolean = false;
+  @Output() browseEnabledChange = new EventEmitter<boolean>();
   @Output() filterValueChange = new EventEmitter<string>();
   @Output() sortingOrderChange = new EventEmitter<string>();
   @ViewChild('searchInputText') searchInputText: ElementRef;
@@ -69,10 +70,10 @@ export class SearchBarComponent implements OnInit {
   public onBrowseButtonClick($event) {
     this.browseButtonEnabled = !this.browseButtonEnabled;
     this.logger.debug('OnShowAllChange', $event, this.browseButtonEnabled);
-    this.browseEnabled.emit(this.browseButtonEnabled);
+    this.browseEnabledChange.emit(this.browseButtonEnabled);
     if (this.browseButtonEnabled) {
       this._searchAllValues = true;
-      this.emitValue(this.actualFilterValue);
+      // this.emitValue(this.actualFilterValue);
     } else {
       this.reset();
     }
