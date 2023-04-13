@@ -454,8 +454,50 @@ export class AppService {
     return await this.auth.authorize();
   }
 
+  public async clearAll(): Promise<boolean> {
+    await this.api.cache.clear().then(async () => {});
+    this.reset();
+    return true;
+  }
+
+  public async clearListOfWorkflows(): Promise<boolean> {
+    await this.api.cache.deleteCacheEntriesByKeys([
+      'userProfile',
+      'userSubscriptions',
+      'subscribedWorkflows',
+      'userScopedWorkflows',
+      'userNotifications',
+      'registeredWorkflows',
+    ]);
+    this.reset();
+    return true;
+  }
+
+  public async refreshWorkflowVersion(workflow: {
+    uuid: string;
+    version: string;
+  }): Promise<boolean> {
+    await this.api.cache.refreshCacheEntriesGroup(
+      JSON.stringify({
+        type: 'workflow',
+        uuid: workflow.uuid,
+        version: workflow.version,
+      })
+    );
+    return true;
+  }
+
+  private reset(): void {
+    this._workflow = null;
+    this._workflow_stats = null;
+    this._workflows = null;
+    this._workflow_versions = null;
+  }
+
   public async logout(redirect: boolean = true) {
-    return await this.api.logout(redirect);
+    return this.api.logout(redirect).then(() => {
+      this.reset();
+    });
   }
 
   public get currentUser(): User {

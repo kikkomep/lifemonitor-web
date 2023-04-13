@@ -556,6 +556,14 @@ export class CacheManager {
     } else return false;
   }
 
+  public async deleteCacheEntriesByKeys(keys: string[]): Promise<boolean[]> {
+    const result: Array<boolean> = [];
+    for (let k of keys) {
+      result[k] = await this.deleteCacheEntryByKey(k);
+    }
+    return result;
+  }
+
   public async deleteCacheEntriesGroup(
     groupName: string,
     notifyEntryDeletion: boolean = true

@@ -20,7 +20,7 @@ import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
 import { AuthService } from './auth.service';
-import { FetchError } from './cache/cache-manager';
+import { CacheManager, FetchError } from './cache/cache-manager';
 import { CachedHttpClientService } from './cache/cachedhttpclient.service';
 import { AppConfigService } from './config.service';
 import { ApiSocket } from '../shared/api-socket';
@@ -83,6 +83,10 @@ export class ApiService {
 
   public get socketIO(): ApiSocket {
     return this.cachedHttpClient.socketIO;
+  }
+
+  public get cache(): CacheManager {
+    return this.cachedHttpClient.cache;
   }
 
   public get jobs$(): Observable<Job> {
@@ -203,19 +207,23 @@ export class ApiService {
       .pipe(retry(MAX_RETRIES), catchError(this.handleError<T>(url)));
   }
 
-  logout(redirect: boolean = true) {
-    this.authService.checkIsUserLogged().then((logged) => {
-      if (logged) {
-        this.authService.logout(false).then(() => {
-          this.cachedHttpClient.deleteCacheEntryByKey('userProfile');
-          this.cachedHttpClient.deleteCacheEntryByKey('userSubscriptions');
-          this.cachedHttpClient.deleteCacheEntryByKey('subscribedWorkflows');
-          this.cachedHttpClient.deleteCacheEntryByKey('userScopedWorkflows');
-          this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
-          if (redirect) document.location.href = '/api/account/logout';
-        });
-      }
-    });
+  async logout(redirect: boolean = true): Promise<boolean> {
+    const logged = await this.authService.checkIsUserLogged();
+    if (logged) {
+      return this.authService.logout(false).then(async () => {
+        await this.cachedHttpClient.deleteCacheEntriesByKeys([
+          'userProfile',
+          'userSubscriptions',
+          'subscribedWorkflows',
+          'userScopedWorkflows',
+          'userNotifications',
+          'registeredWorkflows',
+        ]);
+        if (redirect) document.location.href = '/api/account/logout';
+        return true;
+      });
+    }
+    return false;
   }
 
   get_current_user(): Observable<User> {

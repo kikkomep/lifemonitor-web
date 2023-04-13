@@ -540,6 +540,15 @@
                     </a>
                   </div>
 
+                  <div *ngIf="!isEnabledWorkflowEditMode(item) && !isEnabledWorkflowEditSubscriptionMode(item)">
+                    <a class="btn" (click)="refreshWorkflow(item)" [showDelay]="tooltipShowDelay"
+                      pTooltip="refresh" tooltipPosition="left">
+                      <span *ngIf="workflows && workflows.length > 0">
+                        <i class="fas fa-sync-alt fa-rotate text-muted workflow-list-edit-action mr-1"></i>
+                      </span>
+                    </a>
+                  </div>
+
                   <div *ngIf="isEnabledWorkflowEditMode(item) && isEditable(item)">
                     <a class="btn btn-sm" (click)="openWorkflowVersionUploader(item.workflow)" data-toggle="tooltip"
                       tooltipPosition="left" data-html="true" [showDelay]="tooltipShowDelay"

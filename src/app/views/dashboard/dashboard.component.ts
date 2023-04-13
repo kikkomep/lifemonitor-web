@@ -238,9 +238,35 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     });
   }
 
-  refreshDashboard(): void {
+  refreshDashboardByPageReload(): void {
     window.location.reload();
     this.logger.debug('Refreshing dashboard...');
+  }
+
+  refreshDashboard(): void {
+    this.logger.debug('Refreshing dashboard...');
+    this.appService.clearListOfWorkflows().then(() => {
+      this.appService.checkIsUserLogged().then((isUserLogged) => {
+        if (!this.appService.isLoadingWorkflows()) {
+          // alert('Notify user changed ' + isUserLogged);
+          if (this._workflowStats) this._workflowStats.clear();
+          this.updatingDataTable = true;
+          this.appService
+            .loadWorkflows(false, isUserLogged, isUserLogged)
+            .subscribe((data) => {
+              this.logger.debug('Loaded workflows ', data);
+              // alert('Loading from user logged ' + user);
+            });
+        }
+      });
+    });
+  }
+
+  refreshWorkflow(wf: WorkflowVersion): void {
+    this.appService.refreshWorkflowVersion({
+      uuid: wf.uuid,
+      version: wf.version['version'],
+    });
   }
 
   ngAfterViewChecked() {

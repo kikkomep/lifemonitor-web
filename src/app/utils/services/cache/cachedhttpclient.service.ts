@@ -63,7 +63,7 @@ export class CachedHttpClientService {
   }> = this.workflowVersionDeleteSubject.asObservable();
 
   private subscription: Subscription;
-  private cache: CacheManager = new CacheManager('api:lm');
+  private _cache: CacheManager = new CacheManager('api:lm');
 
   private worker: Worker;
   private socket: ApiSocket;
@@ -123,6 +123,10 @@ export class CachedHttpClientService {
       const data = JSON.parse(groupName);
       this.workflowVersionDeleteSubject.next(data);
     };
+  }
+
+  public get cache(): CacheManager {
+    return this._cache;
   }
 
   public async clear() {
@@ -367,11 +371,7 @@ export class CachedHttpClientService {
   }
 
   public async deleteCacheEntriesByKeys(keys: string[]): Promise<boolean[]> {
-    const result: Array<boolean> = [];
-    for (let k of keys) {
-      result[k] = await this.cache.deleteCacheEntryByKey(k);
-    }
-    return result;
+    return await this.cache.deleteCacheEntriesByKeys(keys);
   }
 
   public async refreshCacheEntriesByKeys(keys: string[]): Promise<boolean[]> {
