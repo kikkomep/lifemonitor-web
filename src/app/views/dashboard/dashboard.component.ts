@@ -773,7 +773,7 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     // reset dataview paginator
     this.goToFirstPage();
 
-    this.scrollTop();
+    // this.scrollTop();
 
     this.cdref.detectChanges();
   }
