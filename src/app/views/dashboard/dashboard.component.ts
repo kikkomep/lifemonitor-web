@@ -33,6 +33,7 @@ import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
 import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
 import { StatsFilterPipe } from './../../utils/filters/stats-filter.pipe';
+import { BaseDataViewComponent } from 'src/app/components/base-data-view/base-data-view.component';
 
 declare var $: any;
 
@@ -43,7 +44,9 @@ const minWidthForListLayout: number = 768;
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
+export class DashboardComponent
+  extends BaseDataViewComponent
+  implements OnInit, OnChanges, AfterViewInit {
   private _workflows: Workflow[] = null;
   // reference to workflows stats
   private _workflowStats: AggregatedStatusStats | null;
@@ -146,10 +149,11 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     private route: ActivatedRoute,
     private inputDialog: InputDialogService,
     private uploaderService: WorkflowUploaderService,
-    private ngZone: NgZone,
-    private readonly viewport: ViewportScroller,
-    @Inject(DOCUMENT) private readonly document: Document
+    protected ngZone: NgZone,
+    protected readonly viewport: ViewportScroller,
+    @Inject(DOCUMENT) protected readonly document: Document
   ) {
+    super(viewport, document);
     this.workflowsLoadingStatus$ = this.appService.observableLoadingWorkflowsStatus;
   }
 
@@ -335,15 +339,6 @@ export class DashboardComponent implements OnInit, OnChanges, AfterViewInit {
     //   $(this).tooltip('hide');
     // });
   }
-
-  scrollTop(): void {
-    this.viewport.scrollToPosition([0, 0]);
-  }
-
-  readonly showScroll$: Observable<boolean> = fromEvent(
-    this.document,
-    'scroll'
-  ).pipe(map(() => this.viewport.getScrollPosition()?.[1] > 0));
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {

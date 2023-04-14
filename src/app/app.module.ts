@@ -40,6 +40,9 @@ import { MenuSidebarComponent } from './pages/main/menu-sidebar/menu-sidebar.com
 import { ArraySizeFilterPipe } from './utils/filters/array-size-filter.pipe';
 
 import { DataTablesModule } from 'angular-datatables';
+import { BaseDataViewComponent } from './components/base-data-view/base-data-view.component';
+import { ScrollComponent } from './components/scroll/scroll.component';
+import { LogoutComponent } from './pages/logout/logout.component';
 import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
 import { OrderByPipe } from './utils/filters/orderby.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
@@ -60,11 +63,9 @@ import { ButtonModule } from 'primeng/button';
 import { DataViewModule } from 'primeng/dataview';
 import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
+import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { ProgressBarModule } from 'primeng/progressbar';
-import { LogoutComponent } from './pages/logout/logout.component';
-import { ScrollComponent } from './components/scroll/scroll.component';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -112,6 +113,7 @@ export function initConfigService(appConfig: AppConfigService) {
     WorkflowVersionSelectorComponent,
     LogoutComponent,
     ScrollComponent,
+    BaseDataViewComponent,
   ],
   imports: [
     // PrimeNg Modules

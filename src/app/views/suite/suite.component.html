@@ -237,6 +237,9 @@
       <!-- /.row -->
     </div>
 
+    <!-- scroll top button -->
+    <app-scroll [hidden]="!(showScroll$ | async)" (scrollToTop)="scrollTop()"></app-scroll>
+
     <!-- Search Bar -->
     <item-search-bar elementType="instances" [(filterValue)]="instanceNameFilter"
       [(sortingOrder)]="instanceSortingOrder"></item-search-bar>

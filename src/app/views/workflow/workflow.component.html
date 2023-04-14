@@ -169,6 +169,9 @@
     <!-- /.row -->
   </div>
 
+  <!-- scroll top button -->
+  <app-scroll [hidden]="!(showScroll$ | async)" (scrollToTop)="scrollTop()"></app-scroll>
+
   <!-- Search Bar -->
   <item-search-bar elementType="suites" [(filterValue)]="suiteNameFilter"
     [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
