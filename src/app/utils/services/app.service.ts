@@ -1,7 +1,16 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable, Subject, Subscription } from 'rxjs';
-import { catchError, finalize, map, tap } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  map,
+  mergeMap,
+  tap,
+  toArray,
+} from 'rxjs/operators';
+import { Job } from 'src/app/models/job.model';
 import { UserNotification } from 'src/app/models/notification.model';
 import { Registry, RegistryWorkflow } from 'src/app/models/registry.models';
 import { AggregatedStatusStats } from 'src/app/models/stats.model';
@@ -13,10 +22,12 @@ import {
   Workflow,
   WorkflowVersion,
   WorkflowVersionDescriptor,
+  WorkflowsLoadingStatus,
 } from 'src/app/models/workflow.model';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { Logger, LoggerManager } from '../logging';
 import { ApiService } from './api.service';
+import { AppConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +41,7 @@ export class AppService {
   private _registryWorkflows: { [uuid: string]: RegistryWorkflow[] } = {};
   private _workflows: Workflow[];
   private _workflow_versions: WorkflowVersion[];
+  private _workflow_stats: AggregatedStatusStats;
   private _workflow: WorkflowVersion;
   private _suite: Suite;
   private _testInstance: TestInstance;
@@ -37,8 +49,10 @@ export class AppService {
   private _currentUser: User;
 
   private loadingWorkflows = false;
+  private loadingWorkflowMap: { [uuid: string]: boolean } = {};
 
   // initialize data sources
+  private subjectUser: Subject<User> = new Subject<User>();
   private subjectNotifications = new Subject<UserNotification[]>();
   private subjectRegistry = new Subject<Registry>();
   private subjectRegistries = new Subject<Registry[]>();
@@ -49,9 +63,18 @@ export class AppService {
   private subjectTestSuite = new Subject<Suite>();
   private subjectTestInstance = new Subject<TestInstance>();
   private subjectTestBuild = new Subject<TestBuild>();
+  private subjectLoadingWorkflow = new Subject<{
+    uuid: string;
+    loading: boolean;
+  }>();
   private subjectLoadingWorkflows = new Subject<boolean>();
+  private subjectWorkflowUpdate = new Subject<WorkflowVersion>();
+  private subjectLoadingWorkflowsStatus = new BehaviorSubject<WorkflowsLoadingStatus>(
+    null
+  );
 
   // initialize data observables
+  // private _observableUser = this.subjectUser.asObservable();
   private _observableNotifications = this.subjectNotifications.asObservable();
   private _observableRegistry = this.subjectRegistry.asObservable();
   private _observableRegistries = this.subjectRegistries.asObservable();
@@ -62,10 +85,14 @@ export class AppService {
   private _observableTestSuite = this.subjectTestSuite.asObservable();
   private _observableTestInstance = this.subjectTestInstance.asObservable();
   private _observableTestBuild = this.subjectTestBuild.asObservable();
+  private _observableLoadingWorkflow = this.subjectLoadingWorkflow.asObservable();
   private _observableLoadingWorkflows = this.subjectLoadingWorkflows.asObservable();
-
+  private _observableWorkflowUpdate = this.subjectWorkflowUpdate.asObservable();
   // Initialize logger
   private logger: Logger = LoggerManager.create('AppService');
+
+  //
+  private syncTimeout = null;
 
   // subscriptions
   private subscriptions: Subscription[] = [];
@@ -77,11 +104,14 @@ export class AppService {
   private TEST_BUILD_ID = 'test_build_id';
 
   constructor(
+    private config: AppConfigService,
     private auth: AuthService,
     private api: ApiService,
-    private http: HttpClient
+    private toastService: ToastrService
   ) {
     this.logger.debug('AppService created!');
+
+    this.setupNetworkListener();
 
     // subscribe for the current selected workflow
     this.subscriptions.push(
@@ -98,33 +128,309 @@ export class AppService {
           this.api.get_current_user().subscribe((data) => {
             this.logger.debug('Current user from APP', data);
             this._currentUser = data;
+            this.subjectUser.next(data);
+            this.api.socketIO.join(data);
           });
         } else {
-          // reload workflows
-          this.loadWorkflows(true, false, false).subscribe(
-            (data: AggregatedStatusStats) => {
-              // delete reference to the previous user
-              this._currentUser = null;
-              this._workflow = null;
-              this.logger.debug('Check workflows loaded: ', data);
-              this.subjectWorkflows.next(this._workflows);
-            }
-          );
+          if (this._currentUser !== null)
+            this.api.socketIO.leave(this._currentUser);
+          this._currentUser = null;
+          this.subjectUser.next(null);
         }
+        // reload workflows
+        // this.loadWorkflows(true, logged, logged).subscribe(
+        //   (data: AggregatedStatusStats) => {
+        //     alert("Logged: " + logged);
+        //     // delete reference to the previous user
+        //     this._currentUser = null;
+        //     this._workflow = null;
+        //     this.logger.debug('Check workflows loaded: ', data);
+        //     this.subjectWorkflows.next(this._workflows);
+        //   }
+        // );
       })
     );
 
-    // get user data if already logged
-    if (this.auth.isUserLogged()) {
-      this.api.get_current_user().subscribe((data) => {
-        this.logger.debug('Current user from APP', data);
-        this._currentUser = data;
+    this.api.onWorkflowVersionCreated.subscribe((wf) => {
+      this.logger.debug('New workflow created', wf);
+      if (
+        this.workflow_versions &&
+        this.workflow_versions.find(
+          (v) =>
+            v.uuid === wf.uuid &&
+            (v.version['version'] === wf.version ||
+              (v.version['is_latest'] && wf.version === 'latest'))
+        )
+      ) {
+        this.logger.warn('Workflow version already loaded');
+        return;
+      }
+      this.api.get_workflow(wf.uuid).subscribe((workflow) => {
+        this.api
+          .get_workflow_version(wf.uuid, wf.version, {
+            previous_versions: true,
+            ro_crate: true,
+            load_status: true,
+            load_suites: true,
+          })
+          .subscribe((workflow_version: WorkflowVersion) => {
+            let current_workflow = this.workflows.find(
+              (w) => w.uuid === wf.uuid
+            );
+            if (!current_workflow) {
+              current_workflow = workflow;
+              this.logger.debug(
+                `Adding workflow ${workflow.uuid} to the list of workflows`
+              );
+              this.workflows.push(workflow);
+            } else {
+              this.logger.debug('The workflow already exists');
+            }
+            if (
+              !this.workflow_versions.find(
+                (v) =>
+                  v.uuid === wf.uuid &&
+                  (v.version['version'] === wf.version ||
+                    (v.version['is_latest'] && wf.version === 'latest'))
+              )
+            ) {
+              current_workflow.addVersion(workflow_version, true);
+              current_workflow.currentVersion = workflow_version;
+              this.workflow_versions.push(workflow_version);
+              this.subjectWorkflows.next(this.workflows);
+              this.logger.warn('Current list of workflows', this.workflows);
+              this.logger.warn(
+                'Current list of workflow versions',
+                this.workflow_versions
+              );
+              this.logger.debug(
+                'Workflow version loaded',
+                wf,
+                workflow_version.version,
+                wf.version
+              );
+              this.toastService.clear();
+              this.toastService.success(
+                `${workflow_version.name} (ver.${workflow_version.version['version']}) loaded!`,
+                'Workflow added',
+                { closeButton: true, timeOut: 2000 }
+              );
+            }
+          });
       });
-    }
+    });
+
+    this.api.onWorkflowVersionUpdate.subscribe(
+      (workflowVersion: { uuid: string; version: string }) => {
+        this.logger.debug('Updating workflow: ', workflowVersion);
+        this.logger.debug('Current list of workflows', this.workflows);
+        const workflow: Workflow = this.workflows.find(
+          (w) => w.uuid === workflowVersion.uuid
+        );
+        const cwv_index = this.workflow_versions.findIndex(
+          (v) =>
+            v.uuid === workflowVersion.uuid &&
+            v.version['version'] === workflowVersion.version
+        );
+        const cwv: WorkflowVersion = this.workflow_versions[cwv_index];
+        this.logger.error('Found workflow:', workflow, cwv);
+        if (!workflow) {
+          this.logger.warn('Workflow not found');
+          return;
+        }
+
+        const oldTimestamp = cwv?.modified ?? 0;
+        this.logger.debug('Old timestamp', oldTimestamp, cwv);
+
+        this.api
+          .get_workflow(workflowVersion.uuid)
+          .subscribe((updatedWorkflow) => {
+            const isCurrentVersion =
+              workflow.currentVersion &&
+              workflow.currentVersion.version['version'] ===
+                workflowVersion.version;
+            this.logger.warn('Workflow updated', workflow, updatedWorkflow);
+            workflow.name = updatedWorkflow.name;
+            workflow['public'] = updatedWorkflow['public'];
+            this.logger.warn(
+              'Workflow updated after',
+              workflow,
+              updatedWorkflow
+            );
+            this.loadWorkflowVersion(
+              workflow,
+              workflowVersion.version,
+              true,
+              true
+            )
+              .pipe(
+                map((wv: WorkflowVersion) => {
+                  this.logger.debug('The workflow', wv);
+                  let updated_workflow_version = workflow.getVersion(
+                    workflowVersion.version
+                  );
+                  this.logger.debug(
+                    'New timestamp',
+                    updated_workflow_version,
+                    updated_workflow_version.modified,
+                    wv,
+                    wv.modified
+                  );
+                  const outdated = wv.modified > oldTimestamp;
+                  workflow.addVersion(wv, isCurrentVersion);
+                  wv.name = workflow.name;
+                  this.workflow_versions[cwv_index] = wv;
+                  // return the new workflow version only if more recent
+                  // than the previous one
+                  return outdated
+                    ? workflow.getVersion(workflowVersion.version)
+                    : null;
+                })
+              )
+              .subscribe((wv: WorkflowVersion) => {
+                this.setLoadingWorkflows(false);
+                if (!wv) {
+                  this.logger.warn('Workflow version not outdated');
+                } else {
+                  this.subjectWorkflowUpdate.next(wv);
+                  this.toastService.success(
+                    `${wv.name} (ver.${wv.version['version']}) reloaded!`,
+                    'Workflow updated',
+                    {
+                      closeButton: true,
+                      timeOut: 2000,
+                    }
+                  );
+                }
+              });
+          });
+      }
+    );
+
+    this.api.onWorkflowVersionDeleted.subscribe((wf) => {
+      this.logger.debug(
+        'on workflow version deleted ',
+        wf,
+        this.workflow_versions
+      );
+      const workflow = this.workflows.find((w) => w.uuid === wf.uuid);
+      if (!workflow) {
+        this.logger.warn('Nothing to delete: workflow deleted yet', wf);
+        return;
+      }
+      this.logger.debug('Found workflow: ', workflow);
+      if (workflow.versionDescriptors.length === 1) {
+        this.workflows.splice(this.workflows.indexOf(workflow), 1);
+        this.workflow_versions.splice(
+          this.workflow_versions.findIndex((v) => v.uuid === wf.uuid)
+        );
+        this.logger.debug('Check workflows after deletion', this.workflows);
+        this.subjectWorkflows.next(this.workflows);
+        this.toastService.error(``, `Workflow ${workflow.name} deleted`, {
+          timeOut: 3000,
+        });
+      } else {
+        // Update array of version descriptors
+        const nextVersion = workflow.pickVersion([wf.version]);
+        if (!nextVersion) {
+          this.logger.warn('Something wrong... next version not found');
+          return;
+        }
+        this.loadWorkflowVersion(
+          workflow,
+          nextVersion.name,
+          true,
+          true,
+          false
+        ).subscribe((nextWorkflowVersion) => {
+          workflow.addVersion(nextWorkflowVersion, true, true);
+          workflow.removeVersion(wf.version);
+          // workflow.versionDescriptors[0].isLatest = true;
+
+          this.workflow_versions.push(nextWorkflowVersion);
+          this.workflow_versions.splice(
+            this.workflow_versions.findIndex(
+              (v) => v.uuid === wf.uuid && v.version['version'] === wf.version
+            ),
+            1
+          );
+
+          this.logger.debug('Check workflows after deletion', this.workflows);
+          this.subjectWorkflows.next(this.workflows);
+          this.toastService.error(
+            ``,
+            `Workflow ${workflow.name} (ver.${wf.version}) deleted`,
+            {
+              closeButton: true,
+              timeOut: 2000,
+            }
+          );
+        });
+      }
+    });
+
+    // get user data if already logged
+    this.config.onLoad.subscribe((loaded) => {
+      if (loaded) {
+        this.checkIsUserLogged().then((logged) => {
+          if (logged) {
+            this.api.get_current_user().subscribe((data) => {
+              this.logger.debug('Current user from APP', data);
+              this._currentUser = data;
+              this.api.socketIO.join(data);
+            });
+          }
+        });
+      }
+    });
+  }
+
+  private setupNetworkListener() {
+    window.addEventListener('offline', () => {
+      this.logger.warn('Offline mode enabled');
+    });
+    window.addEventListener('online', () => {
+      this.logger.warn('OnLine mode enabled');
+      this.api.socketIO.connect();
+      this.checkIsUserLogged().then((logged) => {
+        if (!logged) {
+          this.logger.debug('No user logged');
+        } else {
+          this.api.get_current_user().subscribe((user) => {
+            this.api.socketIO.join(user);
+          });
+        }
+      });
+    });
+  }
+
+  public get job$(): Observable<Job> {
+    return this.api.jobs$;
+  }
+
+  public loadUserProfile(): Observable<User> {
+    return this.api.get_current_user().pipe(
+      map((data) => {
+        this._currentUser = data;
+        return data;
+      })
+    );
   }
 
   public isUserLogged(): boolean {
     return this.auth.isUserLogged();
+  }
+
+  public get observableUser(): Observable<User> {
+    return this.subjectUser.asObservable();
+  }
+
+  public async checkIsUserLogged(): Promise<boolean> {
+    return await this.auth.checkIsUserLogged();
+  }
+
+  public isLoadingWorkflow(uuid: string): boolean {
+    return this.loadingWorkflowMap[uuid] ?? false;
   }
 
   public setLoadingWorkflows(value: boolean) {
@@ -140,16 +446,72 @@ export class AppService {
     return this._observableLoadingWorkflows;
   }
 
-  public login() {
-    return this.auth.login();
+  public login(
+    callback: CallableFunction = null,
+    catchError: CallableFunction = null
+  ): void {
+    return this.auth.login(callback, catchError);
   }
 
-  public authorize() {
-    return this.auth.authorize();
+  public async authorize() {
+    return await this.auth.authorize();
   }
 
-  public logout() {
-    return this.auth.logout();
+  public async clearAll(): Promise<boolean> {
+    await this.api.cache.clear().then(async () => {});
+    this.reset();
+    return true;
+  }
+
+  public async clearListOfWorkflows(): Promise<boolean> {
+    await this.api.cache.deleteCacheEntriesByKeys([
+      'userProfile',
+      'userSubscriptions',
+      'subscribedWorkflows',
+      'userScopedWorkflows',
+      'userNotifications',
+      'registeredWorkflows',
+    ]);
+    this.reset();
+    return true;
+  }
+
+  public async refreshWorkflowVersion(workflow: {
+    uuid: string;
+    version: string;
+  }): Promise<boolean> {
+    await this.api.cache.refreshCacheEntriesGroup(
+      JSON.stringify({
+        type: 'workflow',
+        uuid: workflow.uuid,
+      }),
+      false
+    );
+    await this.api.cache.refreshCacheEntriesGroup(
+      JSON.stringify({
+        type: 'workflow',
+        uuid: workflow.uuid,
+        version: workflow.version,
+      })
+    );
+    return true;
+  }
+
+  public startSync() {
+    this.api.startSync();
+  }
+
+  private reset(): void {
+    this._workflow = null;
+    this._workflow_stats = null;
+    this._workflows = null;
+    this._workflow_versions = null;
+  }
+
+  public async logout(redirect: boolean = true) {
+    return this.api.logout(redirect).then(() => {
+      this.reset();
+    });
   }
 
   public get currentUser(): User {
@@ -236,9 +598,21 @@ export class AppService {
     return this._testBuild;
   }
 
-  public get observableUserLogged(): Observable<boolean> {
-    return this.auth.userLoggedAsObservable();
+  public get observableWorkflowUpdate(): Observable<WorkflowVersion> {
+    return this._observableWorkflowUpdate;
   }
+
+  public get observableLoadingWorkflow(): Observable<{
+    uuid: string;
+    loading: boolean;
+  }> {
+    return this._observableLoadingWorkflow;
+  }
+
+  // public get observableUserLogged(): Observable<boolean> {
+  //   // return this.auth.userLoggedAsObservable();
+  //   return this.subjectUser.asObservable
+  // }
 
   public get observableRegistry(): Observable<Registry> {
     return this._observableRegistry;
@@ -353,157 +727,159 @@ export class AppService {
       });
   }
 
+  public get observableLoadingWorkflowsStatus() {
+    return this.subjectLoadingWorkflowsStatus.asObservable();
+  }
+
   loadWorkflows(
     useCache = false,
     filteredByUser: boolean = undefined,
     includeSubScriptions: boolean = undefined
-  ): Observable<AggregatedStatusStats> {
-    // if (this.loadingWorkflows) return of({} as AggregatedStatusStats);
+  ): Observable<any> {
+    // if (this.loadingWorkflows) return of(this);
     // if (useCache && this._workflowsStats) {
     //   this.logger.debug('Using cache', this._workflowsStats);
     //   this.subjectWorkflows.next(this._workflowsStats);
     //   return;
     // }
 
+    // Process workflow items
+    let stats = new AggregatedStatusStats();
+    let workflows: Workflow[] = [];
+    let workflow_versions: WorkflowVersion[] = [];
+
+    let workflowsStatus: WorkflowsLoadingStatus = null;
+
     this.setLoadingWorkflows(true);
     return this.api
       .get_workflows(
-        filteredByUser !== undefined ? filteredByUser : this.isUserLogged(),
-        includeSubScriptions !== undefined
-          ? includeSubScriptions
-          : this.isUserLogged(),
-        false
+        filteredByUser ?? this.isUserLogged(),
+        includeSubScriptions ?? this.isUserLogged(),
+        false,
+        true,
+        useCache
       )
       .pipe(
         map((data) => {
-          this.logger.debug('AppService Loaded workflows', data);
+          const wfs = data['items'] as Array<any>;
+          workflowsStatus = new WorkflowsLoadingStatus(wfs);
+          return wfs;
+        }),
+        mergeMap((w) => w),
+        map((wdata) => {
+          // const queries: Array<
+          //   Observable<{ workflow: Workflow; version: WorkflowVersion }>
+          // > = [];
 
-          const queries: Array<
-            Observable<{ workflow: Workflow; version: WorkflowVersion }>
-          > = [];
+          let workflow: Workflow = null;
+          // let workflow_version: WorkflowVersion = null;
+          // Load the latest workflow version from the back-end
+          // if cache is disabled or it has not been found
 
-          // Process workflow items
-          let stats = new AggregatedStatusStats();
-          let workflows: Workflow[] = [];
-          let workflow_versions: WorkflowVersion[] = [];
-          for (
-            let wdata_index = 0;
-            wdata_index < data['items'].length;
-            wdata_index++
-          ) {
-            let wdata = data['items'][wdata_index];
-            let workflow: Workflow = null;
-            let workflow_version: WorkflowVersion = null;
-            // Try to get workflow data from cache if it is enabled
-            if (useCache && this._workflow_versions) {
-              workflow_version = this._workflow_versions.find(
-                (e) => e['uuid'] === wdata['uuid']
-              );
-              this.logger.debug(
-                'Using data from cache for worklow: ',
-                workflow_version
-              );
-            }
-            // Load the latest workflow version from the back-end
-            // if cache is disabled or it has not been found
-            if (!workflow_version) {
-              this.setLoadingWorkflows(true);
-              let versions_data = wdata['versions'];
-              workflow = new Workflow(wdata);
-              workflows.push(workflow);
-              let vdata = versions_data
-                ? versions_data.find(
-                    (v: { [x: string]: any }) => v['is_latest']
-                  )
-                : null;
-              this.logger.warn('VDATA', vdata);
-              this.logger.debug('Loading data of workflow ', workflow_version);
-              queries.push(
-                this.loadWorkflowVersion(workflow, 'latest', true).pipe(
-                  map((wv: WorkflowVersion) => ({
-                    workflow: workflow,
-                    version: wv,
-                  }))
-                )
-              );
-            }
-            // Add workflow to the list of loaded workflows
-            else {
+          // this.setLoadingWorkflows(true);
+          let versions_data = wdata['versions'];
+          workflow = workflows.find((e) => e['uuid'] === wdata['uuid']);
+          if (!workflow) {
+            workflow = new Workflow(wdata);
+            workflows.push(workflow);
+          }
+          let vdata = versions_data
+            ? versions_data.find((v: { [x: string]: any }) => v['is_latest'])
+            : null;
+          this.logger.debug('VDATA', vdata);
+          return this.loadWorkflowVersion(
+            workflow,
+            wdata['latest_version'],
+            true,
+            useCache
+          ).pipe(
+            map((workflow_version: WorkflowVersion) => {
+              if (filteredByUser && includeSubScriptions)
+                workflow_version.subscriptions = workflow.getRawData()[
+                  'subscriptions'
+                ];
+              workflow.addVersion(workflow_version, true);
               workflow_versions.push(workflow_version);
               stats.add(workflow_version);
-            }
-          }
-
-          this.logger.debug(
-            'Workflow Versions: ',
-            workflows,
-            workflow_versions
+              this.logger.debug(
+                'Data loaded for workflow',
+                workflow,
+                workflow_version.uuid,
+                workflow_versions,
+                stats
+              );
+              workflowsStatus.setLoaded(workflow.uuid);
+              this.subjectLoadingWorkflowsStatus.next(workflowsStatus);
+              return {
+                workflow: workflow,
+                workflow_version: workflow_version,
+              };
+            })
           );
-
-          forkJoin(queries)
-            .pipe(
-              map((data) => {
-                data.map((wf) => {
-                  const workflow: Workflow = wf.workflow;
-                  const workflow_version: WorkflowVersion = wf.version;
-                  workflow.addVersion(workflow_version, true);
-                  workflow_versions.push(workflow_version);
-                  workflow.currentVersion = workflow_version;
-                  stats.add(workflow_version);
-                  this.logger.debug(
-                    'Data loaded for workflow',
-                    workflow_version.uuid,
-                    workflow_versions,
-                    stats
-                  );
-                });
-                this.setLoadingWorkflows(false);
-              })
-            )
-            .subscribe((data) => {
-              // Update list of workflows and notify observers
-              stats.update(workflow_versions);
-              this._workflows = workflows;
-              this._workflow_versions = workflow_versions;
-              this.subjectWorkflows.next(this._workflows);
-            });
-
-          // Update list of workflows and notify observers
-          stats.update(workflow_versions);
+        }),
+        mergeMap((x) => x),
+        toArray(),
+        map((result) => {
+          this.logger.debug('Loaded workflows', result);
+          // alert('Workflows reloaded');
+          const syncRequired: boolean = !this._workflows;
+          if (syncRequired) {
+            if (this.syncTimeout) clearTimeout(this.syncTimeout);
+            this.syncTimeout = setTimeout(() => {
+              this.api.startSync();
+            }, 10000);
+          }
           this._workflows = workflows;
           this._workflow_versions = workflow_versions;
-          // if(this._workflows && this.workflows.length>0)
-          //   this.subjectWorkflows.next(this._workflows);
+          this.subjectWorkflows.next(this._workflows);
+          this.setLoadingWorkflows(false);
           return stats;
-        }),
-        finalize(() => {
-          if (this._workflows && this._workflows.length == 0) {
-            this.setLoadingWorkflows(false);
-            this.subjectWorkflows.next(this._workflows);
-          }
         })
       );
+  }
+
+  private updateLoadingStateOfWorkflow(uuid: string, loading: boolean) {
+    this.loadingWorkflowMap[uuid] = loading;
+    this.subjectLoadingWorkflow.next({ uuid: uuid, loading: loading });
   }
 
   loadWorkflowVersion(
     w: Workflow,
     version: string = 'latest',
-    status: boolean = false
+    status: boolean = false,
+    useCache: boolean = true,
+    notifyUpdate: boolean = true
   ): Observable<WorkflowVersion> {
+    if (notifyUpdate) this.updateLoadingStateOfWorkflow(w.uuid, true);
     return this.api
       .get_workflow_version(w.uuid, version, {
         previous_versions: true,
         ro_crate: true,
         load_status: status,
         load_suites: true,
+        use_cache: useCache,
       })
       .pipe(
         map((workflow_version: WorkflowVersion) => {
           this.logger.debug('Loaded workflow version data:', workflow_version);
-          //w.update(wdata);
-          //w.suites = wdata.suites;
+          w.addVersion(workflow_version);
+          if (
+            w.currentVersion &&
+            w.currentVersion.version['version'] === version
+          )
+            w.currentVersion = workflow_version;
+          // w.update(workflow_version);
+          // w.suites = wdata.suites;
+          workflow_version.subscriptions = w.getRawData()['subscriptions'];
+          // this.updateLoadingStateOfWorkflow(w.uuid, false);
+          if (notifyUpdate) this.updateLoadingStateOfWorkflow(w.uuid, false);
           this.logger.debug('Workflow data updated!');
           return workflow_version;
+        }),
+        finalize(() => {
+          setTimeout(() => {
+            // this.updateLoadingStateOfWorkflow(w.uuid, false);
+          }, 500);
         })
       );
   }
@@ -571,8 +947,7 @@ export class AppService {
     name: string = null,
     is_public: boolean = false,
     authorization: string = null
-  ): Observable<object> {
-    this.setLoadingWorkflows(true);
+  ): Observable<any> {
     return this.api
       .registerWorkflowRoCrate(
         uuid,
@@ -585,44 +960,42 @@ export class AppService {
       )
       .pipe(
         map((data) => {
-          this.logger.debug('Data of registered workflow', data);
-          this.api
-            .get_workflow_version(data['uuid'], version, {
-              previous_versions: false,
-              ro_crate: true,
-              load_status: true,
-              load_suites: true,
-            })
-            .subscribe((workflow_version: WorkflowVersion) => {
-              this.logger.debug(
-                'Registered Workflow RO-Crate:',
-                workflow_version
-              );
-              this._workflow_versions.push(workflow_version);
-              this.logger.debug('Workflow data loaded!');
-              let workflow: Workflow = this.findWorkflow(uuid);
-              if (!workflow) {
-                this.api.get_workflow(uuid).subscribe((workflow: Workflow) => {
-                  workflow.addVersion(workflow_version, true);
-                  this._workflows.push(workflow);
-                  this.subjectWorkflows.next(this._workflows);
-                  this.setLoadingWorkflows(false);
-                });
-              } else {
-                workflow.addVersion(workflow_version, true);
-                this.subjectWorkflows.next(this._workflows);
-                this.setLoadingWorkflows(false);
-              }
-            });
           return data;
-        }),
-        catchError((err) => {
-          this.logger.debug('Error when registering workflow', err);
-          this.setLoadingWorkflows(false);
-          throw err;
-        }),
-        finalize(() => {
-          // this.setLoadingWorkflows(false);
+          // return this.api
+          //   .get_workflow_version(data['uuid'], version, {
+          //     previous_versions: false,
+          //     ro_crate: true,
+          //     load_status: true,
+          //     load_suites: true,
+          //   })
+          //   .pipe(
+          //     map((workflow_version: WorkflowVersion) => {
+          //       this.logger.debug(
+          //         'Registered Workflow RO-Crate:',
+          //         workflow_version
+          //       );
+          //       this.setLoadingWorkflows(false);
+          //       return workflow_version;
+          //       // this._workflow_versions.push(workflow_version);
+          //       // this.logger.debug('Workflow data loaded!');
+          //       // let workflow: Workflow = this.findWorkflow(uuid);
+          //       // if (!workflow) {
+          //       //   this.api
+          //       //     .get_workflow(uuid)
+          //       //     .subscribe((workflow: Workflow) => {
+          //       //       workflow.addVersion(workflow_version, true);
+          //       //       this._workflows.push(workflow);
+          //       //       this.subjectWorkflows.next(this._workflows);
+          //       //       this.setLoadingWorkflows(false);
+          //       //     });
+          //       // } else {
+          //       //   workflow.addVersion(workflow_version, true);
+          //       //   this.subjectWorkflows.next(this._workflows);
+          //       //   this.setLoadingWorkflows(false);
+          //       // }
+          //       // return workflow_version;
+          //     })
+          //   );
         })
       );
   }
@@ -633,7 +1006,7 @@ export class AppService {
     name: string = null,
     is_public: boolean = false
   ): Observable<object> {
-    this.setLoadingWorkflows(true);
+    // this.setLoadingWorkflows(true);
     return this.api
       .registerRegistryWorkflow(
         workflow,
@@ -644,37 +1017,38 @@ export class AppService {
       .pipe(
         map((data) => {
           this.logger.debug('Data of registered workflow', data);
-          this.api
-            .get_workflow_version(data['uuid'], version, {
-              previous_versions: false,
-              ro_crate: true,
-              load_status: true,
-              load_suites: true,
-            })
-            .subscribe((workflow_version: WorkflowVersion) => {
-              this.logger.debug(
-                'Registered Workflow RO-Crate:',
-                workflow_version
-              );
-              this._workflow_versions.push(workflow_version);
-              this.logger.debug('Workflow data loaded!');
-              let workflow: Workflow = this.findWorkflow(workflow_version.uuid);
-              if (!workflow) {
-                this.api
-                  .get_workflow(workflow_version.uuid)
-                  .subscribe((workflow: Workflow) => {
-                    workflow.addVersion(workflow_version, true);
-                    this._workflows.push(workflow);
-                    this.subjectWorkflows.next(this._workflows);
-                    this.setLoadingWorkflows(false);
-                  });
-              } else {
-                workflow.addVersion(workflow_version, true);
-                this.subjectWorkflows.next(this._workflows);
-                this.setLoadingWorkflows(false);
-              }
-            });
           return data;
+          // this.api
+          //   .get_workflow_version(data['uuid'], version, {
+          //     previous_versions: false,
+          //     ro_crate: true,
+          //     load_status: true,
+          //     load_suites: true,
+          //   })
+          //   .subscribe((workflow_version: WorkflowVersion) => {
+          //     this.logger.debug(
+          //       'Registered Workflow RO-Crate:',
+          //       workflow_version
+          //     );
+          //     this._workflow_versions.push(workflow_version);
+          //     this.logger.debug('Workflow data loaded!');
+          //     let workflow: Workflow = this.findWorkflow(workflow_version.uuid);
+          //     if (!workflow) {
+          //       this.api
+          //         .get_workflow(workflow_version.uuid)
+          //         .subscribe((workflow: Workflow) => {
+          //           workflow.addVersion(workflow_version, true);
+          //           this._workflows.push(workflow);
+          //           this.subjectWorkflows.next(this._workflows);
+          //           this.setLoadingWorkflows(false);
+          //         });
+          //     } else {
+          //       workflow.addVersion(workflow_version, true);
+          //       this.subjectWorkflows.next(this._workflows);
+          //       this.setLoadingWorkflows(false);
+          //     }
+          //   });
+          // return data;
         }),
         catchError((err) => {
           this.logger.debug('Error when registering workflow', err);
@@ -692,7 +1066,6 @@ export class AppService {
   ): Observable<{ uuid: string; version: string }> {
     if (!workflow_version) return;
     let workflow: Workflow = workflow_version.workflow;
-    this.setLoadingWorkflows(true);
     return this.api
       .deleteWorkflowVersion(
         workflow_version.uuid,
@@ -714,10 +1087,9 @@ export class AppService {
                 nextVersionDescriptor.name
               ).subscribe(
                 (wv: WorkflowVersion) => {
-                  workflow.addVersion(wv, true);
                   workflow.removeVersion(workflow_version);
+                  workflow.addVersion(wv, true); //, true);
                   this.subjectWorkflows.next(this._workflows);
-                  this.setLoadingWorkflows(false);
                 },
                 catchError((e) => {
                   this.setLoadingWorkflows(false);
@@ -773,7 +1145,9 @@ export class AppService {
     );
   }
 
-  public updateWorkflowName(w: WorkflowVersion): Observable<any> {
+  public updateWorkflowName(
+    w: Workflow
+  ): Observable<{ meta: { modified: number } }> {
     return this.api.updateWorkflowName(w);
   }
 

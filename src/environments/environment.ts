@@ -4,9 +4,13 @@
 
 export const environment = {
   production: false,
+  logLevel: "INFO",
   // 'apiBaseUrl': base URL of the LifeMonitor API instance
   //               (e.g., https://api.lifemonitor.eu)
   apiBaseUrl: '<LIFEMONITOR_API_BASE_URL>',
+  // 'socketBaseUrl': base URL of the LifeMonitor Socket endpoint
+  //               (e.g., https://api.lifemonitor.eu)
+  socketBaseUrl: '<LIFEMONITOR_SOCKET_BASE_URL>',
   // 'clientId': OAuth2 ClientID that can be obtained by registering
   //             an OAuth2 app with <LIFEMONITOR_API_BASE_URL>/profile -> OAuth Apps
   clientId: '<LIFEMONITOR_OAUTH2_CLIENT_ID>',

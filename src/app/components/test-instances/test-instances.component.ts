@@ -2,11 +2,13 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  HostListener,
   Input,
   OnChanges,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -19,6 +21,8 @@ import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
 
+const minWidthForListLayout: number = 768;
+
 @Component({
   selector: 'test-instances',
   templateUrl: './test-instances.component.html',
@@ -29,6 +33,10 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   @Input() testInstances: TestInstance[];
   @Output() suiteSelected = new EventEmitter<TestInstance>();
 
+  @ViewChild('instancesDataView')
+  dataView: any;
+
+  private enableAutoLayoutSwitch: boolean = false;
   private suiteInstancesDataTable: any;
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
@@ -40,9 +48,15 @@ export class TestInstancesComponent implements OnInit, OnChanges {
     private toast: ToastrService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    if (this.enableAutoLayoutSwitch) {
+      if (window.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+      }
+    }
+  }
 
   ngAfterViewInit() {
     this.initDataTable();
@@ -51,6 +65,17 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.debug('Change detected');
     this.cdr.detectChanges();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    if (this.enableAutoLayoutSwitch) {
+      this.logger.debug('Resize', event.target.innerWidth);
+      if (event.target.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+        this.cdr.detectChanges();
+      }
+    }
   }
 
   public selectTestInstance(testInstance: TestInstance) {
@@ -62,7 +87,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
     if (testBuild) {
       this.logger.debug('Test Build selected', testBuild);
       // this.suiteSelected.emit(testBuild);
-      window.open(testBuild.externalLink, '_blank');
+      window.open(testBuild.externalLink as string, '_blank');
       this.appService.selectWorkflowVersion(
         testBuild.testInstance.suite.workflow.uuid
       );
@@ -76,55 +101,58 @@ export class TestInstancesComponent implements OnInit, OnChanges {
 
   private initDataTable() {
     if (this.suiteInstancesDataTable) return;
-    this.suiteInstancesDataTable = $("#suiteInstances").DataTable({
-      "paging": true,
-      "lengthChange": true,
-      "lengthMenu": [5, 10, 20, 50, 75, 100],
-      "searching": false,
-      "ordering": true,
-      "order": [[1, 'asc']],
-      "columnDefs": [{
-        "targets": [0, 3, 4],
-        "orderable": false
-      }],
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-      "deferRender": true,
-      "stateSave": true,
-      // "scrollY": "520",
-      language: {
-        search: "",
-        searchPlaceholder: "Filter your dashboard",
-        "decimal": "",
-        "emptyTable": "No instances associated to the current test suite",
-        "info": "Showing _START_ to _END_ of _TOTAL_ instances",
-        "infoEmpty": "Showing 0 to 0 of 0 instances",
-        "infoFiltered": "(filtered from a total of _MAX_ instances)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Show _MENU_ instances",
-        "loadingRecords": "Loading instances...",
-        "processing": "Processing instances...",
-        "zeroRecords": "No matching instances found",
-        "paginate": {
-          "first": "First",
-          "last": "Last",
-          "next": "Next",
-          "previous": "Previous"
+    this.suiteInstancesDataTable = $('#suiteInstances').DataTable({
+      paging: true,
+      lengthChange: true,
+      lengthMenu: [5, 10, 20, 50, 75, 100],
+      searching: false,
+      ordering: true,
+      order: [[1, 'asc']],
+      columnDefs: [
+        {
+          targets: [0, 3, 4],
+          orderable: false,
         },
-        "aria": {
-          "sortAscending": ": activate to sort column ascending",
-          "sortDescending": ": activate to sort column descending"
-        }
-      }
+      ],
+      info: true,
+      autoWidth: true,
+      responsive: false,
+      deferRender: false,
+      stateSave: true,
+      // "scrollY": "520",
+      scrollX: 1200,
+      language: {
+        search: '',
+        searchPlaceholder: 'Filter your dashboard',
+        decimal: '',
+        emptyTable: 'No instances associated to the current test suite',
+        info: 'Showing _START_ to _END_ of _TOTAL_ instances',
+        infoEmpty: 'Showing 0 to 0 of 0 instances',
+        infoFiltered: '(filtered from a total of _MAX_ instances)',
+        infoPostFix: '',
+        thousands: ',',
+        lengthMenu: 'Show _MENU_ instances',
+        loadingRecords: 'Loading instances...',
+        processing: 'Processing instances...',
+        zeroRecords: 'No matching instances found',
+        paginate: {
+          first: 'First',
+          last: 'Last',
+          next: 'Next',
+          previous: 'Previous',
+        },
+        aria: {
+          sortAscending: ': activate to sort column ascending',
+          sortDescending: ': activate to sort column descending',
+        },
+      },
     });
     // Add tooltip to the SearchBox
-    $("input[type=search]")
-      .attr('data-placement', 'top')
-      .attr('data-toggle', "tooltip")
-      .attr('data-html', "true")
-      .attr('title', "Filter by UUID or Name");
+    // $('input[type=search]')
+    //   .attr('data-placement', 'top')
+    //   .attr('data-toggle', 'tooltip')
+    //   .attr('data-html', 'true')
+    //   .attr('pTooltip', 'Filter by UUID or Name');
   }
 
   private destroyDataTable() {
@@ -157,19 +185,23 @@ export class TestInstancesComponent implements OnInit, OnChanges {
   }
 
   public updateTestInstance(instance: TestInstance) {
-    this.appService.updateTestInstance(instance).subscribe(() => {
-      instance['editingMode'] = false;
-      this.toast.success("Test instance updated!", '', { timeOut: 2500 });
-    },
+    this.appService.updateTestInstance(instance).subscribe(
+      () => {
+        instance['editingMode'] = false;
+        this.toast.success('Test instance updated!', '', { timeOut: 2500 });
+      },
       (error) => {
-        this.toast.error("Unable to update test instance", '', { timeOut: 2500 });
+        this.toast.error('Unable to update test instance', '', {
+          timeOut: 2500,
+        });
         this.logger.error(error);
-      });
+      }
+    );
   }
 
   public showTestInstanceDetails(instance: TestInstance) {
     this.clickHandler.click(() => {
-      window.open(instance.externalLink, "_blank");
+      window.open(instance.externalLink, '_blank');
     });
   }
 }

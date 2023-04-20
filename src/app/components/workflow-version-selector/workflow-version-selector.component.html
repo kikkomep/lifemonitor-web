@@ -1,25 +1,31 @@
-<div *ngIf="workflow">
+<div class="text-muted" *ngIf="isLoading()">
+  <i class="fas fa-2x fa-sync-alt"></i>
+</div>
+<div *ngIf="!isLoading()" class="text-center flex mx-auto">
   <select
+    [id]="selectorId"
     #selectPicker
-    class="form-select selectpicker show-tick version-picker"
+    class="form-select show-tick version-picker text-center"
     data-width="fit"
     data-style="version"
     aria-label="Select workflow version"
     (change)="selectVersion($event.target.value)"
   >
     <ng-container *ngIf="versions">
-      <ng-container *ngFor="let v of versions">
+      <ng-container *ngFor="let v of versions" class="mx-auto">
         <option
           [value]="v.name"
           [selected]="v.name == workflow.currentVersion.version['version']"
-          class="version-option"
+          class="version-option text-center mx-auto"
           [attr.data-content]="
+            '<div class=\'text-center mx-auto\'>' +
             v.name +
             (v.isLatest
               ? '<span class=\'mx-2 badge badge-success\' style=\'font-size: 0.8em;\'>latest</span>'
-              : '<span class=\'max-2\' style=\'display: block; min-width: ' +
+              : '<span class=\'mx-2\' style=\'display: block; min-width: ' +
                 (workflow.currentVersion.version['version'].length + 7) +
-                'ch;\'> </span>')
+                'ch;\'> </span>') +
+            '</div>'
           "
         ></option>
       </ng-container>

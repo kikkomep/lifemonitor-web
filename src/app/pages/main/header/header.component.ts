@@ -1,7 +1,13 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { AppService } from 'src/app/utils/services/app.service';
 
-import { AuthService } from 'src/app/utils/services/auth.service';
 import { UserDropdownMenuComponent } from './user-dropdown-menu/user-dropdown-menu.component';
 
 @Component({
@@ -10,13 +16,12 @@ import { UserDropdownMenuComponent } from './user-dropdown-menu/user-dropdown-me
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-
   @ViewChild('userDropdownMenu') dropdownMenu: UserDropdownMenuComponent;
   @Output() toggleMenuSidebar: EventEmitter<any> = new EventEmitter<any>();
 
   public searchForm: FormGroup;
 
-  constructor(private appService: AuthService) { }
+  constructor(private appService: AppService) {}
 
   ngOnInit() {
     this.searchForm = new FormGroup({
@@ -32,7 +37,7 @@ export class HeaderComponent implements OnInit {
     this.dropdownMenu.openProfile();
   }
 
-  logout() {
-    this.appService.logout();
+  public logout() {
+    this.appService.logout().then(() => {});
   }
 }

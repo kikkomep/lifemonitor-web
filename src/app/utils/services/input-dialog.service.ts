@@ -13,6 +13,9 @@ export interface InputDialogConfig {
   confirmText?: string;
   cancelText?: string;
   onConfirm?: any;
+  enableCancel?: boolean;
+  onCancel?: any;
+  enableClose?: boolean;
 }
 
 @Injectable({
@@ -34,7 +37,7 @@ export class InputDialogService {
   // initialize logger
   private logger: Logger = LoggerManager.create('InputDialogService');
 
-  constructor() { }
+  constructor() {}
 
   public show(options: InputDialogConfig) {
     this._config = options;

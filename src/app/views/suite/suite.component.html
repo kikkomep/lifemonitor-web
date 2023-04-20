@@ -1,4 +1,4 @@
-<app-loader [enabled]="!suite"></app-loader>
+<app-loader [enabled]="!suite" loadingText="... loading ..." marginTop="-300"></app-loader>
 
 <div *ngIf="suite">
   <div class="content-header">
@@ -9,12 +9,13 @@
         </div>
         <!-- /.col -->
         <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right mr-lg-4 mr-md-2">
+          <ol class="breadcrumb float-right mr-lg-4 mr-md-2">
             <li class="breadcrumb-item">
               <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
             </li>
             <li class="breadcrumb-item active">
-              <a [routerLink]="['/workflow', { uuid: suite.workflow.uuid, version: suite.workflow.version['version'] }]">
+              <a
+                [routerLink]="['/workflow', { uuid: suite.workflow.uuid, version: suite.workflow.version['version'] }]">
                 <i class="fas fa-cogs p-1"></i>Workflow
               </a>
             </li>
@@ -41,8 +42,8 @@
   <section *ngIf="suite.workflow" class="content mx-lg-4 p-2">
     <div *ngIf="suite.workflow && suite.workflow.suites" class="mt-5">
       <h3 style="color: var(--primary)">
-        <span *ngIf="!instanceNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
-          title="The dashboard collects test instances for the suite '{{suite.name}}'">
+        <span *ngIf="!instanceNameFilter" data-toggle="tooltip" tooltipPosition="right" data-html="true"
+          [showDelay]="1500" pTooltip="The dashboard collects the test instances for the suite '{{suite.name}}'">
           Test instances
         </span>
         <div *ngIf="instanceNameFilter">
@@ -71,15 +72,15 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-primary" (click)="filterByStatus('passed')" data-toggle="tooltip"
-            data-placement="bottom" data-html="true"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>passing</b> status</span>">
+            tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+            pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>passing</b> status</div>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
             <div *ngIf="suite.instances && statusFilter && statusFilter != 'passed'" class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.passed.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.passed, instanceNameFilter) : 0 }}
               </h3>
               <p>Passed</p>
             </div>
@@ -96,15 +97,15 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-warning" (click)="filterByStatus('error')" data-toggle="tooltip"
-            data-placement="bottom" data-html="true"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>error</b> status</span>">
+            tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+            pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>error</b> status</div>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
             <div *ngIf="suite.instances && statusFilter && statusFilter != 'error'" class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.error.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.error, instanceNameFilter) : 0 }}
               </h3>
               <p>Error</p>
             </div>
@@ -121,8 +122,8 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-danger" (click)="filterByStatus('failed')" data-toggle="tooltip"
-            data-placement="bottom" data-html="true"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>failed</b> status</span>">
+            tooltipPosition="bottom" data-html="true" [showDelay]="1500" tooltipPosition="bottom"
+            pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>failed</b> status</div>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
@@ -131,7 +132,7 @@
               " class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.failed.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.failed, instanceNameFilter) : 0 }}
               </h3>
               <p>Failed</p>
             </div>
@@ -149,8 +150,8 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-orange" (click)="filterByStatus('waiting')" data-toggle="tooltip"
-            data-placement="bottom" data-html="true"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>waiting</b> status</span>">
+            tooltipPosition="bottom" data-html="true" [showDelay]="1500" tooltipPosition="bottom"
+            pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>waiting</b> status</div>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
@@ -159,7 +160,7 @@
               " class="overlay dark"></div>
             <div class="inner">
               <h3>
-                {{ suite.instances ? suite.instances.waiting.length : 0 }}
+                {{ suite.instances ? suite.instances.getStatsLength(suite.instances.waiting, instanceNameFilter) : 0 }}
               </h3>
 
               <p>Waiting</p>
@@ -178,8 +179,8 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-cyan" (click)="filterByStatus('running')" data-toggle="tooltip"
-            data-placement="bottom" data-html="true"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>running</b> status</span>">
+            tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+            pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>running</b> status</div>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
@@ -207,8 +208,8 @@
         <div class="col-lg-2 col-6">
           <!-- small box -->
           <div class="small-box bg-gray" (click)="filterByStatus('aborted')" data-toggle="tooltip"
-            data-placement="bottom" data-html="true"
-            title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>aborted</b> status</span>">
+            tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+            pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter builds in <b>aborted</b> status</div>">
             <div *ngIf="!suite.instances" class="overlay dark">
               <i class="fas fa-3x fa-sync-alt"></i>
             </div>
@@ -236,10 +237,12 @@
       <!-- /.row -->
     </div>
 
+    <!-- scroll top button -->
+    <app-scroll [hidden]="!(showScroll$ | async)" (scrollToTop)="scrollTop()"></app-scroll>
+
     <!-- Search Bar -->
-    <item-search-bar elementType="instances"
-          [(filterValue)]="instanceNameFilter"
-          [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
+    <item-search-bar elementType="instances" [(filterValue)]="instanceNameFilter"
+      [(sortingOrder)]="instanceSortingOrder"></item-search-bar>
 
     <test-instances [workflow]="suite.workflow" [testInstances]="
         instances

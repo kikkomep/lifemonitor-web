@@ -13,12 +13,15 @@ export class TestInstance extends StatusStatsItem {
 
   constructor(public suite: Suite, rawData: Object) {
     super(rawData);
-    this.setNameFromProperty(rawData, "name", rawData['roc_instance']);
+    if (rawData)
+      this.setNameFromProperty(rawData, 'name', rawData['roc_instance']);
   }
 
   public update(rawData: Object) {
-    super.update(rawData);
-    this.setNameFromProperty(rawData, "name", rawData['roc_instance']);
+    if (rawData) {
+      super.update(rawData);
+      this.setNameFromProperty(rawData, 'name', rawData['roc_instance']);
+    }
   }
 
   public set service(data: TestingService) {

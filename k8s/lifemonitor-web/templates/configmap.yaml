@@ -10,6 +10,7 @@ metadata:
 data:
   config.json : |-
     {
-        "apiBaseUrl": "{{ .Values.backend.apiUrl }}",
+        "apiBaseUrl": "https://{{ .Values.externalServerName }}/api",
+        "socketBaseUrl": "https://{{ .Values.externalServerName }}",
         "clientId": "{{ .Values.backend.clientId }}"
     }

@@ -1,7 +1,9 @@
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   Input,
+  NgZone,
   OnChanges,
   OnInit,
   SimpleChanges,
@@ -19,6 +21,7 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
   selector: 'stats-pie-chart',
   templateUrl: './stats-pie-chart.component.html',
   styleUrls: ['./stats-pie-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatsPieChartComponent implements OnInit, OnChanges {
   _stats: AbstractStats = null;
@@ -72,7 +75,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   public pieChartLegend = false;
   public pieChartPlugins = [];
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
   ngOnInit(): void {}
 
@@ -93,22 +96,24 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   }
 
   public update() {
-    if (this.stats) {
-      this.pieChartLabels = this.getLabels();
-      this.pieChartData = [
-        {
-          data: this.data,
-          backgroundColor: this.getColors(),
-        },
-      ];
-      // this.cdr.detectChanges();
-      this.logger.debug(
-        'workflow pie data',
-        this.pieChartData,
-        this.pieChartLabels,
-        this.stats
-      );
-    }
+    this.zone.runOutsideAngular(() => {
+      if (this.stats) {
+        this.pieChartLabels = this.getLabels();
+        this.pieChartData = [
+          {
+            data: this.data,
+            backgroundColor: this.getColors(),
+          },
+        ];
+        // this.cdr.detectChanges();
+        this.logger.debug(
+          'workflow pie data',
+          this.pieChartData,
+          this.pieChartLabels,
+          this.stats
+        );
+      }
+    });
   }
 
   public getColors() {

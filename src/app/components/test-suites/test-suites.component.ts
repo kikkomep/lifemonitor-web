@@ -2,11 +2,13 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  HostListener,
   Input,
   OnChanges,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -18,6 +20,8 @@ import { AppService } from 'src/app/utils/services/app.service';
 
 declare var $: any;
 
+const minWidthForListLayout: number = 768;
+
 @Component({
   selector: 'test-suites',
   templateUrl: './test-suites.component.html',
@@ -27,6 +31,9 @@ export class TestSuitesComponent implements OnInit, OnChanges {
   @Input() suites: Suite[];
   @Output() suiteSelected = new EventEmitter<TestBuild>();
 
+  @ViewChild('suitesDataView')
+  dataView: any;
+
   // initialize logger
   private logger: Logger = LoggerManager.create('TestSuitesComponent');
 
@@ -34,22 +41,43 @@ export class TestSuitesComponent implements OnInit, OnChanges {
 
   private clickHandler: MouseClickHandler = new MouseClickHandler();
 
+  private enableAutoLayoutSwitch: boolean = false;
+
   constructor(
     private appService: AppService,
     private toastService: ToastrService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
   ngAfterViewInit() {
-    this.initDataTable();
+    this.checkWindowSize();
+  }
+
+  private checkWindowSize() {
+    if (this.enableAutoLayoutSwitch) {
+      if (window.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.debug('Change detected');
     this.cdr.detectChanges();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    if (this.enableAutoLayoutSwitch) {
+      this.logger.debug('Resize', event.target.innerWidth);
+      if (event.target.innerWidth < minWidthForListLayout) {
+        this.dataView.layout = 'grid';
+        this.cdr.detectChanges();
+      }
+    }
   }
 
   public isUserLogged(): boolean {
@@ -75,55 +103,58 @@ export class TestSuitesComponent implements OnInit, OnChanges {
 
   private initDataTable() {
     if (this.suitesDataTable) return;
-    this.suitesDataTable = $("#workflowSuites").DataTable({
-      "paging": true,
-      "lengthChange": true,
-      "lengthMenu": [5, 10, 20, 50, 75, 100],
-      "searching": false,
-      "ordering": true,
-      "order": [[1, 'asc']],
-      "columnDefs": [{
-        "targets": [0, 3, 4],
-        "orderable": false
-      }],
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
-      "deferRender": true,
-      // "scrollY": "520",
-      "stateSave": true,
-      language: {
-        search: "",
-        searchPlaceholder: "Filter your dashboard",
-        "decimal": "",
-        "emptyTable": "No suites associated to the current workflow",
-        "info": "Showing _START_ to _END_ of _TOTAL_ suites",
-        "infoEmpty": "Showing 0 to 0 of 0 suites",
-        "infoFiltered": "(filtered from a total of _MAX_ suites)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Show _MENU_ suites",
-        "loadingRecords": "Loading suites...",
-        "processing": "Processing suites...",
-        "zeroRecords": "No matching suites found",
-        "paginate": {
-          "first": "First",
-          "last": "Last",
-          "next": "Next",
-          "previous": "Previous"
+    this.suitesDataTable = $('#workflowSuites').DataTable({
+      paging: true,
+      lengthChange: true,
+      lengthMenu: [5, 10, 20, 50, 75, 100],
+      searching: false,
+      ordering: true,
+      order: [[1, 'asc']],
+      columnDefs: [
+        {
+          targets: [0, 3, 4],
+          orderable: false,
         },
-        "aria": {
-          "sortAscending": ": activate to sort column ascending",
-          "sortDescending": ": activate to sort column descending"
-        }
-      }
+      ],
+      info: true,
+      autoWidth: true,
+      responsive: false,
+      deferRender: false,
+      scrollX: 1200,
+      // "scrollY": "520",
+      stateSave: true,
+      language: {
+        search: '',
+        searchPlaceholder: 'Filter your dashboard',
+        decimal: '',
+        emptyTable: 'No suites associated to the current workflow',
+        info: 'Showing _START_ to _END_ of _TOTAL_ suites',
+        infoEmpty: 'Showing 0 to 0 of 0 suites',
+        infoFiltered: '(filtered from a total of _MAX_ suites)',
+        infoPostFix: '',
+        thousands: ',',
+        lengthMenu: 'Show _MENU_ suites',
+        loadingRecords: 'Loading suites...',
+        processing: 'Processing suites...',
+        zeroRecords: 'No matching suites found',
+        paginate: {
+          first: 'First',
+          last: 'Last',
+          next: 'Next',
+          previous: 'Previous',
+        },
+        aria: {
+          sortAscending: ': activate to sort column ascending',
+          sortDescending: ': activate to sort column descending',
+        },
+      },
     });
     // Add tooltip to the SearchBox
-    $("input[type=search]")
-      .attr('data-placement', 'top')
-      .attr('data-toggle', "tooltip")
-      .attr('data-html', "true")
-      .attr('title', "Filter by UUID or Name");
+    // $('input[type=search]')
+    //   .attr('data-placement', 'top')
+    //   .attr('data-toggle', 'tooltip')
+    //   .attr('data-html', 'true')
+    //   .attr('pTooltip', 'Filter by UUID or Name');
   }
 
   private destroyDataTable() {
@@ -152,12 +183,15 @@ export class TestSuitesComponent implements OnInit, OnChanges {
   }
 
   public updateSuite(suite: Suite) {
-    this.appService.updateSuite(suite).subscribe(() => {
-      suite['editingMode'] = false;
-      this.toastService.success("Test Suite updated!", '', { timeOut: 2500 });
-    },
+    this.appService.updateSuite(suite).subscribe(
+      () => {
+        suite['editingMode'] = false;
+        this.toastService.success('Test Suite updated!', '', { timeOut: 2500 });
+      },
       (error) => {
-        this.toastService.error("Unable to update test suite", '', { timeOut: 2500 });
+        this.toastService.error('Unable to update test suite', '', {
+          timeOut: 2500,
+        });
         this.logger.error(error);
       }
     );

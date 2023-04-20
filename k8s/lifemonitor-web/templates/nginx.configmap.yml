@@ -1,0 +1,396 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ include "lifemonitor-web.fullname" . }}-nginx-config
+    labels:
+        app.kubernetes.io/name: {{ include "lifemonitor-web.name" . }}
+        helm.sh/chart: {{ include "lifemonitor-web.chart" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+    app.conf: |-
+        # Set upstream server for the LifeMonitor Back-End
+        upstream api {
+            # fail_timeout=0 means we always retry an upstream even if it failed
+            # to return a good HTTP response
+            hash $binary_remote_addr consistent;  
+            server api-backend:8000 fail_timeout=0;
+            keepalive 32;
+        }
+
+        # Set upstream server for the LifeMonitor Back-End
+        upstream wss {
+            # fail_timeout=0 means we always retry an upstream even if it failed
+            # to return a good HTTP response
+            hash $binary_remote_addr consistent;
+            server api-wss:8001 fail_timeout=0;
+            keepalive 32;
+        }
+
+        map $http_upgrade $connection_upgrade {
+            default upgrade;
+            '' close;
+        }
+
+        # Log format globally enabled
+        # log_format extended   '$ip2location $remote_addr - $remote_user [$time_local] '
+        #                       '"$request" $status $body_bytes_sent '
+        #                       '"$http_referer" "$http_user_agent" "$http_x_forwarded_for"';
+
+        server {
+            server_name {{ .Values.externalServerName }};
+
+            # save logs here
+            access_log /var/log/nginx/app.access.log extended;
+            error_log /var/log/nginx/app.error.log error;
+
+            proxy_read_timeout 600;
+            proxy_connect_timeout 600;
+            proxy_send_timeout 600; 
+            
+            listen 4200;
+            client_max_body_size 4G;
+
+            # set the correct host(s) for your site
+            #server_name localhost;
+            keepalive_timeout 60;
+            etag on;
+            
+            # ssl_certificate /nginx/certs/lm.crt;
+            # ssl_certificate_key /nginx/certs/lm.key;
+
+            # force HTTP traffic to HTTPS
+            error_page  497 http://$host:4200$request_uri;
+
+            # expose standard nginx metrics
+            location /nginx-metrics {
+                stub_status on;
+            }
+
+            # expose extended metrics
+            location /metrics {
+                default_type text/html;
+                content_by_lua_block {
+                    metric_connections:set(ngx.var.connections_reading, {"reading"})
+                    metric_connections:set(ngx.var.connections_waiting, {"waiting"})
+                    metric_connections:set(ngx.var.connections_writing, {"writing"})
+                    prometheus:collect()
+                }
+            }
+        
+            # wrap api
+            location ^~ /api/  {
+                proxy_redirect          off;
+    
+                # set uppstream
+                proxy_pass              https://api/;
+
+                # rewrite headers
+                # proxy_pass_header     Server;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        X-Scheme $scheme;
+                
+                # proxy_http_version    1.1;
+                # proxy_set_header      Upgrade $http_upgrade;
+                # proxy_set_header      Connection 'upgrade';
+                proxy_set_header        Host $host;
+
+                # various proxy settings
+                proxy_connect_timeout   600;
+                proxy_read_timeout      600;
+                proxy_send_timeout      600;
+
+                # monitor requests
+                log_by_lua_block {
+                    update_metrics("webapp.api")
+                }
+            }
+
+            location ~ ^/(account|static|oauth2|jobs) {
+                # disable redirects
+                proxy_redirect          off;
+                
+                # set uppstream
+                proxy_pass              https://api;
+
+                # rewrite headers
+                # proxy_pass_header       Server;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        X-Scheme $scheme;
+                proxy_set_header        Host $host;
+
+                # various proxy settings
+                proxy_connect_timeout   600;
+                proxy_read_timeout      600;
+                proxy_send_timeout      600;
+                #proxy_intercept_errors  on;
+
+                # monitor requests
+                log_by_lua_block {
+                    update_metrics("webapp.api")
+                }
+            }
+
+            location /socket.io/ {
+                proxy_pass              https://wss;
+                proxy_http_version      1.1;
+                # proxy_pass_header     Server;
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        X-Scheme $scheme;
+                proxy_set_header        Upgrade $http_upgrade;
+                proxy_set_header        Connection $connection_upgrade;
+                proxy_set_header        Host $host;
+
+                # Callback di evento per le connessioni WebSocket
+                access_by_lua_block {
+                    http_websocket_connections_total:inc(1, {'webapp'})
+                }
+                log_by_lua_block {
+                    http_websocket_connections_total:inc(-1, {'webapp'})
+                }
+            }
+
+
+            location / {
+                # resolver 127.0.0.11 ipv6=off valid=30s;
+                proxy_redirect off;
+                
+                proxy_set_header        X-Real-IP $remote_addr;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        X-Scheme $scheme;
+                proxy_set_header        Host {{ .Values.externalServerName }};
+                #proxy_set_header        X-NginX-Proxy true;
+                
+                proxy_connect_timeout   600;
+                proxy_read_timeout      600;
+                proxy_send_timeout      600;
+                proxy_intercept_errors  on;
+
+                access_log off;
+
+                root   /app;
+                index  index.html index.htm;
+                try_files $uri $uri/ /index.html =404;
+            }
+        }
+
+
+    nginx.conf: |-
+        # Enables the use of JIT for regular expressions to speed-up their processing.
+        pcre_jit on;
+
+        # logs
+        pid        /var/log/nginx/nginx.pid;
+        error_log  /var/log/nginx/nginx.error.log;
+        
+
+
+        events {
+            worker_connections 1024;
+        }
+
+        http {
+            
+            include mime.types;
+
+            default_type application/octet-stream;
+
+            # Enables or disables the use of underscores in client request header fields.
+            # When the use of underscores is disabled, request header fields whose names contain underscores are marked as invalid and become subject to the ignore_invalid_headers directive.
+            # underscores_in_headers off;
+
+            proxy_headers_hash_max_size 512;
+            proxy_headers_hash_bucket_size 128;
+
+            # Define a verbose log format
+            log_format extended '$remote_addr '
+            '[$time_local, $http_x_request_timezone, "$http_x_request_country_long", "$http_x_request_country_short", "$http_x_request_region", "$http_x_request_city", $http_x_request_zipcode, "$http_x_request_isp", $http_x_request_latitude, $http_x_request_longitude] '
+            '"$request" $status $body_bytes_sent '
+            '"$http_referer" "$http_user_agent" "$http_x_request_domain"';
+
+            # Configure Log files
+            access_log /var/log/nginx/nginx.access.log extended;
+            error_log /var/log/nginx/nginx.error.log;
+
+            # Initialize Promethues Metrics
+            lua_shared_dict prometheus_metrics 10M;
+            
+                
+            init_worker_by_lua_block {
+                
+                -- init Promethues
+                prometheus = require("prometheus").init("prometheus_metrics")
+                
+                -- init ip2location
+                ip2location = require('ip2location')
+                ip2loc = ip2location:new('/usr/share/ip2location/DB11.IPV6.BIN')
+
+                -- init metrics
+                metric_requests = prometheus:counter(
+                    "nginx_http_requests_total", "Number of HTTP requests", {"host", "status"})
+                metric_latency = prometheus:histogram(
+                    "nginx_http_request_duration_seconds", "HTTP request latency", {"host"})
+                metric_connections = prometheus:gauge(
+                    "nginx_http_connections", "Number of HTTP connections", {"state"})
+
+                -- counters
+                http_requests_total = prometheus:counter(
+                    "http_requests_total", "Total number of HTTP requests", 
+                    {
+                        "server", "client_ip", "client_isp", "client_domain", 
+                        "client_country_short", "client_country_long", 
+                        "client_latitude", "client_longitude",
+                        "scheme", "method", "request", "request_type", "status"
+                    })
+
+                http_requests_client_error_total = prometheus:counter(
+                    "http_requests_client_error_total", "Total number of HTTP client errors", {"host", "method", "status"})
+
+                http_request_duration_seconds = prometheus:histogram(
+                    "http_request_duration_seconds", "HTTP request duration", {"host", "method", "status"})
+
+                http_websocket_connections_total = prometheus:gauge(
+                    "http_websocket_connections_total", "Total number of active websocket connections", {"name"})  
+
+
+                http_response_size_bytes = prometheus:histogram(
+                "http_response_size_bytes", "HTTP response size", {"status"})
+                http_requests_failed_total = prometheus:counter(
+                "http_requests_failed_total", "Total number of failed HTTP requests", {"method", "status"})
+                http_requests_redirect_total = prometheus:counter(
+                "http_requests_redirect_total", "Total number of redirected HTTP requests", {"method", "status"})
+                
+                http_requests_server_error_total = prometheus:counter(
+                "http_requests_server_error_total", "Total number of HTTP server errors", {"method", "status"})
+                http_request_size_bytes = prometheus:histogram(
+                "http_request_size_bytes", "HTTP request size", {"method"})
+                http_connections_total = prometheus:gauge(
+                "http_connections_total", "Total number of HTTP connections", {"type"})
+                http_connections_active = prometheus:gauge(
+                "http_connections_active", "Number of active HTTP connections", {"type"})
+                http_upstream_response_time_seconds = prometheus:histogram(
+                "http_upstream_response_time_seconds", "HTTP upstream response time", {"upstream"})
+                http_upstream_connections_total = prometheus:gauge(
+                "http_upstream_connections_total", "Total number of upstream connections", {"upstream"})
+                http_upstream_bytes_received_total = prometheus:counter(
+                "http_upstream_bytes_received_total", "Total number of bytes received from upstream", {"upstream"})
+                http_upstream_bytes_sent_total = prometheus:counter(
+                "http_upstream_bytes_sent_total", "Total number of bytes sent to upstream", {"upstream"})
+                http_cache_hit_total = prometheus:counter(
+                "http_cache_hit_total", "Total number of cache hits", {"status"})
+                http_cache_miss_total = prometheus:counter(
+                "http_cache_miss_total", "Total number of cache misses", {"status"})
+                http_cache_stale_total = prometheus:counter(
+                "http_cache_stale_total", "Total number of stale cache responses", {"status"})
+            }
+
+
+
+            init_by_lua_block {
+                
+                function update_metrics(request_type)
+                    local server_name = ngx.var.server_name 
+                    local client_ip = ngx.var.remote_addr       
+                    -- request
+                    local request_scheme = ngx.var.scheme
+                    local request_uri = ngx.var.uri
+                    local request_method = ngx.var.request_method
+                    local request_size = tonumber(ngx.var.request_length)
+                    local request_time = tonumber(ngx.var.request_time)
+                    -- detect request location
+                    local location = ip2loc:get_all('8.8.8.8')
+                    -- response
+                    local response_size = tonumber(ngx.var.bytes_sent)
+                    local response_status = tonumber(ngx.var.status)
+                    -- upstream
+                    local upstream = ngx.var.upstream_name        
+                    local upstream_response_time = tonumber(ngx.var.upstream_response_time)
+                    -- cache        
+                    local cache_status = ngx.var.upstream_cache_status
+                    
+                    -- update metrics
+                    metric_requests:inc(1, {server_name, response_status})
+                    metric_latency:observe(tonumber(request_time), {server_name})
+                    if response_status >= 400 and response_status < 500 then
+                        http_requests_client_error_total:inc(1, {server_name, request_method, response_status})
+                    elseif response_status >= 500 then
+                        http_requests_server_error_total:inc(1, {server_name, request_method, response_status})
+                    else
+                        http_requests_total:inc(1, {
+                            server_name, client_ip, location.isp, location.domain, 
+                            location.country_short, location.country_long, 
+                            location.latitude, location.longitude,
+                            request_scheme, request_method, request_uri, request_type, response_status
+                        })
+                        if string.find(request_uri, 'socket.io') then
+                            http_websocket_connections_total:inc(1, {'Socket X'})
+                        end
+                        -- http_request_duration_seconds:observe(request_time, {request_method, response_status})
+                        -- http_response_size_bytes:observe(response_size, {response_status})
+                        -- http_request_size_bytes:observe(request_size, {request_method})
+                        -- if response_status == 200 and cache_status == "MISS" then
+                        --    http_cache_miss_total:inc(1, {response_status})
+                        -- elseif response_status == 200 and cache_status == "HIT" then
+                        --    http_cache_hit_total:inc(1, {response_status})
+                        -- elseif response_status == 200 and cache_status == "STALE" then
+                        --    http_cache_stale_total:inc(1, {response_status})
+                        -- end
+                    end      
+
+                    -- client IP
+                    ngx.req.set_header('X-Request-IP', location.remote_addr)
+                    ngx.req.set_header('X-Request-ISP', location.isp)
+                    ngx.req.set_header('X-Request-Domain', location.domain)
+                    -- client region
+                    ngx.req.set_header('X-Request-Country-Short', location.country_short)
+                    ngx.req.set_header('X-Request-Country-Long', location.country_long)
+                    ngx.req.set_header('X-Request-Region', location.region)
+                    ngx.req.set_header('X-Request-City', location.city)
+                    ngx.req.set_header('X-Request-ZipCode', location.zipcode)
+                    ngx.req.set_header('X-Request-Timezone', location.timezone)
+                    -- client geo coordinates        
+                    ngx.req.set_header('X-Request-Latitude', location.latitude)
+                    ngx.req.set_header('X-Request-Longitude', location.longitude)
+                end
+            }
+
+
+            access_by_lua_block {
+                -- register_websocket('webappxxxxx', 'socket.io')
+                local server_name = ngx.var.server_name
+                local method = ngx.var.request_method
+                local status = tonumber(ngx.var.status)
+                local request_time = tonumber(ngx.var.request_time)
+                local response_size = tonumber(ngx.var.bytes_sent)
+                local upstream_response_time = tonumber(ngx.var.upstream_response_time)
+                local request_size = tonumber(ngx.var.request_length)
+                local upstream = ngx.var.upstream_name
+                local cache_status = ngx.var.upstream_cache_status
+                -- local location = ip2loc:get_all('8.8.8.8')
+            }
+
+            # See Move default writable paths to a dedicated directory (#119)
+            # https://github.com/openresty/docker-openresty/issues/119
+            client_body_temp_path /var/run/openresty/nginx-client-body;
+            proxy_temp_path /var/run/openresty/nginx-proxy;
+            fastcgi_temp_path /var/run/openresty/nginx-fastcgi;
+            uwsgi_temp_path /var/run/openresty/nginx-uwsgi;
+            scgi_temp_path /var/run/openresty/nginx-scgi;
+
+            sendfile on;
+            #tcp_nopush     on;
+
+            #keepalive_timeout  0;
+            keepalive_timeout 65;
+
+            #gzip  on;
+
+            include /etc/nginx/conf.d/*.conf;
+
+            # Don't reveal OpenResty version to clients.
+            # server_tokens off;
+        }
+

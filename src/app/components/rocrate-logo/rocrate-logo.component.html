@@ -1,8 +1,8 @@
 <div *ngIf="availableForDownload === true" style="margin-top: 40%;">
   <div class="d-none d-sm-none d-md-none d-lg-block">
-    <a [routerLink]="" (click)="downloadROCrate()" class="hvr-float-shadow" data-toggle="tooltip" data-placement="left"
+    <a [routerLink]="" (click)="downloadROCrate()" class="hvr-float-shadow" data-toggle="tooltip" tooltipPosition="bottom"
       data-html="true"
-      title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>click to download workflow <b>RO-Crate </b></span>">
+      pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to download<br><b>Workflow RO-Crate </b></div>">
       <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50" />
       <div style="margin-left: 60px; font-size: 0.9rem;">
         <span>Download</span>
@@ -22,8 +22,8 @@
 
 <div *ngIf="availableForDownload === false" style="margin-top: 40%;">
   <div class="d-none d-sm-none d-md-none d-lg-block">
-    <div class="text-muted text-center disabled" data-toggle="tooltip" data-html="true" data-placement="left"
-      title="Download not available" style="min-width: 175px; max-width: 175px;">
+    <div class="text-muted text-center disabled" data-toggle="tooltip" data-html="true" tooltipPosition="bottom"
+      pTooltip="Download not available" style="min-width: 175px; max-width: 175px;">
       <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50"
         style="filter: brightness(1) sepia(0) hue-rotate(10deg) saturate(0)" />
       <div class="text-right" style="font-size: 0.9rem;">

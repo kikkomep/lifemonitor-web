@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { AggregatedStatusStatsItem, StatsItem } from 'src/app/models/stats.model';
-import { Logger, LoggerManager } from 'typescript-logger';
+import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
   name: 'itemFilterPipe',

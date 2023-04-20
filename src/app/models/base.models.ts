@@ -30,11 +30,11 @@ export class Model {
   private _asObservable = this.subject.asObservable();
 
   // initialize logger
-  protected logger: Logger = LoggerManager.create("model");
+  protected logger: Logger = null;
 
   constructor(private rawData?: Object, skip?: []) {
-    this.update(rawData);
     this.logger = LoggerManager.create(this.constructor.name);
+    this.update(rawData);
   }
 
   public getRawData(): Object {
