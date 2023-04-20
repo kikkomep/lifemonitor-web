@@ -7,6 +7,9 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class LoaderComponent implements OnInit {
   @Input() enabled: boolean = true;
+  @Input() marginTop: string = 'auto';
+  @Input() loadingText: string = '';
+  @Input() loadingProgress: number = null;
 
   constructor() {}
 

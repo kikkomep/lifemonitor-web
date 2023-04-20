@@ -9,10 +9,10 @@ export const AggregatedTestStatus = [
 ];
 
 export const AggregatedTestStatusMap = {
-  'all_failing': ['failing', 'all_failing', 'allfailing'],
-  'all_passing': ['passing', 'all_passing', 'allpassing'],
-  'some_passing': ['some_passing', 'somepassing'],
-  'unknown': ['unavailable', 'unknown']
+  all_failing: ['failing', 'all_failing', 'allfailing'],
+  all_passing: ['passing', 'all_passing', 'allpassing'],
+  some_passing: ['some_passing', 'somepassing'],
+  unknown: ['unavailable', 'unknown'],
 };
 
 export const TestStatus = [
@@ -66,8 +66,10 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
   }
 
   public update(rawData: Object) {
-    super.update(rawData);
-    this.setNameFromProperty(rawData, 'name', rawData['uuid']);
+    if (rawData) {
+      super.update(rawData);
+      this.setNameFromProperty(rawData, 'name', rawData['uuid']);
+    }
   }
 
   getStatus(): string {
@@ -110,8 +112,14 @@ export class AggregatedStatusStatsItem extends Model implements StatsItem {
       ) {
         status = this.status as string;
       }
+    } else if (this['version'] && this['version']['status']) {
+      return this['version']['status']['aggregate_test_status'];
     }
     return status == 'unavailable' ? 'unknown' : status;
+  }
+
+  public get statusText(): string {
+    return this.aggregatedStatus.replace('_', ' ');
   }
 }
 
@@ -197,6 +205,18 @@ export class AbstractStats extends Model {
     this.notifyChanges();
   }
 
+  public getStatsLength(items: StatsItem[], filter: string): number {
+    if (!items) return 0;
+    if (filter && filter !== '______ALL_____') {
+      items = items.filter(
+        (v) =>
+          v.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0 ||
+          v.uuid.toLowerCase().indexOf(filter.toLowerCase()) >= 0
+      );
+    }
+    return items.length;
+  }
+
   public clear(): void {
     for (let k of this._statuses) {
       this[k].length = 0;
@@ -267,6 +287,10 @@ export class StatusStatsItem extends Model implements StatsItem {
     if (['aborted'].includes(this.getStatus())) return 'fas fa-ban';
     if (['running'].includes(this.getStatus())) return 'fas fa-sync';
     return 'fas fa-question-circle';
+  }
+
+  public get statusText(): string {
+    return this.getStatus()?.replace('_', ' ');
   }
 }
 

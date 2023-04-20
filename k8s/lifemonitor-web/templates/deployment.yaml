@@ -30,7 +30,16 @@ spec:
           volumeMounts:
             - name: frontend-config
               mountPath: /app/assets/config.json
-              subPath: config.json
+              subPath: config.json            
+            - name: nginx-config
+              mountPath: /usr/local/openresty/nginx/conf/nginx.conf
+              subPath: nginx.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/webapp.prod.conf
+              subPath: app.conf
+            - name: logs-storage
+              mountPath: /var/log/nginx
+
           # livenessProbe:
           #   httpGet:
           #     path: /
@@ -46,6 +55,12 @@ spec:
           configMap:
             name: {{ include "lifemonitor-web.fullname" . }}-frontend-config
             defaultMode: 0644
+        - name: nginx-config
+          configMap:
+            name: {{ include "lifemonitor-web.fullname" . }}-nginx-config
+            defaultMode: 0644  
+        - name: logs-storage
+          emptyDir: {}
     {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

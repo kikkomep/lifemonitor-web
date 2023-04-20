@@ -1,8 +1,9 @@
 :host {
-  min-width: 100vw;
-  min-height: 100vh;
+  height: 100%;
+  width: 100%;
 }
 
 .content-wrapper {
-  min-height: calc(100vh - 136px);
+  // min-height: calc(100vh - 506px);
+  margin: 80px 0;
 }

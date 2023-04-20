@@ -5,9 +5,14 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ServiceWorkerModule } from '@angular/service-worker';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { SocketIoModule } from 'ngx-socket-io';
+
 import { ChartsModule } from 'ng2-charts';
 import { ToastrModule } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppButtonComponent } from './components/app-button/app-button.component';
@@ -21,6 +26,7 @@ import { TestInstancesComponent } from './components/test-instances/test-instanc
 import { TestSuitesComponent } from './components/test-suites/test-suites.component';
 import { WorkflowHeaderComponent } from './components/workflow-header/workflow-header.component';
 import { WorkflowUploaderComponent } from './components/workflow-uploader/workflow-uploader.component';
+import { WorkflowVersionSelectorComponent } from './components/workflow-version-selector/workflow-version-selector.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { FooterComponent } from './pages/main/footer/footer.component';
@@ -30,22 +36,36 @@ import { NotificationsDropdownMenuComponent } from './pages/main/header/notifica
 import { UserDropdownMenuComponent } from './pages/main/header/user-dropdown-menu/user-dropdown-menu.component';
 import { MainComponent } from './pages/main/main.component';
 import { MenuSidebarComponent } from './pages/main/menu-sidebar/menu-sidebar.component';
-import { RegisterComponent } from './pages/register/register.component';
+
 import { ArraySizeFilterPipe } from './utils/filters/array-size-filter.pipe';
+
+import { DataTablesModule } from 'angular-datatables';
+import { BaseDataViewComponent } from './components/base-data-view/base-data-view.component';
+import { ScrollComponent } from './components/scroll/scroll.component';
+import { LogoutComponent } from './pages/logout/logout.component';
 import { ItemFilterPipe } from './utils/filters/item-filter.pipe';
+import { OrderByPipe } from './utils/filters/orderby.pipe';
 import { SortingFilterPipe } from './utils/filters/sorting-filter.pipe';
 import { SortingNotificationFilterPipe } from './utils/filters/sorting-notification-filter.pipe';
 import { StatsFilterPipe } from './utils/filters/stats-filter.pipe';
+import { TrimPipe } from './utils/filters/trim.pipe';
+import { WorkflowOrderByPipe } from './utils/filters/workflow-orderby.pipe';
 import { HttpErrorInterceptor } from './utils/interceptors/http-error.interceptor';
 import { AppConfigService } from './utils/services/config.service';
 import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
-import { WorkflowVersionSelectorComponent } from './components/workflow-version-selector/workflow-version-selector.component';
-import { TrimPipe } from './utils/filters/trim.pipe';
 
-
+// PrimeNG Modules
+// import { ChartModule } from 'primeng/chart';
+import { ButtonModule } from 'primeng/button';
+import { DataViewModule } from 'primeng/dataview';
+import { DropdownModule } from 'primeng/dropdown';
+import { PaginatorModule } from 'primeng/paginator';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -65,7 +85,6 @@ export function initConfigService(appConfig: AppConfigService) {
     FooterComponent,
     MenuSidebarComponent,
     BlankComponent,
-    RegisterComponent,
     DashboardComponent,
     MessagesDropdownMenuComponent,
     NotificationsDropdownMenuComponent,
@@ -77,6 +96,8 @@ export function initConfigService(appConfig: AppConfigService) {
     TestSuitesComponent,
     SuiteComponent,
     TestInstancesComponent,
+    OrderByPipe,
+    WorkflowOrderByPipe,
     StatsFilterPipe,
     ItemFilterPipe,
     SortingNotificationFilterPipe,
@@ -90,8 +111,21 @@ export function initConfigService(appConfig: AppConfigService) {
     InputDialogComponent,
     WorkflowUploaderComponent,
     WorkflowVersionSelectorComponent,
+    LogoutComponent,
+    ScrollComponent,
+    BaseDataViewComponent,
   ],
   imports: [
+    // PrimeNg Modules
+    // ChartModule,
+    DropdownModule,
+    DataViewModule,
+    TableModule,
+    ButtonModule,
+    PaginatorModule,
+    TooltipModule,
+    ProgressBarModule,
+    DataTablesModule,
     FormsModule,
     BrowserModule,
     AppRoutingModule,
@@ -105,6 +139,13 @@ export function initConfigService(appConfig: AppConfigService) {
     }),
     ChartsModule,
     NgbModule,
+    SocketIoModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
   providers: [
     AppConfigService,
@@ -114,6 +155,7 @@ export function initConfigService(appConfig: AppConfigService) {
       deps: [AppConfigService],
       multi: true,
     },
+    // ApiSocketService,
     {
       // interceptor for HTTP errors
       provide: HTTP_INTERCEPTORS,
@@ -123,4 +165,4 @@ export function initConfigService(appConfig: AppConfigService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

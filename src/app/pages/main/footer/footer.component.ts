@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppConfigService } from 'src/app/utils/services/config.service';
-import { version } from '../../../../../package.json';
+import packageInfo from '../../../../../package.json';
 
 @Component({
   selector: 'app-footer',
@@ -8,10 +8,10 @@ import { version } from '../../../../../package.json';
   styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent implements OnInit {
-  public appVersion = version;
+  public appVersion = packageInfo.version;
   public backendBaseUrl: string = null;
   constructor(private appConfig: AppConfigService) {
-    this.backendBaseUrl = this.appConfig.getConfig()['apiBaseUrl'];
+    this.backendBaseUrl = this.appConfig.apiBaseUrl;
   }
 
   ngOnInit() { }

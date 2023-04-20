@@ -1,12 +1,10 @@
 #loader {
-  bottom: 400px;
-  height: 175px;
   left: 0;
   margin: auto;
   position: absolute;
   right: 0;
-  top: 0;
-  width: 175px;
+  top: calc((100% - 460px) / 2);
+  width: calc(100% / 1.2);
 }
 
 #loader .dot {
@@ -17,7 +15,7 @@
   position: absolute;
   right: 0;
   top: 0;
-  width: 87.5px;
+  width: calc(100% / 4);
 }
 
 #loader .dot::before {
@@ -29,7 +27,7 @@
   right: 0;
   top: 0;
   transform: scale(0);
-  width: 87.5px;
+  width: calc(100% / 2);
 }
 
 #loader .dot:nth-child(7n + 1) {
@@ -107,12 +105,14 @@
 #loader .loading {
   background-position: 50% 50%;
   background-repeat: no-repeat;
-  bottom: -40px;
-  height: 20px;
-  left: 0;
-  position: absolute;
-  right: 0;
-  width: 500px;
+  // position: absolute;
+  width: 100%;
+  // margin-top: -25px;
+  margin: auto;
+  // height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes load {
@@ -131,4 +131,6 @@
 
 .spinner-message {
   text-align: center;
+  font-size: larger;
+  font-weight: bold;
 }

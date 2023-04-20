@@ -22,14 +22,19 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": true,
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
-              "./node_modules/chart.js/dist/Chart.min.css",
+              "./node_modules/primeicons/primeicons.css",
+              "./node_modules/primeng/resources/primeng.min.css",
               "./node_modules/bs-stepper/dist/css/bs-stepper.min.css",
               "./node_modules/bootstrap-select/dist/css/bootstrap-select.min.css",
               "./node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css",
               "./node_modules/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css",
+              "src/ngstyles.css",
               "src/styles.scss"
             ],
             "scripts": [
@@ -44,7 +49,23 @@
               "./node_modules/datatables.net-buttons/js/buttons.html5.min.js",
               "./node_modules/datatables.net-buttons/js/buttons.print.min.js",
               "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
-              "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"
+              "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js",
+              "./node_modules/chart.js/dist/Chart.js",
+              "./node_modules/swiped-events/dist/swiped-events.min.js"
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true,
+            "webWorkerTsConfig": "tsconfig.worker.json",
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json",
+            "allowedCommonJsDependencies": [
+              "deep-equal",
+              "crypto-js",
+              "chart.js"
             ]
           },
           "configurations": {
@@ -74,8 +95,17 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -85,8 +115,12 @@
           "configurations": {
             "production": {
               "browserTarget": "lifemonitor:build:production"
+            },
+            "development": {
+              "browserTarget": "lifemonitor:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -101,9 +135,14 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest"
+            ],
             "styles": ["src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "webWorkerTsConfig": "tsconfig.worker.json"
           }
         },
         "lint": {

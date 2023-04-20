@@ -1,0 +1,21 @@
+.header-title {
+  font-size: 2rem;
+  margin-top: 3px;
+  margin-left: 3.5px;
+}
+
+.header-title-icon {
+  max-width: 50px;
+  text-align: center;
+}
+
+.header-title-text {
+  margin-left: -2px;
+}
+
+@media screen and (max-width: 992px) {
+  .header-title {
+    margin-top: 0;
+    margin-left: 0;
+  }
+}

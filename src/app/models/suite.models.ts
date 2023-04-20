@@ -16,19 +16,29 @@ export class Suite extends AggregatedStatusStatsItem {
 
   constructor(public workflow: WorkflowVersion, rawData: object) {
     super(rawData);
-    this.setNameFromProperty(rawData, "name", rawData['roc_suite']);
+    this.setNameFromProperty(rawData, 'name', rawData['roc_suite']);
   }
 
   public update(rawData: Object) {
-    super.update(rawData);
-    this.setNameFromProperty(rawData, "name", rawData['roc_suite']);
+    if (rawData) {
+      super.update(rawData);
+      this.setNameFromProperty(rawData, 'name', rawData['roc_suite']);
+    }
   }
 
   public asUrlParam() {
-    return Suite.getUrlParam(this.workflow.uuid, this.workflow.version["version"], this.uuid);
+    return Suite.getUrlParam(
+      this.workflow.uuid,
+      this.workflow.version['version'],
+      this.uuid
+    );
   }
 
-  public static getUrlParam(workflow_uuid: string, workflow_version: string, suite_uuid: string): string {
+  public static getUrlParam(
+    workflow_uuid: string,
+    workflow_version: string,
+    suite_uuid: string
+  ): string {
     return btoa(
       JSON.stringify({
         workflow: workflow_uuid,

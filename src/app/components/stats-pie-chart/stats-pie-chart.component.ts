@@ -1,13 +1,19 @@
 import {
-  ChangeDetectorRef, Component,
-  Input, OnChanges, OnInit, SimpleChanges
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  Input,
+  NgZone,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
 } from '@angular/core';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Label } from 'ng2-charts';
 import {
   AbstractStats,
   AggregatedStatusStats,
-  InstanceStats
+  InstanceStats,
 } from 'src/app/models/stats.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 
@@ -15,13 +21,13 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
   selector: 'stats-pie-chart',
   templateUrl: './stats-pie-chart.component.html',
   styleUrls: ['./stats-pie-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatsPieChartComponent implements OnInit, OnChanges {
-  @Input() stats!: AbstractStats;
+  _stats: AbstractStats = null;
 
   // initialize logger
   private logger: Logger = LoggerManager.create('StatsPieChartComponent');
-
 
   public pieChartOptions: ChartOptions = {
     responsive: true,
@@ -69,50 +75,68 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   public pieChartLegend = false;
   public pieChartPlugins = [];
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
-  ngOnChanges(changes: SimpleChanges): void {
+  @Input()
+  set stats(stats: AbstractStats) {
+    this._stats = stats;
     this.update();
   }
+
+  get stats(): AbstractStats {
+    return this._stats;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {}
 
   ngAfterViewInit() {
     this.logger.debug('after view init ' + this.stats);
   }
 
   public update() {
-    if (this.stats) {
-      this.pieChartLabels = this.getLabels();
-      this.pieChartData = [
-        {
-          data: this.data,
-          backgroundColor: this.getColors(),
-        },
-      ];
-      // this.cdr.detectChanges();
-      this.logger.debug(
-        'workflow pie data',
-        this.pieChartData,
-        this.pieChartLabels,
-        this.stats
-      );
-    }
+    this.zone.runOutsideAngular(() => {
+      if (this.stats) {
+        this.pieChartLabels = this.getLabels();
+        this.pieChartData = [
+          {
+            data: this.data,
+            backgroundColor: this.getColors(),
+          },
+        ];
+        // this.cdr.detectChanges();
+        this.logger.debug(
+          'workflow pie data',
+          this.pieChartData,
+          this.pieChartLabels,
+          this.stats
+        );
+      }
+    });
   }
 
   public getColors() {
     return this.stats instanceof AggregatedStatusStats
       ? ['#1f8787', '#f9b233', '#dc3545', 'grey']
       : this.stats instanceof InstanceStats
-        ? ['#1f8787', '#dc3545', '#ffc107', '#6c757d', '#17a2b8', '#fd7e14', 'grey']
-        : ['#D5D8DC'];
+      ? [
+          '#1f8787',
+          '#dc3545',
+          '#ffc107',
+          '#6c757d',
+          '#17a2b8',
+          '#fd7e14',
+          'grey',
+        ]
+      : ['#D5D8DC'];
   }
 
   public getLabels() {
     return this.stats instanceof AggregatedStatusStats
       ? [['Passing'], ['Some passing'], ['Failing'], ['Unavailable']]
       : this.stats instanceof InstanceStats
-        ? [
+      ? [
           ['Passed'],
           ['Failed'],
           ['Error'],
@@ -121,7 +145,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
           ['Waiting'],
           ['Unavailable'],
         ]
-        : [['Unknown']];
+      : [['Unknown']];
   }
 
   public get data(): Array<number> {
@@ -134,7 +158,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
     } else {
       data.push(1);
     }
-    this.logger.debug('Data', data);
+    this.logger.debug('Data', data, this.stats);
     return data;
   }
 }

@@ -3,88 +3,174 @@
     <i class="fas fa-caret-left" style="margin: 0px 2px 0 15px"></i> workflow
   </a>
 </div>
-<div class="card card-primary card-outline">
+<div class="card">
   <div *ngIf="!testInstances" class="overlay dark">
     <i class="fas fa-3x fa-sync-alt"></i>
   </div>
-  <div class="card-body box-profile">
-    <!-- /.card-header -->
-    <div class="card-body mt-4 p-0" style="min-height: 860px;">
-      <table id="suiteInstances" class="table table-striped" #suiteInstances>
-        <thead>
-          <tr>
-            <th style="width: 10px" scope="col"></th>
-            <th class="">Test Instances</th>
-            <th class="text-center" scope="col">Engine</th>
-            <th class="text-center" scope="col" style="width: 100px">
-              Platform
-            </th>
-            <th class="text-center" scope="col" style="width: 300px;">Latest Builds</th>
-          </tr>
-        </thead>
-        <tbody *ngIf="testInstances">
-          <tr *ngFor="
-              let testInstance of testInstances;
-              index as i;
-              first as isFirst
-            ">
-            <td [ngClass]="testInstance.class">
-              <i class="{{ testInstance.statusIcon }} fa-2x"></i>
-            </td>
-            <td class="align-middle">
-              <div class="font-weight-light text-lg">
-                <input *ngIf="testInstance.editingMode" type="text" [(ngModel)]="testInstance.name"
-                  class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
-                  placeholder="Enter suite name" (keyup.enter)="updateTestInstance(testInstance)"
-                  (keyup.esc)="restoreTestInstance(testInstance)" autofocus>
-                <a *ngIf="!testInstance.editingMode" style="color: black; font-size: larger"
-                  (click)="showTestInstanceDetails(testInstance)" (dblclick)="enableTestInstanceEditing(testInstance)"
-                  data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
+
+  <p-dataView #instancesDataView [value]="testInstances" [paginator]="true" [rows]="10" layout="list">
+    <ng-template pTemplate="header">
+      <div class="d-block">
+        <div class="text-sm-center text-md-right p-4">
+          <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
+        </div>
+        <div class="d-flex">
+          <div class="d-inline row instance-list-item mt-4" *ngIf="dataView && dataView.layout === 'list'">
+            <div class="col-3 col-sm-1 col-lg-1 d-inline-block instance-list-item-header"></div>
+            <div class="col-9 col-sm-11 col-md-6 col-lg-5 d-inline-block instance-list-item-header text-left">Test
+              Instance</div>
+            <div class="col-2 col-xl-1 d-none d-lg-inline-block instance-list-item-header">Engine</div>
+            <div class="col-2 d-none d-xl-inline-block instance-list-item-header">Testing Service</div>
+            <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block instance-list-item-header">Latest Test Builds
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template let-instance pTemplate="listItem">
+      <div class="d-flex">
+        <div class="d-inline-flex row instance-list-item">
+          <div class="col-2 col-sm-1 col-lg-1 d-inline-block text-center">
+            <div class="instance-grid-item-status" [ngClass]="instance.class" [pTooltip]="instance.statusText"
+              tooltipPosition="top" showDelay="1500">
+              <i class="{{ instance.statusIcon }} fa-2x"></i>
+            </div>
+          </div>
+          <div class="col-10 col-sm-11 col-md-6 col-lg-5 d-inline-block">
+            <div class="instance-name">
+              <input *ngIf="instance.editingMode" type="text" [(ngModel)]="instance.name"
+                class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
+                placeholder="Enter suite name" (keyup.enter)="updateTestInstance(instance)"
+                (keyup.esc)="restoreTestInstance(instance)" autofocus>
+              <a *ngIf="!instance.editingMode" style="color: black; font-size: larger"
+                (click)="showTestInstanceDetails(instance)" (dblclick)="enableTestInstanceEditing(instance)"
+                data-html="true" data-toggle="tooltip" tooltipPosition="top" pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>see on <b>{{instance.service.type}}</b><i class='fas fa-external-link-alt mx-1'></i>
+                    {{ isEditable(instance) ? 'or double click to edit' : ''}}</div>">
+                <div>{{ instance.name }}</div>
+              </a>
+            </div>
+            <div class="instance-uuid text-sm">
+              <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
+              <b>uuid:</b> {{ instance.uuid }}
+            </div>
+            <div class="instance-url text-sm cut-text">
+              <i class="fas fa-xs fa-external-link-alt mr-1"></i>
+              <b>url:</b> {{ instance.externalLink }}
+            </div>
+          </div>
+          <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">
+            <div class="text-center instance-list-item-engine-type" data-html="true" data-toggle="tooltip"
+              tooltipPosition="top" showDelay="2000"
+              pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</div>">
+              <img *ngIf="instance.suite && instance.suite.engineIcon" src="{{ instance.suite.engineIcon }}"
+                width="100" />
+              <i *ngIf="!(instance.suite && instance.suite.engineIcon)"
+                class="far fa-question-circle fa-2x mr-3 text-muted"></i>
+            </div>
+          </div>
+          <div class="col-2 d-none d-xl-inline-block text-center">
+            <div class="text-center instance-list-item-service-type" data-html="true" data-toggle="tooltip"
+              tooltipPosition="top" showDelay="2000"
+              pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
+              <a href="{{ instance.service.url }}">
+                <img src="{{ instance.platformIcon }}" height="60px" />
+              </a>
+            </div>
+          </div>
+          <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block">
+            <div class="instance-list-item-builds-chart">
+              <stats-bar-chart [stats]="instance.getLatestBuilds() | arraySizeFilterPipe: 10"
+                (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </ng-template>
+    <ng-template let-instance pTemplate="gridItem">
+      <div class="col-lg-4 col-md-6 d-inline-block">
+        <div class="instance-grid-item">
+          <div class="instance-grid-item-top">
+            <div class="instance-grid-item-edit-action" *ngIf="isEditable(instance)">
+              <i class="far fa-edit" aria-hidden="true" (click)="enableTestInstanceEditing(instance)"></i>
+            </div>
+          </div>
+          <div class="instance-grid-item-content">
+            <div class="instance-grid-item-status" [ngClass]="instance.class">
+              <i class="{{ instance.statusIcon }} fa-2x"></i>
+            </div>
+
+            <!-- Suite Name -->
+            <div class="instance-name">
+              <input *ngIf="instance.editingMode" type="text" [(ngModel)]="instance.name"
+                class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
+                placeholder="Enter suite name" (keyup.enter)="updateTestInstance(instance)"
+                (keyup.esc)="restoreTestInstance(instance)" autofocus>
+              <a *ngIf="!instance.editingMode" style="color: black; font-size: larger"
+                (click)="showTestInstanceDetails(instance)" (dblclick)="enableTestInstanceEditing(instance)"
+                data-html="true" data-toggle="tooltip" data-placement="top" title="<span class='text-xs'>
                     <i class='fas fa-question-circle mx-1'></i>
-                    see on <b>{{testInstance.service.type}}</b>
+                    see on <b>{{instance.service.type}}</b>
                     <i class='fas fa-external-link-alt mx-1'></i>
-                    {{ isEditable(testInstance) ? '<br/>or double click to edit' : ''}}</span>">
-                  <div>{{ testInstance.name }}</div>
-                </a>
-                <div class="text-sm">
-                  <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
-                  <b>uuid:</b> {{ testInstance.uuid }}
-                </div>
-                <div class="text-sm cut-text">
-                  <i class="fas fa-xs fa-external-link-alt mr-1"></i>
-                  <b>url:</b> {{ testInstance.externalLink }}
-                </div>
-              </div>
-            </td>
-            <td class="text-center align-middle font-weight-light h-100">
-              <div class="text-center" data-html="true" data-toggle="tooltip" data-placement="top"
-                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.suite.engineType}}</b> engine</span>">
-                <img *ngIf="testInstance.suite && testInstance.suite.engineIcon"
-                  src="{{ testInstance.suite.engineIcon }}" width="100" />
-                <i *ngIf="!(testInstance.suite && testInstance.suite.engineIcon)"
+                    {{ isEditable(instance) ? '<br/>or double click to edit' : ''}}</span>">
+                <div>{{ instance.name }}</div>
+              </a>
+            </div>
+
+            <!-- Suite Identifier -->
+            <div class="instance-identifier text-sm">
+              <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
+              <b>uuid:</b> {{ instance.uuid }}
+            </div>
+            <div class="text-sm cut-text m-auto">
+              <i class="fas fa-xs fa-external-link-alt mr-1"></i>
+              <b>url:</b> {{ instance.externalLink }}
+            </div>
+
+            <!-- Engine Type -->
+            <div class="instance-grid-item-engine">
+              <div class="text-sm">engine</div>
+              <div class="text-center instance-grid-item-engine-type" data-html="true" data-toggle="tooltip"
+                tooltipPosition="bottom"
+                pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</span>">
+                <img *ngIf="instance.suite && instance.suite.engineIcon" src="{{ instance.suite.engineIcon }}"
+                  width="100" />
+                <i *ngIf="!(instance.suite && instance.suite.engineIcon)"
                   class="far fa-question-circle fa-2x mr-3 text-muted"></i>
               </div>
-            </td>
-            <td class="text-center align-middle font-weight-light h-100">
-              <div class="text-center" data-html="true" data-toggle="tooltip" data-placement="top"
-                title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{testInstance.service.type}}</b> service</span>">
-                <a href="{{ testInstance.service.url }}">
-                  <img src="{{ testInstance.platformIcon }}" height="60px" />
+            </div>
+
+            <!-- Testing Service Typpe -->
+            <div class="instance-grid-item-instances">
+              <div class="text-sm">platform</div>
+              <div class="text-center instance-grid-item-service-type" data-html="true" data-toggle="tooltip"
+                tooltipPosition="bottom"
+                pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
+                <a href="{{ instance.service.url }}">
+                  <img src="{{ instance.platformIcon }}" height="60px" />
                 </a>
               </div>
-            </td>
-            <td class="text-center align-middle font-weight-light" width="300">
-              <stats-bar-chart [stats]="testInstance.getLatestBuilds() | arraySizeFilterPipe: 10"
-                (selectedItem)="selectTestBuild($event)">
-              </stats-bar-chart>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div *ngIf="!testInstances || testInstances.length == 0" class="p-4">&nbsp;</div>
-    </div>
-    <!-- /.card-body -->
-  </div>
+            </div>
+
+            <!-- Engine Type -->
+            <div class="instance-grid-item-builds">
+              <div class="text-smx">Latest Test Builds</div>
+              <div class="instance-grid-item-builds-chart">
+                <stats-bar-chart [stats]="instance.getLatestBuilds() | arraySizeFilterPipe: 10"
+                  (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+              </div>
+            </div>
+
+          </div>
+          <div class="instance-grid-item-bottom">
+            <button pButton type="button" iconPos="left" class="p-button-md" label="Details" icon="fa fa-info-circle"
+              (click)="showTestInstanceDetails(instance)"></button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-dataView>
+
   <!-- /.card-body -->
 </div>
 <!-- /.card -->

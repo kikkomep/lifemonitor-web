@@ -1,26 +1,28 @@
-import { AppConfigService } from './../../../../utils/services/config.service';
 import {
   Component,
   ElementRef,
   HostListener,
+  OnDestroy,
   OnInit,
   Renderer2,
   ViewChild,
 } from '@angular/core';
+import { AppConfigService } from './../../../../utils/services/config.service';
 
-import { ApiService } from 'src/app/utils/services/api.service';
-import { AuthService } from 'src/app/utils/services/auth.service';
-import { User } from 'src/app/models/user.modes';
 import { Router } from '@angular/router';
+import { User } from 'src/app/models/user.modes';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
+import { AppService } from 'src/app/utils/services/app.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-user-dropdown-menu',
   templateUrl: './user-dropdown-menu.component.html',
   styleUrls: ['./user-dropdown-menu.component.scss'],
 })
-export class UserDropdownMenuComponent implements OnInit {
+export class UserDropdownMenuComponent implements OnInit, OnDestroy {
   public user: User;
+  private userSubscription: Subscription;
 
   // initialize logger
   private logger: Logger = LoggerManager.create('UserDropdownMenuComponent');
@@ -34,19 +36,32 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   constructor(
-    private elementRef: ElementRef,
-    private renderer: Renderer2,
-    private authService: AuthService,
-    private apiService: ApiService,
+    private appService: AppService,
     private config: AppConfigService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
-    this.apiService.get_current_user().subscribe((data) => {
-      this.logger.debug('Current user', data);
-      this.user = data;
+    this.userSubscription = this.appService.observableUser.subscribe(
+      (user: User) => {
+        this.user = user;
+        this.logger.debug('Current user', user);
+        // alert('Dropdown notified');
+      }
+    );
+    this.appService.checkIsUserLogged().then((logged) => {
+      if (logged) {
+        this.appService.loadUserProfile().subscribe((user) => {
+          this.user = user;
+        });
+      }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) this.userSubscription.unsubscribe();
   }
 
   toggleDropdownMenu() {
@@ -58,7 +73,7 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   public get profileUrl(): string {
-    return this.config.getConfig()['apiBaseUrl'] + '/profile?back=true';
+    return this.config.apiBaseUrl + '/account/profile?back=true';
   }
 
   public openProfile() {
@@ -75,8 +90,6 @@ export class UserDropdownMenuComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout();
-    this.logger.debug('User logout... redirecting');
-    this.router.navigateByUrl('/dashboard');
+    this.router.navigateByUrl('/logout');
   }
 }

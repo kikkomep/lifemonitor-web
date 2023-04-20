@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  logLevel: "INFO",
   // 'apiBaseUrl': base URL of the LifeMonitor API instance
   //               (e.g., https://api.lifemonitor.eu)
   // apiBaseUrl: '<LIFEMONITOR_API_BASE_URL>',

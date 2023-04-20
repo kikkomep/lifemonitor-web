@@ -1,30 +1,33 @@
 import {
   ChangeDetectorRef,
   Component,
+  Inject,
   OnChanges,
   OnInit,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Location } from '@angular/common';
+import { DOCUMENT, Location, ViewportScroller } from '@angular/common';
 import {
   AggregatedStatusStatsItem,
   AggregatedTestStatusMap,
-  StatusStatsItem
+  StatusStatsItem,
 } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
-
+import { BaseDataViewComponent } from 'src/app/components/base-data-view/base-data-view.component';
 
 @Component({
   selector: 'app-workflow',
   templateUrl: './workflow.component.html',
   styleUrls: ['./workflow.component.scss'],
 })
-export class WorkflowComponent implements OnInit, OnChanges {
+export class WorkflowComponent
+  extends BaseDataViewComponent
+  implements OnInit, OnChanges {
   // current workflow
   public workflow: WorkflowVersion;
   // suites of the current workflow
@@ -50,8 +53,12 @@ export class WorkflowComponent implements OnInit, OnChanges {
     private router: Router,
     private location: Location,
     // private apiService: ApiService,
-    private appService: AppService
-  ) { }
+    private appService: AppService,
+    protected readonly viewport: ViewportScroller,
+    @Inject(DOCUMENT) protected readonly document: Document
+  ) {
+    super(viewport, document);
+  }
 
   ngOnInit() {
     this.logger.debug('Created component Workflow');
@@ -65,33 +72,34 @@ export class WorkflowComponent implements OnInit, OnChanges {
           .asObservable()
           .subscribe((change) => {
             if (this.statusFilter)
-              this.suites = this.workflow.suites[this.statusFilter]
+              this.suites = this.workflow.suites[this.statusFilter];
             else this.suites = this.workflow.suites.all;
             this.cdr.detectChanges();
             this.logger.debug('Handle change', change);
           });
         if (this.workflow.suites) {
           if (this.statusFilter)
-            this.suites = this.workflow.suites[this.statusFilter]
+            this.suites = this.workflow.suites[this.statusFilter];
           else this.suites = this.workflow.suites.all;
         }
       }
     );
 
-    this.queryParamsSubscription = this.route.queryParams
-      .subscribe(params => {
-        console.debug("Query params: ", params);
+    this.queryParamsSubscription = this.route.queryParams.subscribe(
+      (params) => {
+        this.logger.debug('Query params: ', params);
         if ('status' in params) {
           // Parse and normalize status filter
           let status: string = params['status'].toLowerCase();
-          console.debug("Status: ", status);
+          console.debug('Status: ', status);
           for (let s in AggregatedTestStatusMap) {
             if (s === status || AggregatedTestStatusMap[s].includes(status)) {
               this.statusFilter = s;
             }
           }
         }
-      });
+      }
+    );
 
     this.internalParamSubscription = this.route.params.subscribe((params) => {
       // select a workflow
@@ -105,7 +113,7 @@ export class WorkflowComponent implements OnInit, OnChanges {
   }
 
   public set suiteNameFilter(value: string) {
-    this._suiteNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
+    this._suiteNameFilter = value ? value.replace('SEARCH_KEY###', '') : '';
   }
 
   public get suiteNameFilter(): string {

@@ -1,0 +1,31 @@
+:host ::ng-deep {
+  .white-badge {
+    color: white !important;
+    background-color: white !important;
+  }
+
+  .version-option {
+    margin: auto;
+    text-align: center;
+    width: 100%;
+
+    li a.version-option span.text {
+      margin-right: 0 !important;
+    }
+  }
+
+  .selected {
+    color: white !important;
+  }
+
+  button {
+    .filter-option {
+      text-align: center;
+    }
+  }
+
+  .version-picker {
+    text-align: center;
+    margin: auto !important;
+  }
+}

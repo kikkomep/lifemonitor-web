@@ -1,12 +1,15 @@
+import { DOCUMENT, ViewportScroller } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
+  Inject,
   Input,
   OnInit,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { BaseDataViewComponent } from 'src/app/components/base-data-view/base-data-view.component';
 import { StatusStatsItem, TestStatus } from 'src/app/models/stats.model';
 import { Suite } from 'src/app/models/suite.models';
 import { WorkflowVersion } from 'src/app/models/workflow.model';
@@ -18,7 +21,7 @@ import { AppService } from 'src/app/utils/services/app.service';
   templateUrl: './suite.component.html',
   styleUrls: ['./suite.component.scss'],
 })
-export class SuiteComponent implements OnInit {
+export class SuiteComponent extends BaseDataViewComponent implements OnInit {
   @Input() suite: Suite;
 
   public statusFilter: string = null;
@@ -40,7 +43,11 @@ export class SuiteComponent implements OnInit {
     private appService: AppService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-  ) { }
+    protected readonly viewport: ViewportScroller,
+    @Inject(DOCUMENT) protected readonly document: Document
+  ) {
+    super(viewport, document);
+  }
 
   ngOnInit() {
     this.logger.debug('Created component Workflow');
@@ -50,18 +57,19 @@ export class SuiteComponent implements OnInit {
       let urlData = this.appService.decodeUrl(params['s']);
       this.logger.debug('UrlData', urlData);
 
-      this.queryParamsSubscription = this.route.queryParams
-        .subscribe(params => {
-          console.debug("Query params: ", params);
+      this.queryParamsSubscription = this.route.queryParams.subscribe(
+        (params) => {
+          this.logger.debug('Query params: ', params);
           if ('status' in params) {
             // Parse and normalize status filter
             let status: string = params['status'].toLowerCase();
-            console.debug("Status: ", status);
+            console.debug('Status: ', status);
             if (TestStatus.includes(status)) {
               this.statusFilter = status;
             }
           }
-        });
+        }
+      );
 
       // subscribe for the current selected workflow
       this.workflowSubscription = this.appService.observableWorkflow.subscribe(
@@ -75,8 +83,7 @@ export class SuiteComponent implements OnInit {
               if (suite) {
                 this.suite = suite;
                 this.suite.workflow = w;
-                if (!this.statusFilter)
-                  this._instances = suite.instances.all;
+                if (!this.statusFilter) this._instances = suite.instances.all;
                 else this._instances = this.suite.instances[this.statusFilter];
               }
             }
@@ -88,7 +95,10 @@ export class SuiteComponent implements OnInit {
       );
 
       // select a workflow
-      this.appService.selectWorkflowVersion(urlData['workflow'], urlData['version']);
+      this.appService.selectWorkflowVersion(
+        urlData['workflow'],
+        urlData['version']
+      );
     });
   }
 
@@ -118,7 +128,7 @@ export class SuiteComponent implements OnInit {
   }
 
   public set instanceNameFilter(value: string) {
-    this._instanceNameFilter = value ? value.replace("SEARCH_KEY###", "") : "";
+    this._instanceNameFilter = value ? value.replace('SEARCH_KEY###', '') : '';
   }
 
   public get instances(): StatusStatsItem[] {
@@ -132,14 +142,11 @@ export class SuiteComponent implements OnInit {
 
   ngOnDestroy() {
     // prevent memory leak when component destroyed
-    if (this.paramSubscription)
-      this.paramSubscription.unsubscribe();
+    if (this.paramSubscription) this.paramSubscription.unsubscribe();
     if (this.queryParamsSubscription)
       this.queryParamsSubscription.unsubscribe();
-    if (this.suiteSubscription)
-      this.suiteSubscription.unsubscribe();
-    if (this.workflowSubscription)
-      this.workflowSubscription.unsubscribe();
+    if (this.suiteSubscription) this.suiteSubscription.unsubscribe();
+    if (this.workflowSubscription) this.workflowSubscription.unsubscribe();
     // this.workflowChangesSubscription.unsubscribe();
   }
 }

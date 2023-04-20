@@ -16,11 +16,12 @@ export class Workflow extends Model {
   _current_version: WorkflowVersion = null;
   private __versions: { [name: string]: WorkflowVersion };
 
-  constructor(rawData?: Object, skip?: []) {
+  constructor(rawData?: any, skip?: []) {
     super();
-    let versions: [] = rawData['versions'];
-    delete rawData['versions'];
+    let versions: [] = rawData?.versions ?? [];
+    if ('versions' in rawData) delete rawData['versions'];
     this.update(rawData);
+    this.setNameFromProperty(rawData, 'name');
     this.updateDescriptors(versions, true);
   }
 
@@ -62,8 +63,12 @@ export class Workflow extends Model {
     }
   }
 
-  public addVersion(v: WorkflowVersion, setAsCurrent: boolean = false) {
-    if (v && v.workflow == null) {
+  public addVersion(
+    v: WorkflowVersion,
+    setAsCurrent: boolean = false,
+    setAsLatest?: boolean
+  ) {
+    if (v) {
       this._versions[v.version['version']] = v;
       v.workflow = this;
       if (setAsCurrent) this.currentVersion = v;
@@ -71,14 +76,19 @@ export class Workflow extends Model {
         let data = { ...v.version };
         delete data['links'];
         delete data['name'];
-        this.logger.debug('Data VERSION: ', v.version, data);
+        this.logger.debug('Data VERSION: ', v.version, data, this);
         this.addVersionDescriptor(data);
       }
     }
   }
 
-  public removeVersion(v: WorkflowVersion, removeDescriptor: boolean = true) {
-    if (v.workflow == this) {
+  public removeVersion(
+    version: WorkflowVersion | string,
+    removeDescriptor: boolean = true
+  ) {
+    const v: WorkflowVersion =
+      version instanceof WorkflowVersion ? version : this.getVersion(version);
+    if (v && v.workflow == this) {
       delete this._versions[v.version['version']];
       v.workflow = null;
       if (removeDescriptor && this._version_descriptors) {
@@ -168,11 +178,13 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
   }
 
   public update(rawData: Object) {
-    super.update(rawData);
-    this.setName(rawData);
+    if (rawData) {
+      super.update(rawData);
+      this.setName(rawData);
+    }
   }
 
-  private setName(data: Object) {
+  public setName(data: Object) {
     let rocIdentifier = this.rocIdentifier;
     this.setNameFromProperty(
       data,
@@ -199,7 +211,7 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
   public get type(): string {
     if (!this._type) {
       if (this._rawData && 'type' in this._rawData) {
-        this._type = this._rawData['type'];
+        this._type = this._rawData['type'] as string;
       } else {
         let crate: RoCrate = this.roCrateMetadata;
         if (crate) {
@@ -257,6 +269,18 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
     this._suites = suites;
     this.updateLatestBuilds();
     this.notifyChanges();
+  }
+
+  public get created(): number {
+    return this._rawData['meta']['created'];
+  }
+
+  public get modified(): number {
+    return this._rawData['meta']['modified'];
+  }
+
+  public set modified(m: number) {
+    this._rawData['meta']['modified'] = m;
   }
 
   public asUrlParam() {
@@ -388,5 +412,32 @@ export class WorkflowVersionDescriptor extends Model {
     return 'ro_crate' in this._rawData
       ? this._rawData['ro_crate']['links']
       : [];
+  }
+}
+
+export class WorkflowsLoadingStatus {
+  private _workflows: Array<{ uuid: string }>;
+  private _loaded: { [key: string]: boolean } = {};
+
+  constructor(workflows: Array<Workflow>) {
+    this._workflows = workflows;
+  }
+
+  public get workflows(): Array<{ uuid: string }> {
+    return this._workflows;
+  }
+
+  public setLoaded(uuid: string) {
+    this._loaded[uuid] = true;
+  }
+
+  public get loaded(): Array<{ uuid: string }> {
+    return this._workflows.filter((w) => w.uuid in this._loaded);
+  }
+
+  public get completionPercentage(): number {
+    return Math.floor(
+      (Object.keys(this._loaded).length / this._workflows.length) * 100
+    );
   }
 }
