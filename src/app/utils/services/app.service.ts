@@ -749,6 +749,7 @@ export class AppService {
     let workflow_versions: WorkflowVersion[] = [];
 
     let workflowsStatus: WorkflowsLoadingStatus = null;
+    this.subjectLoadingWorkflowsStatus.next(null);
 
     this.setLoadingWorkflows(true);
     return this.api
