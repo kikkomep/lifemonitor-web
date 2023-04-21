@@ -38,12 +38,12 @@
         <div>
           <span *ngIf="((isLoading|async)===true)" data-toggle="tooltip" tooltipPosition="right" data-html="true"
             title="The dashboard collects your subscribed workflows">
-            {{ "Loading " + (isUserLogged() ? "Dashboard" : "Workflows") + "....."}}
+            {{ "Loading " + (isUserLogged() && !browseButtonEnabled ? "Dashboard" : "Workflows") + "....."}}
           </span>
           <span *ngIf="(isLoading|async)===false && (!workflowNameFilter || workflowNameFilter.length==0)"
             pTooltip="{{ isUserLogged() ? 'the dashboard collects your workflow subscriptions' : 'registered workflows' }}"
             showDelay=2000 tooltipPosition="right" data-html="true">
-            {{ isUserLogged() ? "Dashboard" : "Workflows" }}
+            {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" : "Workflows" }}
           </span>
         </div>
         <div *ngIf="workflowNameFilter && workflowNameFilter.length>0">
@@ -68,8 +68,7 @@
             <ng-container *ngIf="workflowNameFilter == '______ALL_____'; then allWorkflows; else matchingWorkflows;">
             </ng-container>
             <ng-template #allWorkflows>
-              {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" :
-              "Workflows" }}
+              {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" : "Workflows" }}
             </ng-template>
             <ng-template #matchingWorkflows>Workflows matching "<b>{{workflowNameFilter}}</b>"</ng-template>
           </ng-template>
