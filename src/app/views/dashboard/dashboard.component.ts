@@ -390,6 +390,8 @@ export class DashboardComponent
     this._workflowNameFilter = value ? value.replace('SEARCH_KEY###', '') : '';
     this.editModeEnabled = false;
     this.prepareTableData();
+    // reset dataview paginator
+    this.goToFirstPage();
   }
 
   public get isLoading(): Observable<boolean> {
@@ -764,9 +766,6 @@ export class DashboardComponent
     this.updatingDataTable = false;
 
     this.checkWindowSize();
-
-    // reset dataview paginator
-    this.goToFirstPage();
 
     // this.scrollTop();
 
