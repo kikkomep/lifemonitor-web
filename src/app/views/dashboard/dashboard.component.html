@@ -823,25 +823,26 @@
 
             <ng-template pTemplate="empty">
               <!-- no workflow found/matching -->
-              <div *ngIf="workflows && workflows.length === 0" class="no-workflow-container">
-
+              <div class="no-workflow-container">
                 <div class="no-workflow"
-                  *ngIf="workflows && workflows.length === 0 && (!statusFilter && !workflowNameFilter)">
+                  *ngIf="(!workflows || workflows.length === 0) && (!statusFilter && !workflowNameFilter)">
                   No workflow found
                 </div>
 
                 <div class="no-workflow"
-                  *ngIf="workflows && workflows.length === 0 && (statusFilter || workflowNameFilter)">
+                  *ngIf="(statusFilter || workflowNameFilter)">
                   No matching workflow
                 </div>
 
-                Click on
-                <a class='add-wf' href="/dashboard;add=true">
-                  <i class="fas fa-plus-circle"></i>
-                  to register a workflow
-                </a>
-                <br>or use the main search box to find and subscribe
-                <br>to workflows registered by others in the community
+                <div *ngIf="isUserLogged() && !browseButtonEnabled">
+                  Click on
+                  <a class='add-wf' href="/dashboard;add=true">
+                    <i class="fas fa-plus-circle"></i>
+                    to register a workflow
+                  </a>
+                  <br>or use the main search box to find and subscribe
+                  <br>to workflows registered by others in the community
+                </div>
               </div>
               <!-- /.no workflow found/matching-->
             </ng-template>
