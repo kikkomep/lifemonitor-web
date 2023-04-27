@@ -12,17 +12,20 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  BarElement,
   Chart,
   ChartData,
-  ChartDataSets,
+  ChartDataset,
   ChartOptions,
   ChartType,
 } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { Subscription } from 'rxjs';
 import { DateUtils } from 'src/app/models/common.models';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
+
+import { formatDuration } from 'src/app/utils/shared/utils';
 
 @Component({
   selector: 'stats-bar-chart',
@@ -38,186 +41,21 @@ export class StatsBarChartComponent
   // initialize logger
   private logger: Logger = LoggerManager.create('StatsBarChartComponent');
 
-  public barChartOptions: ChartOptions = {
-    responsive: true,
-    // We use these empty structures as placeholders for dynamic theming.
-    scales: {
-      xAxes: [{ display: false }],
-      yAxes: [
-        {
-          // ticks: {
-          //   minor: {},
-          // },
-          display: false,
-          time: {
-            unit: 'second',
-          },
-        },
-      ],
-    },
-    tooltips: {
-      enabled: false,
-      footerFontSize: 9,
-      footerFontColor: 'lightgray',
-      footerAlign: 'right',
-      custom: function (tooltipModel) {
-        // Tooltip Element
-        var tooltipEl = document.getElementById('chartjs-tooltip');
+  basicData: any;
 
-        // Create element on first render
-        if (!tooltipEl) {
-          tooltipEl = document.createElement('div');
-          tooltipEl.style.background = 'black';
-          tooltipEl.style.color = 'white';
-          tooltipEl.style.fontWeight = '200';
-          tooltipEl.id = 'chartjs-tooltip';
-          tooltipEl.style.borderRadius = '10px';
-          tooltipEl.innerHTML = '<table></table>';
-          document.body.appendChild(tooltipEl);
-        }
+  basicOptions: any;
 
-        // Hide if no tooltip
-        if (tooltipModel.opacity === 0) {
-          tooltipEl.style.opacity = '0';
-          return;
-        }
+  basicDatasets: Array<any>;
 
-        // Set caret Position
-        tooltipEl.classList.remove('above', 'below', 'no-transform');
-        if (tooltipModel.yAlign) {
-          tooltipEl.classList.add(tooltipModel.yAlign);
-        } else {
-          tooltipEl.classList.add('no-transform');
-        }
+  subscription: Subscription;
 
-        function getBody(bodyItem: { lines: any }) {
-          return bodyItem.lines;
-        }
+  public selectedObject: StatusStatsItem;
 
-        // Set Text
-        if (tooltipModel.body) {
-          var titleLines = tooltipModel.title || [];
-          var bodyLines = tooltipModel.body.map(getBody);
-          // set header
-          var innerHtml = '<thead>';
-          titleLines.forEach(function (title) {
-            innerHtml += '<tr>' + '<th>' + title + '</th></tr>';
-          });
-          innerHtml += '</thead><tbody>';
-          // set body
-          bodyLines.forEach(function (body, i) {
-            var colors = tooltipModel.labelColors[i];
-            var style = 'background:' + colors.backgroundColor;
-            style += '; border-color:' + colors.borderColor;
-            style += '; border-width: 2px';
-            var span = '<span style="' + style + '"></span>';
-            innerHtml += '<tr><td>' + span + body + '</td></tr>';
-          });
-          innerHtml += '</tbody>';
-          // append footer
-          var footer =
-            '<div style="color: lightgray; font-size: 8pt; text-align: right;">';
-          footer += tooltipModel.footer;
-          footer += '</div>';
-          innerHtml += footer;
-          // append table
-          var tableRoot = tooltipEl.querySelector('table');
-          tableRoot.innerHTML = innerHtml;
-        }
-
-        // `this` will be the overall tooltip
-        var position = this._chart.canvas.getBoundingClientRect();
-
-        // Display, position, and set styles for font
-        tooltipEl.style.opacity = '1';
-        tooltipEl.style.position = 'absolute';
-        tooltipEl.style.left =
-          position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-        tooltipEl.style.top =
-          position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-        tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
-        tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
-        tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
-        tooltipEl.style.padding =
-          tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
-        tooltipEl.style.pointerEvents = 'none';
-      },
-      callbacks: {
-        title: (tooltipItem, data: ChartData) => {
-          let item: TestBuild = this.getItemTestBuild(tooltipItem[0], data);
-          return (
-            '<span style="color: transparent; font-size: 0.7rem; text-shadow: 0 0 0 ' +
-            item.color +
-            '; ">&#9899;</span>' +
-            ' Build #' +
-            item.build_id +
-            ' : ' +
-            item.status
-          );
-        },
-        label: (tooltipItem, data: ChartData) => {
-          let item: TestBuild = this.getItemTestBuild(tooltipItem, data);
-          this.logger.debug('Check stats item', tooltipItem, data);
-          let label = data.labels[tooltipItem.index];
-          let sec = data.datasets[tooltipItem.datasetIndex].data[
-            tooltipItem.index
-          ] as number;
-          let duration = '';
-          let hours = Math.floor(sec / 3600);
-          let minutes = Math.floor((sec - hours * 3600) / 60);
-          let seconds = sec - hours * 3600 - minutes * 60;
-          if (hours > 0) duration += hours + 'h ';
-          if (minutes > 0) duration += minutes + 'm ';
-          if (sec >= 0) duration += seconds + 's';
-          this.logger.debug(
-            'DURATION',
-            hours,
-            minutes,
-            seconds,
-            duration,
-            tooltipItem,
-            item,
-            data
-          );
-          let ltext =
-            '<div class="ml-1"><i class="far fa-calendar-check"></i> started: ' +
-            DateUtils.formatTimestamp(item.timestamp.toString()) +
-            '</div>';
-          ltext +=
-            '<div class="ml-1"><i class="fas fa-stopwatch"></i> duration: ' +
-            duration +
-            '</div>';
-          return ltext;
-        },
-        footer: (tooltipItem, data) => {
-          let index = tooltipItem[0]['datasetIndex'];
-          let item = this.stats[index] as TestBuild;
-          return (
-            'click to see on <b class="text-white">' +
-            item.instance.service.type +
-            '</b>'
-          );
-        },
-      },
-    },
-    plugins: {
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-      },
-    },
-    legend: {
-      position: 'top',
-    },
-  };
-  public barChartLabels: Label[] = ['build'];
-  public barChartType: ChartType = 'bar';
-  public barChartLegend = false;
-  public barChartPlugins = []; //[pluginDataLabels];
+  public barChartData: ChartDataset[] = [];
 
   public barColors = [];
 
-  private mappings = {
+  private colorMap = {
     passed: { color: '#1f8787' },
     failed: { color: '#dc3545' },
     error: { color: '#ffc107' },
@@ -226,6 +64,31 @@ export class StatsBarChartComponent
     waiting: { color: '#fd7e14' },
   };
 
+  constructor(private router: Router, private zone: NgZone) {}
+
+  ngOnInit(): void {
+    // initialize datasets
+    this.initializeDatasets();
+    // initialize options
+    this.basicOptions = this.setOptions();
+  }
+
+  ngAfterViewChecked(): void {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.zone.runOutsideAngular(() => {
+      this.initializeDatasets();
+    });
+  }
+
+  public getItemByIndex(index: number): any {
+    return this.basicData[0]?.data[index];
+  }
+
+  public getTestBuildByName(name: string): any {
+    return this.stats.find((item) => item.name === name);
+  }
+
   public getItemTestBuild(tooltipItem: any, data: ChartData): TestBuild {
     if (!tooltipItem || !data) return null;
     this.logger.debug('item, data', tooltipItem, data);
@@ -233,79 +96,306 @@ export class StatsBarChartComponent
     return this.stats[index] as TestBuild;
   }
 
-  public selectedObject: StatusStatsItem;
-
-  constructor(private router: Router, private zone: NgZone) {}
-
-  public barChartData: ChartDataSets[] = [];
-
-  ngOnInit(): void {}
-
-  ngAfterViewChecked(): void {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.zone.runOutsideAngular(() => {
-      this.refresh();
-    });
-  }
-
-  refresh() {
-    // this.logger.debug('Stats ', this.stats);
-    this.barChartData = [];
-    this.barColors = [];
-    this.logger.debug('Current bar stas: ', this.stats);
-    let max: number = Math.max.apply(
-      Math,
-      this.stats.map(function (o) {
-        return o.duration || 0;
-      })
-    );
-    this.logger.debug('MAX duration', max);
-    for (let i in this.stats) {
-      let build: StatusStatsItem = this.stats[i];
-      this.barChartData.push({
-        data: [build.duration || 0],
-        label: 'duration',
-      });
-      this.barColors.push(this.getColor(build.status));
-    }
-  }
-
-  private getColor(label: string) {
+  private setOptions(): any {
     return {
-      // first color
-      backgroundColor:
-        label in this.mappings ? this.mappings[label].color : 'gray',
-      borderColor: 'rgba(225,10,24,0.2)',
-      pointBackgroundColor: 'rgba(225,10,24,0.2)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(225,10,24,0.2)',
+      plugins: {
+        title: {
+          display: false,
+          text: (ctx) => {
+            const {
+              axis = 'xy',
+              intersect,
+              mode,
+            } = ctx.chart.options.interaction;
+            return 'Latest builds';
+          },
+        },
+
+        legend: {
+          labels: {
+            color: '#495057',
+          },
+          display: false,
+        },
+        tooltip: {
+          enabled: false,
+          position: 'nearest',
+
+          external: (context) => {
+            console.warn('tooltipModel', context);
+            // Tooltip Element
+            const { chart, tooltip } = context;
+
+            const getOrCreateTooltip = (chart) => {
+              let tooltipEl = chart.canvas.parentNode.querySelector('div');
+
+              if (!tooltipEl) {
+                tooltipEl = document.createElement('div');
+                tooltipEl.classList.add('bar-item-tooltip');
+                const table = document.createElement('table');
+                table.classList.add('bar-item-table');
+                tooltipEl.appendChild(table);
+                const caret = document.createElement('div');
+                caret.classList.add('bar-item-caret');
+                const caretIcon = document.createElement('i');
+                caret.classList.add('fas');
+                caret.classList.add('fa-caret-right');
+                caret.appendChild(caretIcon);
+                tooltipEl.appendChild(caret);
+
+                // tooltipElExt.appendChild(caret);
+                chart.canvas.parentNode.appendChild(tooltipEl);
+              }
+
+              return tooltipEl;
+            };
+
+            const tooltipEl = getOrCreateTooltip(chart);
+
+            // Hide if no tooltip
+            if (tooltip.opacity === 0) {
+              tooltipEl.style.opacity = 0;
+              return;
+            }
+
+            const makeTd = (type: string = 'detail', width?: string) => {
+              const td = document.createElement(
+                type === 'detail' ? 'td' : 'th'
+              );
+              td.style.borderWidth = '0';
+              return td;
+            };
+
+            const makeRow = (type: string = 'detail', build?: TestBuild) => {
+              const tr = document.createElement('tr');
+              tr.classList.add(`bar-item-tooltip-${type}`);
+
+              const iconContainer = document.createElement('div');
+              iconContainer.classList.add(`bar-item-tooltip-${type}-icon`);
+
+              const textContainer = document.createElement('div');
+              textContainer.classList.add(`bar-item-tooltip-${type}-text`);
+
+              const td = makeTd(type, '100%');
+              td.appendChild(iconContainer);
+              td.appendChild(textContainer);
+
+              tr.appendChild(td);
+
+              return {
+                row: tr,
+                icon: iconContainer,
+                text: textContainer,
+                build: build,
+                color: this.colorMap[build.status]?.color ?? 'gray',
+              };
+            };
+
+            // Set Text
+            if (tooltip.body) {
+              const titleLines = tooltip.title || [];
+              const bodyLines = tooltip.title || [];
+              const footerLines = tooltip.title || [];
+
+              this.logger.warn('bodyLines', bodyLines);
+
+              const tableHead = document.createElement('thead');
+
+              titleLines.forEach((title) => {
+                const build = this.getTestBuildByName(title);
+
+                const titleRowInfo = makeRow('header', build);
+
+                const tr = titleRowInfo.row;
+
+                const span = document.createElement('span');
+                span.style.background =
+                  this.colorMap[build.status]?.color ?? 'gray';
+                span.style.borderColor = 'white';
+                span.style.borderWidth = '2px';
+                // span.style.marginRight = '5px';
+                span.style.height = '12px';
+                span.style.width = '12px';
+                span.style.display = 'inline-block';
+                span.style.borderRadius = '12px';
+
+                const thIcon = titleRowInfo.icon;
+                thIcon.appendChild(span);
+
+                const th = titleRowInfo.text;
+                const text = document.createTextNode(
+                  `Build: #${title}: ${build.status}`
+                );
+                th.appendChild(text);
+                tableHead.appendChild(tr);
+              });
+
+              const tableBody = document.createElement('tbody');
+              bodyLines.forEach((title, i) => {
+                this.logger.warn('body', title, i);
+                const colors = tooltip.labelColors[i];
+                const item = this.getTestBuildByName(title);
+
+                var style = 'background:' + colors.backgroundColor;
+
+                const startedIcon = document.createElement('i');
+                startedIcon.classList.add('far');
+                startedIcon.classList.add('fa-clock');
+
+                const startedDiv = document.createElement('div');
+                startedDiv.classList.add('flex-row');
+                // startedDiv.classList.add('mr-1');
+                startedDiv.appendChild(startedIcon);
+                startedDiv.appendChild(
+                  document.createTextNode(
+                    ' started: ' +
+                      DateUtils.formatTimestamp(item.timestamp.toString())
+                  )
+                );
+
+                const startedRow = makeRow('detail', item);
+                startedRow.icon.appendChild(startedIcon);
+                startedRow.text.appendChild(startedDiv);
+
+                const durationIcon = document.createElement('i');
+                durationIcon.classList.add('fas');
+                durationIcon.classList.add('fa-stopwatch');
+
+                const durationDiv = document.createElement('div');
+                durationDiv.classList.add('flex-row');
+                durationDiv.appendChild(durationIcon);
+                durationDiv.appendChild(
+                  document.createTextNode(
+                    ' duration: ' + formatDuration(item.duration)
+                  )
+                );
+
+                const durationRow = makeRow('detail', item);
+                durationRow.icon.appendChild(durationIcon);
+                durationRow.text.appendChild(durationDiv);
+
+                tableBody.appendChild(startedRow.row);
+                tableBody.appendChild(durationRow.row);
+              });
+
+              const tableFooter = document.createElement('tfoot');
+              footerLines.forEach((title) => {
+                const build = this.getTestBuildByName(title);
+                const footerRow = document.createElement('tr');
+                const footerTd = document.createElement('td');
+                footerTd.colSpan = 2;
+                footerTd.classList.add('bar-item-tooltip-footer');
+                const footerText = document.createElement('span');
+                footerText.innerHTML = `click to see on <b class="text-white">${build.instance.service.type}</b>`;
+                footerTd.appendChild(footerText);
+                footerRow.appendChild(footerTd);
+                tableFooter.appendChild(footerRow);
+              });
+
+              // Remove old children
+              const tableRoot = tooltipEl.querySelector('table');
+              while (tableRoot.firstChild) {
+                tableRoot.firstChild.remove();
+              }
+
+              // Add new children
+              tableRoot.appendChild(tableHead);
+              tableRoot.appendChild(tableBody);
+              tableRoot.appendChild(tableFooter);
+
+              // tableRoot.parentNode.parentNode.appendChild(caret);
+            }
+
+            const {
+              offsetLeft: positionX,
+              offsetTop: positionY,
+            } = chart.canvas;
+
+            // Display, position, and set styles for font
+            tooltipEl.style.opacity = 1;
+            tooltipEl.style.left = positionX + tooltip.caretX - 115 + 'px';
+            tooltipEl.style.top = positionY + tooltip.caretY + 'px';
+            tooltipEl.style.font = tooltip.options.bodyFont.string;
+            tooltipEl.style.padding =
+              tooltipEl.options.padding +
+              'px ' +
+              tooltipEl.options.padding +
+              'px';
+          },
+        },
+      },
+
+      scales: {
+        x: {
+          display: false,
+          ticks: {
+            color: '#495057',
+            min: -20,
+          },
+          grid: {
+            color: '#ebedef',
+          },
+        },
+        y: {
+          ticks: {
+            color: '#495057',
+            min: -20,
+          },
+          grid: {
+            color: '#ebedef',
+          },
+          display: false,
+
+          time: { unit: 'second' },
+        },
+      },
     };
   }
 
-  // events
-  public chartClicked({
-    event,
-    active,
-  }: {
-    event: MouseEvent;
-    active: { _chart: any }[];
-  }): void {
-    this.logger.debug('Chart click event', event, active);
-    if (!active || active.length == 0) return;
-    let chart: Chart = active[0]._chart;
-    let selectedElements: [{}] = chart.getElementAtEvent(event);
-    if (selectedElements && selectedElements.length == 1) {
-      let element = selectedElements[0];
-      let dataIndex: number = element['_datasetIndex'];
-      let data = this.barChartData[dataIndex];
-      this.selectedObject = this.stats[dataIndex];
-      this.logger.debug('Data selected', chart, data, this.selectedObject);
-      this.selectedItem.emit(this.selectedObject);
-    } else {
-      this.selectedObject = null;
-    }
+  initializeDatasets() {
+    // TODO: fix this hack to take into account different test suites
+    // each data set is a test suite
+    this.basicDatasets = [];
+
+    const dataset = {
+      data: [],
+      builds: [],
+      label: 'Test Suite 1',
+      backgroundColor: [],
+      yAxisID: 'y',
+    };
+
+    this.stats.forEach((s) => {
+      dataset.builds.push(s);
+      dataset.data.push(s.duration);
+      dataset.backgroundColor.push(
+        s.status in this.colorMap ? this.colorMap[s.status].color : 'gray'
+      );
+    });
+
+    this.basicDatasets = [dataset];
+
+    this.basicData = {
+      labels: this.stats.map((s) => s.name),
+      datasets: this.basicDatasets,
+    };
+  }
+
+  public chartClicked(e: any) {
+    this.logger.debug('Chart click event', e);
+    if (!e || !e.element) return;
+    let el: { element: BarElement; datasetIndex: number; index: number } =
+      e.element;
+    this.logger.debug('Chart element clicked', el);
+
+    let dataset = this.basicDatasets[el.datasetIndex];
+    this.logger.debug('Chart dataset clicked', dataset);
+    let item = dataset.builds[el.index];
+    this.logger.debug('Chart item clicked', item);
+    this.selectedObject = item;
+    if (!item) return;
+
+    this.selectedItem.emit(this.selectedObject);
   }
 
   public chartHovered({
