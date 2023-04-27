@@ -10,7 +10,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { SocketIoModule } from 'ngx-socket-io';
 
-import { ChartsModule } from 'ng2-charts';
 import { ToastrModule } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -137,7 +136,6 @@ export function initConfigService(appConfig: AppConfigService) {
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }),
-    ChartsModule,
     NgbModule,
     SocketIoModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
