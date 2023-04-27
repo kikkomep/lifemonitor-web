@@ -317,9 +317,9 @@ export class StatsBarChartComponent
             tooltipEl.style.top = positionY + tooltip.caretY + 'px';
             tooltipEl.style.font = tooltip.options.bodyFont.string;
             tooltipEl.style.padding =
-              tooltipEl.options.padding +
+              tooltip.options.padding +
               'px ' +
-              tooltipEl.options.padding +
+              tooltip.options.padding +
               'px';
           },
         },
