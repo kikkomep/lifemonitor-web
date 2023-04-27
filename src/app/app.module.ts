@@ -65,6 +65,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { ChartModule } from 'primeng/chart';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -130,6 +131,7 @@ export function initConfigService(appConfig: AppConfigService) {
     AppRoutingModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    ChartModule,
     HttpClientModule,
     ToastrModule.forRoot({
       timeOut: 10000,
