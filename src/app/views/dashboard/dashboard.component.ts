@@ -290,6 +290,10 @@ export class DashboardComponent
     return window.matchMedia('(max-width: 576px)').matches;
   }
 
+  get windowWidth(): number {
+    return window.innerWidth;
+  }
+
   ngAfterViewInit(): void {
     // $('[data-toggle="tooltip"]', function () {
     //   $(this).tooltip('hide');
