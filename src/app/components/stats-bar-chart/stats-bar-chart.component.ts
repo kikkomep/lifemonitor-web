@@ -36,6 +36,9 @@ import { formatDuration } from 'src/app/utils/shared/utils';
 export class StatsBarChartComponent
   implements OnInit, OnChanges, AfterViewChecked {
   @Input() stats!: StatusStatsItem[];
+  @Input() chartWidth: string = '340px';
+  @Input() chartHeight: string = '200px';
+  @Input() showTitle: boolean = true;
   @Output() selectedItem = new EventEmitter<StatusStatsItem>();
 
   // initialize logger
