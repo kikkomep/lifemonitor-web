@@ -1,4 +1,13 @@
 :host ::ng-deep {
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+
   .bar-item-tooltip {
     // top: 0;
     padding: 0;
@@ -45,7 +54,7 @@
 
   .bar-item-tooltip-header {
     padding: 20px 0;
-    
+
   }
 
   .bar-item-tooltip-detail {
@@ -60,6 +69,7 @@
   .bar-item-tooltip-header-text {
     display: inline-flex;
     justify-content: center;
+    vertical-align: middle;
   }
 
   .bar-item-tooltip-detail-icon,
