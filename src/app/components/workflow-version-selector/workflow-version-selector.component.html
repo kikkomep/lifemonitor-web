@@ -2,8 +2,12 @@
   <i class="fas fa-2x fa-sync-alt"></i>
 </div>
 <div *ngIf="!isLoading()" class="flex selector-container">
+  <div *ngIf="showLabel" class="item-label text-bold py-0 mb-n1"
+    [ngClass]="{'d-inline-block': labelInLine, 'm-0': labelInLine}" style="margin-right: 45px; font-weight:600;">
+    version: </div>
   <p-dropdown [options]="versions" [(ngModel)]="selectedVersion" optionLabel="name" placeholder="Select a version"
-    styleClass="selector-container" [disabled]="isLoading()">
+    styleClass="selector-container {{selectorClass}}" [disabled]="isLoading()" autoWidth="false"
+    [style]="{'width':selectorWidth}">
     <ng-template pTemplate="selectedItem">
       <div class="flex align-items-center gap-2" *ngIf="selectedVersion">
         <span *ngIf="selectedVersion.isLatest" class='mx-1 badge badge-success' style='font-size: 0.8em;'>latest</span>
@@ -11,7 +15,7 @@
       </div>
     </ng-template>
     <ng-template let-version pTemplate="item">
-      <div class="flex align-items-center gap-2">
+      <div class="flex align-items-center gap-2 text-right">
         <span *ngIf="version.isLatest" class='mx-1 badge badge-success' style='font-size: 0.8em;'>latest</span>
         <span>{{ version.name }}</span>
       </div>

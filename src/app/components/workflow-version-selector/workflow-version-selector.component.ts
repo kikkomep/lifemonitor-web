@@ -39,6 +39,10 @@ export class WorkflowVersionSelectorComponent
 
   _selectedVersion: WorkflowVersionDescriptor;
 
+  @Input() selectorClass: string = '';
+  @Input() selectorWidth: string = 'fit-content';
+  @Input() labelInLine: boolean = false;
+  @Input() showLabel: boolean = true;
   @Output() workflow_version = new EventEmitter<WorkflowVersion>();
   @Output() loadingWorkflowVersion = new EventEmitter<Workflow>();
 
