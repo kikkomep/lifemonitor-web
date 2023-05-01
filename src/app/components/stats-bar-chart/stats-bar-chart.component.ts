@@ -122,7 +122,6 @@ export class StatsBarChartComponent
           },
 
           display: (ctx) => {
-            console.warn('ctx', ctx);
             return true;
           },
           // maxHeight: 100,
@@ -248,7 +247,6 @@ export class StatsBarChartComponent
             font: { size: 7, weight: 'normal' },
             callback: function (val: number, index: number) {
               // Hide the label of every 2nd dataset
-              console.warn('Formatting duration', val, index);
               return formatDuration(val);
               // return val;
             },

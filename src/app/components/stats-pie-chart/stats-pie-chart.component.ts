@@ -66,7 +66,6 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
           callbacks: {
             label: (context: any) => {
               let label = context.label[0] || 'Unknown';
-              this.logger.warn('context', context);
               if (label) {
                 label += ': ' + context.formattedValue;
               }
