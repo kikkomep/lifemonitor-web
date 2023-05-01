@@ -390,6 +390,14 @@ export class DashboardComponent
     $('.p-paginator-first').click();
   }
 
+  public onChangeLayout(event: any) {
+    // this.editModeEnabled = false;
+    // this.workflows?.forEach((w) => {
+    //   w['editMode'] = false;
+    //   w['editSubscription'] = false;
+    // });
+  }
+
   public set workflowNameFilter(value: string) {
     this._workflowNameFilter = value ? value.replace('SEARCH_KEY###', '') : '';
     this.editModeEnabled = false;
