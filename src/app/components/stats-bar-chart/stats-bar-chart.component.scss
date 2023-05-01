@@ -1,5 +1,4 @@
 :host ::ng-deep {
-
   .loading {
     display: flex;
     justify-content: center;
@@ -12,8 +11,8 @@
     // top: 0;
     padding: 0;
     margin: 0;
-    width: 100%;
-    min-width: 260px;
+    width: fit-content;
+    // min-width: 260px;
     pointer-events: none;
     position: absolute;
     transform: translate(-50%, 0);
@@ -39,22 +38,27 @@
     background: rgba(4, 35, 35, 0.9);
     border-radius: 10px;
     color: white;
+    padding: 10px;
     opacity: 1;
-    min-width: calc(100% - 25px);
+    z-index: 1;
+    text-align: left;
+    // opacity: 1;
+    // min-width: 100%;
   }
 
   .bar-item-caret {
     font-size: 1.2rem;
-    margin-left: -1px;
+    // margin-left: -1px;
   }
 
   .bar-item-tooltip table {
     padding: 10px;
+    width: fit-content;
+    min-width: fit-content;
   }
 
   .bar-item-tooltip-header {
     padding: 20px 0;
-
   }
 
   .bar-item-tooltip-detail {

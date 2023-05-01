@@ -11,14 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  BarElement,
-  Chart,
-  ChartData,
-  ChartDataset,
-  ChartOptions,
-  ChartType,
-} from 'chart.js';
+import { BarElement, ChartData, ChartDataset } from 'chart.js';
 import { Subscription } from 'rxjs';
 import { DateUtils } from 'src/app/models/common.models';
 import { StatusStatsItem } from 'src/app/models/stats.model';
@@ -108,227 +101,101 @@ export class StatsBarChartComponent
     return {
       plugins: {
         title: {
-          display: false,
-          text: (ctx) => {
-            const {
-              axis = 'xy',
-              intersect,
-              mode,
-            } = ctx.chart.options.interaction;
-            return 'Latest builds';
-          },
+          display: this.showTitle,
+          position: 'top',
+          text: 'Latest Test Builds',
         },
-
         legend: {
           labels: {
-            color: '#495057',
+            // color: '#495057',
+            font: { size: 8, weight: 'normal' },
+            textAlign: 'right',
+            // filter: (legendItem, chartData) => {
+            //   return legendItem.text !== 'Test builds';
+            // },
+            boxWidth: 10,
+            useBorderRadius: true,
+            sort: (a: any, b: any) => {
+              // sort legend items descending by datasetIndex
+              return b.datasetIndex < a.datasetIndex ? 1 : -1;
+            },
           },
-          display: false,
+
+          display: (ctx) => {
+            console.warn('ctx', ctx);
+            return true;
+          },
+          // maxHeight: 100,
+          position: 'bottom',
+          align: 'center',
+          onClick: (e, legendItem) => {
+            this.logger.debug('legend click event', e);
+            this.logger.debug('legendItem', legendItem);
+            // const build = this.getTestBuildByName(legendItem.text);
+            // this.selectedItem.emit(build);
+            const dataset = this.basicDatasets[legendItem.datasetIndex];
+            this.logger.debug('click on dataset legend', dataset);
+            dataset.hidden = !dataset.hidden;
+            e.chart.update();
+          },
         },
         tooltip: {
-          enabled: false,
+          enabled: true,
           position: 'nearest',
+          usePointStyle: true,
+          backgroundColor: 'rgba(6, 55, 55, 0.9)',
+          titleFont: { weight: 'bold', size: 12 },
+          bodyFont: { size: 13, weight: 'bold' },
+          footerFont: { weight: 'normal', color: 'gray' },
+          callbacks: {
+            title: (tooltipItem: Array<any>) => {
+              this.logger.debug('tooltipItem', tooltipItem);
+              // extract the index of the dataset (fix ts2532)
+              const datasetIndex = tooltipItem[0].datasetIndex;
+              // get the dataset by index
+              const dataset = this.basicDatasets[datasetIndex];
 
-          external: (context) => {
-            console.warn('tooltipModel', context);
-            // Tooltip Element
-            const { chart, tooltip } = context;
-
-            const getOrCreateTooltip = (chart) => {
-              let tooltipEl = chart.canvas.parentNode.querySelector('div');
-
-              if (!tooltipEl) {
-                tooltipEl = document.createElement('div');
-                tooltipEl.classList.add('bar-item-tooltip');
-                const table = document.createElement('table');
-                table.classList.add('bar-item-table');
-                tooltipEl.appendChild(table);
-                const caret = document.createElement('div');
-                caret.classList.add('bar-item-caret');
-                const caretIcon = document.createElement('i');
-                caret.classList.add('fas');
-                caret.classList.add('fa-caret-right');
-                caret.appendChild(caretIcon);
-                tooltipEl.appendChild(caret);
-
-                // tooltipElExt.appendChild(caret);
-                chart.canvas.parentNode.appendChild(tooltipEl);
+              if (datasetIndex < 2) {
+                const dataIndex = tooltipItem[0].dataIndex;
+                if (!dataset.builds || !dataset.builds[dataIndex]) return null;
+                const build = dataset.builds[dataIndex];
+                return `⚙️ Build ${build.name}`;
               }
 
-              return tooltipEl;
-            };
+              return `⌛️ ${tooltipItem[0].dataset.label}`;
+            },
+            label: (tooltipItem: any) => {
+              // extract the index of the dataset (fix ts2532)
+              const dataIndex = tooltipItem.dataIndex;
+              // get the dataset by index
+              const dataset = tooltipItem.dataset;
+              if (!dataset || !dataset.builds)
+                return formatDuration(tooltipItem.formattedValue);
+              const build = dataset.builds[dataIndex];
+              return ` ${build.status}`;
+            },
 
-            const tooltipEl = getOrCreateTooltip(chart);
+            beforeFooter: (tooltipItem: any) => {
+              // extract the index of the dataset (fix ts2532)
+              const dataIndex = tooltipItem[0].dataIndex;
+              // get the dataset by index
+              const dataset = tooltipItem[0].dataset;
+              if (!dataset || !dataset.builds) return null;
+              const build = dataset.builds[dataIndex];
+              return `⏱️ created: ${DateUtils.formatTimestamp(
+                build.timestamp.toString()
+              )}`;
+            },
 
-            // Hide if no tooltip
-            if (tooltip.opacity === 0) {
-              tooltipEl.style.opacity = 0;
-              return;
-            }
+            footer: (tooltipItem: any) => {
+              if (!tooltipItem || tooltipItem.length === 0) return null;
+              if (tooltipItem[0].datasetIndex > 2) return null;
+              return `⌛️ duration: ${formatDuration(tooltipItem[0].raw)}`;
+            },
 
-            const makeTd = (type: string = 'detail', width?: string) => {
-              const td = document.createElement(
-                type === 'detail' ? 'td' : 'th'
-              );
-              td.style.borderWidth = '0';
-              return td;
-            };
-
-            const makeRow = (type: string = 'detail', build?: TestBuild) => {
-              const tr = document.createElement('tr');
-              tr.classList.add(`bar-item-tooltip-${type}`);
-
-              const iconContainer = document.createElement('div');
-              iconContainer.classList.add(`bar-item-tooltip-${type}-icon`);
-
-              const textContainer = document.createElement('div');
-              textContainer.classList.add(`bar-item-tooltip-${type}-text`);
-
-              const td = makeTd(type, '100%');
-              td.appendChild(iconContainer);
-              td.appendChild(textContainer);
-
-              tr.appendChild(td);
-
-              return {
-                row: tr,
-                icon: iconContainer,
-                text: textContainer,
-                build: build,
-                color: this.colorMap[build.status]?.color ?? 'gray',
-              };
-            };
-
-            // Set Text
-            if (tooltip.body) {
-              const titleLines = tooltip.title || [];
-              const bodyLines = tooltip.title || [];
-              const footerLines = tooltip.title || [];
-
-              this.logger.warn('bodyLines', bodyLines);
-
-              const tableHead = document.createElement('thead');
-
-              titleLines.forEach((title) => {
-                const build = this.getTestBuildByName(title);
-
-                const titleRowInfo = makeRow('header', build);
-
-                const tr = titleRowInfo.row;
-
-                const span = document.createElement('span');
-                span.style.background =
-                  this.colorMap[build.status]?.color ?? 'gray';
-                span.style.borderColor = 'white';
-                span.style.borderWidth = '2px';
-                // span.style.marginRight = '5px';
-                span.style.height = '12px';
-                span.style.width = '12px';
-                span.style.display = 'inline-block';
-                span.style.borderRadius = '12px';
-
-                const thIcon = titleRowInfo.icon;
-                thIcon.appendChild(span);
-
-                const th = titleRowInfo.text;
-                const text = document.createTextNode(
-                  `Build: #${title}: ${build.status}`
-                );
-                th.appendChild(text);
-                tableHead.appendChild(tr);
-              });
-
-              const tableBody = document.createElement('tbody');
-              bodyLines.forEach((title, i) => {
-                this.logger.warn('body', title, i);
-                const colors = tooltip.labelColors[i];
-                const item = this.getTestBuildByName(title);
-
-                var style = 'background:' + colors.backgroundColor;
-
-                const startedIcon = document.createElement('i');
-                startedIcon.classList.add('far');
-                startedIcon.classList.add('fa-clock');
-
-                const startedDiv = document.createElement('div');
-                startedDiv.classList.add('flex-row');
-                // startedDiv.classList.add('mr-1');
-                startedDiv.appendChild(startedIcon);
-                startedDiv.appendChild(
-                  document.createTextNode(
-                    ' started: ' +
-                      DateUtils.formatTimestamp(item.timestamp.toString())
-                  )
-                );
-
-                const startedRow = makeRow('detail', item);
-                startedRow.icon.appendChild(startedIcon);
-                startedRow.text.appendChild(startedDiv);
-
-                const durationIcon = document.createElement('i');
-                durationIcon.classList.add('fas');
-                durationIcon.classList.add('fa-stopwatch');
-
-                const durationDiv = document.createElement('div');
-                durationDiv.classList.add('flex-row');
-                durationDiv.appendChild(durationIcon);
-                durationDiv.appendChild(
-                  document.createTextNode(
-                    ' duration: ' + formatDuration(item.duration)
-                  )
-                );
-
-                const durationRow = makeRow('detail', item);
-                durationRow.icon.appendChild(durationIcon);
-                durationRow.text.appendChild(durationDiv);
-
-                tableBody.appendChild(startedRow.row);
-                tableBody.appendChild(durationRow.row);
-              });
-
-              const tableFooter = document.createElement('tfoot');
-              footerLines.forEach((title) => {
-                const build = this.getTestBuildByName(title);
-                const footerRow = document.createElement('tr');
-                const footerTd = document.createElement('td');
-                footerTd.colSpan = 2;
-                footerTd.classList.add('bar-item-tooltip-footer');
-                const footerText = document.createElement('span');
-                footerText.innerHTML = `click to see on <b class="text-white">${build.instance.service.type}</b>`;
-                footerTd.appendChild(footerText);
-                footerRow.appendChild(footerTd);
-                tableFooter.appendChild(footerRow);
-              });
-
-              // Remove old children
-              const tableRoot = tooltipEl.querySelector('table');
-              while (tableRoot.firstChild) {
-                tableRoot.firstChild.remove();
-              }
-
-              // Add new children
-              tableRoot.appendChild(tableHead);
-              tableRoot.appendChild(tableBody);
-              tableRoot.appendChild(tableFooter);
-
-              // tableRoot.parentNode.parentNode.appendChild(caret);
-            }
-
-            const {
-              offsetLeft: positionX,
-              offsetTop: positionY,
-            } = chart.canvas;
-
-            // Display, position, and set styles for font
-            tooltipEl.style.opacity = 1;
-            tooltipEl.style.left = positionX + tooltip.caretX - 115 + 'px';
-            tooltipEl.style.top = positionY + tooltip.caretY + 'px';
-            tooltipEl.style.font = tooltip.options.bodyFont.string;
-            tooltipEl.style.padding =
-              tooltip.options.padding +
-              'px ' +
-              tooltip.options.padding +
-              'px';
+            afterFooter: (tooltipItem: []) => {
+              return '🔗 click to see more';
+            },
           },
         },
       },
@@ -527,6 +394,7 @@ export class StatsBarChartComponent
 
   public chartClicked(e: any) {
     this.logger.debug('Chart click event', e);
+    return;
     if (!e || !e.element) return;
     let el: { element: BarElement; datasetIndex: number; index: number } =
       e.element;
