@@ -170,7 +170,7 @@ export class StatsBarChartComponent
               // get the dataset by index
               const dataset = tooltipItem.dataset;
               if (!dataset || !dataset.builds)
-                return formatDuration(tooltipItem.formattedValue);
+                return formatDuration(tooltipItem.raw);
               const build = dataset.builds[dataIndex];
               return ` ${build.status}`;
             },
