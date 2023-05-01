@@ -5,9 +5,6 @@
     </div>
   </div>
   <div *ngIf="stats" class="text-sm text-center">
-    <!-- <canvas baseChart height="80" width="120" [datasets]="pieChartData" [labels]="pieChartLabels"
-      [chartType]="pieChartType" [options]="pieChartOptions" [plugins]="pieChartPlugins" [legend]="pieChartLegend">
-    </canvas> -->
     <p-chart type="pie" [data]="pieChartData" [options]="pieChartOptions" [width]="120"></p-chart>
   </div>
 </div>

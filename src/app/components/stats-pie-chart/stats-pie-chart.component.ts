@@ -26,7 +26,7 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   _stats: AbstractStats = null;
 
   @Input() showTitle: boolean = true;
-  @Input() title: string = '# of Test Suites';
+  @Input() titleText: string = '';
 
   public pieChartLabels: Array<string> = [];
 
@@ -43,9 +43,9 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
       responsive: true,
       plugins: {
         title: {
-          display: this.showTitle,
+          display: () => this.showTitle,
           align: 'center',
-          text: this.title,
+          text: () => this.titleText,
           position: 'bottom',
           font: { weight: 'bold', size: 10 },
         },
