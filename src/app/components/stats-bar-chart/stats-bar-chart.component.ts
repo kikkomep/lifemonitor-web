@@ -338,22 +338,58 @@ export class StatsBarChartComponent
           display: false,
           ticks: {
             color: '#495057',
-            min: -20,
+            min: 0,
           },
           grid: {
             color: '#ebedef',
           },
         },
+        y1: {
+          display: true,
+          position: 'left',
+          ticks: {
+            display: false,
+            min: 0,
+          },
+
+          // grid line settings
+          grid: {
+            drawOnChartArea: false, // only want the grid lines for one axis to show up
+          },
+          time: { unit: 'second' },
+          title: {
+            display: true,
+            text: 'duration [hh:mm:ss]',
+            color: '#034545',
+            font: {
+              size: 10,
+              weight: 'bold',
+              lineHeight: 1.2,
+            },
+            padding: { top: 20, left: 0, right: 0, bottom: 0 },
+          },
+        },
         y: {
+          position: 'right',
+          suggestedMin: this.minDuration,
+          suggestedMax: this.maxDuration,
           ticks: {
             color: '#495057',
-            min: -20,
+            min: 0,
+            label: 'duration (seconds)',
+            display: true,
+            font: { size: 7, weight: 'normal' },
+            callback: function (val: number, index: number) {
+              // Hide the label of every 2nd dataset
+              console.warn('Formatting duration', val, index);
+              return formatDuration(val);
+              // return val;
+            },
           },
           grid: {
             color: '#ebedef',
           },
-          display: false,
-
+          display: true,
           time: { unit: 'second' },
         },
       },
