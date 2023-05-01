@@ -8,8 +8,7 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Label } from 'ng2-charts';
+import { ChartType } from 'chart.js';
 import {
   AbstractStats,
   AggregatedStatusStats,
@@ -26,54 +25,61 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 export class StatsPieChartComponent implements OnInit, OnChanges {
   _stats: AbstractStats = null;
 
-  // initialize logger
-  private logger: Logger = LoggerManager.create('StatsPieChartComponent');
+  @Input() showTitle: boolean = true;
+  @Input() title: string = '# of Test Suites';
 
-  public pieChartOptions: ChartOptions = {
-    responsive: true,
-    cutoutPercentage: 15,
-    // circumference: 10,
-    tooltips: {
-      mode: 'label',
-      enabled: true,
-      footerFontSize: 9,
-      footerFontColor: 'lightgray',
-      footerAlign: 'right',
-      callbacks: {
-        // title: (tooltipItem, data) => {
-        //   return 'Test Instances ';
-        // },
-        label: function (tooltipItem, data) {
-          var indice = tooltipItem.index;
-          return (
-            ' ' +
-            data.labels[indice] +
-            ': ' +
-            data.datasets[0].data[indice] +
-            ''
-          );
-        },
-        footer: (item, data) => {
-          return 'click to see more';
-        },
-      },
-    },
-    plugins: {
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-      },
-    },
-    legend: {
-      position: 'right',
-    },
-  };
-  public pieChartLabels: Label[] = [];
+  public pieChartLabels: Array<string> = [];
 
-  public pieChartData: ChartDataSets[];
+  public pieChartData: any;
   public pieChartType: ChartType = 'pie';
   public pieChartLegend = false;
   public pieChartPlugins = [];
+
+  // initialize logger
+  private logger: Logger = LoggerManager.create('StatsPieChartComponent');
+
+  public get pieChartOptions(): any {
+    return {
+      responsive: true,
+      plugins: {
+        title: {
+          display: this.showTitle,
+          align: 'center',
+          text: this.title,
+          position: 'bottom',
+          font: { weight: 'bold', size: 10 },
+        },
+        legend: {
+          display: false,
+          labels: {
+            color: '#495057',
+          },
+        },
+        tooltip: {
+          enabled: true,
+          position: 'nearest',
+          bodyFont: { weight: 'bold', size: 13 },
+          footerFont: { weight: 'normal', size: 11 },
+          footerColor: 'lightgray',
+          footerAlign: 'right',
+          backgroundColor: 'rgba(6, 55, 55, 0.9)',
+          callbacks: {
+            label: (context: any) => {
+              let label = context.label[0] || 'Unknown';
+              this.logger.warn('context', context);
+              if (label) {
+                label += ': ' + context.formattedValue;
+              }
+              return ` ${label}`;
+            },
+            footer: (item: any, data: any) => {
+              return 'click to see more';
+            },
+          },
+        },
+      },
+    };
+  }
 
   constructor(private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
@@ -82,7 +88,15 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   @Input()
   set stats(stats: AbstractStats) {
     this._stats = stats;
-    this.update();
+    this.pieChartData = {
+      labels: this.getLabels(),
+      datasets: [
+        {
+          data: this.data,
+          backgroundColor: this.getColors(),
+        },
+      ],
+    };
   }
 
   get stats(): AbstractStats {
@@ -98,7 +112,6 @@ export class StatsPieChartComponent implements OnInit, OnChanges {
   public update() {
     this.zone.runOutsideAngular(() => {
       if (this.stats) {
-        this.pieChartLabels = this.getLabels();
         this.pieChartData = [
           {
             data: this.data,
