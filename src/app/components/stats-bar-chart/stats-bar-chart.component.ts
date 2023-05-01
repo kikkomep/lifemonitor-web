@@ -50,6 +50,11 @@ export class StatsBarChartComponent
 
   basicDatasets: Array<any>;
 
+  // duration stsatistics
+  minDuration: number;
+  maxDuration: number;
+  averageDuration: number;
+
   subscription: Subscription;
 
   public selectedObject: StatusStatsItem;
@@ -356,27 +361,127 @@ export class StatsBarChartComponent
   }
 
   initializeDatasets() {
-    // TODO: fix this hack to take into account different test suites
-    // each data set is a test suite
     this.basicDatasets = [];
 
-    const dataset = {
-      data: [],
-      builds: [],
-      label: 'Test Suite 1',
-      backgroundColor: [],
-      yAxisID: 'y',
+    const passedBuildsDataset = {
+      builds: [...this.stats],
+      get data(): [] {
+        return this['builds'].map((b: TestBuild) =>
+          b.status === 'passed' ? b.duration : 0
+        );
+      },
+      label: 'Passing',
+      backgroundColor: Array.from(
+        { length: this.stats.length },
+        () => this.colorMap['passed'].color
+      ),
+      yAxisID: 'y1',
+      order: 4,
+      stack: 'builds',
     };
 
-    this.stats.forEach((s) => {
-      dataset.builds.push(s);
-      dataset.data.push(s.duration);
-      dataset.backgroundColor.push(
-        s.status in this.colorMap ? this.colorMap[s.status].color : 'gray'
-      );
-    });
+    const failedBuildsDataset = {
+      get data(): [] {
+        return this['builds'].map((b: TestBuild) =>
+          ['failed', 'error'].find((s) => s === b.status) ? b.duration : 0
+        );
+      },
+      builds: [...this.stats],
+      label: 'Failing',
+      backgroundColor: Array.from(
+        { length: this.stats.length },
+        () => this.colorMap['failed'].color
+      ),
+      yAxisID: 'y1',
+      order: 5,
+      stack: 'builds',
+    };
 
-    this.basicDatasets = [dataset];
+    const builds = passedBuildsDataset.builds;
+    const values = passedBuildsDataset.data.filter((d) => d > 0);
+    const minDuration = (this.minDuration = Math.min(...values));
+    const maxDuration = (this.maxDuration = Math.max(...values));
+    const averageDuration = (this.averageDuration =
+      values.reduce((a, b) => a + b, 0) / values.length);
+
+    this.logger.debug('Builds: ', builds);
+    this.logger.debug('Dataset: ', values);
+    this.logger.debug('Min duration: ' + minDuration);
+    this.logger.debug('Max duration: ' + maxDuration);
+    this.logger.debug('Average duration: ' + averageDuration);
+
+    this.basicDatasets = [
+      passedBuildsDataset,
+      failedBuildsDataset,
+      {
+        data: Array.from(
+          { length: passedBuildsDataset.data.length },
+          () => minDuration
+        ),
+        label: 'Min Duration',
+        backgroundColor: 'rgba(249,178,51,.1)',
+        borderColor: 'rgba(249,178,51,1)',
+        borderWidth: 2,
+        borderDash: [2, 2],
+        // tension: 0.1,
+        fill: true,
+        hitRadius: 10,
+        pointRadius: (ctx: any) => {
+          return passedBuildsDataset.data[ctx.dataIndex] === minDuration
+            ? 5
+            : 0;
+        },
+        yAxisID: 'y1',
+        order: 0,
+        type: 'line',
+        pointStyle: 'star',
+        title: 'Min duration: ' + formatDuration(minDuration),
+      },
+      {
+        data: Array.from(
+          { length: passedBuildsDataset.data.length },
+          () => maxDuration
+        ),
+        label: 'Max Duration',
+        backgroundColor: 'rgba(232,62,140,.5)',
+        borderColor: 'rgba(232,62,140,1)',
+        borderWidth: 2,
+        borderDash: [1, 1],
+        // tension: 0.4,
+        fill: false,
+        pointRadius: (ctx: any) => {
+          return passedBuildsDataset.data[ctx.dataIndex] === maxDuration
+            ? 5
+            : 0;
+        },
+        yAxisID: 'y1',
+        order: 1,
+        type: 'line',
+        pointStyle: 'triangle',
+      },
+      {
+        data: Array.from(
+          { length: passedBuildsDataset.data.length },
+          () => averageDuration
+        ),
+        label: 'Avg Duration',
+        backgroundColor: 'rgba(23,162,184,.1)',
+        borderColor: 'rgba(23,162,184,1)',
+        borderWidth: 1,
+        borderDash: [5, 5],
+        // tension: 0.1,
+        fill: false,
+        pointRadius: (ctx: any) => {
+          return passedBuildsDataset.data[ctx.dataIndex] === averageDuration
+            ? 5
+            : 0;
+        },
+        yAxisID: 'y1',
+        order: 2,
+        type: 'line',
+        pointStyle: 'cross',
+      },
+    ];
 
     this.basicData = {
       labels: this.stats.map((s) => s.name),
