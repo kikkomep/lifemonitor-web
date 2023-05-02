@@ -392,7 +392,6 @@ export class StatsBarChartComponent
 
   public chartClicked(e: any) {
     this.logger.debug('Chart click event', e);
-    return;
     if (!e || !e.element) return;
     let el: { element: BarElement; datasetIndex: number; index: number } =
       e.element;
