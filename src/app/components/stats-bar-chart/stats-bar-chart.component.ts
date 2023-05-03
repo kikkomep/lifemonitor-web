@@ -58,11 +58,11 @@ export class StatsBarChartComponent
 
   private colorMap = {
     passed: { color: '#1f8787' },
-    failed: { color: '#dc3545' },
     error: { color: '#ffc107' },
-    aborted: { color: '#6c757d' },
-    running: { color: '#17a2b8' },
+    failed: { color: '#dc3545' },
     waiting: { color: '#fd7e14' },
+    running: { color: '#17a2b8' },
+    aborted: { color: '#6c757d' },
   };
 
   constructor(private router: Router, private zone: NgZone) {}
