@@ -815,6 +815,13 @@ export class AppService {
                 workflow: workflow,
                 workflow_version: workflow_version,
               };
+            }),
+            catchError((e) => {
+              workflowsStatus.setLoaded(workflow.uuid);
+              console.error(e);
+              this.logger.error('Error loading workflow', e);              // workflowsStatus.setError(workflow.uuid);
+              this.subjectLoadingWorkflowsStatus.next(workflowsStatus);
+              return of(null);
             })
           );
         }),

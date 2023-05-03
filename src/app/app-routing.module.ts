@@ -102,29 +102,32 @@ export class AppRoutingModule {
 
     this.apiService.onAuthorizationError = (error: FetchError) => {
       this.logger.warn('Authorization error detected', error);
-      this.authService.checkIsUserLogged().then((isUserLogged) => {
-        if (isUserLogged) {
-          this.authService.logout(false).then(() => {
-            this.inputDialogService.show({
-              question: 'Session Expired',
-              description: 'You need to relogin',
-              confirmText: 'Login',
-              iconClass: 'fas fa-user-clock',
-              enableCancel: true,
-              onCancel: () => {
-                window.location.reload();
-              },
-              onConfirm: () => {
-                this.router.navigateByUrl('/login');
-              },
-            });
-          });
-        }
-      });
-    };
+    this.apiService.onError = async (error: FetchError, response: Response) => {
+      this.logger.error('Generic error detected', error, response);
+      if (error.status === 401) {
+        this.toastr.error('Session expired', '', { timeOut: 4000 });
+        this.router.navigateByUrl('/login');
+      } else if (
+        error.status === 503 &&
+        error.statusText.match(/service unavailable/i)
+      ) {
+        const serviceDetails = await response?.json();
+        console.warn(
+          serviceDetails?.extra_info?.service || error,
+          'External service unavailable'
+        );
+        this.toastr.warning(
+          'Service Unavailable',
+          serviceDetails?.extra_info?.service || error,
+          {
+            timeOut: 4000,
+          }
+        );
+      } 
+      // else {
+      //   this.toastr.error('Something went wrong', '', { timeOut: 4000 });
+      // }
 
-    this.apiService.onError = (error: FetchError) => {
-      this.logger.error('Generic error detected', error);
       if (this.configService.developmentMode) {
         this.inputDialogService.show({
           question: 'Ops...',

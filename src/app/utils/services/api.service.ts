@@ -174,8 +174,8 @@ export class ApiService {
     this.logger.error('Detected Authorization error', error);
   };
 
-  public onError = (error: FetchError) => {
-    this.logger.error('Detected error', error);
+  public onError = (error: FetchError, response?: Response) => {
+    this.logger.error('Detected error', error, response);
   };
 
   private doGet<T>(
@@ -200,7 +200,6 @@ export class ApiService {
     const base_path = options.base_path ?? this.apiBaseUrl;
     const httpOptions = options.http_options ?? this.get_http_options();
     const url: string = `${base_path}${path}`;
-
     return this.cachedHttpClient
       .get<T>(url, {
         ...httpOptions,
@@ -208,7 +207,10 @@ export class ApiService {
         cacheGroup: options.cacheGroup,
         cacheTTL: options.cacheTTL,
       })
-      .pipe(retry(MAX_RETRIES), catchError(this.handleError<T>(url)));
+      .pipe(
+        retry(MAX_RETRIES),
+        catchError((error: FetchError) => this.handleError('doGet', error))
+      );
   }
 
   async logout(redirect: boolean = true): Promise<boolean> {
@@ -299,7 +301,7 @@ export class ApiService {
         tap(() => {
           this.logger.debug('Notifications updated');
         }),
-        catchError(this.handleError('Updating notifications', []))
+        catchError((error) => this.handleError('Updating notifications', error))
       );
   }
 
@@ -315,7 +317,7 @@ export class ApiService {
           this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
           this.logger.debug('Notification deleted');
         }),
-        catchError(this.handleError('Deleting notification', []))
+        catchError((error) => this.handleError('Deleting notification', error))
       );
   }
 
@@ -335,7 +337,7 @@ export class ApiService {
           this.cachedHttpClient.deleteCacheEntryByKey('userNotifications');
           this.logger.debug('Notifications deleted');
         }),
-        catchError(this.handleError('Deleting notifications', []))
+        catchError((error) => this.handleError('Deleting notifications', error))
       );
   }
 
@@ -605,7 +607,7 @@ export class ApiService {
       .pipe(
         retry(MAX_RETRIES),
         tap((data) => this.logger.debug('RO-Create downloaded')),
-        catchError(this.handleError('download RO-Crate', []))
+        catchError((error) => this.handleError('download RO-Crate', error))
       );
   }
 
@@ -737,7 +739,7 @@ export class ApiService {
       tap((data) => {
         this.logger.debug('Loaded workflows TAP: ', data);
       }),
-      catchError(this.handleError('get_workflows', []))
+      catchError((error) => this.handleError('get_workflows', error))
     );
   }
 
@@ -1152,20 +1154,18 @@ export class ApiService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      // TODO: send the error to remote logging infrastructure
-      this.logger.error(error); // log to console instead
+  private handleError(operation = 'operation', error: any) {
+    // TODO: send the error to remote logging infrastructure
+    this.logger.error(error); // log to console instead
 
-      // TODO: better job of transforming error for user consumption
-      this.logger.debug(`${operation} failed: ${error.message}`);
+    // TODO: better job of transforming error for user consumption
+    this.logger.debug(`${operation} failed: ${error.message}`);
 
-      if (error.status === 401 && error.statusText === 'UNAUTHORIZED') {
-        if (this.onAuthorizationError) this.onAuthorizationError(error);
-      } else if (this.onError) this.onError(error);
+    if (error.status === 401 && error.statusText === 'UNAUTHORIZED') {
+      if (this.onAuthorizationError) this.onAuthorizationError(error);
+    } else if (this.onError) this.onError(error, error?.response);
 
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
+    // Let the app keep running by returning an empty result.
+    return throwError(error);
   }
 }

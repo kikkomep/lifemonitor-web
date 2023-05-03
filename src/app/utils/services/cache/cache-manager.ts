@@ -248,8 +248,9 @@ export class CacheManager {
           break;
         } catch (error) {
           logger.error('Detected error', response, error);
-          if (retry > 0) retry -= 1;
-          else {
+          retry -= 1;
+          logger.error(`Retrying request ${url}... (retries left: ${retry})`);
+          if (retry === 0) {
             if (response && response.status >= 400 && response.status < 600) {
               if (response.status === 404) {
                 await cache.delete(request.url);
