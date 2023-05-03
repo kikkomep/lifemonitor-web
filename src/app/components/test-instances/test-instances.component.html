@@ -10,18 +10,18 @@
 
   <p-dataView #instancesDataView [value]="testInstances" [paginator]="true" [rows]="10" layout="list">
     <ng-template pTemplate="header">
-      <div class="d-block">
+      <div class="d-block m-0 p-0">
         <div class="text-sm-center text-md-right p-4">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
         </div>
-        <div class="d-flex">
+        <div class="d-flex m-0 p-0">
           <div class="d-inline row instance-list-item mt-4" *ngIf="dataView && dataView.layout === 'list'">
-            <div class="col-3 col-sm-1 col-lg-1 d-inline-block instance-list-item-header"></div>
-            <div class="col-9 col-sm-11 col-md-6 col-lg-5 d-inline-block instance-list-item-header text-left">Test
+            <div class="d-inline-block col-sm-1 col-md-1 col-xl-1 instance-list-item-header"></div>
+            <div class="d-inline-block col-sm-11 col-md-5 col-xl-5 instance-list-item-header text-left">Test
               Instance</div>
-            <div class="col-2 col-xl-1 d-none d-lg-inline-block instance-list-item-header">Engine</div>
-            <div class="col-2 d-none d-xl-inline-block instance-list-item-header">Testing Service</div>
-            <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block instance-list-item-header">Latest Test Builds
+            <div class="d-none d-xl-inline-block col-xl-1 instance-list-item-header">Engine</div>
+            <div class="d-none d-xl-inline-block col-xl-1 instance-list-item-header">Testing Service</div>
+            <div class="d-none d-md-inline-block col-md-6 col-xl-4 instance-list-item-header">Latest Test Builds
             </div>
           </div>
         </div>
@@ -30,13 +30,13 @@
     <ng-template let-instance pTemplate="listItem">
       <div class="d-flex">
         <div class="d-inline-flex row instance-list-item">
-          <div class="col-2 col-sm-1 col-lg-1 d-inline-block text-center">
+          <div class="d-inline-block col-sm-1 col-md-1 col-xl-1 text-center">
             <div class="instance-grid-item-status" [ngClass]="instance.class" [pTooltip]="instance.statusText"
               tooltipPosition="top" showDelay="1500">
               <i class="{{ instance.statusIcon }} fa-2x"></i>
             </div>
           </div>
-          <div class="col-10 col-sm-11 col-md-6 col-lg-5 d-inline-block">
+          <div class="d-inline-block col-sm-11 col-md-5 col-xl-5">
             <div class="instance-name">
               <input *ngIf="instance.editingMode" type="text" [(ngModel)]="instance.name"
                 class="form-control datatable-input-no-border" aria-describedby="instanceNameInput"
@@ -58,7 +58,7 @@
               <b>url:</b> {{ instance.externalLink }}
             </div>
           </div>
-          <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">
+          <div class="d-none d-xl-inline-block col-xl-1 text-center">
             <div class="text-center instance-list-item-engine-type" data-html="true" data-toggle="tooltip"
               tooltipPosition="top" showDelay="2000"
               pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i><b>{{instance.suite.engineType}}</b> engine</div>">
@@ -68,7 +68,7 @@
                 class="far fa-question-circle fa-2x mr-3 text-muted"></i>
             </div>
           </div>
-          <div class="col-2 d-none d-xl-inline-block text-center">
+          <div class="d-none d-xl-inline-block col-xl-1 text-center m-auto">
             <div class="text-center instance-list-item-service-type" data-html="true" data-toggle="tooltip"
               tooltipPosition="top" showDelay="2000"
               pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i><b>{{instance.service.type}}</b> service</span>">
@@ -77,10 +77,10 @@
               </a>
             </div>
           </div>
-          <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block">
+          <div class="d-none d-md-inline-block col-md-6 col-xl-4">
             <div class="instance-list-item-builds-chart">
               <stats-bar-chart [stats]="instance.getLatestBuilds() | arraySizeFilterPipe: 10"
-                (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+                (selectedItem)="selectTestBuild($event)" [showTitle]="false"></stats-bar-chart>
             </div>
           </div>
 
@@ -141,7 +141,7 @@
             </div>
 
             <!-- Testing Service Typpe -->
-            <div class="instance-grid-item-instances">
+            <div class="instance-grid-item-instances mt-4">
               <div class="text-sm">platform</div>
               <div class="text-center instance-grid-item-service-type" data-html="true" data-toggle="tooltip"
                 tooltipPosition="bottom"
@@ -157,7 +157,7 @@
               <div class="text-smx">Latest Test Builds</div>
               <div class="instance-grid-item-builds-chart">
                 <stats-bar-chart [stats]="instance.getLatestBuilds() | arraySizeFilterPipe: 10"
-                  (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+                  (selectedItem)="selectTestBuild($event)" [showTitle]="false" chartWidth="fit-content"></stats-bar-chart>
               </div>
             </div>
 

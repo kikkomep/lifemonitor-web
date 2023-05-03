@@ -290,6 +290,10 @@ export class DashboardComponent
     return window.matchMedia('(max-width: 576px)').matches;
   }
 
+  get windowWidth(): number {
+    return window.innerWidth;
+  }
+
   ngAfterViewInit(): void {
     // $('[data-toggle="tooltip"]', function () {
     //   $(this).tooltip('hide');
@@ -384,6 +388,14 @@ export class DashboardComponent
 
   public goToFirstPage() {
     $('.p-paginator-first').click();
+  }
+
+  public onChangeLayout(event: any) {
+    // this.editModeEnabled = false;
+    // this.workflows?.forEach((w) => {
+    //   w['editMode'] = false;
+    //   w['editSubscription'] = false;
+    // });
   }
 
   public set workflowNameFilter(value: string) {

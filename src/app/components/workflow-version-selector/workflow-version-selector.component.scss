@@ -4,9 +4,12 @@
     background-color: white !important;
   }
 
+  .selector-container {
+    border: none;
+  }
+
   .version-option {
     margin: auto;
-    text-align: center;
     width: 100%;
 
     li a.version-option span.text {
@@ -19,13 +22,14 @@
   }
 
   button {
+    padding: 0;
+
     .filter-option {
       text-align: center;
     }
   }
 
   .version-picker {
-    text-align: center;
     margin: auto !important;
   }
 }

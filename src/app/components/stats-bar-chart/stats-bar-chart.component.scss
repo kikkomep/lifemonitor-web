@@ -1,0 +1,109 @@
+:host ::ng-deep {
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
+
+  .bar-item-tooltip {
+    // top: 0;
+    padding: 0;
+    margin: 0;
+    width: fit-content;
+    // min-width: 260px;
+    pointer-events: none;
+    position: absolute;
+    transform: translate(-50%, 0);
+    transition: all 0.1s ease;
+    font-size: 11px;
+    align-items: left;
+    text-align: left;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+  }
+
+  .bar-item-table,
+  .bar-item-caret {
+    margin: 0;
+    padding: 0;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    justify-content: center;
+  }
+
+  .bar-item-table {
+    background: rgba(4, 35, 35, 0.9);
+    border-radius: 10px;
+    color: white;
+    padding: 10px;
+    opacity: 1;
+    z-index: 1;
+    text-align: left;
+    // opacity: 1;
+    // min-width: 100%;
+  }
+
+  .bar-item-caret {
+    font-size: 1.2rem;
+    // margin-left: -1px;
+  }
+
+  .bar-item-tooltip table {
+    padding: 10px;
+    width: fit-content;
+    min-width: fit-content;
+  }
+
+  .bar-item-tooltip-header {
+    padding: 20px 0;
+  }
+
+  .bar-item-tooltip-detail {
+    font-size: 10px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .bar-item-tooltip-detail-icon,
+  .bar-item-tooltip-detail-text,
+  .bar-item-tooltip-header-icon,
+  .bar-item-tooltip-header-text {
+    display: inline-flex;
+    justify-content: center;
+    vertical-align: middle;
+  }
+
+  .bar-item-tooltip-detail-icon,
+  .bar-item-tooltip-header-icon {
+    width: 25px;
+  }
+
+  .bar-item-tooltip-detail-text,
+  .bar-item-tooltip-header-text {
+    width: auto;
+  }
+
+  .bar-item-tooltip-header-text {
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .bar-item-tooltip-detail-text {
+    font-size: 0.7rem;
+    font-weight: 200;
+  }
+
+  .bar-item-tooltip-footer {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    margin-top: 5px;
+    padding: 0;
+    font-size: 0.6rem;
+    font-weight: 200;
+    width: calc(300px- 25px);
+  }
+}

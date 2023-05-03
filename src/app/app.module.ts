@@ -10,7 +10,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { SocketIoModule } from 'ngx-socket-io';
 
-import { ChartsModule } from 'ng2-charts';
 import { ToastrModule } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
@@ -66,6 +65,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { ChartModule } from 'primeng/chart';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -131,13 +131,13 @@ export function initConfigService(appConfig: AppConfigService) {
     AppRoutingModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    ChartModule,
     HttpClientModule,
     ToastrModule.forRoot({
       timeOut: 10000,
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }),
-    ChartsModule,
     NgbModule,
     SocketIoModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
