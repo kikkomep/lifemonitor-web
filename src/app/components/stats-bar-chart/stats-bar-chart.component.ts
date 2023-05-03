@@ -341,34 +341,32 @@ export class StatsBarChartComponent
       failedBuildsDataset,
       {
         data: Array.from(
-          { length: passedBuildsDataset.data.length },
+          { length: datasets[0].data.length },
           () => minDuration
         ),
-        label: 'Min Duration',
-        backgroundColor: 'rgba(249,178,51,.1)',
-        borderColor: 'rgba(249,178,51,1)',
+        label: 'min duration',
+        backgroundColor: 'rgba(147,255,51,.1)',
+        borderColor: 'rgba(147,255,51,1)',
         borderWidth: 2,
         borderDash: [2, 2],
         // tension: 0.1,
         fill: true,
         hitRadius: 10,
         pointRadius: (ctx: any) => {
-          return passedBuildsDataset.data[ctx.dataIndex] === minDuration
-            ? 5
-            : 0;
+          return datasets[0].data[ctx.dataIndex] === minDuration ? 5 : 0;
         },
         yAxisID: 'y1',
         order: 0,
         type: 'line',
         pointStyle: 'star',
-        title: 'Min duration: ' + formatDuration(minDuration),
+        title: 'min duration: ' + formatDuration(minDuration),
       },
       {
         data: Array.from(
-          { length: passedBuildsDataset.data.length },
+          { length: datasets[0].data.length },
           () => maxDuration
         ),
-        label: 'Max Duration',
+        label: 'max duration',
         backgroundColor: 'rgba(232,62,140,.5)',
         borderColor: 'rgba(232,62,140,1)',
         borderWidth: 2,
@@ -376,9 +374,7 @@ export class StatsBarChartComponent
         // tension: 0.4,
         fill: false,
         pointRadius: (ctx: any) => {
-          return passedBuildsDataset.data[ctx.dataIndex] === maxDuration
-            ? 5
-            : 0;
+          return datasets[0].data[ctx.dataIndex] === maxDuration ? 5 : 0;
         },
         yAxisID: 'y1',
         order: 1,
@@ -387,10 +383,10 @@ export class StatsBarChartComponent
       },
       {
         data: Array.from(
-          { length: passedBuildsDataset.data.length },
+          { length: datasets[0].data.length },
           () => averageDuration
         ),
-        label: 'Avg Duration',
+        label: 'avg duration',
         backgroundColor: 'rgba(23,162,184,.1)',
         borderColor: 'rgba(23,162,184,1)',
         borderWidth: 1,
@@ -398,9 +394,7 @@ export class StatsBarChartComponent
         // tension: 0.1,
         fill: false,
         pointRadius: (ctx: any) => {
-          return passedBuildsDataset.data[ctx.dataIndex] === averageDuration
-            ? 5
-            : 0;
+          return datasets[0].data[ctx.dataIndex] === averageDuration ? 5 : 0;
         },
         yAxisID: 'y1',
         order: 2,
