@@ -618,7 +618,8 @@
                       </div>
                       <a *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length > 0"
                         [routerLink]="['/workflow', { uuid: item.asUrlParam() }]">
-                        <stats-pie-chart [stats]="item.suites"></stats-pie-chart>
+                        <stats-pie-chart [stats]="item.suites" [showTitle]="true"
+                          titleText="# of test suites"></stats-pie-chart>
                       </a>
                     </div>
                   </div>
