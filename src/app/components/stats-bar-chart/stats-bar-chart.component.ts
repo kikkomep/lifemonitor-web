@@ -186,13 +186,14 @@ export class StatsBarChartComponent
               const dataIndex = tooltipItem.dataIndex;
               // get the dataset by index
               const dataset = tooltipItem.dataset;
-              this.logger.warn(
-                'dataset color',
-                dataset.backgroundColor[dataIndex]
-              );
+              const lColor =
+                typeof dataset.backgroundColor === 'string' ||
+                dataset.backgroundColor instanceof String
+                  ? dataset.borderColor
+                  : dataset.backgroundColor[dataIndex];
               return {
-                borderColor: dataset.backgroundColor[dataIndex],
-                backgroundColor: dataset.backgroundColor[dataIndex],
+                borderColor: lColor,
+                backgroundColor: lColor,
                 borderWidth: 2,
                 borderDash: [2, 2],
                 borderRadius: 2,
