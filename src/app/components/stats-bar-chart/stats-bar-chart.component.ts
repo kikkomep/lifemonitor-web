@@ -158,7 +158,7 @@ export class StatsBarChartComponent
               // get the dataset by index
               const dataset = this.basicDatasets[datasetIndex];
 
-              if (datasetIndex < 2) {
+              if (datasetIndex < 6) {
                 const dataIndex = tooltipItem[0].dataIndex;
                 if (!dataset.builds || !dataset.builds[dataIndex]) return null;
                 const build = dataset.builds[dataIndex];
