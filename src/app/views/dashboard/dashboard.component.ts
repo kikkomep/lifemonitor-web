@@ -34,6 +34,7 @@ import { InputDialogService } from 'src/app/utils/services/input-dialog.service'
 import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
 import { StatsFilterPipe } from './../../utils/filters/stats-filter.pipe';
 import { BaseDataViewComponent } from 'src/app/components/base-data-view/base-data-view.component';
+import { ItemFilterPipe } from 'src/app/utils/filters/item-filter.pipe';
 
 declare var $: any;
 
@@ -72,6 +73,7 @@ export class DashboardComponent
   _browseButtonEnabled: boolean = false;
 
   private statsFilter = new StatsFilterPipe();
+  private itemFilter = new ItemFilterPipe();
 
   // Reference to the dataTable instance
   private workflowDataTable: any = null;
