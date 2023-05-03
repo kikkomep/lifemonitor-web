@@ -293,6 +293,7 @@ export class AppService {
                   this.logger.warn('Workflow version not outdated');
                 } else {
                   this.subjectWorkflowUpdate.next(wv);
+                  this.updateLoadingStateOfWorkflow(wv.uuid, false);
                   this.toastService.success(
                     `${wv.name} (ver.${wv.version['version']}) reloaded!`,
                     'Workflow updated',
@@ -480,6 +481,7 @@ export class AppService {
     uuid: string;
     version: string;
   }): Promise<boolean> {
+    this.updateLoadingStateOfWorkflow(workflow.uuid, true);
     await this.api.cache.refreshCacheEntriesGroup(
       JSON.stringify({
         type: 'workflow',
@@ -494,6 +496,7 @@ export class AppService {
         version: workflow.version,
       })
     );
+    this.updateLoadingStateOfWorkflow(workflow.uuid, false);
     return true;
   }
 
