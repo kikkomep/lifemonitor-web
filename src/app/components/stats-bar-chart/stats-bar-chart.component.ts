@@ -239,6 +239,7 @@ export class StatsBarChartComponent
           display: true,
           position: 'left',
           ticks: {
+            beginAtZero: true,
             display: false,
             min: 0,
           },
@@ -267,6 +268,7 @@ export class StatsBarChartComponent
           ticks: {
             color: '#495057',
             min: 0,
+            beginAtZero: true,
             label: 'duration (seconds)',
             display: true,
             font: { size: 7, weight: 'normal' },
@@ -289,42 +291,36 @@ export class StatsBarChartComponent
   initializeDatasets() {
     this.basicDatasets = [];
 
-    const passedBuildsDataset = {
-      builds: [...this.stats],
-      get data(): [] {
-        return this['builds'].map((b: TestBuild) =>
-          b.status === 'passed' ? b.duration : 0
-        );
-      },
-      label: 'Passing',
-      backgroundColor: Array.from(
-        { length: this.stats.length },
-        () => this.colorMap['passed'].color
-      ),
-      yAxisID: 'y1',
-      order: 4,
-      stack: 'builds',
-    };
+    const datasets = [];
+    for (const statusType in this.colorMap) {
+      const dataset = {
+        builds: [...this.stats],
+        get data(): [] {
+          return this['builds'].map((b: TestBuild) =>
+            [statusType].find((s) => s === b.status) ? b.duration : null
+          );
+        },
+        label: statusType,
+        backgroundColor: Array.from(
+          { length: this.stats.length },
+          () => this.colorMap[statusType].color
+        ),
+        borderColor: Array.from(
+          { length: this.stats.length },
+          () => this.colorMap[statusType].color
+        ),
+        yAxisID: 'y1',
+        order: datasets.length + 3,
+        stack: 'builds',
+        borderSkipped: true,
+        borderWidth: 4,
+        minBarLength: 4,
+      };
+      datasets.push(dataset);
+    }
 
-    const failedBuildsDataset = {
-      get data(): [] {
-        return this['builds'].map((b: TestBuild) =>
-          ['failed', 'error'].find((s) => s === b.status) ? b.duration : 0
-        );
-      },
-      builds: [...this.stats],
-      label: 'Failing',
-      backgroundColor: Array.from(
-        { length: this.stats.length },
-        () => this.colorMap['failed'].color
-      ),
-      yAxisID: 'y1',
-      order: 5,
-      stack: 'builds',
-    };
-
-    const builds = passedBuildsDataset.builds;
-    const values = passedBuildsDataset.data.filter((d) => d > 0);
+    const builds = [...this.stats];
+    const values = datasets[0].data.filter((d) => d > 0);
     const minDuration = (this.minDuration = Math.min(...values));
     const maxDuration = (this.maxDuration = Math.max(...values));
     const averageDuration = (this.averageDuration =
@@ -337,8 +333,7 @@ export class StatsBarChartComponent
     this.logger.debug('Average duration: ' + averageDuration);
 
     this.basicDatasets = [
-      passedBuildsDataset,
-      failedBuildsDataset,
+      ...datasets,
       {
         data: Array.from(
           { length: datasets[0].data.length },
