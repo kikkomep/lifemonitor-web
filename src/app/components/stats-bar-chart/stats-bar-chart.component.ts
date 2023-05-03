@@ -99,6 +99,10 @@ export class StatsBarChartComponent
 
   private setOptions(): any {
     return {
+      interaction: {
+        intersect: true,
+        mode: 'nearest',
+      },
       plugins: {
         title: {
           display: this.showTitle,
@@ -164,6 +168,8 @@ export class StatsBarChartComponent
               return `⌛️ ${tooltipItem[0].dataset.label}`;
             },
             label: (tooltipItem: any) => {
+              // this.logger.warn('tooltipItem', tooltipItem);
+              if (tooltipItem.raw === null) return;
               // extract the index of the dataset (fix ts2532)
               const dataIndex = tooltipItem.dataIndex;
               // get the dataset by index
@@ -172,6 +178,25 @@ export class StatsBarChartComponent
                 return formatDuration(tooltipItem.raw);
               const build = dataset.builds[dataIndex];
               return ` ${build.status}`;
+            },
+
+            labelColor: (tooltipItem: any) => {
+              this.logger.warn('tooltipItem', tooltipItem);
+              // extract the index of the dataset (fix ts2532)
+              const dataIndex = tooltipItem.dataIndex;
+              // get the dataset by index
+              const dataset = tooltipItem.dataset;
+              this.logger.warn(
+                'dataset color',
+                dataset.backgroundColor[dataIndex]
+              );
+              return {
+                borderColor: dataset.backgroundColor[dataIndex],
+                backgroundColor: dataset.backgroundColor[dataIndex],
+                borderWidth: 2,
+                borderDash: [2, 2],
+                borderRadius: 2,
+              };
             },
 
             beforeFooter: (tooltipItem: any) => {
