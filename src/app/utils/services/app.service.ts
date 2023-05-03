@@ -497,6 +497,16 @@ export class AppService {
     return true;
   }
 
+  public async refreshWorkflowsList(workflows: Array<WorkflowVersion>) {
+    this.logger.debug('List of workflows to be refreshed', workflows);
+    workflows.forEach(async (wf) => {
+      await this.refreshWorkflowVersion({
+        uuid: wf.uuid,
+        version: wf.version['version'],
+      });
+    });
+  }
+
   public startSync() {
     this.api.startSync();
   }

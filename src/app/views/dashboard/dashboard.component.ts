@@ -254,26 +254,16 @@ export class DashboardComponent
   }
 
   refreshDashboard(): void {
-    this.logger.debug('Refreshing dashboard...');
-    this.appService.clearListOfWorkflows().then(() => {
-      this.appService.checkIsUserLogged().then((isUserLogged) => {
-        if (!this.appService.isLoadingWorkflows()) {
-          // alert('Notify user changed ' + isUserLogged);
-          if (this._workflowStats) this._workflowStats.clear();
-          this.updatingDataTable = true;
-          this.appService
-            .loadWorkflows(
-              false,
-              isUserLogged && !this._browseButtonEnabled,
-              isUserLogged
-            )
-            .subscribe((data) => {
-              this.logger.debug('Loaded workflows ', data);
-              // alert('Loading from user logged ' + user);
-            });
-        }
+    this.logger.debug('Refreshing dashboard...', this.dataView);
+    this.appService.setLoadingWorkflows(true);
+    const viewWorkflows = [...(this.dataView?.value as WorkflowVersion[])];
+    while (viewWorkflows.length > 0) {
+      const page = viewWorkflows.splice(0, this.dataView.rows);
+      this.appService.refreshWorkflowsList(page).then(() => {
+        this.logger.debug('Refreshed page...', page);
       });
-    });
+    }
+    this.appService.setLoadingWorkflows(false);
   }
 
   refreshWorkflow(wf: WorkflowVersion): void {
