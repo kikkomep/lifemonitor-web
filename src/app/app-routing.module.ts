@@ -100,13 +100,12 @@ export class AppRoutingModule {
       }
     );
 
-    this.apiService.onAuthorizationError = (error: FetchError) => {
-      this.logger.warn('Authorization error detected', error);
+    this.apiService.onAuthorizationError = this.handleAuthError;
+
     this.apiService.onError = async (error: FetchError, response: Response) => {
       this.logger.error('Generic error detected', error, response);
       if (error.status === 401) {
-        this.toastr.error('Session expired', '', { timeOut: 4000 });
-        this.router.navigateByUrl('/login');
+        this.handleAuthError(error);
       } else if (
         error.status === 503 &&
         error.statusText.match(/service unavailable/i)
@@ -123,21 +122,19 @@ export class AppRoutingModule {
             timeOut: 4000,
           }
         );
-      } 
-      // else {
-      //   this.toastr.error('Something went wrong', '', { timeOut: 4000 });
-      // }
-
-      if (this.configService.developmentMode) {
-        this.inputDialogService.show({
-          question: 'Ops...',
-          description: 'Something went wrong!',
-          confirmText: '',
-          cancelText: 'Close',
-          iconClass: 'fas fa-exclamation-triangle',
-          enableCancel: false,
-          onCancel: () => {},
-        });
+      } else {
+        this.toastr.error('Something went wrong', '', { timeOut: 4000 });
+        if (this.configService.developmentMode) {
+          this.inputDialogService.show({
+            question: 'Ops...',
+            description: 'Something went wrong!',
+            confirmText: '',
+            cancelText: 'Close',
+            iconClass: 'fas fa-exclamation-triangle',
+            enableCancel: false,
+            onCancel: () => {},
+          });
+        }
       }
     };
   }
@@ -154,6 +151,36 @@ export class AppRoutingModule {
     if (returnUrl) {
       this.router.navigateByUrl(returnUrl);
     }
+  }
+
+  handleAuthError(error: FetchError) {
+    this.logger.warn('Authorization error detected', error);
+    this.authService.checkIsUserLogged().then((isUserLogged) => {
+      if (isUserLogged) {
+        this.toastr.error('Session expired', '', { timeOut: 4000 });
+      }
+      this.appService.logout(false).then(() => {
+        this.logger.debug('Logout from app routing module');
+        this.inputDialogService.show({
+          question: 'Session Expired',
+          description: 'You need to relogin',
+          confirmText: 'Login',
+          iconClass: 'fas fa-user-clock',
+          enableCancel: true,
+          // onCancel: () => {
+          //   window.location.reload();
+          // },
+          // onConfirm: () => {
+          //   this.router.navigateByUrl('/dashboard');
+          // },
+        });
+      });
+      setTimeout(() => {
+        this.router.navigate(['/logout'], {
+          queryParams: { next: '/login' },
+        });
+      }, 1500);
+    });
   }
 
   ngOnDestroy() {

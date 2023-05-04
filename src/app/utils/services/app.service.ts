@@ -129,7 +129,7 @@ export class AppService {
             this.logger.debug('Current user from APP', data);
             this._currentUser = data;
             this.subjectUser.next(data);
-            this.api.socketIO.join(data);
+            if (data) this.api.socketIO.join(data);
           });
         } else {
           if (this._currentUser !== null)
@@ -378,7 +378,7 @@ export class AppService {
             this.api.get_current_user().subscribe((data) => {
               this.logger.debug('Current user from APP', data);
               this._currentUser = data;
-              this.api.socketIO.join(data);
+              if (data) this.api.socketIO.join(data);
             });
           }
         });
@@ -398,7 +398,7 @@ export class AppService {
           this.logger.debug('No user logged');
         } else {
           this.api.get_current_user().subscribe((user) => {
-            this.api.socketIO.join(user);
+            if (user) this.api.socketIO.join(user);
           });
         }
       });
@@ -451,7 +451,14 @@ export class AppService {
     callback: CallableFunction = null,
     catchError: CallableFunction = null
   ): void {
-    return this.auth.login(callback, catchError);
+    this.auth
+      .login(callback, catchError)
+      .then(() => {
+        this.logger.debug('Login from app service');
+      })
+      .catch((error) => {
+        this.logger.debug('Detected Error during login');
+      });
   }
 
   public async authorize() {
