@@ -224,16 +224,19 @@ export class AppService {
       (workflowVersion: { uuid: string; version: string }) => {
         this.logger.debug('Updating workflow: ', workflowVersion);
         this.logger.debug('Current list of workflows', this.workflows);
-        const workflow: Workflow = this.workflows.find(
-          (w) => w.uuid === workflowVersion.uuid
-        );
-        const cwv_index = this.workflow_versions.findIndex(
+        const workflow: Workflow =
+          this.workflows?.find((w) => w.uuid === workflowVersion.uuid) ||
+          new Workflow({ uuid: workflowVersion.uuid });
+        if (!this.workflow_versions) this._workflow_versions = [];
+        const cwv_index = this.workflow_versions?.findIndex(
           (v) =>
             v.uuid === workflowVersion.uuid &&
             v.version['version'] === workflowVersion.version
         );
-        const cwv: WorkflowVersion = this.workflow_versions[cwv_index];
-        this.logger.error('Found workflow:', workflow, cwv);
+        const cwv: WorkflowVersion = cwv_index
+          ? this.workflow_versions[cwv_index]
+          : null;
+        this.logger.debug('Found workflow:', workflow, cwv);
         if (!workflow) {
           this.logger.warn('Workflow not found');
           return;
@@ -279,7 +282,8 @@ export class AppService {
                   const outdated = wv.modified > oldTimestamp;
                   workflow.addVersion(wv, isCurrentVersion);
                   wv.name = workflow.name;
-                  this.workflow_versions[cwv_index] = wv;
+                  if (cwv_index >= 0) this.workflow_versions[cwv_index] = wv;
+                  else this.workflow_versions.push(wv);
                   // return the new workflow version only if more recent
                   // than the previous one
                   return outdated
@@ -484,10 +488,13 @@ export class AppService {
     return true;
   }
 
-  public async refreshWorkflowVersion(workflow: {
-    uuid: string;
-    version: string;
-  }): Promise<boolean> {
+  public async refreshWorkflowVersion(
+    workflow: {
+      uuid: string;
+      version: string;
+    },
+    notifyUpdate?: boolean
+  ): Promise<boolean> {
     this.updateLoadingStateOfWorkflow(workflow.uuid, true);
     await this.api.cache.refreshCacheEntriesGroup(
       JSON.stringify({
@@ -501,7 +508,8 @@ export class AppService {
         type: 'workflow',
         uuid: workflow.uuid,
         version: workflow.version,
-      })
+      }),
+      notifyUpdate ?? true
     );
     this.updateLoadingStateOfWorkflow(workflow.uuid, false);
     return true;
