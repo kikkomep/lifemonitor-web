@@ -228,19 +228,21 @@ export class DashboardComponent
     if (this._workflows) {
       this.prepareTableData();
     } else {
-      this.appService.checkIsUserLogged().then((isUserLogged) => {
-        this.updatingDataTable = true;
-        if (this._workflowStats) this._workflowStats.clear();
-        if (this.openUploader === true) this.openWorkflowUploader();
-        if (!this.appService.isLoadingWorkflows())
-          this.appService
-            .loadWorkflows(false, isUserLogged, isUserLogged)
-            .subscribe((data) => {
-              this.logger.debug('Loaded workflows ', data);
-              // alert('Loaded workflows from dashboard init');
-            });
-        // else alert('Already loading workflows');
-      });
+      if (!this.appService.isLoadingWorkflows()) {
+        this.appService.checkIsUserLogged().then((isUserLogged) => {
+          this.updatingDataTable = true;
+          if (this._workflowStats) this._workflowStats.clear();
+          if (this.openUploader === true) this.openWorkflowUploader();
+          this.appService.clearListOfWorkflows().then(() => {
+            this.appService
+              .loadWorkflows(false, isUserLogged, isUserLogged)
+              .subscribe((data) => {
+                this.logger.debug('Loaded workflows ', data);
+                // alert('Loaded workflows from dashboard init');
+              });
+          });
+        });
+      } //else alert('Already loading workflows');
     }
     // Reload page when the swipe-down event is detected
     document.addEventListener('swiped-down', (e: any) => {
