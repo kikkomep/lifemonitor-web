@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SwUpdate } from '@angular/service-worker';
+import { SwUpdate, UpdateAvailableEvent } from '@angular/service-worker';
 
+import { Observable, Subscription } from 'rxjs';
 import { Logger, LoggerManager } from './utils/logging/index';
-import { InputDialogService } from './utils/services/input-dialog.service';
-import { CachedHttpClientService } from './utils/services/cache/cachedhttpclient.service';
 import { CacheRefreshStatus } from './utils/services/cache/cache.model';
-import { Observable } from 'rxjs';
+import { CachedHttpClientService } from './utils/services/cache/cachedhttpclient.service';
+import { InputDialogService } from './utils/services/input-dialog.service';
 
 declare var $: any;
 
@@ -21,6 +21,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   refreshStatus$: Observable<CacheRefreshStatus>;
 
+  checkVersionSubscription: Subscription;
+
   constructor(
     private inputDialog: InputDialogService,
     private swUpdate: SwUpdate,
@@ -29,9 +31,13 @@ export class AppComponent implements OnInit, OnDestroy {
     this.refreshStatus$ = this.cachedHttpClient.refreshProgressStatus$;
   }
 
+  get updateAvailable(): Observable<UpdateAvailableEvent> {
+    return this.swUpdate.available;
+  }
+
   ngOnInit() {
     if (this.swUpdate.isEnabled) {
-      this.swUpdate.available.subscribe(() => {
+      this.checkVersionSubscription = this.updateAvailable.subscribe(() => {
         this.inputDialog.show({
           iconImage: '/assets/img/logo/lm/LifeMonitorLogo.png',
           iconImageSize: '250',
@@ -42,9 +48,11 @@ export class AppComponent implements OnInit, OnDestroy {
           enableClose: false,
         });
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        this.cachedHttpClient.clear().then(() => {
+          setTimeout(() => {
+            window.location.reload();
+          }, 4000);
+        });
       });
     }
   }
@@ -65,5 +73,9 @@ export class AppComponent implements OnInit, OnDestroy {
     //   });
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    if (this.checkVersionSubscription) {
+      this.checkVersionSubscription.unsubscribe();
+    }
+  }
 }

@@ -43,7 +43,8 @@
           <span *ngIf="(isLoading|async)===false && (!workflowNameFilter || workflowNameFilter.length==0)"
             pTooltip="{{ isUserLogged() ? 'the dashboard collects your workflow subscriptions' : 'registered workflows' }}"
             showDelay=2000 tooltipPosition="right" data-html="true">
-            {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" : "Workflows" }}
+            {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" :
+            "Workflows" }}
           </span>
         </div>
         <div *ngIf="workflowNameFilter && workflowNameFilter.length>0">
@@ -68,7 +69,8 @@
             <ng-container *ngIf="workflowNameFilter == '______ALL_____'; then allWorkflows; else matchingWorkflows;">
             </ng-container>
             <ng-template #allWorkflows>
-              {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" : "Workflows" }}
+              {{ browseButtonEnabled && isUserLogged() ? 'Registered Workflows' : isUserLogged() ? "Dashboard" :
+              "Workflows" }}
             </ng-template>
             <ng-template #matchingWorkflows>Workflows matching "<b>{{workflowNameFilter}}</b>"</ng-template>
           </ng-template>
@@ -206,14 +208,15 @@
 
         <!-- Loading (remove the following to stop the loading)-->
         <div class="card-body box-profile p-0">
-          <p-dataView #workflowsDataView
+          <p-dataView #workflowsDataView (onChangeLayout)="onChangeLayout($event)"
             [value]="workflows | itemFilterPipe: workflowNameFilter | workflowOrderBy:'modified':'desc'"
             [paginator]="true" filterBy="Workflow" [rows]="6" layout="list" [sortField]="sortField"
             [sortOrder]="sortOrder">
-            <ng-template pTemplate="header">
-              <div class="d-flex py-4 align-items-center justify-content-center">
+            <ng-template pTemplate="header" class="p-0">
+              <div class="d-flex px-4 py-4 align-items-center justify-content-center">
                 <div class="flex-lg-fill align-items-center justify-content-center justify-content-lg-start">
-                  <div *ngIf="currentLayout === 'grid'" class="d-inline-block mx-3 mx-lg-0 flex-grow">
+                  <!-- *ngIf="currentLayout === 'grid' || windowWidth < 1200" -->
+                  <div class="d-inline-block mx-3 mx-lg-0 flex-grow">
                     <a class="btn btn-sm" (click)="refreshDashboard()">
                       <i class="fas fa-sync fa-lg text-primary"></i>
                     </a>
@@ -263,7 +266,7 @@
                   <p-dataViewLayoutOptions class="d-line-block mx-1">
                   </p-dataViewLayoutOptions>
 
-                  <div *ngIf="isUserLogged() && currentLayout === 'grid'"
+                  <div *ngIf="isUserLogged() && (currentLayout === 'grid' || windowWidth < 1200)"
                     class="d-inline-block d-xl-none mx-md-3 mx-lg-0">
                     <a *ngIf="!editModeEnabled" class="btn btn-sm" (click)="openWorkflowUploader()"
                       pTooltip="click to register a workflow" [showDelay]="tooltipShowDelay" tooltipPosition="top"
@@ -274,16 +277,13 @@
                 </div>
               </div>
 
-              <div class="d-flex mt-3 d-none d-sm-block" *ngIf="layout === 'list'">
-                <div class="d-inline-flex row workflow-list-item-header">
-                  <div class="col-2 col-md-1 workflow-list-item-status m-0 p-0 text-center">
-                    <a class="btn btn-sm" (click)="refreshDashboard()" pTooltip="refresh workflow list"
-                      [showDelay]="tooltipShowDelay" tooltipPosition="top">
-                      <i class="fas fa-sync fa-lg text-primary"></i>
-                    </a>
-                  </div>
-                  <div class="col-10 col-md-6 col-xl-5"
-                    [ngClass]="{'col-5': true, 'text-primary': sortField === 'name'}">Workflow
+              <!-- check alignment: -->
+              <div class="d-flex mt-3 d-none d-sm-block m-0 p-0" *ngIf="layout === 'list'">
+                <div class="d-none d-xl-flex workflow-list-header m-0 p-0">
+
+                  <div class="workflow-list-status-header p-0 m-0"></div>
+                  <div class="workflow-list-description-header" [ngClass]="{'text-primary': sortField === 'name'}">
+                    Workflow
                     <span *ngIf="!sortField || sortField !== 'name'" (click)="onSortChange({field: 'name', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
                     </span>
@@ -296,8 +296,9 @@
                       <i class="fas fa-sort-amount-down-alt"></i>
                     </span>
                   </div>
-                  <div class="col-1 d-none d-xl-block text-center">Visibility</div>
-                  <div class="col-1 d-none d-xl-block text-center" [ngClass]="{'text-primary': sortField === 'type'}">
+
+                  <!-- <div class="col-2 col-xl-1 d-none d-md-block text-center">Version</div> -->
+                  <div class="d-none workflow-list-type-header" [ngClass]="{'text-primary': sortField === 'type'}">
                     Type
                     <span *ngIf="!sortField || sortField !== 'type'" (click)="onSortChange({field: 'type', order: 1})">
                       <i class="fas fa-sort-amount-up-alt text-muted"></i>
@@ -311,47 +312,134 @@
                       <i class="fas fa-sort-amount-down-alt"></i>
                     </span>
                   </div>
-                  <div class="col-2 col-xl-1 d-none d-md-block text-center">Version</div>
-                  <div class="col-1 d-none d-xl-block text-center">Suites</div>
-                  <div class="col-3 col-xl-2 d-none d-md-block text-center">Latest Test Builds</div>
+                  <div class="d-none workflow-list-visibility-header">Visibility</div>
+                  <div class="d-none workflow-list-suites-chart-header">Suites</div>
+                  <div class="d-none workflow-list-builds-chart-header text-center">Latest Test
+                    Builds</div>
+
+                  <div class="workflow-list-actions-header my-md-3">
+                    <div *ngIf="isUserLogged()">
+                      <a *ngIf="!editModeEnabled && isUserLogged()" class="text-center" (click)="openWorkflowUploader()"
+                        pTooltip="click to register a workflow" [showDelay]="tooltipShowDelay" tooltipPosition="top">
+                        <i class="fas fa-plus-circle fa-lg" style="margin-left: 5px;"></i>
+                        <!-- <div class="d-block text-sm">Add</div> -->
+                      </a>
+                    </div>
+                  </div>
                 </div>
-                <div class="d-inline-flex flex-column workflow-list-item-actions-header justify-content-center my-md-3">
-                  <div *ngIf="isUserLogged()" class="d-inline-block workflow-list-item-add-action">
-                    <a *ngIf="!editModeEnabled && isUserLogged()" class="text-center" (click)="openWorkflowUploader()"
-                      pTooltip="click to register a workflow" [showDelay]="tooltipShowDelay" tooltipPosition="top">
-                      <i class="fas fa-plus-circle fa-lg" style="margin-left: 5px;"></i>
-                      <!-- <div class="d-block text-sm">Add</div> -->
+
+                <!-- </div> -->
+              </div>
+
+
+
+            </ng-template>
+            <ng-template let-item pTemplate="listItem">
+              <!-- Workflow header -->
+              <div class="d-block d-xl-none workflow-list-item-header">
+                <div class="d-flex text-center align-items-center w-100 m-auto justify-content-center">
+                  <div class="workflow-list-item-type-container d-none d-md-inline-block p-2 ml-n5">
+                    <div *ngIf="isLoadingWorkflowVersion(item)" class="text-muted">
+                      <i class="fas fa-2x fa-sync-alt"></i>
+                    </div>
+                    <div *ngIf="!isLoadingWorkflowVersion(item)">
+                      <div class="workflow-list-item-type text-center" [showDelay]="tooltipShowDelay" data-html="true"
+                        data-toggle="tooltip" tooltipPosition="top"
+                        pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{item.type}} workflow</span>">
+                        <img *ngIf="item.typeIcon" [src]="item.typeIcon" width="{{ item.typeIconSize }}" />
+                        <i *ngIf="!item.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
+                        <div class="text-muted text-xs mt-1">{{ item.type }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Workflow Name -->
+                  <div class="item-name d-md-inline-block mt-md-n3" [class.large-font]="item.workflow.name">
+                    <input *ngIf="item.editingMode" type="text"
+                      class="form-control datatable-input-no-border text-center" [(ngModel)]="item.workflow.name"
+                      aria-describedby="workflowNameInput" placeholder="Enter workflow name"
+                      (keyup.enter)="updateWorkflowName(item)" (keyup.esc)="restoreWorkflowName(item)" autofocus>
+                    <a *ngIf="!item.editingMode" (click)="showWorkflowDetails(item)"
+                      style="color: black; font-size: larger" (dblclick)="enableWorkflowEditMode(item)"
+                      data-toggle="tooltip" tooltipPosition="top" data-html="true" [showDelay]="tooltipShowDelay"
+                      pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b><i class='fas fa-external-link-alt mx-1'></i>
+                {{ isEditable(item) ? 'or double click to edit' : ''}}</div>">
+                      {{ item.workflow.name }}
                     </a>
                   </div>
                 </div>
+                <!-- Workflow Version -->
+                <div class="item-version text-center d-block pl-3">
+                  <div class="item-detail" [showDelay]="tooltipShowDelay" pTooltip="select a workflow version"
+                    tooltipPosition="right">
+                    <workflow-version-selector [workflow]="item.workflow" selectorClass="text-left"
+                      selectorWidth="100px" (workflow_version)="updateSelectedVersion($event)" labelInLine="true">
+                    </workflow-version-selector>
+                  </div>
+                </div>
+                <!-- Workflow Visibility -->
+                <div class="workflow-list-item-visibility mt-4">
+                  <div *ngIf="isLoadingWorkflowVersion(item)">
+                    <i class="fas fa-2x fa-sync-alt text-muted"></i>
+                  </div>
+                  <div *ngIf="!isLoadingWorkflowVersion(item)" data-html="true" data-toggle="tooltip"
+                    tooltipPosition="top" class="workflow-list-item-visibility workflow-visibility-{{item.uuid}}"
+                    pTooltip="{{ getWorkflowVisibilityTitle(item) }}" [showDelay]="tooltipShowDelay">
+                    <i *ngIf="item.public" class="fas fa-lg fa-globe-americas"></i>
+                    <i *ngIf="!item.public" class="fas fa-lg fa-user-lock"></i>
+                    <div class="text-muted text-xs">{{ item.public ? 'public': 'private' }}</div>
+
+                    <!-- <div *ngIf="!isEditable(item) || !(editModeEnabled && item.editingMode)">&nbsp;</div> -->
+                  </div>
+                  <a *ngIf="isEditable(item) && (editModeEnabled || item.editingMode)" class="btn badge badge-primary"
+                    (click)="changeVisibility(item)" [showDelay]="tooltipShowDelay"
+                    [pTooltip]="item.public ? 'click to make the workflow private' : 'click to make the workflow public'">
+                    change
+                  </a>
+                </div>
               </div>
-            </ng-template>
-            <ng-template let-item pTemplate="listItem">
+
               <div class="d-flex">
-                <div class="d-inline-flex row workflow-list-item">
-                  <div class="col-2 col-md-1 text-center workflow-list-item-status m-0 p-0" [pTooltip]="item.statusText"
+                <div class="workflow-list-item">
+
+                  <!-- Workflow Status -->
+                  <div class="text-center workflow-list-item-status m-0 p-0" [pTooltip]="item.statusText"
                     tooltipPosition="top" [showDelay]="tooltipShowDelay">
                     <div class="workflow-list-item-status" [ngClass]="item.class">
                       <i class="{{ item.statusIcon }} fa-2x"></i>
                     </div>
                   </div>
 
-                  <div class="col-10 col-md-6 col-xl-5">
+                  <!-- Workflow Name, Info, Version Selector -->
+                  <div class="d-inline-flex workflow-list-item-description-container">
 
                     <div class="workflow-list-item-description">
                       <!-- Workflow Name -->
-                      <div class="item-name" [class.large-font]="item.workflow.name">
-                        <input *ngIf="item.editingMode" type="text" class="form-control datatable-input-no-border"
-                          [(ngModel)]="item.workflow.name" aria-describedby="workflowNameInput"
-                          placeholder="Enter workflow name" (keyup.enter)="updateWorkflowName(item)"
-                          (keyup.esc)="restoreWorkflowName(item)" autofocus>
-                        <a *ngIf="!item.editingMode" (click)="showWorkflowDetails(item)"
-                          style="color: black; font-size: larger" (dblclick)="enableWorkflowEditMode(item)"
-                          data-toggle="tooltip" tooltipPosition="top" data-html="true" [showDelay]="tooltipShowDelay"
-                          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b><i class='fas fa-external-link-alt mx-1'></i>
+                      <div class="d-none d-xl-block">
+                        <div class="item-name" [class.large-font]="item.workflow.name">
+                          <input *ngIf="item.editingMode" type="text" class="form-control datatable-input-no-border"
+                            [(ngModel)]="item.workflow.name" aria-describedby="workflowNameInput"
+                            placeholder="Enter workflow name" (keyup.enter)="updateWorkflowName(item)"
+                            (keyup.esc)="restoreWorkflowName(item)" autofocus>
+                          <a *ngIf="!item.editingMode" (click)="showWorkflowDetails(item)"
+                            style="color: black; font-size: larger" (dblclick)="enableWorkflowEditMode(item)"
+                            data-toggle="tooltip" tooltipPosition="top" data-html="true" [showDelay]="tooltipShowDelay"
+                            pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to see <b>suites</b><i class='fas fa-external-link-alt mx-1'></i>
                     {{ isEditable(item) ? 'or double click to edit' : ''}}</div>">
-                          {{ item.workflow.name }}
-                        </a>
+                            {{ item.workflow.name }}
+                          </a>
+                        </div>
+
+                        <div class="d-inline-block workflow-item-details">
+                          <div class="text-right d-block p-0 m-0">
+                            <div class="item-detail" [showDelay]="tooltipShowDelay" pTooltip="select a workflow version"
+                              tooltipPosition="right">
+                              <workflow-version-selector [workflow]="item.workflow" labelInLine="true"
+                                (workflow_version)="updateSelectedVersion($event)">
+                              </workflow-version-selector>
+                            </div>
+                            <!-- <div class="item-label" style="margin-top: -12px">version</div> -->
+                          </div>
+                        </div>
                       </div>
 
                       <!-- Workflow Details -->
@@ -431,37 +519,71 @@
                             {{ item.created * 1000 | date:'long' }}
                           </span>
                         </div>
+
+                        <!-- Workflow modification time -->
+                        <div *ngIf="item.created" class="item-detail">
+                          <span class="item-icon">
+                            <i class="fas fa-history fa-xs mr-1"></i>
+                          </span>
+                          <span class="item-label">updated: </span>
+                          <span class="cut-text">
+                            {{ item.modified * 1000 | date:'long' }}
+                          </span>
+                        </div>
+
+
+
                       </div>
                       <!-- Workflows Details -->
+                      <div *ngIf="isUserLogged()">
+                        <span *ngIf="item.subscriptions !== undefined || browseButtonEnabled">
+                          <a *ngIf="(searchModeEnabled || editModeEnabled || item.editingMode || item.editSubscription) && (!item.subscriptions || item.subscriptions.length == 0)"
+                            class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(item)" role="button"
+                            data-toggle="tooltip" tooltipPosition="bottom" data-html="true"
+                            [showDelay]="tooltipShowDelay"
+                            pTooltip="Click to subscribe to this workflow and add it to your dashboard">
+                            SUBSCRIBE
+                          </a>
+                          <div
+                            *ngIf="!(editModeEnabled || item.editingMode || item.editSubscription) && searchModeEnabled && (item.subscriptions && item.subscriptions.length > 0)"
+                            class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)"
+                            role="button" data-toggle="tooltip" tooltipPosition="bottom" data-html="true"
+                            [showDelay]="tooltipShowDelay"
+                            pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
+                            SUBSCRIBED
+                          </div>
+                          <a *ngIf="(editModeEnabled || item.editingMode || item.editSubscription) && item.subscriptions && item.subscriptions.length > 0"
+                            class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
+                            data-toggle="tooltip" tooltipPosition="bottom" data-html="true"
+                            [showDelay]="tooltipShowDelay"
+                            pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
+                            UNSUBSCRIBE
+                          </a>
+                        </span>
+                        <!-- <span *ngIf="!editModeEnabled">&nbsp;</span> -->
+                      </div>
                     </div>
-                    <div *ngIf="isUserLogged()">
-                      <span *ngIf="item.subscriptions !== undefined || browseButtonEnabled">
-                        <a *ngIf="(searchModeEnabled || editModeEnabled || item.editingMode || item.editSubscription) && (!item.subscriptions || item.subscriptions.length == 0)"
-                          class="badge badge-success mt-3 ml-n1 mr-2" (click)="subscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
-                          pTooltip="Click to subscribe to this workflow and add it to your dashboard">
-                          SUBSCRIBE
-                        </a>
-                        <div
-                          *ngIf="!(editModeEnabled || item.editingMode || item.editSubscription) && searchModeEnabled && (item.subscriptions && item.subscriptions.length > 0)"
-                          class="badge badge-primary mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
-                          pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
-                          SUBSCRIBED
-                        </div>
-                        <a *ngIf="(editModeEnabled || item.editingMode || item.editSubscription) && item.subscriptions && item.subscriptions.length > 0"
-                          class="badge badge-danger mt-3 ml-n1 mr-2" (click)="unsubscribeWorkflow(item)" role="button"
-                          data-toggle="tooltip" tooltipPosition="bottom" data-html="true" [showDelay]="tooltipShowDelay"
-                          pTooltip="Click to unsubscribe from this workflow and remove it from your dashboard">
-                          UNSUBSCRIBE
-                        </a>
-                      </span>
-                      <!-- <span *ngIf="!editModeEnabled">&nbsp;</span> -->
+
+                  </div>
+
+                  <!-- Workflow Type -->
+                  <div class="d-none workflow-list-item-type-container">
+                    <div *ngIf="isLoadingWorkflowVersion(item)" class="text-muted">
+                      <i class="fas fa-2x fa-sync-alt"></i>
+                    </div>
+                    <div *ngIf="!isLoadingWorkflowVersion(item)">
+                      <div class="workflow-list-item-type text-center" [showDelay]="tooltipShowDelay" data-html="true"
+                        data-toggle="tooltip" tooltipPosition="top"
+                        pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{item.type}} workflow</span>">
+                        <img *ngIf="item.typeIcon" [src]="item.typeIcon" width="{{ item.typeIconSize }}" />
+                        <i *ngIf="!item.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
+                        <div class="text-muted text-xs mt-1">{{ item.type }}</div>
+                      </div>
                     </div>
                   </div>
 
                   <!-- Workflow Visibility -->
-                  <div class="col-1 d-none d-xl-block">
+                  <div class="d-none workflow-list-item-visibility">
                     <div class="workflow-list-item-visibility">
                       <div *ngIf="isLoadingWorkflowVersion(item)">
                         <i class="fas fa-2x fa-sync-alt text-muted"></i>
@@ -483,35 +605,12 @@
                     </div>
                   </div>
 
-                  <div class="col-1 d-none d-xl-block">
-                    <div *ngIf="isLoadingWorkflowVersion(item)" class="text-muted">
-                      <i class="fas fa-2x fa-sync-alt"></i>
-                    </div>
-                    <div *ngIf="!isLoadingWorkflowVersion(item)">
-                      <div class="workflow-list-item-type" [showDelay]="tooltipShowDelay" data-html="true"
-                        data-toggle="tooltip" tooltipPosition="top"
-                        pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>{{item.type}} workflow</span>">
-                        <img *ngIf="item.typeIcon" [src]="item.typeIcon" width="{{ item.typeIconSize }}" />
-                        <i *ngIf="!item.typeIcon" class="far fa-question-circle fa-2x text-muted mr-2"></i>
-                        <div class="text-muted text-xs mt-1">{{ item.type }}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-2 col-xl-1 d-none d-md-block">
-                    <div class="workflow-list-item-version-selector" [showDelay]="tooltipShowDelay"
-                      pTooltip="select a workflow version" tooltipPosition="top">
-                      <workflow-version-selector [workflow]="item.workflow"
-                        (workflow_version)="updateSelectedVersion($event)">
-                      </workflow-version-selector>
-                    </div>
-                  </div>
-
-                  <div class="col-1 d-none d-xl-block">
+                  <!-- Workflow Test Suites -->
+                  <div class="d-none workflow-list-item-suites-chart-container">
                     <div class="workflow-list-item-suites-chart">
                       <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
-                        data-toggle="tooltip" tooltipPosition="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
-                      no test suite available<br/> for this workflow version</span>">
+                        data-toggle="tooltip" tooltipPosition="top" data-html="true"
+                        pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>no test suite available<br/> for this workflow version</span>">
                         <i class="fas fa-ban fa-2x text-muted"></i>
                       </div>
                       <div *ngIf="item.suites === undefined || isLoadingWorkflowVersion(item)" class="text-muted">
@@ -519,23 +618,26 @@
                       </div>
                       <a *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length > 0"
                         [routerLink]="['/workflow', { uuid: item.asUrlParam() }]">
-                        <stats-pie-chart [stats]="item.suites"></stats-pie-chart>
+                        <stats-pie-chart [stats]="item.suites" [showTitle]="true"
+                          titleText="# of test suites"></stats-pie-chart>
                       </a>
                     </div>
                   </div>
 
-                  <div class="col-3 col-xl-2 d-none d-md-block">
+                  <!-- Workflow Builds -->
+                  <div class="d-none workflow-list-item-builds-chart-container"
+                    classx="col-3 col-xl-2 d-none d-md-block">
                     <div class="workflow-list-item-builds-chart">
                       <div *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length == 0"
-                        data-toggle="tooltip" tooltipPosition="top" data-html="true" title="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>
-                      no test build available<br/> for this workflow version</span>">
+                        data-toggle="tooltip" tooltipPosition="top" data-html="true"
+                        pTooltip="<span class='text-xs'><i class='fas fa-question-circle mx-1'></i>no test build available<br/> for this workflow version</span>">
                         <i class="fas fa-ban fa-2x text-muted"></i>
                       </div>
                       <div *ngIf="item.suites === undefined || isLoadingWorkflowVersion(item)" class="text-muted">
                         <i class="fas fa-2x fa-sync-alt"></i>
                       </div>
                       <stats-bar-chart *ngIf="!isLoadingWorkflowVersion(item) && item.getLatestBuilds().length > 0"
-                        [stats]="item.getLatestBuilds() | arraySizeFilterPipe: 10"
+                        [stats]="item.getLatestBuilds() | arraySizeFilterPipe: 10" [showTitle]="windowWidth < 1200"
                         (selectedItem)="selectTestBuild($event)">
                       </stats-bar-chart>
                     </div>
@@ -761,7 +863,7 @@
                     <div class="workflow-grid-item-section">
                       <div class="workflow-grid-item-section-label">version</div>
                       <div class="workflow-grid-item-version-selector">
-                        <workflow-version-selector [workflow]="item.workflow"
+                        <workflow-version-selector [workflow]="item.workflow" [showLabel]="false"
                           (workflow_version)="updateSelectedVersion($event)">
                         </workflow-version-selector>
                       </div>
@@ -798,7 +900,7 @@
                         </div>
                         <a *ngIf="!isLoadingWorkflowVersion(item) && item.suites && item.suites.all.length > 0"
                           [routerLink]="['/workflow', { uuid: item.asUrlParam() }]">
-                          <stats-pie-chart [stats]="item.suites"></stats-pie-chart>
+                          <stats-pie-chart [stats]="item.suites" title="# of test suites"></stats-pie-chart>
                         </a>
                       </div>
                     </div>
@@ -816,8 +918,8 @@
                           <i class="fas fa-2x fa-sync-alt"></i>
                         </div>
                         <stats-bar-chart *ngIf="!isLoadingWorkflowVersion(item) && item.getLatestBuilds().length > 0"
-                          [stats]="item.getLatestBuilds() | arraySizeFilterPipe: 10"
-                          (selectedItem)="selectTestBuild($event)">
+                          [stats]="item.getLatestBuilds() | arraySizeFilterPipe: 10" chartWidth="fit-content"
+                          (selectedItem)="selectTestBuild($event)" [showTitle]="false">
                         </stats-bar-chart>
                       </div>
                     </div>
@@ -840,8 +942,7 @@
                   No workflow found
                 </div>
 
-                <div class="no-workflow"
-                  *ngIf="(statusFilter || workflowNameFilter)">
+                <div class="no-workflow" *ngIf="(statusFilter || workflowNameFilter)">
                   No matching workflow
                 </div>
 

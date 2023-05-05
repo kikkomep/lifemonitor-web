@@ -11,18 +11,14 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  Chart,
-  ChartData,
-  ChartDataSets,
-  ChartOptions,
-  ChartType,
-} from 'chart.js';
-import { Label } from 'ng2-charts';
+import { BarElement, ChartData, ChartDataset } from 'chart.js';
+import { Subscription } from 'rxjs';
 import { DateUtils } from 'src/app/models/common.models';
 import { StatusStatsItem } from 'src/app/models/stats.model';
 import { TestBuild } from 'src/app/models/testBuild.models';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
+
+import { formatDuration } from 'src/app/utils/shared/utils';
 
 @Component({
   selector: 'stats-bar-chart',
@@ -33,198 +29,66 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 export class StatsBarChartComponent
   implements OnInit, OnChanges, AfterViewChecked {
   @Input() stats!: StatusStatsItem[];
+  @Input() chartWidth: string = '340px';
+  @Input() chartHeight: string = '200px';
+  @Input() showTitle: boolean = true;
   @Output() selectedItem = new EventEmitter<StatusStatsItem>();
 
   // initialize logger
   private logger: Logger = LoggerManager.create('StatsBarChartComponent');
 
-  public barChartOptions: ChartOptions = {
-    responsive: true,
-    // We use these empty structures as placeholders for dynamic theming.
-    scales: {
-      xAxes: [{ display: false }],
-      yAxes: [
-        {
-          // ticks: {
-          //   minor: {},
-          // },
-          display: false,
-          time: {
-            unit: 'second',
-          },
-        },
-      ],
-    },
-    tooltips: {
-      enabled: false,
-      footerFontSize: 9,
-      footerFontColor: 'lightgray',
-      footerAlign: 'right',
-      custom: function (tooltipModel) {
-        // Tooltip Element
-        var tooltipEl = document.getElementById('chartjs-tooltip');
+  basicData: any;
 
-        // Create element on first render
-        if (!tooltipEl) {
-          tooltipEl = document.createElement('div');
-          tooltipEl.style.background = 'black';
-          tooltipEl.style.color = 'white';
-          tooltipEl.style.fontWeight = '200';
-          tooltipEl.id = 'chartjs-tooltip';
-          tooltipEl.style.borderRadius = '10px';
-          tooltipEl.innerHTML = '<table></table>';
-          document.body.appendChild(tooltipEl);
-        }
+  basicOptions: any;
 
-        // Hide if no tooltip
-        if (tooltipModel.opacity === 0) {
-          tooltipEl.style.opacity = '0';
-          return;
-        }
+  basicDatasets: Array<any>;
 
-        // Set caret Position
-        tooltipEl.classList.remove('above', 'below', 'no-transform');
-        if (tooltipModel.yAlign) {
-          tooltipEl.classList.add(tooltipModel.yAlign);
-        } else {
-          tooltipEl.classList.add('no-transform');
-        }
+  // duration stsatistics
+  minDuration: number;
+  maxDuration: number;
+  averageDuration: number;
 
-        function getBody(bodyItem: { lines: any }) {
-          return bodyItem.lines;
-        }
+  subscription: Subscription;
 
-        // Set Text
-        if (tooltipModel.body) {
-          var titleLines = tooltipModel.title || [];
-          var bodyLines = tooltipModel.body.map(getBody);
-          // set header
-          var innerHtml = '<thead>';
-          titleLines.forEach(function (title) {
-            innerHtml += '<tr>' + '<th>' + title + '</th></tr>';
-          });
-          innerHtml += '</thead><tbody>';
-          // set body
-          bodyLines.forEach(function (body, i) {
-            var colors = tooltipModel.labelColors[i];
-            var style = 'background:' + colors.backgroundColor;
-            style += '; border-color:' + colors.borderColor;
-            style += '; border-width: 2px';
-            var span = '<span style="' + style + '"></span>';
-            innerHtml += '<tr><td>' + span + body + '</td></tr>';
-          });
-          innerHtml += '</tbody>';
-          // append footer
-          var footer =
-            '<div style="color: lightgray; font-size: 8pt; text-align: right;">';
-          footer += tooltipModel.footer;
-          footer += '</div>';
-          innerHtml += footer;
-          // append table
-          var tableRoot = tooltipEl.querySelector('table');
-          tableRoot.innerHTML = innerHtml;
-        }
+  public selectedObject: StatusStatsItem;
 
-        // `this` will be the overall tooltip
-        var position = this._chart.canvas.getBoundingClientRect();
-
-        // Display, position, and set styles for font
-        tooltipEl.style.opacity = '1';
-        tooltipEl.style.position = 'absolute';
-        tooltipEl.style.left =
-          position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-        tooltipEl.style.top =
-          position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-        tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
-        tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
-        tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
-        tooltipEl.style.padding =
-          tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
-        tooltipEl.style.pointerEvents = 'none';
-      },
-      callbacks: {
-        title: (tooltipItem, data: ChartData) => {
-          let item: TestBuild = this.getItemTestBuild(tooltipItem[0], data);
-          return (
-            '<span style="color: transparent; font-size: 0.7rem; text-shadow: 0 0 0 ' +
-            item.color +
-            '; ">&#9899;</span>' +
-            ' Build #' +
-            item.build_id +
-            ' : ' +
-            item.status
-          );
-        },
-        label: (tooltipItem, data: ChartData) => {
-          let item: TestBuild = this.getItemTestBuild(tooltipItem, data);
-          this.logger.debug('Check stats item', tooltipItem, data);
-          let label = data.labels[tooltipItem.index];
-          let sec = data.datasets[tooltipItem.datasetIndex].data[
-            tooltipItem.index
-          ] as number;
-          let duration = '';
-          let hours = Math.floor(sec / 3600);
-          let minutes = Math.floor((sec - hours * 3600) / 60);
-          let seconds = sec - hours * 3600 - minutes * 60;
-          if (hours > 0) duration += hours + 'h ';
-          if (minutes > 0) duration += minutes + 'm ';
-          if (sec >= 0) duration += seconds + 's';
-          this.logger.debug(
-            'DURATION',
-            hours,
-            minutes,
-            seconds,
-            duration,
-            tooltipItem,
-            item,
-            data
-          );
-          let ltext =
-            '<div class="ml-1"><i class="far fa-calendar-check"></i> started: ' +
-            DateUtils.formatTimestamp(item.timestamp.toString()) +
-            '</div>';
-          ltext +=
-            '<div class="ml-1"><i class="fas fa-stopwatch"></i> duration: ' +
-            duration +
-            '</div>';
-          return ltext;
-        },
-        footer: (tooltipItem, data) => {
-          let index = tooltipItem[0]['datasetIndex'];
-          let item = this.stats[index] as TestBuild;
-          return (
-            'click to see on <b class="text-white">' +
-            item.instance.service.type +
-            '</b>'
-          );
-        },
-      },
-    },
-    plugins: {
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-      },
-    },
-    legend: {
-      position: 'top',
-    },
-  };
-  public barChartLabels: Label[] = ['build'];
-  public barChartType: ChartType = 'bar';
-  public barChartLegend = false;
-  public barChartPlugins = []; //[pluginDataLabels];
+  public barChartData: ChartDataset[] = [];
 
   public barColors = [];
 
-  private mappings = {
+  private colorMap = {
     passed: { color: '#1f8787' },
-    failed: { color: '#dc3545' },
     error: { color: '#ffc107' },
-    aborted: { color: '#6c757d' },
-    running: { color: '#17a2b8' },
+    failed: { color: '#dc3545' },
     waiting: { color: '#fd7e14' },
+    running: { color: '#17a2b8' },
+    aborted: { color: '#6c757d' },
   };
+
+  constructor(private router: Router, private zone: NgZone) {}
+
+  ngOnInit(): void {
+    // initialize datasets
+    this.initializeDatasets();
+    // initialize options
+    this.basicOptions = this.setOptions();
+  }
+
+  ngAfterViewChecked(): void {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.zone.runOutsideAngular(() => {
+      this.initializeDatasets();
+    });
+  }
+
+  public getItemByIndex(index: number): any {
+    return this.basicData[0]?.data[index];
+  }
+
+  public getTestBuildByName(name: string): any {
+    return this.stats.find((item) => item.name === name);
+  }
 
   public getItemTestBuild(tooltipItem: any, data: ChartData): TestBuild {
     if (!tooltipItem || !data) return null;
@@ -233,79 +97,329 @@ export class StatsBarChartComponent
     return this.stats[index] as TestBuild;
   }
 
-  public selectedObject: StatusStatsItem;
-
-  constructor(private router: Router, private zone: NgZone) {}
-
-  public barChartData: ChartDataSets[] = [];
-
-  ngOnInit(): void {}
-
-  ngAfterViewChecked(): void {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.zone.runOutsideAngular(() => {
-      this.refresh();
-    });
-  }
-
-  refresh() {
-    // this.logger.debug('Stats ', this.stats);
-    this.barChartData = [];
-    this.barColors = [];
-    this.logger.debug('Current bar stas: ', this.stats);
-    let max: number = Math.max.apply(
-      Math,
-      this.stats.map(function (o) {
-        return o.duration || 0;
-      })
-    );
-    this.logger.debug('MAX duration', max);
-    for (let i in this.stats) {
-      let build: StatusStatsItem = this.stats[i];
-      this.barChartData.push({
-        data: [build.duration || 0],
-        label: 'duration',
-      });
-      this.barColors.push(this.getColor(build.status));
-    }
-  }
-
-  private getColor(label: string) {
+  private setOptions(): any {
     return {
-      // first color
-      backgroundColor:
-        label in this.mappings ? this.mappings[label].color : 'gray',
-      borderColor: 'rgba(225,10,24,0.2)',
-      pointBackgroundColor: 'rgba(225,10,24,0.2)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(225,10,24,0.2)',
+      interaction: {
+        intersect: true,
+        mode: 'nearest',
+      },
+      plugins: {
+        title: {
+          display: this.showTitle,
+          position: 'top',
+          text: 'Latest Test Builds',
+        },
+        legend: {
+          labels: {
+            // color: '#495057',
+            font: { size: 8, weight: 'normal' },
+            textAlign: 'right',
+            // filter: (legendItem, chartData) => {
+            //   return legendItem.text !== 'Test builds';
+            // },
+            boxWidth: 10,
+            useBorderRadius: true,
+            sort: (a: any, b: any) => {
+              // sort legend items descending by datasetIndex
+              return b.datasetIndex < a.datasetIndex ? 1 : -1;
+            },
+          },
+
+          display: (ctx) => {
+            return true;
+          },
+          // maxHeight: 100,
+          position: 'bottom',
+          align: 'center',
+          onClick: (e, legendItem) => {
+            this.logger.debug('legend click event', e);
+            this.logger.debug('legendItem', legendItem);
+            // const build = this.getTestBuildByName(legendItem.text);
+            // this.selectedItem.emit(build);
+            const dataset = this.basicDatasets[legendItem.datasetIndex];
+            this.logger.debug('click on dataset legend', dataset);
+            dataset.hidden = !dataset.hidden;
+            e.chart.update();
+          },
+        },
+        tooltip: {
+          enabled: true,
+          position: 'nearest',
+          usePointStyle: true,
+          backgroundColor: 'rgba(6, 55, 55, 0.9)',
+          titleFont: { weight: 'bold', size: 12 },
+          bodyFont: { size: 13, weight: 'bold' },
+          footerFont: { weight: 'normal', color: 'gray' },
+          callbacks: {
+            title: (tooltipItem: Array<any>) => {
+              this.logger.debug('tooltipItem', tooltipItem);
+              // extract the index of the dataset (fix ts2532)
+              const datasetIndex = tooltipItem[0].datasetIndex;
+              // get the dataset by index
+              const dataset = this.basicDatasets[datasetIndex];
+
+              if (datasetIndex < 6) {
+                const dataIndex = tooltipItem[0].dataIndex;
+                if (!dataset.builds || !dataset.builds[dataIndex]) return null;
+                const build = dataset.builds[dataIndex];
+                return `⚙️ Build ${build.name}`;
+              }
+
+              return `⌛️ ${tooltipItem[0].dataset.label}`;
+            },
+            label: (tooltipItem: any) => {
+              // this.logger.warn('tooltipItem', tooltipItem);
+              if (tooltipItem.raw === null) return;
+              // extract the index of the dataset (fix ts2532)
+              const dataIndex = tooltipItem.dataIndex;
+              // get the dataset by index
+              const dataset = tooltipItem.dataset;
+              if (!dataset || !dataset.builds)
+                return formatDuration(tooltipItem.raw);
+              const build = dataset.builds[dataIndex];
+              return ` ${build.status}`;
+            },
+
+            labelColor: (tooltipItem: any) => {
+              this.logger.warn('tooltipItem', tooltipItem);
+              // extract the index of the dataset (fix ts2532)
+              const dataIndex = tooltipItem.dataIndex;
+              // get the dataset by index
+              const dataset = tooltipItem.dataset;
+              const lColor =
+                typeof dataset.backgroundColor === 'string' ||
+                dataset.backgroundColor instanceof String
+                  ? dataset.borderColor
+                  : dataset.backgroundColor[dataIndex];
+              return {
+                borderColor: lColor,
+                backgroundColor: lColor,
+                borderWidth: 2,
+                borderDash: [2, 2],
+                borderRadius: 2,
+              };
+            },
+
+            beforeFooter: (tooltipItem: any) => {
+              // extract the index of the dataset (fix ts2532)
+              const dataIndex = tooltipItem[0].dataIndex;
+              // get the dataset by index
+              const dataset = tooltipItem[0].dataset;
+              if (!dataset || !dataset.builds) return null;
+              const build = dataset.builds[dataIndex];
+              return `⏱️ created: ${DateUtils.formatTimestamp(
+                build.timestamp.toString()
+              )}`;
+            },
+
+            footer: (tooltipItem: any) => {
+              if (!tooltipItem || tooltipItem.length === 0) return null;
+              if (tooltipItem[0].datasetIndex > 2) return null;
+              return `⌛️ duration: ${formatDuration(tooltipItem[0].raw)}`;
+            },
+
+            afterFooter: (tooltipItem: []) => {
+              return '🔗 click to see more';
+            },
+          },
+        },
+      },
+
+      scales: {
+        x: {
+          display: false,
+          ticks: {
+            color: '#495057',
+            min: 0,
+          },
+          grid: {
+            color: '#ebedef',
+          },
+        },
+        y1: {
+          display: true,
+          position: 'left',
+          ticks: {
+            beginAtZero: true,
+            display: false,
+            min: 0,
+          },
+
+          // grid line settings
+          grid: {
+            drawOnChartArea: false, // only want the grid lines for one axis to show up
+          },
+          time: { unit: 'second' },
+          title: {
+            display: true,
+            text: 'duration [hh:mm:ss]',
+            color: '#034545',
+            font: {
+              size: 10,
+              weight: 'bold',
+              lineHeight: 1.2,
+            },
+            padding: { top: 20, left: 0, right: 0, bottom: 0 },
+          },
+        },
+        y: {
+          position: 'right',
+          suggestedMin: this.minDuration,
+          suggestedMax: this.maxDuration,
+          ticks: {
+            color: '#495057',
+            min: 0,
+            beginAtZero: true,
+            label: 'duration (seconds)',
+            display: true,
+            font: { size: 7, weight: 'normal' },
+            callback: function (val: number, index: number) {
+              // Hide the label of every 2nd dataset
+              return formatDuration(val);
+              // return val;
+            },
+          },
+          grid: {
+            color: '#ebedef',
+          },
+          display: true,
+          time: { unit: 'second' },
+        },
+      },
     };
   }
 
-  // events
-  public chartClicked({
-    event,
-    active,
-  }: {
-    event: MouseEvent;
-    active: { _chart: any }[];
-  }): void {
-    this.logger.debug('Chart click event', event, active);
-    if (!active || active.length == 0) return;
-    let chart: Chart = active[0]._chart;
-    let selectedElements: [{}] = chart.getElementAtEvent(event);
-    if (selectedElements && selectedElements.length == 1) {
-      let element = selectedElements[0];
-      let dataIndex: number = element['_datasetIndex'];
-      let data = this.barChartData[dataIndex];
-      this.selectedObject = this.stats[dataIndex];
-      this.logger.debug('Data selected', chart, data, this.selectedObject);
-      this.selectedItem.emit(this.selectedObject);
-    } else {
-      this.selectedObject = null;
+  initializeDatasets() {
+    this.basicDatasets = [];
+
+    const datasets = [];
+    for (const statusType in this.colorMap) {
+      const dataset = {
+        builds: [...this.stats],
+        get data(): [] {
+          return this['builds'].map((b: TestBuild) =>
+            [statusType].find((s) => s === b.status) ? b.duration : null
+          );
+        },
+        label: statusType,
+        backgroundColor: Array.from(
+          { length: this.stats.length },
+          () => this.colorMap[statusType].color
+        ),
+        borderColor: Array.from(
+          { length: this.stats.length },
+          () => this.colorMap[statusType].color
+        ),
+        yAxisID: 'y1',
+        order: datasets.length + 3,
+        stack: 'builds',
+        borderSkipped: true,
+        borderWidth: 4,
+        minBarLength: 4,
+      };
+      datasets.push(dataset);
     }
+
+    const builds = [...this.stats];
+    const values = datasets[0].data.filter((d) => d > 0);
+    const minDuration = (this.minDuration = Math.min(...values));
+    const maxDuration = (this.maxDuration = Math.max(...values));
+    const averageDuration = (this.averageDuration =
+      values.reduce((a, b) => a + b, 0) / values.length);
+
+    this.logger.debug('Builds: ', builds);
+    this.logger.debug('Dataset: ', values);
+    this.logger.debug('Min duration: ' + minDuration);
+    this.logger.debug('Max duration: ' + maxDuration);
+    this.logger.debug('Average duration: ' + averageDuration);
+
+    this.basicDatasets = [
+      ...datasets,
+      {
+        data: Array.from(
+          { length: datasets[0].data.length },
+          () => minDuration
+        ),
+        label: 'min duration',
+        backgroundColor: 'rgba(147,255,51,.1)',
+        borderColor: 'rgba(147,255,51,1)',
+        borderWidth: 2,
+        borderDash: [2, 2],
+        // tension: 0.1,
+        fill: true,
+        hitRadius: 10,
+        pointRadius: (ctx: any) => {
+          return datasets[0].data[ctx.dataIndex] === minDuration ? 5 : 0;
+        },
+        yAxisID: 'y1',
+        order: 0,
+        type: 'line',
+        pointStyle: 'star',
+        title: 'min duration: ' + formatDuration(minDuration),
+      },
+      {
+        data: Array.from(
+          { length: datasets[0].data.length },
+          () => maxDuration
+        ),
+        label: 'max duration',
+        backgroundColor: 'rgba(232,62,140,.5)',
+        borderColor: 'rgba(232,62,140,1)',
+        borderWidth: 2,
+        borderDash: [1, 1],
+        // tension: 0.4,
+        fill: false,
+        pointRadius: (ctx: any) => {
+          return datasets[0].data[ctx.dataIndex] === maxDuration ? 5 : 0;
+        },
+        yAxisID: 'y1',
+        order: 1,
+        type: 'line',
+        pointStyle: 'triangle',
+      },
+      {
+        data: Array.from(
+          { length: datasets[0].data.length },
+          () => averageDuration
+        ),
+        label: 'avg duration',
+        backgroundColor: 'rgba(23,162,184,.1)',
+        borderColor: 'rgba(23,162,184,1)',
+        borderWidth: 1,
+        borderDash: [5, 5],
+        // tension: 0.1,
+        fill: false,
+        pointRadius: (ctx: any) => {
+          return datasets[0].data[ctx.dataIndex] === averageDuration ? 5 : 0;
+        },
+        yAxisID: 'y1',
+        order: 2,
+        type: 'line',
+        pointStyle: 'cross',
+      },
+    ];
+
+    this.basicData = {
+      labels: this.stats.map((s) => s.name),
+      datasets: this.basicDatasets,
+    };
+  }
+
+  public chartClicked(e: any) {
+    this.logger.debug('Chart click event', e);
+    if (!e || !e.element) return;
+    let el: { element: BarElement; datasetIndex: number; index: number } =
+      e.element;
+    this.logger.debug('Chart element clicked', el);
+
+    let dataset = this.basicDatasets[el.datasetIndex];
+    this.logger.debug('Chart dataset clicked', dataset);
+    let item = dataset.builds[el.index];
+    this.logger.debug('Chart item clicked', item);
+    this.selectedObject = item;
+    if (!item) return;
+
+    this.selectedItem.emit(this.selectedObject);
   }
 
   public chartHovered({

@@ -11,18 +11,19 @@
   </div>
   <p-dataView #suitesDataView [value]="suites" [paginator]="true" [rows]="10" layout="list">
     <ng-template pTemplate="header">
-      <div class="d-block">
+      <div class="d-block m-0 p-0">
         <div class="text-center text-md-right p-4">
           <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
         </div>
-        <div class="d-flex">
+        <div class="d-flex m-0 p-0">
           <div class="d-inline row suite-list-item mt-4" *ngIf="dataView && dataView.layout === 'list'">
-            <div class="col-3 col-sm-1 col-lg-1 d-inline-block suite-list-item-header"></div>
-            <div class="col-9 col-sm-11 col-md-6 col-lg-5 d-inline-block suite-list-item-header text-left">Workflow
+            <div class="d-inline-block col-sm-1 col-md-1 col-xl-1 suite-list-item-header"></div>
+            <div class="d-inline-block col-sm-11 col-md-5 col-lg-4 col-xl-4 suite-list-item-header text-left">Workflow
             </div>
-            <div class="col-2 col-xl-1 d-none d-lg-inline-block suite-list-item-header">Engine</div>
-            <div class="col-2 d-none d-xl-inline-block suite-list-item-header">Test Instances</div>
-            <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block suite-list-item-header">Latest Test Builds
+            <div class="d-none d-xl-inline-block col-xl-1 suite-list-item-header m-auto">Engine</div>
+            <div class="d-none d-lg-inline-block col-lg-2 col-xl-2 suite-list-item-header m-auto">Test Instances</div>
+            <div class="d-none d-md-inline-block col-md-6 col-lg-5 col-xl-4 suite-list-item-header m-auto">Latest Test
+              Builds
             </div>
           </div>
         </div>
@@ -31,13 +32,13 @@
     <ng-template let-suite pTemplate="listItem">
       <div class="d-flex">
         <div class="d-inline-flex row suite-list-item">
-          <div class="col-3 col-sm-1 col-lg-1 d-inline-block text-center">
+          <div class="cd-inline-block col-sm-1 col-md-1 col-lg-1 col-xl-1 text-center">
             <div class="suite-list-item-status" [ngClass]="suite.class" [pTooltip]="suite.statusText"
               tooltipPosition="top" showDelay="1500">
               <i class="{{ suite.statusIcon }} fa-2x"></i>
             </div>
           </div>
-          <div class="col-9 col-sm-11 col-md-6 col-lg-5 d-inline-block">
+          <div class="d-inline-block col-sm-11 col-md-5 col-lg-4 col-xl-4">
             <div class="suite-name">
               <input *ngIf="suite.editingMode" type="text" [(ngModel)]="suite.name" autofocus
                 class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
@@ -53,24 +54,24 @@
               <b>uuid:</b> {{ suite.uuid }}
             </div>
           </div>
-          <div class="col-2 col-xl-1 d-none d-lg-inline-block text-center">
+          <div class="d-none d-xl-inline-block col-xl-1 text-center m-auto">
             <!-- <div class="text-sm">engine</div> -->
             <div class="suite-list-item-engine-type">
               <img *ngIf="suite.engineIcon" src="{{ suite.engineIcon }}" />
               <i *ngIf="!suite.engineIcon" class="far fa-question-circle fa-2x text-muted"></i>
             </div>
           </div>
-          <div class="col-2 d-none d-xl-inline-block text-center">
+          <div class="d-none d-lg-inline-block col-lg-2 col-xl-2 text-center m-auto">
             <div class="suite-list-item-instances-chart">
               <a [routerLink]="['/suite', { s: suite.asUrlParam() }]">
                 <stats-pie-chart [stats]="suite.instances"></stats-pie-chart>
               </a>
             </div>
           </div>
-          <div class="col-5 col-lg-4 col-xl-3 d-none d-md-inline-block">
+          <div class="d-none d-md-inline-block col-md-6 col-lg-5 col-xl-4 m-auto">
             <div class="suite-list-item-builds-chart">
               <stats-bar-chart [stats]="suite.getLatestBuilds() | arraySizeFilterPipe: 10"
-                (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+                (selectedItem)="selectTestBuild($event)" [showTitle]="false"></stats-bar-chart>
             </div>
           </div>
 
@@ -123,7 +124,8 @@
               <div class="text-smx">Test Instances</div>
               <div class="suite-grid-item-instances-chart">
                 <a [routerLink]="['/suite', { s: suite.asUrlParam() }]">
-                  <stats-pie-chart [stats]="suite.instances"></stats-pie-chart>
+                  <stats-pie-chart [stats]="suite.instances" [titleText]="'# of test instances'"
+                    [showTitle]="true"></stats-pie-chart>
                 </a>
               </div>
             </div>
@@ -133,7 +135,8 @@
               <div class="text-smx">Latest Test Builds</div>
               <div class="suite-grid-item-builds-chart">
                 <stats-bar-chart [stats]="suite.getLatestBuilds() | arraySizeFilterPipe: 10"
-                  (selectedItem)="selectTestBuild($event)"></stats-bar-chart>
+                  (selectedItem)="selectTestBuild($event)" chartWidth="fit-content">
+                </stats-bar-chart>
               </div>
             </div>
           </div>

@@ -50,7 +50,7 @@
               "./node_modules/datatables.net-buttons/js/buttons.print.min.js",
               "./node_modules/datatables.net-buttons/js/buttons.colVis.min.js",
               "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js",
-              "./node_modules/chart.js/dist/Chart.js",
+              "./node_modules/chart.js/dist/chart.js",
               "./node_modules/swiped-events/dist/swiped-events.min.js"
             ],
             "vendorChunk": true,
@@ -92,7 +92,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "6kb",
-                  "maximumError": "10kb"
+                  "maximumError": "12kb"
                 }
               ]
             },

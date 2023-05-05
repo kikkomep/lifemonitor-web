@@ -85,6 +85,17 @@ export class SuiteComponent extends BaseDataViewComponent implements OnInit {
                 this.suite.workflow = w;
                 if (!this.statusFilter) this._instances = suite.instances.all;
                 else this._instances = this.suite.instances[this.statusFilter];
+                this.appService
+                  .refreshWorkflowVersion(
+                    {
+                      uuid: w.uuid,
+                      version: w.version['version'],
+                    },
+                    false
+                  )
+                  .then(() => {
+                    this.logger.debug("Workflow's version refreshed");
+                  });
               }
             }
           );

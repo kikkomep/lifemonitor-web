@@ -9,18 +9,17 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
   Workflow,
   WorkflowVersion,
-  WorkflowVersionDescriptor
+  WorkflowVersionDescriptor,
 } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
-declare var $: any;
 @Component({
   selector: 'workflow-version-selector',
   templateUrl: './workflow-version-selector.component.html',
@@ -38,8 +37,16 @@ export class WorkflowVersionSelectorComponent
 
   versions: WorkflowVersionDescriptor[];
 
+  _selectedVersion: WorkflowVersionDescriptor;
+
+  @Input() selectorClass: string = '';
+  @Input() selectorWidth: string = 'fit-content';
+  @Input() labelInLine: boolean = false;
+  @Input() showLabel: boolean = true;
   @Output() workflow_version = new EventEmitter<WorkflowVersion>();
   @Output() loadingWorkflowVersion = new EventEmitter<Workflow>();
+
+  private reloading: boolean = false;
 
   // initialize logger
   private logger: Logger = LoggerManager.create(
@@ -53,7 +60,8 @@ export class WorkflowVersionSelectorComponent
     this._isLoadingSubcription = this.appService.observableLoadingWorkflow.subscribe(
       (w) => {
         if (w.uuid === this.workflow.uuid) {
-          this.refresh(w.loading);
+          this.reloading = true;
+          this.cdRef.detectChanges();
         }
       }
     );
@@ -63,40 +71,13 @@ export class WorkflowVersionSelectorComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     this.logger.debug('Change detected');
-    // this.cdRef.detectChanges();
-    // this.jquerySelector.selectpicker();
   }
 
   ngOnDestroy(): void {
     if (this._isLoadingSubcription) this._isLoadingSubcription.unsubscribe();
   }
 
-  ngAfterViewChecked(): void {
-    this.jquerySelector.selectpicker();
-  }
-
-  get selectorId(): string {
-    return `versionSelector-${this.workflow.uuid}`;
-  }
-
-  private get jquerySelector(): any {
-    return $(`#${this.selectorId}`);
-  }
-
-  refresh(isLoading?: boolean) {
-    const selector = this.jquerySelector;
-    const loading = isLoading ?? this.isLoading();
-    this.cdRef.detectChanges();
-    if (loading) {
-      selector.prop('disabled', true);
-      selector.addClass('disabled');
-    } else {
-      selector.prop('disabled', false);
-      selector.removeClass('disabled');
-    }
-    selector.selectpicker('refresh');
-    this.cdRef.detectChanges();
-  }
+  ngAfterViewChecked(): void {}
 
   @Input()
   set workflow(w: Workflow) {
@@ -107,6 +88,9 @@ export class WorkflowVersionSelectorComponent
     w.versionDescriptors.forEach(
       (v: WorkflowVersionDescriptor, index) => (this._versions_map[v.name] = v)
     );
+    this._selectedVersion = this.versions.find(
+      (v) => v.name === w.currentVersion.version['version']
+    );
     this.logger.debug('Version map:', this._versions_map);
     this.cdRef.detectChanges();
   }
@@ -115,22 +99,28 @@ export class WorkflowVersionSelectorComponent
     return this._workflow;
   }
 
-  public isLoading(): boolean {
-    return this.appService.isLoadingWorkflow(this.workflow.uuid);
+  public get selectedVersion(): WorkflowVersionDescriptor {
+    return this._selectedVersion;
   }
 
-  public selectVersion(version: string) {
-    this.logger.debug('Selected workflow version:', version);
-    this._workflow_version = this._versions_map[version];
+  public set selectedVersion(v: WorkflowVersionDescriptor) {
+    this._selectedVersion = v;
+    this._workflow_version = this._versions_map[v.name];
     this.logger.debug('Selected workflow version:', this._workflow_version);
     this.loadingWorkflowVersion.next(this._workflow);
     this.appService
-      .loadWorkflowVersion(this.workflow, version, true)
+      .loadWorkflowVersion(this.workflow, v.name, true)
       .subscribe((v: WorkflowVersion) => {
         this.workflow.addVersion(v, true);
         this.loadingWorkflowVersion.next(null);
         this.workflow_version.emit(v);
-        this.refresh();
       });
+    this.cdRef.detectChanges();
+  }
+
+  public isLoading(): boolean {
+    return (
+      this.appService.isLoadingWorkflow(this.workflow.uuid) && !this.reloading
+    );
   }
 }
