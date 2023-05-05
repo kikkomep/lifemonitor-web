@@ -123,8 +123,8 @@ export class AppRoutingModule {
           }
         );
       } else {
-        this.toastr.error('Something went wrong', '', { timeOut: 4000 });
         if (this.configService.developmentMode) {
+        this.toastr.error('Something went wrong', '', { timeOut: 4000 });
           this.inputDialogService.show({
             question: 'Ops...',
             description: 'Something went wrong!',
@@ -163,7 +163,7 @@ export class AppRoutingModule {
         this.logger.debug('Logout from app routing module');
         this.inputDialogService.show({
           question: 'Session Expired',
-          description: 'You need to relogin',
+          description: 'You need to login again to continue',
           confirmText: 'Login',
           iconClass: 'fas fa-user-clock',
           enableCancel: true,
