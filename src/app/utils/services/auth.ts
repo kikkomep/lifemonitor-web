@@ -1,5 +1,5 @@
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, throwError } from 'rxjs';
 import { Logger, LoggerManager } from '../logging';
 import IndexedDb from '../shared/indexdb';
 import { AppConfigService } from './config.service';
@@ -66,7 +66,7 @@ export class AuthHandler {
         redirectUrl: window.location.origin + '/login?callback',
         onAccessTokenExpiry(refreshAccessToken) {
           this.logger.debug('Expired! Access token needs to be renewed.');
-          alert(
+          this.logger.warn(
             'We will try to get a new access token via grant code or refresh token.'
           );
           return refreshAccessToken();
@@ -75,8 +75,10 @@ export class AuthHandler {
           this.logger.debug(
             'Expired! Auth code or refresh token needs to be renewed.'
           );
-          alert('Redirecting to auth server to obtain a new auth grant code.');
-          //return refreshAuthCodeOrRefreshToken();
+          this.logger.debug(
+            'Redirecting to auth server to obtain a new auth grant code.'
+          );
+          return refreshAuthCodeOrRefreshToken();
         },
       });
     }
@@ -98,50 +100,53 @@ export class AuthHandler {
     return await this.oauth.fetchAuthorizationCode();
   }
 
-  public login(
+  public async login(
     callback: CallableFunction = null,
     catchError: CallableFunction = null
   ) {
     this.logger.debug('Is authorized: ', this.oauth.isAuthorized());
     this.logger.debug('Is expired: ', this.oauth.isAccessTokenExpired());
 
-    if (!this.oauth.isAuthorized()) {
-      this.oauth
-        .isReturningFromAuthServer()
-        .then(async (hasAuthCode) => {
-          if (!hasAuthCode) {
-            this.logger.debug('Something wrong...no auth code.');
-          }
-          const token = await this.oauth.getAccessToken();
-
-          this.saveToken(token).then((value) => {
-            this._token = token as Token;
-            this._isUserLogged = true;
-            this._userLogged.next(true);
-
-            if (callback) callback();
-
-            // setTimeout(() => {
-            //   this.saveToken({
-            //     ...token,
-            //     token: { ...token.token, value: '123' },
-            //   });
-            // }, 5000);
-            // return this.logger.debug('This is the access token: ', token);
+    try {
+      const currentToken = await this.getToken();
+      if (
+        !this.oauth.isAuthorized() ||
+        !currentToken ||
+        this.oauth.isAccessTokenExpired()
+      ) {
+        this.oauth
+          .isReturningFromAuthServer()
+          .then(async (hasAuthCode) => {
+            if (!hasAuthCode) {
+              this.logger.debug('Something wrong...no auth code.');
+              throw new Error('Something wrong...no auth code.');
+            }
+            const token = await this.oauth.getAccessToken();
+            this.saveToken(token).then((value) => {
+              this._token = token as Token;
+              this._isUserLogged = true;
+              this._userLogged.next(true);
+              if (callback) callback();
+            });
+          })
+          .catch((potentialError) => {
+            if (potentialError) {
+              this.logger.debug(potentialError);
+            }
+            if (catchError) catchError(potentialError);
+            throwError(potentialError);
           });
-        })
-        .catch((potentialError) => {
-          if (potentialError) {
-            this.logger.debug(potentialError);
-          }
-          if (catchError) catchError(potentialError);
+      } else {
+        this.getToken().then((token) => {
+          this._token = token;
+          this._isUserLogged = true;
+          this._userLogged.next(true);
+          if (callback) callback();
         });
-    } else {
-      this.getToken().then((token) => {
-        this._token = token;
-        this._isUserLogged = true;
-        this._userLogged.next(true);
-      });
+      }
+    } catch (error) {
+      this.logger.debug(error);
+      throw error;
     }
   }
 

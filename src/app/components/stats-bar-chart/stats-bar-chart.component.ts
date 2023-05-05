@@ -58,11 +58,11 @@ export class StatsBarChartComponent
 
   private colorMap = {
     passed: { color: '#1f8787' },
-    failed: { color: '#dc3545' },
     error: { color: '#ffc107' },
-    aborted: { color: '#6c757d' },
-    running: { color: '#17a2b8' },
+    failed: { color: '#dc3545' },
     waiting: { color: '#fd7e14' },
+    running: { color: '#17a2b8' },
+    aborted: { color: '#6c757d' },
   };
 
   constructor(private router: Router, private zone: NgZone) {}
@@ -99,6 +99,10 @@ export class StatsBarChartComponent
 
   private setOptions(): any {
     return {
+      interaction: {
+        intersect: true,
+        mode: 'nearest',
+      },
       plugins: {
         title: {
           display: this.showTitle,
@@ -154,7 +158,7 @@ export class StatsBarChartComponent
               // get the dataset by index
               const dataset = this.basicDatasets[datasetIndex];
 
-              if (datasetIndex < 2) {
+              if (datasetIndex < 6) {
                 const dataIndex = tooltipItem[0].dataIndex;
                 if (!dataset.builds || !dataset.builds[dataIndex]) return null;
                 const build = dataset.builds[dataIndex];
@@ -164,6 +168,8 @@ export class StatsBarChartComponent
               return `⌛️ ${tooltipItem[0].dataset.label}`;
             },
             label: (tooltipItem: any) => {
+              // this.logger.warn('tooltipItem', tooltipItem);
+              if (tooltipItem.raw === null) return;
               // extract the index of the dataset (fix ts2532)
               const dataIndex = tooltipItem.dataIndex;
               // get the dataset by index
@@ -172,6 +178,26 @@ export class StatsBarChartComponent
                 return formatDuration(tooltipItem.raw);
               const build = dataset.builds[dataIndex];
               return ` ${build.status}`;
+            },
+
+            labelColor: (tooltipItem: any) => {
+              this.logger.warn('tooltipItem', tooltipItem);
+              // extract the index of the dataset (fix ts2532)
+              const dataIndex = tooltipItem.dataIndex;
+              // get the dataset by index
+              const dataset = tooltipItem.dataset;
+              const lColor =
+                typeof dataset.backgroundColor === 'string' ||
+                dataset.backgroundColor instanceof String
+                  ? dataset.borderColor
+                  : dataset.backgroundColor[dataIndex];
+              return {
+                borderColor: lColor,
+                backgroundColor: lColor,
+                borderWidth: 2,
+                borderDash: [2, 2],
+                borderRadius: 2,
+              };
             },
 
             beforeFooter: (tooltipItem: any) => {
@@ -214,6 +240,7 @@ export class StatsBarChartComponent
           display: true,
           position: 'left',
           ticks: {
+            beginAtZero: true,
             display: false,
             min: 0,
           },
@@ -242,6 +269,7 @@ export class StatsBarChartComponent
           ticks: {
             color: '#495057',
             min: 0,
+            beginAtZero: true,
             label: 'duration (seconds)',
             display: true,
             font: { size: 7, weight: 'normal' },
@@ -264,42 +292,36 @@ export class StatsBarChartComponent
   initializeDatasets() {
     this.basicDatasets = [];
 
-    const passedBuildsDataset = {
-      builds: [...this.stats],
-      get data(): [] {
-        return this['builds'].map((b: TestBuild) =>
-          b.status === 'passed' ? b.duration : 0
-        );
-      },
-      label: 'Passing',
-      backgroundColor: Array.from(
-        { length: this.stats.length },
-        () => this.colorMap['passed'].color
-      ),
-      yAxisID: 'y1',
-      order: 4,
-      stack: 'builds',
-    };
+    const datasets = [];
+    for (const statusType in this.colorMap) {
+      const dataset = {
+        builds: [...this.stats],
+        get data(): [] {
+          return this['builds'].map((b: TestBuild) =>
+            [statusType].find((s) => s === b.status) ? b.duration : null
+          );
+        },
+        label: statusType,
+        backgroundColor: Array.from(
+          { length: this.stats.length },
+          () => this.colorMap[statusType].color
+        ),
+        borderColor: Array.from(
+          { length: this.stats.length },
+          () => this.colorMap[statusType].color
+        ),
+        yAxisID: 'y1',
+        order: datasets.length + 3,
+        stack: 'builds',
+        borderSkipped: true,
+        borderWidth: 4,
+        minBarLength: 4,
+      };
+      datasets.push(dataset);
+    }
 
-    const failedBuildsDataset = {
-      get data(): [] {
-        return this['builds'].map((b: TestBuild) =>
-          ['failed', 'error'].find((s) => s === b.status) ? b.duration : 0
-        );
-      },
-      builds: [...this.stats],
-      label: 'Failing',
-      backgroundColor: Array.from(
-        { length: this.stats.length },
-        () => this.colorMap['failed'].color
-      ),
-      yAxisID: 'y1',
-      order: 5,
-      stack: 'builds',
-    };
-
-    const builds = passedBuildsDataset.builds;
-    const values = passedBuildsDataset.data.filter((d) => d > 0);
+    const builds = [...this.stats];
+    const values = datasets[0].data.filter((d) => d > 0);
     const minDuration = (this.minDuration = Math.min(...values));
     const maxDuration = (this.maxDuration = Math.max(...values));
     const averageDuration = (this.averageDuration =
@@ -312,38 +334,35 @@ export class StatsBarChartComponent
     this.logger.debug('Average duration: ' + averageDuration);
 
     this.basicDatasets = [
-      passedBuildsDataset,
-      failedBuildsDataset,
+      ...datasets,
       {
         data: Array.from(
-          { length: passedBuildsDataset.data.length },
+          { length: datasets[0].data.length },
           () => minDuration
         ),
-        label: 'Min Duration',
-        backgroundColor: 'rgba(249,178,51,.1)',
-        borderColor: 'rgba(249,178,51,1)',
+        label: 'min duration',
+        backgroundColor: 'rgba(147,255,51,.1)',
+        borderColor: 'rgba(147,255,51,1)',
         borderWidth: 2,
         borderDash: [2, 2],
         // tension: 0.1,
         fill: true,
         hitRadius: 10,
         pointRadius: (ctx: any) => {
-          return passedBuildsDataset.data[ctx.dataIndex] === minDuration
-            ? 5
-            : 0;
+          return datasets[0].data[ctx.dataIndex] === minDuration ? 5 : 0;
         },
         yAxisID: 'y1',
         order: 0,
         type: 'line',
         pointStyle: 'star',
-        title: 'Min duration: ' + formatDuration(minDuration),
+        title: 'min duration: ' + formatDuration(minDuration),
       },
       {
         data: Array.from(
-          { length: passedBuildsDataset.data.length },
+          { length: datasets[0].data.length },
           () => maxDuration
         ),
-        label: 'Max Duration',
+        label: 'max duration',
         backgroundColor: 'rgba(232,62,140,.5)',
         borderColor: 'rgba(232,62,140,1)',
         borderWidth: 2,
@@ -351,9 +370,7 @@ export class StatsBarChartComponent
         // tension: 0.4,
         fill: false,
         pointRadius: (ctx: any) => {
-          return passedBuildsDataset.data[ctx.dataIndex] === maxDuration
-            ? 5
-            : 0;
+          return datasets[0].data[ctx.dataIndex] === maxDuration ? 5 : 0;
         },
         yAxisID: 'y1',
         order: 1,
@@ -362,10 +379,10 @@ export class StatsBarChartComponent
       },
       {
         data: Array.from(
-          { length: passedBuildsDataset.data.length },
+          { length: datasets[0].data.length },
           () => averageDuration
         ),
-        label: 'Avg Duration',
+        label: 'avg duration',
         backgroundColor: 'rgba(23,162,184,.1)',
         borderColor: 'rgba(23,162,184,1)',
         borderWidth: 1,
@@ -373,9 +390,7 @@ export class StatsBarChartComponent
         // tension: 0.1,
         fill: false,
         pointRadius: (ctx: any) => {
-          return passedBuildsDataset.data[ctx.dataIndex] === averageDuration
-            ? 5
-            : 0;
+          return datasets[0].data[ctx.dataIndex] === averageDuration ? 5 : 0;
         },
         yAxisID: 'y1',
         order: 2,

@@ -296,10 +296,16 @@ export class CachedHttpClientService {
     };
     this.logger.debug('Cache request headers', init);
     return from(
-      this.cache.fetch(input.toString(), init, false).then(async (r) => {
-        const v = await r.json();
-        return v as T;
-      })
+      this.cache
+        .fetch(input.toString(), init, false)
+        .then(async (r) => {
+          const v = await r.json();
+          return v as T;
+        })
+        .catch((e) => {
+          this.logger.error('Cache error', e);
+          throw e;
+        })
     );
   }
 

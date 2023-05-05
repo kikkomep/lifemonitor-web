@@ -104,6 +104,17 @@ export class WorkflowComponent
     this.internalParamSubscription = this.route.params.subscribe((params) => {
       // select a workflow
       this.appService.selectWorkflowVersion(params['uuid'], params['version']);
+      this.appService
+        .refreshWorkflowVersion(
+          {
+            uuid: params['uuid'],
+            version: params['version'],
+          },
+          false
+        )
+        .then(() => {
+          this.logger.debug('Refreshed workflow');
+        });
     });
   }
 

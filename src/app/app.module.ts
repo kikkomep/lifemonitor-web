@@ -1,5 +1,5 @@
 import { registerLocaleData } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import localeEn from '@angular/common/locales/en';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -59,13 +59,14 @@ import { WorkflowComponent } from './views/workflow/workflow.component';
 // PrimeNG Modules
 // import { ChartModule } from 'primeng/chart';
 import { ButtonModule } from 'primeng/button';
+import { ChartModule } from 'primeng/chart';
 import { DataViewModule } from 'primeng/dataview';
 import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
+import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TooltipModule } from 'primeng/tooltip';
-import { ChartModule } from 'primeng/chart';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -125,6 +126,7 @@ export function initConfigService(appConfig: AppConfigService) {
     PaginatorModule,
     TooltipModule,
     ProgressBarModule,
+    ToggleButtonModule,
     DataTablesModule,
     FormsModule,
     BrowserModule,

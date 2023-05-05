@@ -46,6 +46,8 @@ export class WorkflowVersionSelectorComponent
   @Output() workflow_version = new EventEmitter<WorkflowVersion>();
   @Output() loadingWorkflowVersion = new EventEmitter<Workflow>();
 
+  private reloading: boolean = false;
+
   // initialize logger
   private logger: Logger = LoggerManager.create(
     'WorkflowVersionSelectorComponent'
@@ -58,6 +60,7 @@ export class WorkflowVersionSelectorComponent
     this._isLoadingSubcription = this.appService.observableLoadingWorkflow.subscribe(
       (w) => {
         if (w.uuid === this.workflow.uuid) {
+          this.reloading = true;
           this.cdRef.detectChanges();
         }
       }
@@ -116,6 +119,8 @@ export class WorkflowVersionSelectorComponent
   }
 
   public isLoading(): boolean {
-    return this.appService.isLoadingWorkflow(this.workflow.uuid);
+    return (
+      this.appService.isLoadingWorkflow(this.workflow.uuid) && !this.reloading
+    );
   }
 }
