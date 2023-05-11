@@ -67,6 +67,14 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TooltipModule } from 'primeng/tooltip';
+import { cookieConfig as defaultCookieConfig } from './cookieConfig';
+
+// Cookie Consent modules
+import {
+  NgcCookieConsentModule,
+  NgcCookieConsentConfig,
+} from 'ngx-cookieconsent';
+import { map } from 'rxjs/operators';
 
 registerLocaleData(localeEn, 'en-EN');
 
@@ -148,6 +156,8 @@ export function initConfigService(appConfig: AppConfigService) {
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000',
     }),
+    // cookie consent
+    NgcCookieConsentModule.forRoot(defaultCookieConfig),
   ],
   providers: [
     AppConfigService,
