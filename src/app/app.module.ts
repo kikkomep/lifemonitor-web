@@ -78,9 +78,21 @@ import { map } from 'rxjs/operators';
 
 registerLocaleData(localeEn, 'en-EN');
 
-export function initConfigService(appConfig: AppConfigService) {
+export function initConfigService(
+  appConfig: AppConfigService,
+  cookieConfig: NgcCookieConsentConfig
+) {
   return (): Promise<any> => {
-    return appConfig.loadConfig().toPromise();
+    return appConfig
+      .loadConfig()
+      .pipe(
+        map((data: any) => {
+          Object.assign(cookieConfig, defaultCookieConfig);
+          cookieConfig.cookie.domain = data.appDomain;
+          return data;
+        })
+      )
+      .toPromise();
   };
 }
 
@@ -164,7 +176,7 @@ export function initConfigService(appConfig: AppConfigService) {
     {
       provide: APP_INITIALIZER,
       useFactory: initConfigService,
-      deps: [AppConfigService],
+      deps: [AppConfigService, NgcCookieConsentModule],
       multi: true,
     },
     // ApiSocketService,
