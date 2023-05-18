@@ -38,6 +38,16 @@ export function getTimeStamp(date?: Date): number {
   return Math.floor((date ?? new Date()).getTime());
 }
 
+async function getCache(cacheName: string): Promise<Cache | null> {
+  return caches
+    .open(cacheName)
+    .then((cache) => cache)
+    .catch((error) => {
+      logger.warn(`Unable to open the cache ${cacheName}`, error);
+      return null;
+    });
+}
+
 export class FetchError extends Error {
   private _response: Response;
   private _status: number = 500;
