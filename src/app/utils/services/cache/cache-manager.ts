@@ -38,6 +38,16 @@ export function getTimeStamp(date?: Date): number {
   return Math.floor((date ?? new Date()).getTime());
 }
 
+async function getCache(cacheName: string): Promise<Cache | null> {
+  return caches
+    .open(cacheName)
+    .then((cache) => cache)
+    .catch((error) => {
+      logger.warn(`Unable to open the cache ${cacheName}`, error);
+      return null;
+    });
+}
+
 export class FetchError extends Error {
   private _response: Response;
   private _status: number = 500;
@@ -84,7 +94,8 @@ export class CacheManager {
   }
 
   public async isEmpty(): Promise<boolean> {
-    const cache = await caches.open(this._cacheName);
+    const cache = await getCache(this._cacheName);
+    if (!cache) return true;
     const keys = await cache.keys();
     return keys.length == 0;
   }
@@ -144,7 +155,8 @@ export class CacheManager {
     url: string,
     cache?: Cache
   ): Promise<CachedRequest> {
-    cache = cache ?? (await caches.open(this._cacheName));
+    cache = cache ?? (await getCache(this._cacheName));
+    if (!cache) return null;
     logger.debug('Searching request on cache...', url, cache);
     for (let req of await cache.keys()) {
       if (req.url === url) {
@@ -166,7 +178,8 @@ export class CacheManager {
     key: string,
     cache?: Cache
   ): Promise<CachedRequest> {
-    cache = cache ?? (await caches.open(this._cacheName));
+    cache = cache ?? (await getCache(this._cacheName));
+    if (!cache) return null;
     for (let req of await cache.keys()) {
       if (req.headers.get('cache-entry') === key) {
         req['cacheEntry'] = req.headers.get('cache-entry');
@@ -205,6 +218,7 @@ export class CacheManager {
   }
 
   private static isExpired(cachedReq: CachedRequest): boolean {
+    if (!cachedReq) return true;
     return (
       cachedReq &&
       cachedReq.cacheTTL > 0 &&
@@ -218,8 +232,8 @@ export class CacheManager {
     notifyUpdates: boolean = true
   ): Promise<Response> {
     const request = CacheManager.getRequest(url, init);
-    const cache = await caches.open(this._cacheName);
-    let response = await cache.match(request.url);
+    const cache = await getCache(this._cacheName);
+    let response = cache ? await cache.match(request.url) : null;
 
     const cachedReq = await this.findCachedRequestByURL(url.toString(), cache);
     logger.debug('Check cache entry:', response, cachedReq);
@@ -252,9 +266,13 @@ export class CacheManager {
           logger.error(`Retrying request ${url}... (retries left: ${retry})`);
           if (retry === 0) {
             if (response && response.status >= 400 && response.status < 600) {
-              if (response.status === 404) {
-                await cache.delete(request.url);
-              }
+              logger.error(
+                `Error while fetching request (retry ${retry}): ${response}`
+              );
+              if (cache) await cache.delete(request.url);
+              // if (response.status === 404) {
+              //   await cache.delete(request.url);
+              // }
               throw new FetchError(error, response);
             }
           }
@@ -263,6 +281,10 @@ export class CacheManager {
 
       // if (response && response.status >= 400 && response.status < 600)
       //   throw Error(`${response.status}: ${response.statusText}`);
+      if (!cache) {
+        logger.debug('Cache not available, returning response', response);
+        return response;
+      }
       response['cacheEntry'] = init.cacheEntry;
       response['cacheGroup'] = init.cacheGroup;
       response['cacheTTL'] = init.cacheTTL;
@@ -294,7 +316,10 @@ export class CacheManager {
       namedEntries: {},
       createdAt: {},
     };
-    cache = cache ?? (await caches.open(this._cacheName));
+    cache = cache ?? (await getCache(this._cacheName));
+    // if the cache is not available, return an empty result
+    if (!cache) return result;
+
     for (const rq of await cache.keys()) {
       const request = await this.getCachedRequest(rq);
       const response = fetchResponse ? await cache.match(request.url) : null;
@@ -350,7 +375,7 @@ export class CacheManager {
       ignoreTTL: false,
     }
   ): Promise<{ request: CachedRequest; response: CachedResponse } | null> {
-    const cache = options.cache ?? (await caches.open(this._cacheName));
+    const cache = options.cache ?? (await getCache(this._cacheName));
     const request = await this.findCachedRequestByKey(entryKey, cache);
     if (request) {
       const response = await cache.match(request.url);
@@ -379,6 +404,10 @@ export class CacheManager {
       notifyUpdates: false,
     }
   ): Promise<{ request: CachedRequest; response: CachedResponse }> {
+    // set a reference to the cache
+    const cache = options.cache ?? (await getCache(this._cacheName));
+    if (!cache) throw Error('Cache not available');
+
     const request = entry.request;
     let response = entry.response;
     const isExpired = CacheManager.isExpired(entry.request);
@@ -397,8 +426,6 @@ export class CacheManager {
     logger.debug('Check request-response', updateRequest, entry.response);
     updateRequest.headers.delete('cache-created-at');
     updateRequest.headers.append('cache-created-at', String(getTimeStamp()));
-
-    const cache = options.cache ?? (await caches.open(this._cacheName));
 
     try {
       const updatedResponse = await fetch(
@@ -451,8 +478,11 @@ export class CacheManager {
   }
 
   public async refresh(): Promise<{ [req: string]: Response }> {
+    const cache = await getCache(this._cacheName);
     const result: { [req: string]: Response } = {};
-    const cache = await caches.open(this._cacheName);
+    // if the cache is not available, return an empty result
+    if (!cache) return result;
+
     const entriesMap = await this.getEntries();
     // logger.debug('Entries Map', entriesMap);
     const entries = { ...entriesMap.requests };
@@ -506,7 +536,9 @@ export class CacheManager {
     groupName: string,
     notifyEntryGroupUpdate: boolean = true
   ): Promise<boolean> {
-    const cache = await caches.open(this._cacheName);
+    const cache = await getCache(this._cacheName);
+    // if the cache is not available, return false
+    if (!cache) return false;
     const entriesMap = await this.getEntries(cache, true);
     const groupEntries = entriesMap.groups[groupName];
     const updatedEntries: {
@@ -545,7 +577,8 @@ export class CacheManager {
   }
 
   public async deleteCacheEntryByURL(url: string): Promise<boolean> {
-    const cache = await caches.open(this._cacheName);
+    const cache = await getCache(this._cacheName);
+    if (!cache) return false;
     const result = await cache.delete(url);
     logger.debug(`Cache entry ${url} deleted`);
     if (this.onCacheEntryDeleted) this.onCacheEntryDeleted(url);
@@ -553,7 +586,8 @@ export class CacheManager {
   }
 
   public async deleteCacheEntryByKey(key: string): Promise<boolean> {
-    const cache = await caches.open(this._cacheName);
+    const cache = await getCache(this._cacheName);
+    if (!cache) return false;
     const request = await this.findCachedRequestByKey(key, cache);
     if (request) {
       const result = await cache.delete(request.url);
@@ -576,7 +610,8 @@ export class CacheManager {
     notifyEntryDeletion: boolean = true
   ): Promise<boolean> {
     console.debug(`Deleting cache group ${groupName}... START`);
-    const cache = await caches.open(this._cacheName);
+    const cache = await getCache(this._cacheName);
+    if (!cache) return false;
     const entriesMap = await this.getEntries(cache, false);
     console.debug('EntriesMap', entriesMap);
     const groupEntries = entriesMap.groups[groupName];
@@ -602,7 +637,8 @@ export class CacheManager {
   }
 
   public async clear() {
-    const cache = await caches.open(this._cacheName);
+    const cache = await getCache(this._cacheName);
+    if (!cache) return;
     const entries = await cache.keys();
     for (let entry of entries) {
       await cache.delete(entry);
