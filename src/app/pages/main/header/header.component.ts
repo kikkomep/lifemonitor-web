@@ -9,6 +9,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { AppService } from 'src/app/utils/services/app.service';
 
 import { UserDropdownMenuComponent } from './user-dropdown-menu/user-dropdown-menu.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -21,7 +22,7 @@ export class HeaderComponent implements OnInit {
 
   public searchForm: FormGroup;
 
-  constructor(private appService: AppService) {}
+  constructor(private router: Router, private appService: AppService) {}
 
   ngOnInit() {
     this.searchForm = new FormGroup({
@@ -38,6 +39,6 @@ export class HeaderComponent implements OnInit {
   }
 
   public logout() {
-    this.appService.logout().then(() => {});
+    this.router.navigateByUrl('/logout');
   }
 }
