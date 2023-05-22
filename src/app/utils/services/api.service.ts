@@ -131,6 +131,7 @@ export class ApiService {
       //headers: new HttpHeaders(http_headers),
       headers: http_headers,
       params: params,
+      withCredentials: token ? false : true,
     };
     return http_options;
   }
