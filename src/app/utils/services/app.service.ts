@@ -386,19 +386,20 @@ export class AppService {
     });
 
     // get user data if already logged
-    this.config.onLoad.subscribe((loaded) => {
-      if (loaded) {
-        this.checkIsUserLogged().then((logged) => {
-          if (logged) {
-            this.api.get_current_user().subscribe((data) => {
-              this.logger.debug('Current user from APP', data);
-              this._currentUser = data;
-              if (data) this.api.socketIO.join(data);
-            });
-          }
-        });
-      }
-    });
+    // this.config.onLoad.subscribe((loaded) => {
+    //   if (loaded) {
+    //     this.checkIsUserLogged().then((logged) => {
+    //       if (logged) {
+    //         this.api.get_current_user().subscribe((data) => {
+    //           this.logger.debug('Current user from APP', data);
+    //           this._currentUser = data;
+    //           if (data) this.api.socketIO.join(data);
+    //         });
+    //       }
+    //     });
+    //   }
+    // });
+
   }
 
   private setupNetworkListener() {
