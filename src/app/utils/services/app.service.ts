@@ -52,7 +52,7 @@ export class AppService {
   private loadingWorkflowMap: { [uuid: string]: boolean } = {};
 
   // initialize data sources
-  private subjectUser: Subject<User> = new Subject<User>();
+  private subjectReady: Subject<boolean> = new BehaviorSubject<boolean>(false);
   private subjectNotifications = new Subject<UserNotification[]>();
   private subjectRegistry = new Subject<Registry>();
   private subjectRegistries = new Subject<Registry[]>();
@@ -111,6 +111,20 @@ export class AppService {
   ) {
     this.logger.debug('AppService created!');
 
+    this.subscriptions.push(
+      this.api.notifyWhenReady().subscribe((ready) => {
+        if (ready) {
+          this.init();
+        }
+      })
+    );
+  }
+
+  public notifyWhenReady(): Observable<boolean> {
+    return this.subjectReady.asObservable();
+  }
+
+  public init() {
     this.setupNetworkListener();
 
     // subscribe for the current selected workflow
@@ -122,32 +136,27 @@ export class AppService {
 
     // subscribe to the current user
     this.subscriptions.push(
-      this.auth.userLoggedAsObservable().subscribe((logged) => {
-        // get user data
+        // skip updates when user is undefined
+        if (logged === undefined) {
+          this.logger.debug('User logged: undefined');
+          return;
+        }
+        // update user data when user is logged
         if (logged === true) {
           this.api.get_current_user().subscribe((data) => {
             this.logger.debug('Current user from APP', data);
+            // alert('Settings data: ' + data);
             this._currentUser = data;
             this.subjectUser.next(data);
+            // join socket.io room
             if (data) this.api.socketIO.join(data);
           });
         } else {
           if (this._currentUser !== null)
-            this.api.socketIO.leave(this._currentUser);
+            this.api.socketIO?.leave(this._currentUser);
           this._currentUser = null;
           this.subjectUser.next(null);
         }
-        // reload workflows
-        // this.loadWorkflows(true, logged, logged).subscribe(
-        //   (data: AggregatedStatusStats) => {
-        //     alert("Logged: " + logged);
-        //     // delete reference to the previous user
-        //     this._currentUser = null;
-        //     this._workflow = null;
-        //     this.logger.debug('Check workflows loaded: ', data);
-        //     this.subjectWorkflows.next(this._workflows);
-        //   }
-        // );
       })
     );
 

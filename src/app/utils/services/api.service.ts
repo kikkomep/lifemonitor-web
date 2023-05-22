@@ -33,6 +33,8 @@ const MAX_RETRIES = 0;
 export class ApiService {
   private httpOptions: object = null;
 
+  private _apiBaseUrl: string = null;
+
   // initialize logger
   private logger: Logger = LoggerManager.create('ApiService');
 
@@ -68,8 +70,16 @@ export class ApiService {
     });
   }
 
+  public notifyWhenReady(): Observable<boolean> {
+    return this.cachedHttpClient.readySubscription();
+  }
+
+  public set apiBaseUrl(url: string) {
+    this._apiBaseUrl = url;
+  }
+
   public get apiBaseUrl(): string {
-    return this.config.apiBaseUrl;
+    return this._apiBaseUrl ?? this.config.apiBaseUrl;
   }
 
   private handleWorkerMessage(

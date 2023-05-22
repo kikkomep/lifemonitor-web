@@ -71,24 +71,43 @@ import { cookieConfig as defaultCookieConfig } from './cookieConfig';
 
 // Cookie Consent modules
 import {
-  NgcCookieConsentModule,
   NgcCookieConsentConfig,
+  NgcCookieConsentModule,
 } from 'ngx-cookieconsent';
 import { map } from 'rxjs/operators';
+import { LoggerManager } from './utils/logging';
+import { ApiService } from './utils/services/api.service';
+import { AuthService } from './utils/services/auth.service';
+import { CachedHttpClientService } from './utils/services/cache/cachedhttpclient.service';
 
 registerLocaleData(localeEn, 'en-EN');
 
 export function initConfigService(
   appConfig: AppConfigService,
-  cookieConfig: NgcCookieConsentConfig
+  cookieConfig: NgcCookieConsentConfig,
+  cachedHttpClient: CachedHttpClientService,
+  authService: AuthService,
+  apiService: ApiService
 ) {
+  const logger = LoggerManager.create('AppModuleInitializer');
   return (): Promise<any> => {
     return appConfig
       .loadConfig()
       .pipe(
-        map((data: any) => {
+        map(async (data: any) => {
+          console.info('Configuration loaded', data);
           Object.assign(cookieConfig, defaultCookieConfig);
           cookieConfig.cookie.domain = data.appDomain;
+          cachedHttpClient.init();
+          apiService.apiBaseUrl = data['apiBaseUrl'];
+          authService.init().subscribe(
+            (data) => {
+              logger.info('User data fetched', data);
+            },
+            (err) => {
+              logger.warn('Error fetching user data', err);
+            }
+          );
           return data;
         })
       )
@@ -176,7 +195,13 @@ export function initConfigService(
     {
       provide: APP_INITIALIZER,
       useFactory: initConfigService,
-      deps: [AppConfigService, NgcCookieConsentModule],
+      deps: [
+        AppConfigService,
+        NgcCookieConsentModule,
+        CachedHttpClientService,
+        AuthService,
+        ApiService,
+      ],
       multi: true,
     },
     // ApiSocketService,
