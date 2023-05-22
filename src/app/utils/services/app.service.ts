@@ -52,6 +52,7 @@ export class AppService {
   private loadingWorkflowMap: { [uuid: string]: boolean } = {};
 
   // initialize data sources
+  private subjectUser: Subject<User> = new BehaviorSubject<User>(undefined);
   private subjectReady: Subject<boolean> = new BehaviorSubject<boolean>(false);
   private subjectNotifications = new Subject<UserNotification[]>();
   private subjectRegistry = new Subject<Registry>();
@@ -67,7 +68,7 @@ export class AppService {
     uuid: string;
     loading: boolean;
   }>();
-  private subjectLoadingWorkflows = new Subject<boolean>();
+  private subjectLoadingWorkflows = new BehaviorSubject<boolean>(false);
   private subjectWorkflowUpdate = new Subject<WorkflowVersion>();
   private subjectLoadingWorkflowsStatus = new BehaviorSubject<WorkflowsLoadingStatus>(
     null
