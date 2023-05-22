@@ -414,12 +414,9 @@ export class AppService {
   }
 
   public loadUserProfile(): Observable<User> {
-    return this.api.get_current_user().pipe(
-      map((data) => {
-        this._currentUser = data;
-        return data;
-      })
-    );
+    const user = this.auth.getCurrentUser();
+    this._currentUser = user;
+    return of(user);
   }
 
   public isUserLogged(): boolean {

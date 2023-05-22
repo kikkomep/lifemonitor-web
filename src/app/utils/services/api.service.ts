@@ -233,29 +233,8 @@ export class ApiService {
   }
 
   get_current_user(): Observable<User> {
-    const result = this.authService
-      .checkIsUserLogged()
-      .then<User>((isUserLogged) => {
-        if (isUserLogged) {
-          this.logger.debug('User logged... redirecting');
-          return this.doGet('/users/current', {
-            cacheEntry: 'userProfile',
-            cacheTTL: 300,
-          })
-            .pipe(
-              retry(MAX_RETRIES),
-              map((data) => {
-                return new User(data);
-              })
-            )
-            .toPromise();
-        } else {
-          this.logger.debug('User logged out...');
-          return null;
-        }
-      });
-
-    return from(result);
+    this.logger.debug('Getting current user', this.authService.isUserLogged());
+    return of(this.authService.getCurrentUser());
   }
 
   get_current_user_notifications(): Observable<Array<UserNotification>> {
