@@ -459,18 +459,8 @@ export class AppService {
     return this._observableLoadingWorkflows;
   }
 
-  public login(
-    callback: CallableFunction = null,
-    catchError: CallableFunction = null
-  ): void {
-    this.auth
-      .login(callback, catchError)
-      .then(() => {
-        this.logger.debug('Login from app service');
-      })
-      .catch((error) => {
-        this.logger.debug('Detected Error during login');
-      });
+  public login(): Promise<boolean> {
+    return this.auth.login();
   }
 
   public async authorize() {

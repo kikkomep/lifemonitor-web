@@ -51,7 +51,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.appService.authorize().then(() => {});
         } else {
           this.logger.debug('Handling login callback');
-          this.appService.login(() => {
+          this.appService.login().then((data) => {
+            this.logger.debug('User logged in...');
             this.appService.loadUserProfile().subscribe((user: User) => {
               this.router.navigateByUrl('/dashboard');
               if (this.previousToast)

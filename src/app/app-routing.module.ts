@@ -95,9 +95,8 @@ export class AppRoutingModule implements OnInit {
       (userLogged) => {
         if (userLogged) {
           this.logger.debug('User logged... redirecting');
-          // alert(`Current route: ${this.router.url}`);
-          // this.handleRedirect('/dashboard');
         } else {
+          // alert("APp routing module")
           this.logger.debug('User logged out...');
           this.toastr.clear();
           this.toastr.success('You have successfully logged out', '', {
