@@ -60,6 +60,7 @@ export class DashboardComponent
   private internalParamsSubscription: Subscription;
   private queryParamsSubscription: Subscription;
   private internalParamSubscription: Subscription;
+  private appReadySubscription: Subscription;
   //
   private filteredWorkflows: AggregatedStatusStatsItem[] | null;
 
@@ -161,21 +162,32 @@ export class DashboardComponent
 
   ngOnInit() {
     this.logger.debug('Dashboard Created!!');
-    // alert('Initializing Dashboard...');
+
+    this.initDashboard();
+    this.appReadySubscription = this.appService
+      .notifyWhenReady()
+      .subscribe((ready: boolean) => {
+        if (ready) {
+          this.logger.debug('App is ready!');
+        }
+      });
+  }
+
+  private initDashboard(): void {
+    this.logger.debug('Initializing dashboard...');
     this.userLoggedSubscription = this.appService.observableUser.subscribe(
       (user: User) => {
+        // don't load workflows if user is not logged
+        if (user === undefined) return;
+        // load workflows
         const isUserLogged = user !== null;
-        if (!this.appService.isLoadingWorkflows()) {
-          // alert('Notify user changed ' + isUserLogged);
-          if (this._workflowStats) this._workflowStats.clear();
-          this.updatingDataTable = true;
-          this.appService
-            .loadWorkflows(false, isUserLogged, isUserLogged)
-            .subscribe((data) => {
-              this.logger.debug('Loaded workflows ', data);
-              // alert('Loading from user logged ' + user);
-            });
-        }
+        if (this._workflowStats) this._workflowStats.clear();
+        this.updatingDataTable = true;
+        this.appService
+          .loadWorkflows(false, isUserLogged, isUserLogged)
+          .subscribe((data) => {
+            this.logger.debug('Loaded workflows ', data);
+          });
       }
     );
     this.workflowsStatsSubscription = this.appService.observableWorkflows.subscribe(
@@ -187,7 +199,6 @@ export class DashboardComponent
 
     this.workflowUpdateSubscription = this.appService.observableWorkflowUpdate.subscribe(
       (wv: WorkflowVersion) => {
-        // alert('Dashboard::observableLoadingWorkflow Updating... ' + wv.name);
         this.prepareTableData();
       }
     );
@@ -228,21 +239,22 @@ export class DashboardComponent
     if (this._workflows) {
       this.prepareTableData();
     } else {
-      if (!this.appService.isLoadingWorkflows()) {
-        this.appService.checkIsUserLogged().then((isUserLogged) => {
-          this.updatingDataTable = true;
-          if (this._workflowStats) this._workflowStats.clear();
-          if (this.openUploader === true) this.openWorkflowUploader();
-          this.appService.clearListOfWorkflows().then(() => {
-            this.appService
-              .loadWorkflows(false, isUserLogged, isUserLogged)
-              .subscribe((data) => {
-                this.logger.debug('Loaded workflows ', data);
-                // alert('Loaded workflows from dashboard init');
-              });
-          });
-        });
-      } //else alert('Already loading workflows');
+      this.logger.debug('Loading workflows from dashboard init');
+      // if (!this.appService.isLoadingWorkflows()) {
+      //   this.appService.checkIsUserLogged().then((isUserLogged) => {
+      //     this.updatingDataTable = true;
+      //     if (this._workflowStats) this._workflowStats.clear();
+      //     if (this.openUploader === true) this.openWorkflowUploader();
+      //     this.appService.clearListOfWorkflows().then(() => {
+      //       this.appService
+      //         .loadWorkflows(false, isUserLogged, isUserLogged)
+      //         .subscribe((data) => {
+      //           this.logger.debug('Loaded workflows ', data);
+      //           // alert('Loaded workflows from dashboard init');
+      //         });
+      //     });
+      //   });
+      // } //else alert('Already loading workflows');
     }
     // Reload page when the swipe-down event is detected
     document.addEventListener('swiped-down', (e: any) => {
@@ -784,6 +796,7 @@ export class DashboardComponent
 
   ngOnDestroy() {
     // prevent memory leak when component destroyed
+    if (this.appReadySubscription) this.appReadySubscription.unsubscribe();
     if (this.workflowsStatsSubscription)
       this.workflowsStatsSubscription.unsubscribe();
     if (this.internalParamsSubscription)
