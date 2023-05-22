@@ -791,7 +791,7 @@ export class DashboardComponent
   }
 
   public get layout(): string {
-    return this.dataView?.layout;
+    return this.dataView?.layout ?? 'list';
   }
 
   ngOnDestroy() {
