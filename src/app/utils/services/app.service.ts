@@ -400,6 +400,8 @@ export class AppService {
     //   }
     // });
 
+    // notify that the app is ready
+    this.subjectReady.next(true);
   }
 
   private setupNetworkListener() {
