@@ -13,8 +13,8 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Subscription, fromEvent } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { BaseDataViewComponent } from 'src/app/components/base-data-view/base-data-view.component';
 import { MouseClickHandler } from 'src/app/models/common.models';
 import {
   AggregatedStatusStats,
@@ -28,13 +28,12 @@ import {
   WorkflowVersion,
   WorkflowsLoadingStatus,
 } from 'src/app/models/workflow.model';
+import { ItemFilterPipe } from 'src/app/utils/filters/item-filter.pipe';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
 import { WorkflowUploaderService } from 'src/app/utils/services/workflow-uploader.service';
 import { StatsFilterPipe } from './../../utils/filters/stats-filter.pipe';
-import { BaseDataViewComponent } from 'src/app/components/base-data-view/base-data-view.component';
-import { ItemFilterPipe } from 'src/app/utils/filters/item-filter.pipe';
 
 declare var $: any;
 
