@@ -142,7 +142,8 @@ export class CacheManager {
     if (init.cacheGroup) headers.append('cache-group', init.cacheGroup);
     headers.append('cache-created-at', String(createdAt));
     headers.append('cache-TTL', String(init.cacheTTL ?? defaultCacheTTL));
-    headers.append('Access-Control-Allow-Origin', '*');
+    // headers.append('Access-Control-Allow-Origin', '*');
+    headers.append('Access-Control-Allow-Credentials', 'true');
     const request = new Request(url.toString(), { ...init, headers: headers });
     request['cacheEntry'] = init.cacheEntry;
     request['cacheGroup'] = init.cacheGroup;
@@ -255,7 +256,7 @@ export class CacheManager {
       let retry = this._maxRetries + 1;
       while (retry > 0) {
         try {
-          response = await fetch(request);
+          response = await fetch(request, { credentials: 'same-origin' });
           logger.debug('Request fetch result: ', response);
           if (response && response.status >= 400 && response.status < 600)
             throw Error(`${response.status}: ${response.statusText}`);
@@ -429,7 +430,8 @@ export class CacheManager {
 
     try {
       const updatedResponse = await fetch(
-        updateRequest.clone ? updateRequest.clone() : updateRequest
+        updateRequest.clone ? updateRequest.clone() : updateRequest,
+        { credentials: 'same-origin' }
       );
       await cache.put(
         updateRequest.clone ? updateRequest.clone() : updateRequest,
