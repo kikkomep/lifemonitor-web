@@ -137,6 +137,7 @@ export class AppService {
 
     // subscribe to the current user
     this.subscriptions.push(
+      this.auth.userLogged$().subscribe((logged) => {
         // skip updates when user is undefined
         if (logged === undefined) {
           this.logger.debug('User logged: undefined');
