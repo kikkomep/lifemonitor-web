@@ -1,6 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
 
 import { BehaviorSubject, from, Observable, Subject, Subscription } from 'rxjs';
 import { Job } from 'src/app/models/job.model';
@@ -21,6 +20,22 @@ declare var $: any;
 
 // Reference to subject worker: always notify the last inizialited worker
 const workerSubject = new BehaviorSubject<Worker>(null);
+
+// reference to the active cache worker
+let worker: Worker = null;
+if (typeof Worker !== 'undefined') {
+  // Create a new
+  worker = new Worker(new URL('./cache.worker', import.meta.url));
+  worker.onmessage = ({ data }) => {
+    console.debug(`page got message: ${data}`);
+  };
+  workerSubject.next(worker);
+  worker.postMessage({ type: 'ping' });
+} else {
+  // Web Workers are not supported in this environment.
+  // You should add a fallback so that your program still executes correctly.
+  console.warn('Workers are not supported on this environment');
+}
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +77,7 @@ export class CachedHttpClientService {
     version: string;
   }> = this.workflowVersionDeleteSubject.asObservable();
 
+  private initSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
   private subscription: Subscription;
   private _cache: CacheManager = new CacheManager('api:lm');
 
@@ -78,7 +94,11 @@ export class CachedHttpClientService {
     private authService: AuthService // private socket: ApiSocketService
   ) {
     // this.syncInterval = Number(this.config.getConfig()['syncInterval']);
+  }
+
+  public init() {
     this.apiBaseUrl = this.config.apiBaseUrl;
+    // alert(`API Service created: ${this.apiBaseUrl}`);
     this.logger.debug(`API Service created: ${this.apiBaseUrl}`);
 
     this.cache.isEmpty().then((empty) => {
@@ -92,12 +112,15 @@ export class CachedHttpClientService {
     this.config.onLoad.subscribe((loaded) => {
       if (loaded) {
         workerSubject.subscribe((worker: Worker) => {
-          this.setUpWorkerMessageHandler(worker);
-          this.socket = new ApiSocket(this.config, this, worker);
-          this.socket.connect();
+          console.log('Worker', worker);
         });
       }
     });
+
+    // setup network listener
+    this.setUpWorkerMessageHandler(worker);
+    this.socket = new ApiSocket(this.config, this, worker);
+    this.socket.connect();
 
     this.cache.onCacheEntryUpdated = (
       request: CachedRequest,
@@ -129,6 +152,13 @@ export class CachedHttpClientService {
       const data = JSON.parse(groupName);
       this.workflowVersionDeleteSubject.next(data);
     };
+
+    // notify that the service is ready
+    this.initSubject.next(true);
+  }
+
+  public readySubscription(): Observable<boolean> {
+    return this.initSubject.asObservable();
   }
 
   public get cache(): CacheManager {
@@ -469,20 +499,4 @@ export class CachedHttpClientService {
       }
     };
   }
-}
-
-// reference to the active cache worker
-let worker: Worker = null;
-if (typeof Worker !== 'undefined') {
-  // Create a new
-  worker = new Worker(new URL('./cache.worker', import.meta.url));
-  worker.onmessage = ({ data }) => {
-    console.debug(`page got message: ${data}`);
-  };
-  workerSubject.next(worker);
-  worker.postMessage({ type: 'ping' });
-} else {
-  // Web Workers are not supported in this environment.
-  // You should add a fallback so that your program still executes correctly.
-  console.warn('Workers are not supported on this environment');
 }
