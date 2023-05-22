@@ -1,6 +1,13 @@
 import { formatDate } from '@angular/common';
 import {
-  Component, ElementRef, EventEmitter, HostListener, OnInit, Output, Renderer2, ViewChild
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  OnInit,
+  Output,
+  Renderer2,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DateUtils } from 'src/app/models/common.models';
@@ -16,7 +23,6 @@ import { InputDialogService } from 'src/app/utils/services/input-dialog.service'
   styleUrls: ['./notifications-dropdown-menu.component.scss'],
 })
 export class NotificationsDropdownMenuComponent implements OnInit {
-
   @ViewChild('dropdownMenu', { static: false }) dropdownMenu: any;
 
   @Output() openUserProfile = new EventEmitter<boolean>();
@@ -25,34 +31,49 @@ export class NotificationsDropdownMenuComponent implements OnInit {
   private notificationsByDate: {};
 
   // initialize logger
-  private logger: Logger = LoggerManager.create('NotificationsDropdownMenuComponent');
+  private logger: Logger = LoggerManager.create(
+    'NotificationsDropdownMenuComponent'
+  );
 
   constructor(
     private router: Router,
     private elementRef: ElementRef,
     private renderer: Renderer2,
     private appService: AppService,
-    private inputDialog: InputDialogService) { }
+    private inputDialog: InputDialogService
+  ) {}
 
   ngOnInit() {
-    this.appService.loadNotifications().subscribe((data: UserNotification[]) => {
-      this.logger.debug("loaded notifications...", data);
-      this.updateNotifications(data);
-    })
+    this.appService.observableUser.subscribe((user) => {
+      if (user) {
+        this.appService
+          .loadNotifications()
+          .subscribe((data: UserNotification[]) => {
+            this.logger.debug('loaded notifications...', data);
+            this.updateNotifications(data);
+          });
+      } else {
+        this.updateNotifications([]);
+      }
+    });
   }
 
   @HostListener('document:click', ['$event'])
-  clickout(event: { target: any; }) {
+  clickout(event: { target: any }) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.hideDropdownMenu();
     }
   }
 
   private updateNotifications(notifications: UserNotification[]) {
-    this.logger.debug("Updating notifications...", notifications);
-    this.notifications = notifications.filter(n => n.event !== 'UNCONFIGURED_EMAIL' || !n.read);
-    this.notificationsByDate = this.groupNotificationsByDate(this.notifications);
-    this.logger.debug("Notifications by date: ", this.notifications);
+    this.logger.debug('Updating notifications...', notifications);
+    this.notifications = notifications.filter(
+      (n) => n.event !== 'UNCONFIGURED_EMAIL' || !n.read
+    );
+    this.notificationsByDate = this.groupNotificationsByDate(
+      this.notifications
+    );
+    this.logger.debug('Notifications by date: ', this.notifications);
   }
 
   public get notificationsToRead(): UserNotification[] {
@@ -82,41 +103,47 @@ export class NotificationsDropdownMenuComponent implements OnInit {
 
   public readNotification(n: UserNotification) {
     this.appService.setNotificationsReadingTime([n]).subscribe((data) => {
-      this.logger.debug("Notification marked as read", n);
+      this.logger.debug('Notification marked as read', n);
       this.hideDropdownMenu();
     });
     if (n.event === 'UNCONFIGURED_EMAIL') {
       // this.openUserProfile.emit(true);
     } else if (n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED') {
       let suite: Suite = null;
-      if (n.data && "build" in n.data
-        && "suite" in n.data["build"]
-        && "workflow" in n.data["build"]) {
+      if (
+        n.data &&
+        'build' in n.data &&
+        'suite' in n.data['build'] &&
+        'workflow' in n.data['build']
+      ) {
         suite = this.appService.findTestSuite(
-          n.data["build"]["suite"]["uuid"],
-          n.data["build"]["workflow"]["uuid"]
+          n.data['build']['suite']['uuid'],
+          n.data['build']['workflow']['uuid']
         );
       }
-      this.logger.debug("Test suite related with notification", suite);
+      this.logger.debug('Test suite related with notification', suite);
       if (!suite || suite === undefined) {
         this.inputDialog.show({
           iconClass: 'fas fa-exclamation-triangle text-warning',
-          question: "Ops...",
+          question: 'Ops...',
           description:
             'Unable to find the test suite related with this notification',
-          confirmText: "",
-          cancelText: "Close",
+          confirmText: '',
+          cancelText: 'Close',
         });
       } else {
-        return this.navigateTo('/suite', { 's': suite.asUrlParam() });
+        return this.navigateTo('/suite', { s: suite.asUrlParam() });
       }
     }
   }
 
   public markAllAsRead(notifications: UserNotification[] = null) {
-    this.appService.setNotificationsReadingTime(notifications ? notifications : this.notifications)
+    this.appService
+      .setNotificationsReadingTime(
+        notifications ? notifications : this.notifications
+      )
       .subscribe((data) => {
-        this.logger.debug("Notifiations marked as read", notifications);
+        this.logger.debug('Notifiations marked as read', notifications);
         this.hideDropdownMenu();
       });
   }
@@ -125,26 +152,24 @@ export class NotificationsDropdownMenuComponent implements OnInit {
     if (!notification) return;
     if (notification.event === 'UNCONFIGURED_EMAIL')
       this.updateNotifications(
-        this.notifications.filter(n => n !== notification)
-      )
+        this.notifications.filter((n) => n !== notification)
+      );
     else {
-      this.appService.deleteNotification(notification)
-        .subscribe((data) => {
-          this.logger.debug("Notification deleted", notification);
-          this.updateNotifications(
-            this.notifications.filter(n => n !== notification)
-          )
-        });
+      this.appService.deleteNotification(notification).subscribe((data) => {
+        this.logger.debug('Notification deleted', notification);
+        this.updateNotifications(
+          this.notifications.filter((n) => n !== notification)
+        );
+      });
     }
   }
 
   public deleteAllNotifications() {
-    this.appService.deleteNotifications(this.notifications)
-      .subscribe(() => {
-        this.logger.debug("All notifications deleted", this.notifications);
-        this.updateNotifications([]);
-        this.hideDropdownMenu();
-      });
+    this.appService.deleteNotifications(this.notifications).subscribe(() => {
+      this.logger.debug('All notifications deleted', this.notifications);
+      this.updateNotifications([]);
+      this.hideDropdownMenu();
+    });
   }
 
   public navigateTo(url: string, params: object) {
