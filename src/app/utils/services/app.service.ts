@@ -411,15 +411,12 @@ export class AppService {
     window.addEventListener('online', () => {
       this.logger.warn('OnLine mode enabled');
       this.api.socketIO.connect();
-      this.checkIsUserLogged().then((logged) => {
-        if (!logged) {
-          this.logger.debug('No user logged');
-        } else {
-          this.api.get_current_user().subscribe((user) => {
-            if (user) this.api.socketIO.join(user);
-          });
-        }
-      });
+      if (!this.isUserLogged()) this.logger.debug('No user logged');
+      else {
+        this.api.get_current_user().subscribe((user) => {
+          if (user) this.api.socketIO.join(user);
+        });
+      }
     });
   }
 
