@@ -223,7 +223,7 @@ export class ApiService {
       );
   }
 
-  async logout(redirect: boolean = true): Promise<boolean> {
+  async logout(): Promise<boolean> {
     const logged = await this.authService.checkIsUserLogged();
     if (logged) {
       return this.authService.logout(false).then(async () => {
@@ -235,7 +235,6 @@ export class ApiService {
           'userNotifications',
           'registeredWorkflows',
         ]);
-        if (redirect) document.location.href = '/api/account/logout';
         return true;
       });
     }

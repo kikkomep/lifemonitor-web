@@ -96,12 +96,7 @@ export class AppRoutingModule implements OnInit {
         if (userLogged) {
           this.logger.debug('User logged... redirecting');
         } else {
-          // alert("APp routing module")
           this.logger.debug('User logged out...');
-          this.toastr.clear();
-          this.toastr.success('You have successfully logged out', '', {
-            timeOut: 4000,
-          });
         }
       }
     );

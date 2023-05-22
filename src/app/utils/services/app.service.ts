@@ -542,8 +542,8 @@ export class AppService {
     this._workflow_versions = null;
   }
 
-  public async logout(redirect: boolean = true) {
-    return this.api.logout(redirect).then(() => {
+  public async logout() {
+    return this.api.logout().then(() => {
       this.reset();
     });
   }
