@@ -118,14 +118,19 @@ export class ApiService {
   }
 
   private get_http_options(params = {}, skip: boolean = false) {
-    const token = this.authService.token;
+    const token = this.authService.getToken();
     let http_headers = {
       'Content-Type': 'application/json',
       skip: String(skip),
     };
     if (token) {
-      // http_headers['Authorization'] = 'Bearer ' + token['token']['value'];
-      http_headers['Authorization'] = 'Bearer ' + token.token.value;
+      this.logger.debug('Using token', token);
+      http_headers['Authorization'] = 'Bearer ' + token['token']['value'];
+      // http_headers['Authorization'] = 'Bearer ' + token.token.value;
+    } else {
+      this.logger.debug('No token found');
+      // http_headers['Access-Control-Allow-Origin'] = '*';
+      // http_headers['Access-Control-Allow-Credentials'] = true;
     }
     let http_options = {
       //headers: new HttpHeaders(http_headers),
