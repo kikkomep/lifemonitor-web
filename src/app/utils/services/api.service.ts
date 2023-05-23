@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Socket } from 'ngx-socket-io';
 import { forkJoin, from, Observable, of, Subject, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { Job } from 'src/app/models/job.model';
@@ -19,11 +18,11 @@ import { User } from 'src/app/models/user.modes';
 import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
+import { ApiSocket } from '../shared/api-socket';
 import { AuthService } from './auth.service';
 import { CacheManager, FetchError } from './cache/cache-manager';
 import { CachedHttpClientService } from './cache/cachedhttpclient.service';
 import { AppConfigService } from './config.service';
-import { ApiSocket } from '../shared/api-socket';
 
 const MAX_RETRIES = 0;
 
