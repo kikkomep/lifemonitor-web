@@ -73,13 +73,19 @@ export class AuthCookieService implements IAuthService {
   }
 
   public authorize() {
+    this.logger.debug('Redirecting to AuthServer');
     const url = this.baseUrl + '/account/login?next=/login?callback';
     window.location.href = url;
+    return Promise.resolve(false);
   }
 
   public async login(): Promise<boolean> {
     this.logger.debug('Login');
-    if (this.isReturningFromAuthServer()) {
+    // if we are not returning from the auth server
+    // we need to redirect to the auth server
+    if (!this.isReturningFromAuthServer()) {
+      return this.authorize();
+    } else {
       this.logger.debug('Returning from AuthServer');
 
       return this.fetchUserData()
@@ -92,12 +98,7 @@ export class AuthCookieService implements IAuthService {
           this.logger.error('Error fetching user data: ', error);
           return false;
         });
-    } else {
-      this.logger.debug('Not returning from AuthServer');
-      alert('Not returning from AuthServer');
     }
-    alert('Returning false');
-    return false;
   }
 
   public logout(notify: boolean = true): Promise<boolean> {
