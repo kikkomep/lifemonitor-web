@@ -2,6 +2,22 @@ import { Observable } from 'rxjs';
 import { User } from 'src/app/models/user.modes';
 
 /**
+ * @export
+ * @interface Token
+ * @description
+ * This interface represents a token.
+ * It contains the scopes and the token value.
+ * The token value is a string and the scopes are an array of strings.
+ */
+export interface Token {
+  scopes: Array<string>;
+  token: {
+    value: string;
+    expiry: string;
+  };
+}
+
+/**
  *
  * @export
  * @class AuthCookieService
@@ -91,6 +107,15 @@ export interface IAuthService {
    * If notify is true, it will notify the current user is changed.to null.
    */
   logout(notify: boolean): Promise<boolean>;
+
+  /**
+   * @returns {string}
+   * @memberof IAuthService
+   * @description
+   * This method returns the authentication token.
+   * If the user is not logged in or the token is not available, it will return null.
+   */
+  getToken(): Token;
 
   /**
    * @returns {boolean}

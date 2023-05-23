@@ -58,7 +58,7 @@ export class AuthService implements IAuthService {
     return as.authorize();
   }
 
-  public getToken(): { value: string } {
+  public getToken(): Token {
     return this.currentAuthInstance.getToken();
   }
 
