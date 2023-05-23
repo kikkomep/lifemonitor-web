@@ -125,7 +125,7 @@ export class AppRoutingModule implements OnInit {
         );
       } else {
         if (this.configService.developmentMode) {
-        this.toastr.error('Something went wrong', '', { timeOut: 4000 });
+          this.toastr.error('Something went wrong', '', { timeOut: 4000 });
           this.inputDialogService.show({
             question: 'Ops...',
             description: 'Something went wrong!',
@@ -158,9 +158,9 @@ export class AppRoutingModule implements OnInit {
     this.logger.warn('Authorization error detected', error);
     this.authService.checkIsUserLogged().then((isUserLogged) => {
       if (isUserLogged) {
-        this.toastr.error('Session expired', '', { timeOut: 4000 });
+        this.toastr?.error('Session expired', '', { timeOut: 4000 });
       }
-      this.appService.logout(false).then(() => {
+      this.appService.logout().then(() => {
         this.logger.debug('Logout from app routing module');
         this.inputDialogService.show({
           question: 'Session Expired',
