@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 import { User } from 'src/app/models/user.modes';
 import { Logger, LoggerManager } from '../logging';
 import { AuthCookieService } from './auth-cookie.service';
-import { IAuthService } from './auth.interface';
+import { AuthOAuth2Service } from './auth-oauth2.service';
+import { IAuthService, Token } from './auth.interface';
 import { AppConfigService } from './config.service';
 
 @Injectable({
@@ -39,6 +40,10 @@ export class AuthService implements IAuthService {
       } else {
         // Use AuthOauth2Service if clientId is set
         this.logger.debug('Using AuthOauth2Service');
+        this._currentAuthInstance = new AuthOAuth2Service(
+          this.config,
+          this.httpClient
+        );
       }
     }
     // If no auth instance is available, throw an error
