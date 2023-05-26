@@ -98,6 +98,8 @@ export function initConfigService(
           logger.info('Configuration loaded', data);
           Object.assign(cookieConfig, defaultCookieConfig);
           cookieConfig.cookie.domain = data.appDomain;
+          cookieConfig.content.policyLink = appConfig.privacyPolicyUrl;
+          cookieConfig.content.tosLink = appConfig.termsOfServiceUrl;
           cachedHttpClient.init();
           apiService.apiBaseUrl = data['apiBaseUrl'];
           authService.init().subscribe(

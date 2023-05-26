@@ -25,14 +25,14 @@ export const cookieConfig: NgcCookieConsentConfig = {
     dismiss: 'Got it!',
     deny: 'Refuse cookies',
     link: 'Learn more',
-    href: 'https://www.crs4.it/privacy-policy/',
+    href: 'https://lifemonitor.eu/legal/privacy-policy.pdf',
     policy: 'Cookie Policy',
 
     privacyPolicyLink: 'Privacy Policy',
-    privacyPolicyHref: 'https://www.crs4.it/privacy-policy/',
+    privacyPolicyHref: 'https://lifemonitor.eu/legal/privacy-policy.pdf',
 
     tosLink: 'Terms of Service',
-    tosHref: 'https://www.crs4.it/privacy-policy/',
+    tosHref: 'https://lifemonitor.eu/legal/terms-of-service.pdf',
   },
 
   onInitialise: (status: any) => {
