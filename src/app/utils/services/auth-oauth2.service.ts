@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { OAuth2AuthCodePKCE } from '@bity/oauth2-auth-code-pkce';
-import { Observable, from, of } from 'rxjs';
-import IndexedDb from '../shared/indexdb';
+import { Observable } from 'rxjs';
+import { User } from 'src/app/models/user.modes';
 import { AuthBaseService } from './auth-base.service';
 import { IAuthService, Token } from './auth.interface';
 import { AppConfigService } from './config.service';
-import { User } from 'src/app/models/user.modes';
 
 export class AuthOAuth2Service extends AuthBaseService implements IAuthService {
   private _oauth: OAuth2AuthCodePKCE = null;
@@ -16,14 +15,14 @@ export class AuthOAuth2Service extends AuthBaseService implements IAuthService {
 
   public async checkIsUserLogged(): Promise<boolean> {
     const token = this.fetchToken();
-    return this.fetchToken().then((token) => {
+    return new Promise((resolve, reject) => {
       this.logger.debug('Current token', token);
       if (token && 'token' in token) {
         this._token = token;
         this.logger.debug('This is the access token: ', token);
-        return true;
+        return resolve(true);
       }
-      return false;
+      return resolve(false);
     });
   }
 
@@ -83,54 +82,32 @@ export class AuthOAuth2Service extends AuthBaseService implements IAuthService {
     if (!this.isCallbackFromAuthServer()) {
       this.logger.debug('Redirecting to auth server...');
       return this.authorize();
-    } else {
-      try {
-        let currentToken = await this.fetchToken();
-        if (
-          !this.oauth.isAuthorized() ||
-          !currentToken ||
-          this.oauth.isAccessTokenExpired()
-        ) {
-          const hasAuthCode = await this.oauth.isReturningFromAuthServer();
-          if (!hasAuthCode) {
-            this.logger.debug('Something wrong...no auth code.');
-            throw new Error('Something wrong...no auth code.');
-          }
-          const token = await this.oauth.getAccessToken();
-          return this.saveToken(token).then((value) => {
-            this._token = token as Token;
-            return this.fetchUserData()
-              .toPromise()
-              .then((data) => {
-                this.logger.debug('User is logged');
-                return true;
-              })
-              .catch((error) => {
-                this.logger.error('Error fetching user data: ', error);
-                return false;
-              });
-          });
-        } else {
-          if (!currentToken) {
-            currentToken = await this.fetchToken();
-            this._token = currentToken;
-            this.logger.debug('Current token', currentToken);
-          }
-          return this.fetchUserData()
-            .toPromise()
-            .then((data) => {
-              this.logger.debug('User is logged');
-              return true;
-            })
-            .catch((error) => {
-              this.logger.error('Error fetching user data: ', error);
-              return false;
-            });
+    }
+    try {
+      let currentToken = this.fetchToken();
+      if (!this.oauth.isAuthorized() || this.oauth.isAccessTokenExpired()) {
+        const hasAuthCode = await this.oauth.isReturningFromAuthServer();
+        if (!hasAuthCode) {
+          this.logger.debug('Something wrong...no auth code.');
+          throw new Error('Something wrong...no auth code.');
         }
-      } catch (error) {
-        this.logger.debug(error);
-        throw error;
+        this.logger.debug('Getting access token...');
+        await this.oauth.getAccessToken(); // Fetches the access token and stores it in the local storage
+        this._token = this.fetchToken();
       }
+      return this.fetchUserData()
+        .toPromise()
+        .then((data) => {
+          this.logger.debug('User is logged');
+          return true;
+        })
+        .catch((error) => {
+          this.logger.error('Error fetching user data: ', error);
+          return false;
+        });
+    } catch (error) {
+      this.logger.debug(error);
+      throw error;
     }
   }
 
@@ -147,79 +124,54 @@ export class AuthOAuth2Service extends AuthBaseService implements IAuthService {
   }
 
   public async logout(notify: boolean = true): Promise<boolean> {
-    // if (!this.isCallbackFromAuthServer()) {
-    //   this.logger.debug('Returning from AuthServer');
-    //   document.location.href = '/api/account/logout?next=/logout?callback';
-    // } else {
-    return new Promise<boolean>((resolve, reject) => {
-      this.logger.debug('Not returning from AuthServer');
-      this.deleteToken();
-      this._token = null;
-      this.oauth.reset();
-      localStorage.clear();
-      sessionStorage.clear();
-      localStorage.removeItem(this.lifemonitorUserKey);
-      if (notify) this._userLogged.next(false);
-      return resolve(true);
-    });
-    // }
+    if (!this.isCallbackFromAuthServer()) {
+      this.logger.debug('Returning from AuthServer');
+      document.location.href = '/api/account/logout?next=/logout?callback';
+    } else {
+      return new Promise<boolean>((resolve, reject) => {
+        this.logger.debug('Not returning from AuthServer');
+        this.deleteToken();
+        this._token = null;
+        this.oauth.reset();
+        localStorage.clear();
+        sessionStorage.clear();
+        localStorage.removeItem(this.lifemonitorUserKey);
+        if (notify) this._userLogged.next(false);
+        return resolve(true);
+      });
+    }
   }
 
   public refreshToken() {
-    // this.deleteToken().then(() => {
     this.deleteToken();
     this.oauth.reset();
     this._token = null;
     this._userLogged.next(false);
     this.login();
-    // });
   }
 
   public init(): Observable<User> {
-    const promise = new Promise<User>(async (resolve, reject) => {
-      const token = await this.fetchToken();
-      alert('token: ' + token);
-      if (token && 'token' in token) {
-        this._token = token;
-        this._fetchUserData(true).subscribe((user) => {
-          resolve(user);
-        });
-      } else {
-        this.setUserData(null, true);
-        resolve(null);
-      }
-    });
-    return from(promise);
+    const token = this.fetchToken();
+    if (token && 'token' in token) {
+      this._token = token;
+    }
+    return this._fetchUserData(true);
   }
 
-  private databaseName = 'lifemonitor';
-  private objectStoreName = 'oauth';
-  private async saveToken(token: any) {
-    const db = new IndexedDb(this.databaseName);
-    await db.createObjectStore(['oauth']);
-    await db.putValue(this.objectStoreName, { ...token, type: 'token' });
-  }
-
-  private async fetchToken(): Promise<Token> {
-    // return this._token;
-    // const token = await this.oauth.getAccessToken();
+  private fetchToken(): Token {
     const oauthState = localStorage.getItem('oauth2authcodepkce-state');
     if (!oauthState) {
-      console.log('No oauth state found');
+      this.logger.debug('No oauth state found');
       return null;
     }
     const token = JSON.parse(oauthState);
-    console.log('Fetched Token: ', token);
+    this.logger.log('Fetched Token: ', token);
 
     this._token = {
       scopes: token.scopes,
       token: token['accessToken'],
     };
-
-    return of(this._token).toPromise();
-    // const db = new IndexedDb(this.databaseName);
-    // await db.createObjectStore(['oauth']);
-    // return await db.getValue(this.objectStoreName, 'token');
+    return this._token;
   }
 
   private deleteToken() {
