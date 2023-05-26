@@ -3,8 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  // set the app mode
   production: false,
-  logLevel: "INFO",
+  // set the app domain (required to set the cookie)
+  appDomain: 'lifemonitor.eu',
+  // 'logLevel': the log level of the application
+  logLevel: 'INFO',
   // 'apiBaseUrl': base URL of the LifeMonitor API instance
   //               (e.g., https://api.lifemonitor.eu)
   apiBaseUrl: '<LIFEMONITOR_API_BASE_URL>',
@@ -19,7 +23,7 @@ export const environment = {
   //               and set without rebuild (e.g., apiBaseUrl, clientId).
   //               They overwrite the default environment settings defined at build-time
   //               and are exposed by the `AppConfigService.getConfig()` method.
-  configFile: "/assets/config.json",
+  configFile: '/assets/config.json',
 };
 
 /*
