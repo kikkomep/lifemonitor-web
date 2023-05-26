@@ -60,23 +60,4 @@ export class AuthCookieService extends AuthBaseService implements IAuthService {
       return Promise.resolve(true);
     }
   }
-
-  public isAuthError(error: any): boolean {
-    this.logger.debug('Checking HTTP error: ', error);
-    return (
-      error.url.startsWith(this.config.apiBaseUrl) &&
-      (error.status == 401 ||
-        (error.status == 403 &&
-          !(
-            ('title' in error.error &&
-              error.error['title'] === 'Rate Limit Exceeded') ||
-            ('detail' in error.error &&
-              error.error['detail'] ===
-                'User not authorized to get workflow data')
-          )) ||
-        (error.status == 500 &&
-          'extra_info' in error.error &&
-          error.error['extra_info']['exception_type'] == 'OAuthError'))
-    );
-  }
 }
