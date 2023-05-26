@@ -112,7 +112,7 @@ export class AppRoutingModule implements OnInit {
         error.statusText.match(/service unavailable/i)
       ) {
         const serviceDetails = await response?.json();
-        console.warn(
+        this.logger.warn(
           serviceDetails?.extra_info?.service || error,
           'External service unavailable'
         );
