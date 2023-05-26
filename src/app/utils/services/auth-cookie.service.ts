@@ -48,6 +48,7 @@ export class AuthCookieService extends AuthBaseService implements IAuthService {
     if (!this.isCallbackFromAuthServer()) {
       this.logger.debug('Returning from AuthServer');
       document.location.href = '/api/account/logout?next=/logout?callback';
+      return Promise.resolve(false);
     } else {
       this.logger.debug('Not returning from AuthServer');
       localStorage.clear();
