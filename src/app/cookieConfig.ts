@@ -36,7 +36,6 @@ export const cookieConfig: NgcCookieConsentConfig = {
   },
 
   onInitialise: (status: any) => {
-    console.log('onInitialise', status);
-    alert('Status: ' + status);
+    // console.debug('onInitialise', status);
   },
 };

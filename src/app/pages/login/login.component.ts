@@ -46,12 +46,9 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.logger.debug('callback is undefined: ', callback === 'undefined');
         this.toastr.clear();
         this.previousToast = this.toastr.info('Authorizing...');
-        if (typeof callback === 'undefined') {
-          this.logger.debug('Handling authorization');
-          this.appService.authorize().then(() => {});
-        } else {
-          this.logger.debug('Handling login callback');
-          this.appService.login(() => {
+        this.appService.login().then((logged) => {
+          if (logged) {
+            this.logger.debug('User logged in...');
             this.appService.loadUserProfile().subscribe((user: User) => {
               this.router.navigateByUrl('/dashboard');
               if (this.previousToast)
@@ -65,8 +62,8 @@ export class LoginComponent implements OnInit, OnDestroy {
                 }
               );
             });
-          });
-        }
+          }
+        });
       }
     );
   }

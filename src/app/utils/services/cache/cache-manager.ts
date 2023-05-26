@@ -142,7 +142,8 @@ export class CacheManager {
     if (init.cacheGroup) headers.append('cache-group', init.cacheGroup);
     headers.append('cache-created-at', String(createdAt));
     headers.append('cache-TTL', String(init.cacheTTL ?? defaultCacheTTL));
-    headers.append('Access-Control-Allow-Origin', '*');
+    // headers.append('Access-Control-Allow-Origin', '*');
+    // headers.append('Access-Control-Allow-Credentials', 'true');
     const request = new Request(url.toString(), { ...init, headers: headers });
     request['cacheEntry'] = init.cacheEntry;
     request['cacheGroup'] = init.cacheGroup;
@@ -255,7 +256,7 @@ export class CacheManager {
       let retry = this._maxRetries + 1;
       while (retry > 0) {
         try {
-          response = await fetch(request);
+          response = await fetch(request, { credentials: 'same-origin' });
           logger.debug('Request fetch result: ', response);
           if (response && response.status >= 400 && response.status < 600)
             throw Error(`${response.status}: ${response.statusText}`);
@@ -429,7 +430,8 @@ export class CacheManager {
 
     try {
       const updatedResponse = await fetch(
-        updateRequest.clone ? updateRequest.clone() : updateRequest
+        updateRequest.clone ? updateRequest.clone() : updateRequest,
+        { credentials: 'same-origin' }
       );
       await cache.put(
         updateRequest.clone ? updateRequest.clone() : updateRequest,
@@ -609,29 +611,29 @@ export class CacheManager {
     groupName: string,
     notifyEntryDeletion: boolean = true
   ): Promise<boolean> {
-    console.debug(`Deleting cache group ${groupName}... START`);
+    logger.debug(`Deleting cache group ${groupName}... START`);
     const cache = await getCache(this._cacheName);
     if (!cache) return false;
     const entriesMap = await this.getEntries(cache, false);
-    console.debug('EntriesMap', entriesMap);
+    logger.debug('EntriesMap', entriesMap);
     const groupEntries = entriesMap.groups[groupName];
-    console.debug('GroupEntries', groupEntries);
+    logger.debug('GroupEntries', groupEntries);
     if (groupEntries) {
-      console.debug('Found group', groupEntries);
+      logger.debug('Found group', groupEntries);
       for (let key of groupEntries) {
-        console.debug('Trying to delete', key);
+        logger.debug('Trying to delete', key);
         const entry = entriesMap.requests[key];
         await cache.delete(entry.request.url);
-        console.debug('Delete entry', entry);
+        logger.debug('Delete entry', entry);
         if (notifyEntryDeletion && this.onCacheEntryDeleted)
           this.onCacheEntryDeleted(key);
       }
-      console.debug('Deleted group', groupName, groupEntries);
+      logger.debug('Deleted group', groupName, groupEntries);
       if (notifyEntryDeletion && this.onCacheEntriesGroupDeleted)
         this.onCacheEntriesGroupDeleted(groupName, groupEntries);
       return true;
     } else {
-      console.debug(`Group ${groupName} not found`);
+      logger.debug(`Group ${groupName} not found`);
     }
     return false;
   }

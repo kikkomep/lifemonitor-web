@@ -85,6 +85,10 @@ export class ApiSocket extends Socket {
   }
 
   public join(user: User) {
+    if (!user) {
+      this.logger.warn('User not defined');
+      return;
+    }
     this.emit('message', {
       type: 'join',
       data: { user: user.id },
@@ -102,10 +106,12 @@ export class ApiSocket extends Socket {
   }
 
   public leave(user: User) {
-    this.emit('message', {
-      type: 'leave',
-      data: { user: user.id },
-    });
+    if (user) {
+      this.emit('message', {
+        type: 'leave',
+        data: { user: user.id },
+      });
+    }
   }
 
   public onLeft(payload: { data: { user: string } }) {

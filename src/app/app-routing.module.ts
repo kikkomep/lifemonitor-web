@@ -1,10 +1,11 @@
-import { NgModule } from '@angular/core';
+import { NgModule, OnInit } from '@angular/core';
 import { Router, RouterModule, Routes } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/utils/services/auth.service';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
+import { LogoutComponent } from './pages/logout/logout.component';
 import { MainComponent } from './pages/main/main.component';
 import { Logger, LoggerManager } from './utils/logging';
 import { ApiService } from './utils/services/api.service';
@@ -15,7 +16,6 @@ import { InputDialogService } from './utils/services/input-dialog.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
-import { LogoutComponent } from './pages/logout/logout.component';
 
 const routes: Routes = [
   {
@@ -70,7 +70,7 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule {
+export class AppRoutingModule implements OnInit {
   userLoggedSubscription: Subscription;
 
   private logger: Logger = LoggerManager.create('AppRoutingModule');
@@ -83,19 +83,20 @@ export class AppRoutingModule {
     private router: Router,
     private inputDialogService: InputDialogService,
     private toastr: ToastrService
-  ) {
+  ) {}
+
+  ngOnInit() {
+    this.logger.debug('Initializing app routing module');
+    this.init();
+  }
+
+  public init() {
     this.userLoggedSubscription = this.appService.observableUser.subscribe(
       (userLogged) => {
         if (userLogged) {
           this.logger.debug('User logged... redirecting');
-          // alert(`Current route: ${this.router.url}`);
-          // this.handleRedirect('/dashboard');
         } else {
           this.logger.debug('User logged out...');
-          this.toastr.clear();
-          this.toastr.success('You have successfully logged out', '', {
-            timeOut: 4000,
-          });
         }
       }
     );
@@ -124,7 +125,7 @@ export class AppRoutingModule {
         );
       } else {
         if (this.configService.developmentMode) {
-        this.toastr.error('Something went wrong', '', { timeOut: 4000 });
+          this.toastr.error('Something went wrong', '', { timeOut: 4000 });
           this.inputDialogService.show({
             question: 'Ops...',
             description: 'Something went wrong!',
@@ -157,9 +158,9 @@ export class AppRoutingModule {
     this.logger.warn('Authorization error detected', error);
     this.authService.checkIsUserLogged().then((isUserLogged) => {
       if (isUserLogged) {
-        this.toastr.error('Session expired', '', { timeOut: 4000 });
+        this.toastr?.error('Session expired', '', { timeOut: 4000 });
       }
-      this.appService.logout(false).then(() => {
+      this.appService.logout().then(() => {
         this.logger.debug('Logout from app routing module');
         this.inputDialogService.show({
           question: 'Session Expired',

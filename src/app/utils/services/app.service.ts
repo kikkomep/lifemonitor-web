@@ -52,7 +52,8 @@ export class AppService {
   private loadingWorkflowMap: { [uuid: string]: boolean } = {};
 
   // initialize data sources
-  private subjectUser: Subject<User> = new Subject<User>();
+  private subjectUser: Subject<User> = new BehaviorSubject<User>(undefined);
+  private subjectReady: Subject<boolean> = new BehaviorSubject<boolean>(false);
   private subjectNotifications = new Subject<UserNotification[]>();
   private subjectRegistry = new Subject<Registry>();
   private subjectRegistries = new Subject<Registry[]>();
@@ -67,7 +68,7 @@ export class AppService {
     uuid: string;
     loading: boolean;
   }>();
-  private subjectLoadingWorkflows = new Subject<boolean>();
+  private subjectLoadingWorkflows = new BehaviorSubject<boolean>(false);
   private subjectWorkflowUpdate = new Subject<WorkflowVersion>();
   private subjectLoadingWorkflowsStatus = new BehaviorSubject<WorkflowsLoadingStatus>(
     null
@@ -111,6 +112,20 @@ export class AppService {
   ) {
     this.logger.debug('AppService created!');
 
+    this.subscriptions.push(
+      this.api.notifyWhenReady().subscribe((ready) => {
+        if (ready) {
+          this.init();
+        }
+      })
+    );
+  }
+
+  public notifyWhenReady(): Observable<boolean> {
+    return this.subjectReady.asObservable();
+  }
+
+  public init() {
     this.setupNetworkListener();
 
     // subscribe for the current selected workflow
@@ -122,32 +137,28 @@ export class AppService {
 
     // subscribe to the current user
     this.subscriptions.push(
-      this.auth.userLoggedAsObservable().subscribe((logged) => {
-        // get user data
+      this.auth.userLogged$().subscribe((logged) => {
+        // skip updates when user is undefined
+        if (logged === undefined) {
+          this.logger.debug('User logged: undefined');
+          return;
+        }
+        // update user data when user is logged
         if (logged === true) {
           this.api.get_current_user().subscribe((data) => {
             this.logger.debug('Current user from APP', data);
+            // alert('Settings data: ' + data);
             this._currentUser = data;
             this.subjectUser.next(data);
+            // join socket.io room
             if (data) this.api.socketIO.join(data);
           });
         } else {
           if (this._currentUser !== null)
-            this.api.socketIO.leave(this._currentUser);
+            this.api.socketIO?.leave(this._currentUser);
           this._currentUser = null;
           this.subjectUser.next(null);
         }
-        // reload workflows
-        // this.loadWorkflows(true, logged, logged).subscribe(
-        //   (data: AggregatedStatusStats) => {
-        //     alert("Logged: " + logged);
-        //     // delete reference to the previous user
-        //     this._currentUser = null;
-        //     this._workflow = null;
-        //     this.logger.debug('Check workflows loaded: ', data);
-        //     this.subjectWorkflows.next(this._workflows);
-        //   }
-        // );
       })
     );
 
@@ -375,19 +386,22 @@ export class AppService {
     });
 
     // get user data if already logged
-    this.config.onLoad.subscribe((loaded) => {
-      if (loaded) {
-        this.checkIsUserLogged().then((logged) => {
-          if (logged) {
-            this.api.get_current_user().subscribe((data) => {
-              this.logger.debug('Current user from APP', data);
-              this._currentUser = data;
-              if (data) this.api.socketIO.join(data);
-            });
-          }
-        });
-      }
-    });
+    // this.config.onLoad.subscribe((loaded) => {
+    //   if (loaded) {
+    //     this.checkIsUserLogged().then((logged) => {
+    //       if (logged) {
+    //         this.api.get_current_user().subscribe((data) => {
+    //           this.logger.debug('Current user from APP', data);
+    //           this._currentUser = data;
+    //           if (data) this.api.socketIO.join(data);
+    //         });
+    //       }
+    //     });
+    //   }
+    // });
+
+    // notify that the app is ready
+    this.subjectReady.next(true);
   }
 
   private setupNetworkListener() {
@@ -397,15 +411,12 @@ export class AppService {
     window.addEventListener('online', () => {
       this.logger.warn('OnLine mode enabled');
       this.api.socketIO.connect();
-      this.checkIsUserLogged().then((logged) => {
-        if (!logged) {
-          this.logger.debug('No user logged');
-        } else {
-          this.api.get_current_user().subscribe((user) => {
-            if (user) this.api.socketIO.join(user);
-          });
-        }
-      });
+      if (!this.isUserLogged()) this.logger.debug('No user logged');
+      else {
+        this.api.get_current_user().subscribe((user) => {
+          if (user) this.api.socketIO.join(user);
+        });
+      }
     });
   }
 
@@ -414,12 +425,9 @@ export class AppService {
   }
 
   public loadUserProfile(): Observable<User> {
-    return this.api.get_current_user().pipe(
-      map((data) => {
-        this._currentUser = data;
-        return data;
-      })
-    );
+    const user = this.auth.getCurrentUser();
+    this._currentUser = user;
+    return of(user);
   }
 
   public isUserLogged(): boolean {
@@ -451,18 +459,8 @@ export class AppService {
     return this._observableLoadingWorkflows;
   }
 
-  public login(
-    callback: CallableFunction = null,
-    catchError: CallableFunction = null
-  ): void {
-    this.auth
-      .login(callback, catchError)
-      .then(() => {
-        this.logger.debug('Login from app service');
-      })
-      .catch((error) => {
-        this.logger.debug('Detected Error during login');
-      });
+  public login(): Promise<boolean> {
+    return this.auth.login();
   }
 
   public async authorize() {
@@ -544,8 +542,8 @@ export class AppService {
     this._workflow_versions = null;
   }
 
-  public async logout(redirect: boolean = true) {
-    return this.api.logout(redirect).then(() => {
+  public async logout() {
+    return this.api.logout().then(() => {
       this.reset();
     });
   }
@@ -877,7 +875,6 @@ export class AppService {
             }),
             catchError((e) => {
               workflowsStatus.setLoaded(workflow.uuid);
-              console.error(e);
               this.logger.error('Error loading workflow', e);
               this.subjectLoadingWorkflowsStatus.next(workflowsStatus);
               return of(null);

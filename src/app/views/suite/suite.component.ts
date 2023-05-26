@@ -63,7 +63,7 @@ export class SuiteComponent extends BaseDataViewComponent implements OnInit {
           if ('status' in params) {
             // Parse and normalize status filter
             let status: string = params['status'].toLowerCase();
-            console.debug('Status: ', status);
+            this.logger.debug('Status: ', status);
             if (TestStatus.includes(status)) {
               this.statusFilter = status;
             }

@@ -10,10 +10,10 @@ import {
 import { AppConfigService } from './../../../../utils/services/config.service';
 
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { User } from 'src/app/models/user.modes';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-user-dropdown-menu',
@@ -47,17 +47,9 @@ export class UserDropdownMenuComponent implements OnInit, OnDestroy {
     this.userSubscription = this.appService.observableUser.subscribe(
       (user: User) => {
         this.user = user;
-        this.logger.debug('Current user', user);
-        // alert('Dropdown notified');
+        this.logger.debug('Current user', user, this.appService.isUserLogged());
       }
     );
-    this.appService.checkIsUserLogged().then((logged) => {
-      if (logged) {
-        this.appService.loadUserProfile().subscribe((user) => {
-          this.user = user;
-        });
-      }
-    });
   }
 
   ngOnDestroy(): void {
