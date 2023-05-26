@@ -1,6 +1,6 @@
 <div *ngIf="availableForDownload === true" style="margin-top: 40%;">
   <div class="d-none d-sm-none d-md-none d-lg-block">
-    <a [routerLink]="" (click)="downloadROCrate()" class="hvr-float-shadow" data-toggle="tooltip" tooltipPosition="bottom"
+    <a href="{{roCrateDownloadUrl}}" (click)="downloadROCrate()" class="hvr-float-shadow" data-toggle="tooltip" tooltipPosition="bottom"
       data-html="true"
       pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to download<br><b>Workflow RO-Crate </b></div>">
       <img src="/assets/img/logo/crates/ro-crate-workflow.svg" height="50" />
@@ -12,7 +12,7 @@
   </div>
 
   <div class="row d-lg-none mt-5" style="font-size: 1.0rem; float: right;">
-    <a [routerLink]="" (click)="downloadROCrate()">
+    <a href="{{roCrateDownloadUrl}}" (click)="downloadROCrate()">
       <i class="fas fa-cloud-download-alt mx-1"></i>
       download as
       RO-Crate <img class="mx-0" src="/assets/img/logo/crates/ro-crate-w-text.png" height="25" />

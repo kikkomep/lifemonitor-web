@@ -486,16 +486,21 @@ export class DashboardComponent
         '</b>?',
       onConfirm: () => {
         // this.updatingDataTable = true;
-        this.appService
-          .deleteWorkflowVersion(w)
-          .subscribe((wd: { uuid: string; version: string }) => {
+        this.appService.deleteWorkflowVersion(w).subscribe(
+          (wd: { uuid: string; version: string }) => {
             this.logger.debug('Workflow deleted', wd);
             this.toastService.error(
               '',
               `${w.name} (ver. ${w.version['version']}) deleted`,
               { timeOut: 5000 }
             );
-          });
+          },
+          (error) => {
+            this.logger.error(error);
+            this.updatingDataTable = false;
+            this.toastService.error(`Unable to delete workflow version`);
+          }
+        );
       },
     });
   }
@@ -507,14 +512,19 @@ export class DashboardComponent
       description: 'Delete workflow <b>' + w.name + '</b>?',
       onConfirm: () => {
         this.updatingDataTable = true;
-        this.appService
-          .deleteWorkflow(w)
-          .subscribe((wd: { uuid: string; version: string }) => {
+        this.appService.deleteWorkflow(w).subscribe(
+          (wd: { uuid: string; version: string }) => {
             this.logger.debug('Workflow deleted', wd);
             this.toastService.error('', `${w.name} (${w.uuid}) deleted`, {
               timeOut: 5000,
             });
-          });
+          },
+          (error) => {
+            this.logger.error(error);
+            this.updatingDataTable = false;
+            this.toastService.error('Unable to delete workflow');
+          }
+        );
       },
     });
   }
