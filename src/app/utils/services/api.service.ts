@@ -597,13 +597,14 @@ export class ApiService {
   }
 
   downloadROCrate(workflow: WorkflowVersion): Observable<any> {
-    let token = JSON.parse(localStorage.getItem('token'));
+    // init headers with authorization token if available
     let headers = new HttpHeaders();
-    if (token) {
-      headers.append['Authorization'] = 'Bearer ' + token['token']['value'];
+    let accessToken = this.authService.getToken();
+    if (accessToken) {
+      headers.append['Authorization'] = 'Bearer ' + accessToken.token.value;
     }
     return this.http
-      .get(workflow.downloadLink, {
+      .get(workflow.getDownloadLink(this.apiBaseUrl), {
         headers: headers,
         responseType: 'blob',
       })
@@ -1137,8 +1138,13 @@ export class ApiService {
   public checkROCrateAvailability(
     workflow: WorkflowVersion
   ): Observable<boolean> {
+    this.logger.warn('Checking ROCrate availability for', workflow);
+    this.logger.warn('http options', this.get_http_options({}, true));
     return this.http
-      .head(workflow.downloadLink, this.get_http_options({}, true))
+      .head(
+        workflow.getDownloadLink(this.apiBaseUrl),
+        this.get_http_options({}, true)
+      )
       .pipe(
         map((result) => {
           this.logger.debug('Result: ', result);

@@ -346,8 +346,21 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
     return this.version['ro_crate']['links']['metadata'];
   }
 
-  public get downloadLink(): string {
-    return this.version['ro_crate']['links']['download'];
+  public getDownloadLink(apiBaseUrl: string = null): string {
+    try {
+      const originalLink = this.version['ro_crate']['links']['download'];
+      if (!apiBaseUrl) return originalLink;
+      // parse the url to extract the path
+      const path = new URL(originalLink).pathname;
+      this.logger.debug('Relative path of RO-Crate: ', path);
+      // build the download link using the api base url
+      const downloadLink = apiBaseUrl + path;
+      this.logger.debug('Download link: ', downloadLink);
+      return downloadLink;
+    } catch (error) {
+      this.logger.error('Error while getting download link: ', error);
+      return null;
+    }
   }
 
   get testInstances() {
