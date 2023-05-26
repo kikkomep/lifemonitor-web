@@ -165,7 +165,10 @@ export abstract class AuthBaseService implements IAuthService {
     return this._user;
   }
 
-  public abstract logout(notify: boolean): Promise<boolean>;
+  public abstract logout(
+    notify: boolean,
+    closeSession: boolean
+  ): Promise<boolean>;
 
   public abstract isAuthError(error: any): boolean;
 }

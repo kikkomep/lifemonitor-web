@@ -91,8 +91,11 @@ export class AuthService implements IAuthService {
     return this.currentAuthInstance.login();
   }
 
-  public logout(notify: boolean = true): Promise<boolean> {
-    return this.currentAuthInstance.logout(notify);
+  public logout(
+    notify: boolean = true,
+    closeSession: boolean = true
+  ): Promise<boolean> {
+    return this.currentAuthInstance.logout(notify, closeSession);
   }
 
   public isAuthError(error: any): boolean {

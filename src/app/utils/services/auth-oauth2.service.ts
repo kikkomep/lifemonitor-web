@@ -123,8 +123,11 @@ export class AuthOAuth2Service extends AuthBaseService implements IAuthService {
     return this._user;
   }
 
-  public async logout(notify: boolean = true): Promise<boolean> {
-    if (!this.isCallbackFromAuthServer()) {
+  public async logout(
+    notify: boolean = true,
+    closeSession: boolean = true
+  ): Promise<boolean> {
+    if (closeSession && !this.isCallbackFromAuthServer()) {
       this.logger.debug('Returning from AuthServer');
       document.location.href = '/api/account/logout?next=/logout?callback';
     } else {
