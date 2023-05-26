@@ -143,7 +143,7 @@ export class CacheManager {
     headers.append('cache-created-at', String(createdAt));
     headers.append('cache-TTL', String(init.cacheTTL ?? defaultCacheTTL));
     // headers.append('Access-Control-Allow-Origin', '*');
-    headers.append('Access-Control-Allow-Credentials', 'true');
+    // headers.append('Access-Control-Allow-Credentials', 'true');
     const request = new Request(url.toString(), { ...init, headers: headers });
     request['cacheEntry'] = init.cacheEntry;
     request['cacheGroup'] = init.cacheGroup;

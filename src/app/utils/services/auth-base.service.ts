@@ -130,11 +130,13 @@ export abstract class AuthBaseService implements IAuthService {
       }
     }
     this.logger.debug('Trying to fetch user data');
+    const accessToken = this.getToken();
+    const useToken = accessToken !== null && accessToken !== undefined;
     return this.httpClient
       .get(this.baseUrl + '/users/current', {
-        withCredentials: !this.getToken() ? true : false,
+        withCredentials: !useToken,
         headers: this.getToken()
-          ? { Authorization: `Bearer ${this.getToken().token.value}` }
+          ? { Authorization: `Bearer ${accessToken.token.value}` }
           : {},
       })
       .pipe(

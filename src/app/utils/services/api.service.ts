@@ -122,7 +122,8 @@ export class ApiService {
       'Content-Type': 'application/json',
       skip: String(skip),
     };
-    if (token) {
+    const useToken = token !== null && token !== undefined;
+    if (useToken) {
       this.logger.debug('Using token', token);
       http_headers['Authorization'] = 'Bearer ' + token['token']['value'];
       // http_headers['Authorization'] = 'Bearer ' + token.token.value;
@@ -135,7 +136,7 @@ export class ApiService {
       //headers: new HttpHeaders(http_headers),
       headers: http_headers,
       params: params,
-      withCredentials: token ? false : true,
+      withCredentials: !useToken,
     };
     return http_options;
   }
