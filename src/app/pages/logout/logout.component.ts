@@ -31,7 +31,7 @@ export class LogoutComponent implements OnInit, OnDestroy {
           nextRoute = params['next'];
         }
         this.logger.debug(`Next route: ${nextRoute}`);
-        this.appService.logout().then((data) => {
+        this.appService.logout().then(() => {
           this.logger.debug('User logged out...');
           this.redirectTo(nextRoute, false);
         });

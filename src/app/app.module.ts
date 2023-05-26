@@ -95,7 +95,7 @@ export function initConfigService(
       .loadConfig()
       .pipe(
         map(async (data: any) => {
-          console.info('Configuration loaded', data);
+          logger.info('Configuration loaded', data);
           Object.assign(cookieConfig, defaultCookieConfig);
           cookieConfig.cookie.domain = data.appDomain;
           cachedHttpClient.init();

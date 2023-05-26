@@ -122,7 +122,8 @@ export abstract class AuthBaseService implements IAuthService {
     if (skipIfNone) {
       this.logger.debug('_fetchUserData: skipIfNone', skipIfNone);
       const userData = this.isUserLogged();
-      if (!userData || window.location.pathname.startsWith('/logout')) {
+      const currentPath = window.location.pathname;
+      if (!userData || currentPath.startsWith('/logout')) {
         this._userData = null;
         this.setUserData(null, true);
         return of(null);
@@ -132,6 +133,9 @@ export abstract class AuthBaseService implements IAuthService {
     return this.httpClient
       .get(this.baseUrl + '/users/current', {
         withCredentials: !this.getToken() ? true : false,
+        headers: this.getToken()
+          ? { Authorization: `Bearer ${this.getToken().token.value}` }
+          : {},
       })
       .pipe(
         map((data: any) => {

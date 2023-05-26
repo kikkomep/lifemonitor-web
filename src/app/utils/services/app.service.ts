@@ -875,7 +875,6 @@ export class AppService {
             }),
             catchError((e) => {
               workflowsStatus.setLoaded(workflow.uuid);
-              console.error(e);
               this.logger.error('Error loading workflow', e);
               this.subjectLoadingWorkflowsStatus.next(workflowsStatus);
               return of(null);

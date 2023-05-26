@@ -21,20 +21,23 @@ declare var $: any;
 // Reference to subject worker: always notify the last inizialited worker
 const workerSubject = new BehaviorSubject<Worker>(null);
 
+// initialize logger
+const _logger = LoggerManager.create('WorkerLogger');
+
 // reference to the active cache worker
 let worker: Worker = null;
 if (typeof Worker !== 'undefined') {
   // Create a new
   worker = new Worker(new URL('./cache.worker', import.meta.url));
   worker.onmessage = ({ data }) => {
-    console.debug(`page got message: ${data}`);
+    _logger.debug(`page got message: ${data}`);
   };
   workerSubject.next(worker);
   worker.postMessage({ type: 'ping' });
 } else {
   // Web Workers are not supported in this environment.
   // You should add a fallback so that your program still executes correctly.
-  console.warn('Workers are not supported on this environment');
+  _logger.warn('Workers are not supported on this environment');
 }
 
 @Injectable({
@@ -112,7 +115,7 @@ export class CachedHttpClientService {
     this.config.onLoad.subscribe((loaded) => {
       if (loaded) {
         workerSubject.subscribe((worker: Worker) => {
-          console.log('Worker', worker);
+          this.logger.debug('Worker', worker);
         });
       }
     });
@@ -243,7 +246,7 @@ export class CachedHttpClientService {
   }
 
   public onVisibilityChanged(e) {
-    console.debug('visibility', e, document.hidden);
+    this.logger.debug('visibility', e, document.hidden);
     if (!document.hidden) {
       this.enableBackgroundRefresh();
     } else {
@@ -495,7 +498,7 @@ export class CachedHttpClientService {
           }
         }
       } catch (e) {
-        console.error(e);
+        this.logger.error(e);
       }
     };
   }

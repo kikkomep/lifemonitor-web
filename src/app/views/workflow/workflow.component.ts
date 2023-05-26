@@ -91,7 +91,7 @@ export class WorkflowComponent
         if ('status' in params) {
           // Parse and normalize status filter
           let status: string = params['status'].toLowerCase();
-          console.debug('Status: ', status);
+          this.logger.debug('Status: ', status);
           for (let s in AggregatedTestStatusMap) {
             if (s === status || AggregatedTestStatusMap[s].includes(status)) {
               this.statusFilter = s;
