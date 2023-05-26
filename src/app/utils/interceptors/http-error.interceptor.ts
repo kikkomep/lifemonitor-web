@@ -9,10 +9,10 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, throwError } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { Logger, LoggerManager } from '../logging';
 import { AuthService } from '../services/auth.service';
-import { AppConfigService } from '../services/config.service';
+import { InputDialogService } from '../services/input-dialog.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
@@ -20,10 +20,10 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   private logger: Logger = LoggerManager.create('HttpErrorInterceptor');
 
   constructor(
-    private appConfig: AppConfigService,
     private authService: AuthService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private inputDialogService: InputDialogService
   ) {}
 
   intercept(
@@ -37,6 +37,28 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         // if error code is 401 and the server is the LifeMonitor back-end
         // then try to restart the authentication process
         if (this.authService.isAuthError(error)) {
+          this.logger.error('OAuth error detected', error);
+          if (!this.authService.isUserLogged()) {
+            this.logger.error('User is not logged in');
+            alert('User is not logged in');
+            return;
+          }
+          // notify the user
+          this.toastr?.error('Session expired', '', { timeOut: 4000 });
+          this.logger.debug('Logout from app routing module');
+          this.inputDialogService.show({
+            question: 'Session Expired',
+            description: 'You need to login again to continue',
+            confirmText: 'Login',
+            iconClass: 'fas fa-user-clock',
+            enableCancel: true,
+            onConfirm: () => {
+              this.logger.debug('Trying to reauthenticate user');
+              this.router.navigateByUrl('/logout?callback=&next=/login');
+            },
+            onCancel: () => {
+              this.authService.logout(false, false);
+            },
           });
         }
         if (
