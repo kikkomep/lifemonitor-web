@@ -30,7 +30,6 @@ export class AuthCookieService extends AuthBaseService implements IAuthService {
       return this.authorize();
     } else {
       this.logger.debug('Returning from AuthServer');
-
       return this.fetchUserData()
         .toPromise()
         .then((data) => {
@@ -51,12 +50,11 @@ export class AuthCookieService extends AuthBaseService implements IAuthService {
       return Promise.resolve(false);
     } else {
       this.logger.debug('Not returning from AuthServer');
+      this._userData = undefined;
       localStorage.clear();
       sessionStorage.clear();
-      this._userData = undefined;
-      localStorage.removeItem(this.lifemonitorUserKey);
       if (notify) this.userLoggedSubject.next(false);
-      return of(true).toPromise();
+      return Promise.resolve(true);
     }
   }
 
