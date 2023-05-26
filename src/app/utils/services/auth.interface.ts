@@ -106,7 +106,7 @@ export interface IAuthService {
    * If the user is not logged out, it will return false.
    * If notify is true, it will notify the current user is changed.to null.
    */
-  logout(notify: boolean): Promise<boolean>;
+  logout(notify: boolean, closeSession: boolean): Promise<boolean>;
 
   /**
    * @returns {string}
