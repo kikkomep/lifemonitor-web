@@ -231,20 +231,17 @@ export class ApiService {
 
   async logout(): Promise<boolean> {
     const logged = await this.authService.checkIsUserLogged();
-    if (logged) {
-      return this.authService.logout(false).then(async () => {
-        await this.cachedHttpClient.deleteCacheEntriesByKeys([
-          'userProfile',
-          'userSubscriptions',
-          'subscribedWorkflows',
-          'userScopedWorkflows',
-          'userNotifications',
-          'registeredWorkflows',
-        ]);
-        return true;
-      });
-    }
-    return false;
+    return this.authService.logout(!logged).then(async () => {
+      await this.cachedHttpClient.deleteCacheEntriesByKeys([
+        'userProfile',
+        'userSubscriptions',
+        'subscribedWorkflows',
+        'userScopedWorkflows',
+        'userNotifications',
+        'registeredWorkflows',
+      ]);
+      return true;
+    });
   }
 
   get_current_user(): Observable<User> {
