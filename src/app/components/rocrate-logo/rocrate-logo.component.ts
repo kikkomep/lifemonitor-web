@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { WorkflowVersion } from 'src/app/models/workflow.model';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
+import { AppConfigService } from 'src/app/utils/services/config.service';
 
 declare var $: any;
 
@@ -18,7 +19,10 @@ export class RocrateLogoComponent implements OnInit {
   // initialize logger
   private logger: Logger = LoggerManager.create('RocrateLogoComponent');
 
-  constructor(private appService: AppService) {}
+  constructor(
+    private appConfig: AppConfigService,
+    private appService: AppService
+  ) {}
 
   ngOnInit(): void {
     this._availableForDownload = null;
@@ -27,6 +31,10 @@ export class RocrateLogoComponent implements OnInit {
       .subscribe((active: boolean) => {
         this._availableForDownload = active;
       });
+  }
+
+  public get roCrateDownloadUrl(): string {
+    return this.workflow.getDownloadLink(this.appConfig.apiBaseUrl);
   }
 
   public get availableForDownload(): boolean {
@@ -38,5 +46,6 @@ export class RocrateLogoComponent implements OnInit {
       this.logger.debug('Downloading RO-Crate of workflow ', this.workflow);
       this.appService.downloadROCrate(this.workflow);
     }
+    return false;
   }
 }

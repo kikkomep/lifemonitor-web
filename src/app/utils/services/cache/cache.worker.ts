@@ -307,13 +307,14 @@ async function onSync(
   Object.entries(workflowVersionsUdates).forEach(
     async ([key, value], index) => {
       logger.debug(
-        `Checking ${key}, ${workflowVersionsUdates[key].lastUpdate} ${cacheEntries.createdAt[key]}`
+        `CacheMananger: Checking ${key}, ${workflowVersionsUdates[key].lastUpdate} ${cacheEntries.createdAt[key]}`
       );
       if (key in cachedWorkflows) {
         const mAge =
           workflowVersionsUdates[key].lastUpdate - cacheEntries.createdAt[key];
         const outdated = mAge > 0;
 
+        logger.debug('CacheMananger: key', key);
         logger.debug(
           `Found ${key}, updated at ${
             workflowVersionsUdates[key].lastUpdate
@@ -326,6 +327,10 @@ async function onSync(
         );
         if (outdated) {
           logger.debug(`Outdated: ${key} (age: ${mAge} msecs)`);
+          logger.debug(
+            'Trying to refresh key',
+            getCacheKey({ uuid: value.uuid })
+          );
           await cache.refreshCacheEntriesGroup(
             getCacheKey({ uuid: value.uuid }),
             false

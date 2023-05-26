@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Socket } from 'ngx-socket-io';
 import { forkJoin, from, Observable, of, Subject, throwError } from 'rxjs';
 import { catchError, map, mergeMap, retry, tap } from 'rxjs/operators';
 import { Job } from 'src/app/models/job.model';
@@ -19,11 +18,11 @@ import { User } from 'src/app/models/user.modes';
 import { Workflow, WorkflowVersion } from 'src/app/models/workflow.model';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger, LoggerManager } from '../logging';
+import { ApiSocket } from '../shared/api-socket';
 import { AuthService } from './auth.service';
 import { CacheManager, FetchError } from './cache/cache-manager';
 import { CachedHttpClientService } from './cache/cachedhttpclient.service';
 import { AppConfigService } from './config.service';
-import { ApiSocket } from '../shared/api-socket';
 
 const MAX_RETRIES = 0;
 
@@ -32,6 +31,8 @@ const MAX_RETRIES = 0;
 })
 export class ApiService {
   private httpOptions: object = null;
+
+  private _apiBaseUrl: string = null;
 
   // initialize logger
   private logger: Logger = LoggerManager.create('ApiService');
@@ -68,8 +69,16 @@ export class ApiService {
     });
   }
 
+  public notifyWhenReady(): Observable<boolean> {
+    return this.cachedHttpClient.readySubscription();
+  }
+
+  public set apiBaseUrl(url: string) {
+    this._apiBaseUrl = url;
+  }
+
   public get apiBaseUrl(): string {
-    return this.config.apiBaseUrl;
+    return this._apiBaseUrl ?? this.config.apiBaseUrl;
   }
 
   private handleWorkerMessage(
@@ -108,19 +117,26 @@ export class ApiService {
   }
 
   private get_http_options(params = {}, skip: boolean = false) {
-    const token = this.authService.token;
+    const token = this.authService.getToken();
     let http_headers = {
       'Content-Type': 'application/json',
       skip: String(skip),
     };
-    if (token) {
-      // http_headers['Authorization'] = 'Bearer ' + token['token']['value'];
-      http_headers['Authorization'] = 'Bearer ' + token.token.value;
+    const useToken = token !== null && token !== undefined;
+    if (useToken) {
+      this.logger.debug('Using token', token);
+      http_headers['Authorization'] = 'Bearer ' + token['token']['value'];
+      // http_headers['Authorization'] = 'Bearer ' + token.token.value;
+    } else {
+      this.logger.debug('No token found');
+      // http_headers['Access-Control-Allow-Origin'] = '*';
+      // http_headers['Access-Control-Allow-Credentials'] = true;
     }
     let http_options = {
       //headers: new HttpHeaders(http_headers),
       headers: http_headers,
       params: params,
+      withCredentials: !useToken,
     };
     return http_options;
   }
@@ -213,49 +229,24 @@ export class ApiService {
       );
   }
 
-  async logout(redirect: boolean = true): Promise<boolean> {
+  async logout(): Promise<boolean> {
     const logged = await this.authService.checkIsUserLogged();
-    if (logged) {
-      return this.authService.logout(false).then(async () => {
-        await this.cachedHttpClient.deleteCacheEntriesByKeys([
-          'userProfile',
-          'userSubscriptions',
-          'subscribedWorkflows',
-          'userScopedWorkflows',
-          'userNotifications',
-          'registeredWorkflows',
-        ]);
-        if (redirect) document.location.href = '/api/account/logout';
-        return true;
-      });
-    }
-    return false;
+    return this.authService.logout(!logged).then(async () => {
+      await this.cachedHttpClient.deleteCacheEntriesByKeys([
+        'userProfile',
+        'userSubscriptions',
+        'subscribedWorkflows',
+        'userScopedWorkflows',
+        'userNotifications',
+        'registeredWorkflows',
+      ]);
+      return true;
+    });
   }
 
   get_current_user(): Observable<User> {
-    const result = this.authService
-      .checkIsUserLogged()
-      .then<User>((isUserLogged) => {
-        if (isUserLogged) {
-          this.logger.debug('User logged... redirecting');
-          return this.doGet('/users/current', {
-            cacheEntry: 'userProfile',
-            cacheTTL: 300,
-          })
-            .pipe(
-              retry(MAX_RETRIES),
-              map((data) => {
-                return new User(data);
-              })
-            )
-            .toPromise();
-        } else {
-          this.logger.debug('User logged out...');
-          return null;
-        }
-      });
-
-    return from(result);
+    this.logger.debug('Getting current user', this.authService.isUserLogged());
+    return of(this.authService.getCurrentUser());
   }
 
   get_current_user_notifications(): Observable<Array<UserNotification>> {
@@ -606,13 +597,14 @@ export class ApiService {
   }
 
   downloadROCrate(workflow: WorkflowVersion): Observable<any> {
-    let token = JSON.parse(localStorage.getItem('token'));
+    // init headers with authorization token if available
     let headers = new HttpHeaders();
-    if (token) {
-      headers.append['Authorization'] = 'Bearer ' + token['token']['value'];
+    let accessToken = this.authService.getToken();
+    if (accessToken) {
+      headers.append['Authorization'] = 'Bearer ' + accessToken.token.value;
     }
     return this.http
-      .get(workflow.downloadLink, {
+      .get(workflow.getDownloadLink(this.apiBaseUrl), {
         headers: headers,
         responseType: 'blob',
       })
@@ -1146,8 +1138,13 @@ export class ApiService {
   public checkROCrateAvailability(
     workflow: WorkflowVersion
   ): Observable<boolean> {
+    this.logger.warn('Checking ROCrate availability for', workflow);
+    this.logger.warn('http options', this.get_http_options({}, true));
     return this.http
-      .head(workflow.downloadLink, this.get_http_options({}, true))
+      .head(
+        workflow.getDownloadLink(this.apiBaseUrl),
+        this.get_http_options({}, true)
+      )
       .pipe(
         map((result) => {
           this.logger.debug('Result: ', result);

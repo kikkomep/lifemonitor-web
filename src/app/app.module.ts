@@ -67,12 +67,53 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TooltipModule } from 'primeng/tooltip';
+import { cookieConfig as defaultCookieConfig } from './cookieConfig';
+
+// Cookie Consent modules
+import {
+  NgcCookieConsentConfig,
+  NgcCookieConsentModule,
+} from 'ngx-cookieconsent';
+import { map } from 'rxjs/operators';
+import { LoggerManager } from './utils/logging';
+import { ApiService } from './utils/services/api.service';
+import { AuthService } from './utils/services/auth.service';
+import { CachedHttpClientService } from './utils/services/cache/cachedhttpclient.service';
 
 registerLocaleData(localeEn, 'en-EN');
 
-export function initConfigService(appConfig: AppConfigService) {
+export function initConfigService(
+  appConfig: AppConfigService,
+  cookieConfig: NgcCookieConsentConfig,
+  cachedHttpClient: CachedHttpClientService,
+  authService: AuthService,
+  apiService: ApiService
+) {
+  const logger = LoggerManager.create('AppModuleInitializer');
   return (): Promise<any> => {
-    return appConfig.loadConfig().toPromise();
+    return appConfig
+      .loadConfig()
+      .pipe(
+        map(async (data: any) => {
+          logger.info('Configuration loaded', data);
+          Object.assign(cookieConfig, defaultCookieConfig);
+          cookieConfig.cookie.domain = data.appDomain;
+          cookieConfig.content.policyLink = appConfig.privacyPolicyUrl;
+          cookieConfig.content.tosLink = appConfig.termsOfServiceUrl;
+          cachedHttpClient.init();
+          apiService.apiBaseUrl = data['apiBaseUrl'];
+          authService.init().subscribe(
+            (data) => {
+              logger.info('User data fetched', data);
+            },
+            (err) => {
+              logger.warn('Error fetching user data', err);
+            }
+          );
+          return data;
+        })
+      )
+      .toPromise();
   };
 }
 
@@ -148,13 +189,21 @@ export function initConfigService(appConfig: AppConfigService) {
       // or after 30 seconds (whichever comes first).
       registrationStrategy: 'registerWhenStable:30000',
     }),
+    // cookie consent
+    NgcCookieConsentModule.forRoot(defaultCookieConfig),
   ],
   providers: [
     AppConfigService,
     {
       provide: APP_INITIALIZER,
       useFactory: initConfigService,
-      deps: [AppConfigService],
+      deps: [
+        AppConfigService,
+        NgcCookieConsentModule,
+        CachedHttpClientService,
+        AuthService,
+        ApiService,
+      ],
       multi: true,
     },
     // ApiSocketService,

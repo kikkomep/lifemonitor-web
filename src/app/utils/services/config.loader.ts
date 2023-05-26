@@ -16,7 +16,7 @@ export class AppConfigLoader {
 
   public onLoad: Observable<boolean> = this.subject.asObservable();
 
-  public loadConfig(): Observable<object> {
+  public loadConfig(): Observable<any> {
     if (!('configFile' in environment)) {
       return of(this.config);
     }

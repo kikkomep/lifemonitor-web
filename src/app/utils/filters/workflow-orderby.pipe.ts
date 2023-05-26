@@ -41,7 +41,6 @@ export class WorkflowOrderByPipe implements PipeTransform {
       return 0;
     }
     const latestVersion = versions.reduce((previous, current) => {
-      console.debug('Checking ', previous, current);
       const a = previous[property] || 0;
       const b = current[property] || 0;
       return this.compare(a, b, 'desc');

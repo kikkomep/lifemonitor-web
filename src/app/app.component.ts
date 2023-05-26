@@ -7,6 +7,13 @@ import { CacheRefreshStatus } from './utils/services/cache/cache.model';
 import { CachedHttpClientService } from './utils/services/cache/cachedhttpclient.service';
 import { InputDialogService } from './utils/services/input-dialog.service';
 
+import {
+  NgcCookieConsentService,
+  NgcInitializingEvent,
+  NgcNoCookieLawEvent,
+  NgcStatusChangeEvent,
+} from 'ngx-cookieconsent';
+
 declare var $: any;
 
 @Component({
@@ -17,16 +24,25 @@ declare var $: any;
 export class AppComponent implements OnInit, OnDestroy {
   title = 'LifeMonitor';
   webWorker: Worker;
-  private logger: Logger = LoggerManager.create('AppComponent');
-
   refreshStatus$: Observable<CacheRefreshStatus>;
 
-  checkVersionSubscription: Subscription;
+  private logger: Logger = LoggerManager.create('AppComponent');
+
+  private checkVersionSubscription: Subscription;
+
+  //keep refs to subscriptions to be able to unsubscribe later
+  private popupOpenSubscription: Subscription;
+  private popupCloseSubscription: Subscription;
+  private initializeSubscription: Subscription;
+  private statusChangeSubscription: Subscription;
+  private revokeChoiceSubscription: Subscription;
+  private noCookieLawSubscription: Subscription;
 
   constructor(
     private inputDialog: InputDialogService,
     private swUpdate: SwUpdate,
-    private cachedHttpClient: CachedHttpClientService
+    private cachedHttpClient: CachedHttpClientService,
+    private ccService: NgcCookieConsentService
   ) {
     this.refreshStatus$ = this.cachedHttpClient.refreshProgressStatus$;
   }
@@ -55,27 +71,54 @@ export class AppComponent implements OnInit, OnDestroy {
         });
       });
     }
+
+    // subscribe to cookieconsent observables to react to main events
+    this.popupOpenSubscription = this.ccService.popupOpen$.subscribe(() => {});
+
+    this.popupCloseSubscription = this.ccService.popupClose$.subscribe(
+      () => {}
+    );
+
+    this.initializeSubscription = this.ccService.initializing$.subscribe(
+      (event: NgcInitializingEvent) => {}
+    );
+
+    this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
+      (event: NgcStatusChangeEvent) => {}
+    );
+
+    this.revokeChoiceSubscription = this.ccService.revokeChoice$.subscribe(
+      () => {}
+    );
+
+    this.noCookieLawSubscription = this.ccService.noCookieLaw$.subscribe(
+      (event: NgcNoCookieLawEvent) => {}
+    );
   }
 
-  ngAfterViewInit() {
-    // $(document)
-    //   .on('mouseover', '[data-toggle="tooltip"]', function () {
-    //     $(this).tooltip('show');
-    //   })
-    //   .on('mouseout', '[data-toggle="tooltip"]', function () {
-    //     $(this).tooltip('hide');
-    //   })
-    //   .on('keyup', '[data-toggle="tooltip"]', function () {
-    //     $(this).tooltip('hide');
-    //   })
-    //   .on('click', '[data-toggle="tooltip"]', function () {
-    //     $(this).tooltip('hide');
-    //   });
-  }
+  ngAfterViewInit() {}
 
   ngOnDestroy() {
     if (this.checkVersionSubscription) {
       this.checkVersionSubscription.unsubscribe();
+    }
+    if (this.popupOpenSubscription) {
+      this.popupOpenSubscription.unsubscribe();
+    }
+    if (this.popupCloseSubscription) {
+      this.popupCloseSubscription.unsubscribe();
+    }
+    if (this.initializeSubscription) {
+      this.initializeSubscription.unsubscribe();
+    }
+    if (this.statusChangeSubscription) {
+      this.statusChangeSubscription.unsubscribe();
+    }
+    if (this.revokeChoiceSubscription) {
+      this.revokeChoiceSubscription.unsubscribe();
+    }
+    if (this.noCookieLawSubscription) {
+      this.noCookieLawSubscription.unsubscribe();
     }
   }
 }
