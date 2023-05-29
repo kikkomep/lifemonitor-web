@@ -1,10 +1,10 @@
-<div style="widthx: 100%">
+<div style="width: 120px">
   <div *ngIf="!stats" style="display: flex; align-items: center; width: 150px;">
     <div class="text-center w-100">
       <i class="fas fa-2x fa-sync-alt text-muted"></i>
     </div>
   </div>
   <div *ngIf="stats" class="text-sm text-center">
-    <p-chart type="pie" [data]="pieChartData" [options]="pieChartOptions" [width]="120"></p-chart>
+    <p-chart type="pie" [data]="pieChartData" [options]="pieChartOptions"></p-chart>
   </div>
 </div>
