@@ -12,6 +12,6 @@ data:
     {
         "apiBaseUrl": "https://{{ .Values.externalServerName }}/api",
         "appDomain": "{{ .Values.externalServerName }}",
-        "socketBaseUrl": "https://{{ .Values.externalServerName }}",
-        "clientId": "{{ .Values.backend.clientId }}"
+        "socketBaseUrl": "https://{{ .Values.externalServerName }}"{{ if .Values.backend.clientId }},{{ end }}
+        {{ if .Values.backend.clientId }}"clientId": "{{ .Values.backend.clientId }}"{{ end }}
     }
