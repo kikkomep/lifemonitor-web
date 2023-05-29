@@ -119,19 +119,29 @@ export abstract class AuthBaseService implements IAuthService {
     skipIfNone: boolean = false
   ): Observable<User | null> {
     this.logger.warn('fetchUserData', this.baseUrl);
+    // fetch current token
+    const accessToken = this.getToken();
+    const useToken = accessToken !== null && accessToken !== undefined;
     if (skipIfNone) {
       this.logger.debug('_fetchUserData: skipIfNone', skipIfNone);
+      // check if user is logged
       const userData = this.isUserLogged();
+      // get current path
       const currentPath = window.location.pathname;
-      if (!userData || currentPath.startsWith('/logout')) {
+      if (
+        // if the user flag is not set
+        !userData ||
+        // or if the access token is not set and the client id is set
+        (accessToken === null && this.config.clientId !== null) ||
+        // or if the current path is the logout page
+        currentPath.startsWith('/logout')
+      ) {
         this._userData = null;
         this.setUserData(null, true);
         return of(null);
       }
     }
     this.logger.debug('Trying to fetch user data');
-    const accessToken = this.getToken();
-    const useToken = accessToken !== null && accessToken !== undefined;
     return this.httpClient
       .get(this.baseUrl + '/users/current', {
         withCredentials: !useToken,

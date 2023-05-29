@@ -169,6 +169,10 @@ export class AuthOAuth2Service extends AuthBaseService implements IAuthService {
     }
     const token = JSON.parse(oauthState);
     this.logger.log('Fetched Token: ', token);
+    if (!token || !('accessToken' in token)) {
+      this.logger.debug('No access token found');
+      return null;
+    }
 
     this._token = {
       scopes: token.scopes,
