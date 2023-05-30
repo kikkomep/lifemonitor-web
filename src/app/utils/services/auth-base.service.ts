@@ -132,7 +132,9 @@ export abstract class AuthBaseService implements IAuthService {
         // if the user flag is not set
         !userData ||
         // or if the access token is not set and the client id is set
-        (accessToken === null && this.config.clientId !== null) ||
+        (accessToken === null &&
+          this.config.clientId &&
+          this.config.clientId !== '<LIFEMONITOR_OAUTH2_CLIENT_ID>') ||
         // or if the current path is the logout page
         currentPath.startsWith('/logout')
       ) {
