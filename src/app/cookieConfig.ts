@@ -32,7 +32,7 @@ export const cookieConfig: NgcCookieConsentConfig = {
     privacyPolicyHref: 'https://lifemonitor.eu/legal/privacy-policy.pdf',
 
     tosLink: 'Terms of Service',
-    tosHref: 'https://lifemonitor.eu/legal/terms-of-service.pdf',
+    tosHref: 'https://lifemonitor.eu/legal/terms-and-conditions.pdf',
   },
 
   onInitialise: (status: any) => {
