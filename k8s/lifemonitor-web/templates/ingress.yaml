@@ -43,16 +43,18 @@ spec:
       paths:
       {{- range .paths }}
       - path: {{ . | quote }}
+        {{- if $newStyle }}
         pathType: Prefix
+        {{- end }}
         backend:
-          service:
-            {{- if $newStyle }}
+          {{- if $newStyle }}
+          service:            
             name: {{$fullname}}-frontend
             port:
               name: http
-            {{- else }}
-            serviceName: {{$fullname}}-frontend
-            servicePort: http
-            {{- end }}
+          {{- else }}
+          serviceName: {{$fullname}}-frontend
+          servicePort: http
+          {{- end }}
       {{- end }}    
   {{- end }}
