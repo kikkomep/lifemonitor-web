@@ -25,3 +25,14 @@ Create chart name and version as used by the chart label.
 {{- define "lifemonitor-web.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
+
+
+{{/*
+Define the service name
+*/}}
+{{- define "lifemonitor-web.serviceName" -}}
+{{- printf "%s-frontend" (include "lifemonitor-web.fullname" .) -}}
+{{- end -}}
+
+{{- end -}}
+
