@@ -39,6 +39,9 @@ spec:
               subPath: app.conf
             - name: logs-storage
               mountPath: /var/log/nginx
+            {{ if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+            {{- end }}
 
           # livenessProbe:
           #   httpGet:
@@ -61,6 +64,9 @@ spec:
             defaultMode: 0644  
         - name: logs-storage
           emptyDir: {}
+        {{ if .Values.extraVolumes }}
+          {{- toYaml .Values.extraVolumes | nindent 8 }}
+        {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
