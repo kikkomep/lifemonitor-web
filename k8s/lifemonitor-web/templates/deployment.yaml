@@ -4,20 +4,24 @@ metadata:
   name: {{ include "lifemonitor-web.fullname" . }}-frontend
   labels:
     app.kubernetes.io/name: {{ include "lifemonitor-web.name" . }}
-    helm.sh/chart: {{ include "lifemonitor-web.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "lifemonitor-web.chart" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "lifemonitor-web.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      helm.sh/chart: {{ include "lifemonitor-web.chart" . }}
   template:
     metadata:
       labels:
         app.kubernetes.io/name: {{ include "lifemonitor-web.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        helm.sh/chart: {{ include "lifemonitor-web.chart" . }}
     spec:
       containers:
         - name: frontend
@@ -35,7 +39,7 @@ spec:
           volumeMounts:
             - name: frontend-config
               mountPath: /app/assets/config.json
-              subPath: config.json            
+              subPath: config.json
             - name: nginx-config
               mountPath: /usr/local/openresty/nginx/conf/nginx.conf
               subPath: nginx.conf
@@ -66,7 +70,7 @@ spec:
         - name: nginx-config
           configMap:
             name: {{ include "lifemonitor-web.fullname" . }}-nginx-config
-            defaultMode: 0644  
+            defaultMode: 0644
         - name: logs-storage
           emptyDir: {}
         {{ if .Values.extraVolumes }}
