@@ -27,6 +27,11 @@ spec:
             - name: http
               containerPort: 4200
               protocol: TCP
+          {{ if .Values.monitoring.enabled }}
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          {{- end }}
           volumeMounts:
             - name: frontend-config
               mountPath: /app/assets/config.json

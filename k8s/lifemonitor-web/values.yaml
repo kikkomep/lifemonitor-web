@@ -23,6 +23,8 @@ service:
   type: NodePort
   port: 80
 
+monitoring:
+  enabled: false
 ingress:
   enabled: false
   className: nginx
