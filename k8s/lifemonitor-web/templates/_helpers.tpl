@@ -34,5 +34,3 @@ Define the service name
 {{- printf "%s-frontend" (include "lifemonitor-web.fullname" .) -}}
 {{- end -}}
 
-{{- end -}}
-
