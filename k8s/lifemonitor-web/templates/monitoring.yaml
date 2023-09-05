@@ -1,0 +1,27 @@
+{{- if .Values.monitoring.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: '9090'
+  labels:
+    app.kubernetes.io/name: {{ include "lifemonitor-web.name" . }}
+  name: {{ .Release.Name }}-frontend-proxy-metrics-headless
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ include "lifemonitor-web.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "lifemonitor-web.chart" . }}
+  ports:
+  - name: metrics
+    protocol: TCP
+    port: 9090
+    targetPort: 9090
+
+---
+{{- end -}} # end if .Values.monitoring.enabled
+
