@@ -25,6 +25,11 @@ service:
 
 monitoring:
   enabled: false
+  servicemonitor:
+    enabled: false
+  prometheus:
+    namespace: kube-prometheus-stack
+
 ingress:
   enabled: false
   className: nginx
