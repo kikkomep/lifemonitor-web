@@ -9,50 +9,61 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 externalServerName: 'localhost'
 
 # Setting for the LifeMonitor Backend API
 backend:
-  apiUrl: ""
-  clientId: ""
+  apiUrl: ''
+  clientId: ''
 
 service:
   type: NodePort
   port: 80
 
+monitoring:
+  enabled: false
+  servicemonitor:
+    enabled: false
+  prometheus:
+    namespace: kube-prometheus-stack
+
 ingress:
   enabled: false
-  annotations: {
-    kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    # hosts:
-    #   - host: app.lifemonitor.eu
-    #     paths:
-    #       - "/"
-  }
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  className: nginx
+  annotations: {}
+  # kubernetes.io/tls-acme: "true"
+  # configures the backend service
+  hosts:
+    - host: localhost
+      paths:
+        - '/'
+  # configure TLS for the ingress
+  tls:
+    - secretName: lifemonitor-web-tls
+      hosts:
+        - localhost
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
 
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+extraVolumes: []
+
+extraVolumeMounts: []

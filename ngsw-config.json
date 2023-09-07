@@ -37,7 +37,10 @@
         "/oauth2/**",
         "/jobs/**",
         "/socket.io/**",
-        "/openapi.*"
+        "/github/**",
+        "/integrations/**",
+        "/openapi.*",
+        "/metrics"
       ],
       "cacheConfig": {
         "strategy": "freshness",
