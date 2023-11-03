@@ -31,7 +31,7 @@ spec:
             - name: http
               containerPort: 4200
               protocol: TCP
-          {{ if .Values.monitoring.enabled }}
+          {{- if .Values.monitoring.enabled }}
             - name: metrics
               containerPort: 9090
               protocol: TCP
@@ -46,8 +46,10 @@ spec:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/webapp.prod.conf
               subPath: app.conf
-            - name: logs-storage
+            - name: nginx-logs
               mountPath: /var/log/nginx
+            - name: nginx-run
+              mountPath: /var/run/nginx
             {{ if .Values.extraVolumeMounts }}
             {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
             {{- end }}
@@ -62,6 +64,24 @@ spec:
           #     port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.monitoring.enabled }}
+        - name: promtail
+          image: grafana/promtail:master
+          args:
+            - "-config.file=/etc/promtail/promtail.yaml" # Found in the ConfigMap
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: promtail-config
+              mountPath: /etc/promtail
+            - name: nginx-logs
+              mountPath: /var/log/nginx
+        {{- end }}
       volumes:
         - name: frontend-config
           configMap:
@@ -71,8 +91,16 @@ spec:
           configMap:
             name: {{ include "lifemonitor-web.fullname" . }}-nginx-config
             defaultMode: 0644
-        - name: logs-storage
+        - name: nginx-logs
           emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        {{- if .Values.monitoring.enabled }}
+        - name: promtail-config
+          configMap:
+            name: {{ include "lifemonitor-web.fullname" . }}-promtail-configmap
+            defaultMode: 0644
+        {{- end }}
         {{ if .Values.extraVolumes }}
           {{- toYaml .Values.extraVolumes | nindent 8 }}
         {{- end }}
