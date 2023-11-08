@@ -47,10 +47,6 @@ data:
         server {
             server_name {{ .Values.externalServerName }} {{ include "lifemonitor-web.name" . }}-metrics.default {{ include "lifemonitor-web.name" . }}-metrics.default.svc.cluster.local;
 
-            # save logs here
-            access_log /var/log/nginx/metrics.access.log extended;
-            error_log /var/log/nginx/metrics.error.log;
-
             proxy_read_timeout 600;
             proxy_connect_timeout 600;
             proxy_send_timeout 600;
@@ -69,9 +65,12 @@ data:
             # force HTTP traffic to HTTPS
             # error_page  497 http://$host:4200$request_uri;
 
-            # expose extended metrics
+            # expose standard nginx metrics
             location = /metrics {
                 stub_status on;
+
+                access_log    off;
+                log_not_found off;
             }
         }
         {{- end -}}
@@ -97,8 +96,43 @@ data:
             # force HTTP traffic to HTTPS
             error_page  497 http://$host:4200$request_uri;
 
+            # define error pages
+            error_page 404 /error/404;
+            error_page 405 /error/405;
+            error_page 429 /error/429;
+            error_page 500 /error/500;
+            error_page 502 /error/502;
+
+            # location for error pages
+            location ~ ^/error {
+                # disable redirects
+                proxy_redirect          off;
+
+                # rewrite headers
+                proxy_pass_header       Server;
+                proxy_set_header        X-Real-IP $http_x_forwarded_for;
+                proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        X-Scheme $scheme;
+                proxy_set_header        Host $http_host;
+                proxy_set_header        Cookie $http_cookie;
+                proxy_set_header        X-Requested-With $http_x_requested_with;
+
+                # various proxy settings
+                proxy_connect_timeout   600;
+                proxy_read_timeout      600;
+                proxy_send_timeout      600;
+                #proxy_intercept_errors  on;
+
+                # set uppstream
+                proxy_pass              https://api;
+
+                # log errors using the extended format
+                access_log /var/log/nginx/http.error.log custom_format;
+            }
+
             # disable standard nginx metrics
             location = /nginx-metrics {
+                # stub_status on;
                 deny all;
             }
 
@@ -155,7 +189,6 @@ data:
               proxy_connect_timeout   600;
               proxy_read_timeout      600;
               proxy_send_timeout      600;
-              #proxy_intercept_errors  on;
           }
 
             location ~ ^/(account|oauth2|jobs|github|integrations) {
@@ -177,7 +210,6 @@ data:
                 proxy_connect_timeout   600;
                 proxy_read_timeout      600;
                 proxy_send_timeout      600;
-                #proxy_intercept_errors  on;
             }
 
             location /socket.io/ {
@@ -223,15 +255,15 @@ data:
         pcre_jit on;
 
         # logs
-        pid        /var/run/openresty/nginx.pid;
-        error_log  /var/log/nginx/nginx.error.log crit;
+        pid        /var/log/nginx/nginx.pid;
+        error_log  /var/log/nginx/nginx.error.log warn;
 
         events {
             worker_connections 1024;
         }
 
         http {
-
+            
             include mime.types;
 
             default_type application/octet-stream;
@@ -240,27 +272,35 @@ data:
             # When the use of underscores is disabled, request header fields whose names contain underscores are marked as invalid and become subject to the ignore_invalid_headers directive.
             # underscores_in_headers off;
 
-            server_names_hash_bucket_size  128;
-            server_names_hash_max_size 512;
-        
+            # fix issues with large client headers
             proxy_headers_hash_max_size 512;
             proxy_headers_hash_bucket_size 128;
 
-            # Define a verbose log format
-            log_format extended 
-            '[$http_x_forwarded_for] '
-            '"$request" $status ($body_bytes_sent bytes) - "$http_referer", "$http_user_agent", "$http_x_request_domain"';
-            
-            # Configure Log files
-            access_log /usr/local/openresty/nginx/logs/access.log extended;
-            # error_log /usr/local/openresty/nginx/logs/error.log warn;
+            # Define the log format
+            log_format custom_format '$http_x_client_ip - $remote_user [$time_local] '
+                            '"$request" $status $body_bytes_sent '
+                            '"$http_referer" "$http_user_agent" - '
+                            '$http_x_forwarded_for $request_time $request_length - '
+                            '$connection $connection_requests $pipe - '
+                            '$upstream_addr $upstream_status $upstream_cache_status '
+                            '$upstream_response_time $upstream_response_length';
 
-            # Extra settings
-            client_body_temp_path /var/run/openresty/nginx-client-body;
-            proxy_temp_path /var/run/openresty/nginx-proxy;
-            fastcgi_temp_path /var/run/openresty/nginx-fastcgi;
-            uwsgi_temp_path /var/run/openresty/nginx-uwsgi;
-            scgi_temp_path /var/run/openresty/nginx-scgi;
+            # Configure Log files
+            access_log /var/log/nginx/access.log custom_format;
+            error_log  /var/log/nginx/error.log warn;
+
+            
+            # See Move default writable paths to a dedicated directory (#119)
+            # https://github.com/openresty/docker-openresty/issues/119
+            client_body_temp_path /var/run/nginx/nginx-client-body;
+            proxy_temp_path /var/run/nginx/nginx-proxy;
+            fastcgi_temp_path /var/run/nginx/nginx-fastcgi;
+            uwsgi_temp_path /var/run/nginx/nginx-uwsgi;
+            scgi_temp_path /var/run/nginx/nginx-scgi;
+
+
+            # Defines a file that will store the process ID of the main process.            
+            server_names_hash_bucket_size  128;
 
             sendfile on;
             #tcp_nopush     on;
@@ -275,4 +315,3 @@ data:
             # Don't reveal OpenResty version to clients.
             # server_tokens off;
         }
-
