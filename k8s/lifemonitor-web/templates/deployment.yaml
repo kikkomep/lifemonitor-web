@@ -17,6 +17,8 @@ spec:
       helm.sh/chart: {{ include "lifemonitor-web.chart" . }}
   template:
     metadata:
+      annotations:
+        checksum/frontend-config: {{ include (print $.Template.BasePath "/nginx.configmap.yml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ include "lifemonitor-web.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
