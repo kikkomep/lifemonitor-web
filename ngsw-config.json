@@ -33,6 +33,7 @@
       "name": "api",
       "urls": [
         "/api/**",
+        "/error/**",
         "/account/**",
         "/oauth2/**",
         "/jobs/**",

@@ -105,6 +105,9 @@ data:
 
             # location for error pages
             location ~ ^/error {
+                # rewrite request uri to point to the api
+                rewrite /error/(.*) /api/error/$1  break;
+
                 # disable redirects
                 proxy_redirect          off;
 
