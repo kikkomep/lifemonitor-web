@@ -9,15 +9,15 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-nameOverride: ''
-fullnameOverride: ''
+nameOverride: ""
+fullnameOverride: ""
 
-externalServerName: 'localhost'
+externalServerName: "localhost"
 
 # Setting for the LifeMonitor Backend API
 backend:
-  apiUrl: ''
-  clientId: ''
+  apiUrl: ""
+  clientId: ""
 
 service:
   type: NodePort
@@ -52,7 +52,7 @@ ingress:
   hosts:
     - host: localhost
       paths:
-        - '/'
+        - "/"
   # configure TLS for the ingress
   tls:
     - secretName: lifemonitor-web-tls
