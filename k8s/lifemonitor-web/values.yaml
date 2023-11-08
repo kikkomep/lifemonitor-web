@@ -29,6 +29,19 @@ monitoring:
     enabled: false
   prometheus:
     namespace: kube-prometheus-stack
+  loki:
+    enabled: false
+    url: http://loki:3100
+    exporter:
+      image: grafana/promtail:main-60ea954
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 0.1
+        limits:
+          memory: 256Mi
+          cpu: 0.2
 
 ingress:
   enabled: false
