@@ -9,15 +9,15 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-nameOverride: ''
-fullnameOverride: ''
+nameOverride: ""
+fullnameOverride: ""
 
-externalServerName: 'localhost'
+externalServerName: "localhost"
 
 # Setting for the LifeMonitor Backend API
 backend:
-  apiUrl: ''
-  clientId: ''
+  apiUrl: ""
+  clientId: ""
 
 service:
   type: NodePort
@@ -29,6 +29,19 @@ monitoring:
     enabled: false
   prometheus:
     namespace: kube-prometheus-stack
+  loki:
+    enabled: false
+    url: http://loki:3100
+    exporter:
+      image: grafana/promtail:main-60ea954
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 0.1
+        limits:
+          memory: 256Mi
+          cpu: 0.2
 
 ingress:
   enabled: false
@@ -39,24 +52,30 @@ ingress:
   hosts:
     - host: localhost
       paths:
-        - '/'
+        - "/"
   # configure TLS for the ingress
   tls:
     - secretName: lifemonitor-web-tls
       hosts:
         - localhost
 
-resources: {}
-# We usually recommend not to specify default resources and to leave this as a conscious
-# choice for the user. This also increases chances charts run on environments with little
-# resources, such as Minikube. If you do want to specify resources, uncomment the following
-# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-# limits:
-#   cpu: 100m
-#   memory: 128Mi
-# requests:
-#   cpu: 100m
-#   memory: 128Mi
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+  requests:
+    memory: "4096Mi"
+    cpu: "1000m"
+  limits:
+    memory: "7680Mi"
+    cpu: "1800m"
 
 nodeSelector: {}
 
