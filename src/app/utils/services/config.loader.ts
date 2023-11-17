@@ -72,6 +72,15 @@ export class AppConfigLoader {
     return !this.config['production'];
   }
 
+  public get maintenanceMode(): boolean {
+    try {
+      return this.config['maintenanceMode'];
+    } catch (e) {
+      this.logger.error('Unable to load configuration from server', e);
+      return false;
+    }
+  }
+
   public get apiBaseUrl(): string {
     return this.config['apiBaseUrl'];
   }

@@ -133,11 +133,16 @@ export class AppRoutingModule implements OnInit {
             cancelText: 'Close',
             iconClass: 'fas fa-exclamation-triangle',
             enableCancel: false,
-            onCancel: () => {},
+            onCancel: () => { },
           });
         }
       }
     };
+
+    // handle maintenance mode
+    if (this.configService.maintenanceMode) {
+      return this.router.navigateByUrl('/maintenance');
+    }
   }
 
   handleRedirect(redirectTo: string = null) {
