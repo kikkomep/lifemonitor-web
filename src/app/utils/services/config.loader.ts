@@ -12,7 +12,7 @@ export class AppConfigLoader {
   // initialize logger
   private logger: Logger = LoggerManager.create('AppConfigService');
 
-  constructor() {}
+  constructor() { }
 
   public onLoad: Observable<boolean> = this.subject.asObservable();
 

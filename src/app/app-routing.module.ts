@@ -83,7 +83,7 @@ export class AppRoutingModule implements OnInit {
     private router: Router,
     private inputDialogService: InputDialogService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.logger.debug('Initializing app routing module');
