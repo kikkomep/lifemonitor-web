@@ -20,10 +20,6 @@ import { MaintenanceComponent } from './pages/maintenance/maintenance.component'
 
 const routes: Routes = [
   {
-    path: 'maintenance',
-    component: MaintenanceComponent,
-  },
-  {
     path: 'home',
     component: HomeComponent,
   },
@@ -33,6 +29,11 @@ const routes: Routes = [
     // canActivate: [AuthGuard],
     // canActivateChild: [AuthGuard],
     children: [
+      {
+        path: 'maintenance',
+        component: MaintenanceComponent,
+        pathMatch: 'full',
+      },
       {
         path: 'dashboard',
         component: DashboardComponent,
