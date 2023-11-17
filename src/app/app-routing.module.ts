@@ -16,6 +16,7 @@ import { InputDialogService } from './utils/services/input-dialog.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
+import { MaintenanceComponent } from './pages/maintenance/maintenance.component';
 
 const routes: Routes = [
   {
@@ -52,6 +53,10 @@ const routes: Routes = [
     path: 'logout',
     component: LogoutComponent,
   },
+  {
+    path: 'maintenance',
+    component: MaintenanceComponent,
+  }
   // {
   //   path: 'register',
   //   component: RegisterComponent,

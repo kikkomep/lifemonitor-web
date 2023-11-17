@@ -55,6 +55,7 @@ import { BlankComponent } from './views/blank/blank.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
+import { MaintenanceComponent } from './pages/maintenance/maintenance.component';
 
 // PrimeNG Modules
 // import { ChartModule } from 'primeng/chart';
@@ -156,6 +157,7 @@ export function initConfigService(
     LogoutComponent,
     ScrollComponent,
     BaseDataViewComponent,
+    MaintenanceComponent,
   ],
   imports: [
     // PrimeNg Modules
