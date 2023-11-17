@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppConfigService } from 'src/app/utils/services/config.service';
 
 @Component({
   selector: 'app-maintenance',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MaintenanceComponent implements OnInit {
 
-  constructor() { }
+  constructor(private appConfig: AppConfigService) { }
 
   ngOnInit(): void {
+  }
+
+  public get maintenanceMessage(): string {
+    return this.appConfig.maintenanceMessage;
   }
 
 }

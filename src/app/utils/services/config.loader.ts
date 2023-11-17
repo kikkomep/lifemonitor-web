@@ -81,6 +81,10 @@ export class AppConfigLoader {
     }
   }
 
+  public get maintenanceMessage(): string {
+    return this.config['maintenanceMessage'];
+  }
+
   public get apiBaseUrl(): string {
     return this.config['apiBaseUrl'];
   }
