@@ -41,7 +41,7 @@
         "/github/**",
         "/integrations/**",
         "/openapi.*",
-        "/metrics"
+        "/maintenance"
       ],
       "cacheConfig": {
         "strategy": "freshness",
