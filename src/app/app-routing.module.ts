@@ -138,11 +138,6 @@ export class AppRoutingModule implements OnInit {
         }
       }
     };
-
-    // handle maintenance mode
-    if (this.configService.maintenanceMode) {
-      return this.router.navigateByUrl('/maintenance');
-    }
   }
 
   handleRedirect(redirectTo: string = null) {

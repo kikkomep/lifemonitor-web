@@ -1,10 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SwUpdate, UpdateAvailableEvent } from '@angular/service-worker';
 
+import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { Logger, LoggerManager } from './utils/logging/index';
 import { CacheRefreshStatus } from './utils/services/cache/cache.model';
 import { CachedHttpClientService } from './utils/services/cache/cachedhttpclient.service';
+import { AppConfigService } from './utils/services/config.service';
 import { InputDialogService } from './utils/services/input-dialog.service';
 
 import {
@@ -42,7 +44,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private inputDialog: InputDialogService,
     private swUpdate: SwUpdate,
     private cachedHttpClient: CachedHttpClientService,
-    private ccService: NgcCookieConsentService
+    private ccService: NgcCookieConsentService,
+    private config: AppConfigService,
+    private router: Router
   ) {
     this.refreshStatus$ = this.cachedHttpClient.refreshProgressStatus$;
   }
@@ -51,7 +55,20 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.swUpdate.available;
   }
 
+  get maintenanceModeEnabled(): boolean {
+    return this.config.maintenanceMode;
+  }
+
   ngOnInit() {
+
+    if (this.maintenanceModeEnabled) {
+      console.log("Current route: " + this.router.url);
+      if (this.router.url !== '/maintenance'
+        && !this.router.url.startsWith('/static')) {
+        return this.router.navigateByUrl('/maintenance');
+      }
+    }
+
     if (this.swUpdate.isEnabled) {
       this.checkVersionSubscription = this.updateAvailable.subscribe(() => {
         this.inputDialog.show({
@@ -73,30 +90,30 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     // subscribe to cookieconsent observables to react to main events
-    this.popupOpenSubscription = this.ccService.popupOpen$.subscribe(() => {});
+    this.popupOpenSubscription = this.ccService.popupOpen$.subscribe(() => { });
 
     this.popupCloseSubscription = this.ccService.popupClose$.subscribe(
-      () => {}
+      () => { }
     );
 
     this.initializeSubscription = this.ccService.initializing$.subscribe(
-      (event: NgcInitializingEvent) => {}
+      (event: NgcInitializingEvent) => { }
     );
 
     this.statusChangeSubscription = this.ccService.statusChange$.subscribe(
-      (event: NgcStatusChangeEvent) => {}
+      (event: NgcStatusChangeEvent) => { }
     );
 
     this.revokeChoiceSubscription = this.ccService.revokeChoice$.subscribe(
-      () => {}
+      () => { }
     );
 
     this.noCookieLawSubscription = this.ccService.noCookieLaw$.subscribe(
-      (event: NgcNoCookieLawEvent) => {}
+      (event: NgcNoCookieLawEvent) => { }
     );
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   ngOnDestroy() {
     if (this.checkVersionSubscription) {
