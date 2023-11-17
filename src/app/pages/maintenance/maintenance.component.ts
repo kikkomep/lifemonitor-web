@@ -11,6 +11,9 @@ export class MaintenanceComponent implements OnInit {
   constructor(private appConfig: AppConfigService) { }
 
   ngOnInit(): void {
+    if (!this.appConfig.maintenanceMode) {
+      window.location.href = '/';
+    }
   }
 
   public get maintenanceMessage(): string {
