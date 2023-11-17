@@ -40,8 +40,7 @@
         "/socket.io/**",
         "/github/**",
         "/integrations/**",
-        "/openapi.*",
-        "/maintenance"
+        "/openapi.*"
       ],
       "cacheConfig": {
         "strategy": "freshness",
