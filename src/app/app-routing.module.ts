@@ -56,7 +56,7 @@ const routes: Routes = [
   {
     path: 'maintenance',
     component: MaintenanceComponent,
-  }
+  },
   // {
   //   path: 'register',
   //   component: RegisterComponent,
