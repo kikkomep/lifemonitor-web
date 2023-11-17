@@ -20,6 +20,10 @@ import { MaintenanceComponent } from './pages/maintenance/maintenance.component'
 
 const routes: Routes = [
   {
+    path: 'maintenance',
+    component: MaintenanceComponent,
+  },
+  {
     path: 'home',
     component: HomeComponent,
   },
@@ -52,11 +56,7 @@ const routes: Routes = [
   {
     path: 'logout',
     component: LogoutComponent,
-  },
-  {
-    path: 'maintenance',
-    component: MaintenanceComponent,
-  },
+  },  
   // {
   //   path: 'register',
   //   component: RegisterComponent,
