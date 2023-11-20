@@ -16,6 +16,7 @@ import { InputDialogService } from './utils/services/input-dialog.service';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { SuiteComponent } from './views/suite/suite.component';
 import { WorkflowComponent } from './views/workflow/workflow.component';
+import { MaintenanceComponent } from './pages/maintenance/maintenance.component';
 
 const routes: Routes = [
   {
@@ -28,6 +29,11 @@ const routes: Routes = [
     // canActivate: [AuthGuard],
     // canActivateChild: [AuthGuard],
     children: [
+      {
+        path: 'maintenance',
+        component: MaintenanceComponent,
+        pathMatch: 'full',
+      },
       {
         path: 'dashboard',
         component: DashboardComponent,
@@ -51,7 +57,7 @@ const routes: Routes = [
   {
     path: 'logout',
     component: LogoutComponent,
-  },
+  },  
   // {
   //   path: 'register',
   //   component: RegisterComponent,
@@ -83,7 +89,7 @@ export class AppRoutingModule implements OnInit {
     private router: Router,
     private inputDialogService: InputDialogService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.logger.debug('Initializing app routing module');
@@ -133,7 +139,7 @@ export class AppRoutingModule implements OnInit {
             cancelText: 'Close',
             iconClass: 'fas fa-exclamation-triangle',
             enableCancel: false,
-            onCancel: () => {},
+            onCancel: () => { },
           });
         }
       }

@@ -7,6 +7,7 @@ import { User } from 'src/app/models/user.modes';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { ApiService } from 'src/app/utils/services/api.service';
 import { AppService } from './../../utils/services/app.service';
+import { AppConfigService } from 'src/app/utils/services/config.service';
 
 @Component({
   selector: 'app-main',
@@ -27,8 +28,9 @@ export class MainComponent implements OnInit {
     private router: Router,
     private renderer: Renderer2,
     private apiService: ApiService,
-    private appService: AppService
-  ) {}
+    private appService: AppService,
+    private appConfig: AppConfigService
+  ) { }
 
   ngOnInit() {
     this.renderer.removeClass(document.querySelector('app-root'), 'login-page');
@@ -77,6 +79,10 @@ export class MainComponent implements OnInit {
           );
         }
       });
+  }
+
+  get maintenanceMode(): boolean {
+    return this.appConfig.maintenanceMode;
   }
 
   mainSidebarHeight(height) {

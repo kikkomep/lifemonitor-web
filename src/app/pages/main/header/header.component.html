@@ -35,7 +35,8 @@
     /> -->
   </a>
 
-  <a *ngIf="!isUserLogged" [routerLink]="['/login']" class="btn btn-primary btn-lg mr-4" role="button">
+  <a *ngIf="!isUserLogged && !maintenanceMode" [routerLink]="['/login']" class="btn btn-primary btn-lg mr-4"
+    role="button">
     <i class="fas fa-sign-in-alt mr-2"></i>Sign In
   </a>
 

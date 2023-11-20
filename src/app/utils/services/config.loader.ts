@@ -12,7 +12,7 @@ export class AppConfigLoader {
   // initialize logger
   private logger: Logger = LoggerManager.create('AppConfigService');
 
-  constructor() {}
+  constructor() { }
 
   public onLoad: Observable<boolean> = this.subject.asObservable();
 
@@ -70,6 +70,19 @@ export class AppConfigLoader {
 
   public get developmentMode(): boolean {
     return !this.config['production'];
+  }
+
+  public get maintenanceMode(): boolean {
+    try {
+      return this.config['maintenanceMode'];
+    } catch (e) {
+      this.logger.error('Unable to load configuration from server', e);
+      return false;
+    }
+  }
+
+  public get maintenanceMessage(): string {
+    return this.config['maintenanceMessage'];
   }
 
   public get apiBaseUrl(): string {

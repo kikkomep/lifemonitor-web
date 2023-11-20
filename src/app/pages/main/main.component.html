@@ -10,7 +10,7 @@
     (mainSidebarHeight)="mainSidebarHeight($event)"
   ></app-menu-sidebar>-->
 
-  <div #contentWrapper class="content-wrapper" >
+  <div #contentWrapper [ngClass]="{'content-wrapper': !maintenanceMode}">
     <router-outlet></router-outlet>
   </div>
 

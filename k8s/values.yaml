@@ -14,6 +14,11 @@ fullnameOverride: ''
 
 externalServerName: 'localhost'
 
+# Manage maintenance mode
+maintenanceMode:
+  enabled: false
+  # message: "The service is currently under maintenance. Please try again later."
+
 # Setting for the LifeMonitor Backend API
 backend:
   apiUrl: 'https://api.lifemonitor.eu'
