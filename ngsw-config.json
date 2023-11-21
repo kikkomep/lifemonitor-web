@@ -33,14 +33,14 @@
       "name": "api",
       "urls": [
         "/api/**",
+        "/error/**",
         "/account/**",
         "/oauth2/**",
         "/jobs/**",
         "/socket.io/**",
         "/github/**",
         "/integrations/**",
-        "/openapi.*",
-        "/metrics"
+        "/openapi.*"
       ],
       "cacheConfig": {
         "strategy": "freshness",

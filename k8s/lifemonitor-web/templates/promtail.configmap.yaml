@@ -1,0 +1,41 @@
+{{- if .Values.monitoring.loki.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ include "lifemonitor-web.fullname" . }}-promtail-configmap"
+data:
+  promtail.yaml: |
+    server:
+      http_listen_port: 9080
+      grpc_listen_port: 0
+      log_level: "debug"
+    positions:
+      filename: /tmp/positions.yaml
+    clients: # Specify target
+      - url: {{ $.Values.monitoring.loki.url }}/loki/api/v1/push
+    scrape_configs:
+      - job_name:  "lifemonitor-app-proxy-logger" 
+        static_configs:
+          - targets:
+              - localhost 
+            labels:
+              app: "lifemonitor-webapp"
+              component: "{{$.Release.Name}}-proxy"
+              environment: "{{$.Release.Namespace}}"
+              format: "extended"
+              level: "INFO"
+              __path__: /var/log/nginx/access.log
+          - targets: 
+              - localhost 
+            labels:
+              app: "lifemonitor-webapp"
+              component: "{{ $.Release.Name }}-proxy"
+              environment: "{{ $.Release.Namespace }}"
+              format: "extended"
+              level: "ERROR"
+              __path__: /var/log/nginx/*error.log          
+        pipeline_stages:
+        - drop:
+            expression: ".*(DEBUG|health|heartbeat).*"
+{{- end }}

@@ -12,6 +12,8 @@ data:
     {
         "apiBaseUrl": "https://{{ .Values.externalServerName }}/api",
         "appDomain": "{{ .Values.externalServerName }}",
-        "socketBaseUrl": "https://{{ .Values.externalServerName }}"{{ if .Values.backend.clientId }},{{ end }}
-        {{ if .Values.backend.clientId }}"clientId": "{{ .Values.backend.clientId }}"{{ end }}
+        "socketBaseUrl": "https://{{ .Values.externalServerName }}"
+        {{- if .Values.backend.clientId }}, "clientId": "{{ .Values.backend.clientId }}"{{ end }}
+        {{- if .Values.maintenanceMode.enabled }}, "maintenanceMode": "true"{{ end }}
+        {{- if .Values.maintenanceMode.message }}, "maintenanceMessage":"{{.Values.maintenanceMode.message}}"{{ end }}
     }
