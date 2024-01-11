@@ -39,6 +39,8 @@ COM_MAP = {
     ".js": ("/*", "*/"),
     ".html": ("<!--", "-->"),
     ".css": ("/*", "*/"),
+    ".yaml": "#",
+    ".yml": "#",
 }
 EXCLUDE_FILES = set()
 EXCLUDE_DIRS = {"build", "dist", "venv", "node_modules"}
