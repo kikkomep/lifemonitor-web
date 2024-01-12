@@ -1,6 +1,6 @@
 {
   "name": "lifemonitor",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "scripts": {
     "start": "ng build --configuration production && http-server -p 4202 --ssl -C ./certs/lm.crt -K ./certs/lm.key --host lm dist/lifemonitor",
     "start:dev": "ng serve --port 4200 --ssl --ssl-key ./certs/lm.key --ssl-cert ./certs/lm.crt --host lm",
