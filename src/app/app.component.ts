@@ -21,7 +21,7 @@ SOFTWARE.
 */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SwUpdate, UpdateAvailableEvent } from '@angular/service-worker';
+import { SwUpdate, VersionEvent } from '@angular/service-worker';
 
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
@@ -73,8 +73,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.refreshStatus$ = this.cachedHttpClient.refreshProgressStatus$;
   }
 
-  get updateAvailable(): Observable<UpdateAvailableEvent> {
-    return this.swUpdate.available;
+  get updateAvailable(): Observable<VersionEvent> {
+    return this.swUpdate.versionUpdates;
   }
 
   get maintenanceModeEnabled(): boolean {
