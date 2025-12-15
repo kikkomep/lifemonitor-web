@@ -21,17 +21,14 @@ SOFTWARE.
 */
 
 import { Injectable } from '@angular/core';
-import {
-  ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot,
-  UrlTree
-} from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AppService } from '../services/app.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class WfGuard implements CanActivate {
+export class WfGuard  {
   constructor(private appService: AppService) {}
   canActivate(
     route: ActivatedRouteSnapshot,

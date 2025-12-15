@@ -21,7 +21,7 @@ SOFTWARE.
 */
 
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { ApplicationRef, Injectable } from '@angular/core';
 
 import { BehaviorSubject, from, Observable, Subject, Subscription } from 'rxjs';
 import { Job } from 'src/app/models/job.model';
@@ -116,7 +116,8 @@ export class CachedHttpClientService {
     private http: HttpClient,
     private config: AppConfigService,
     private dialog: InputDialogService,
-    private authService: AuthService // private socket: ApiSocketService
+    private authService: AuthService, // private socket: ApiSocketService
+    private appRef: ApplicationRef
   ) {
     // this.syncInterval = Number(this.config.getConfig()['syncInterval']);
   }
@@ -144,7 +145,7 @@ export class CachedHttpClientService {
 
     // setup network listener
     this.setUpWorkerMessageHandler(worker);
-    this.socket = new ApiSocket(this.config, this, worker);
+    this.socket = new ApiSocket(this.config, this, worker, this.appRef);
     this.socket.connect();
 
     this.cache.onCacheEntryUpdated = (
