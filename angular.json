@@ -112,14 +112,14 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "lifemonitor:build"
+            "buildTarget": "lifemonitor:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "lifemonitor:build:production"
+              "buildTarget": "lifemonitor:build:production"
             },
             "development": {
-              "browserTarget": "lifemonitor:build:development"
+              "buildTarget": "lifemonitor:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -127,7 +127,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "lifemonitor:build"
+            "buildTarget": "lifemonitor:build"
           }
         },
         "test": {
