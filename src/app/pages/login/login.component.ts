@@ -21,7 +21,7 @@ SOFTWARE.
 */
 
 import { Component, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from 'src/app/utils/services/app.service';
 
@@ -36,7 +36,7 @@ import { User } from 'src/app/models/user.modes';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  public loginForm: FormGroup;
+  public loginForm: UntypedFormGroup;
   public isAuthLoading = false;
   private previousToast: ActiveToast<any> = null;
   private userLoggedSubscription: Subscription;
