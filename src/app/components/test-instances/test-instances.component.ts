@@ -223,7 +223,7 @@ export class TestInstancesComponent implements OnInit, OnChanges {
 
   public showTestInstanceDetails(instance: TestInstance) {
     this.clickHandler.click(() => {
-      window.open(instance.externalLink, '_blank');
+      window.open(instance.externalLink as string, '_blank');
     });
   }
 }

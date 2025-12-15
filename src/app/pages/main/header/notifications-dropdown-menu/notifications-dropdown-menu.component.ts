@@ -135,8 +135,8 @@ export class NotificationsDropdownMenuComponent implements OnInit {
       if (
         n.data &&
         'build' in n.data &&
-        'suite' in n.data['build'] &&
-        'workflow' in n.data['build']
+        'suite' in (n.data['build'] as object) &&
+        'workflow' in (n.data['build'] as object)
       ) {
         suite = this.appService.findTestSuite(
           n.data['build']['suite']['uuid'],

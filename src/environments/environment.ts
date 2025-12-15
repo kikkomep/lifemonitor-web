@@ -28,18 +28,18 @@ export const environment = {
   // set the app mode
   production: false,
   // set the app domain (required to set the cookie)
-  appDomain: 'lifemonitor.eu',
+  // appDomain: 'lifemonitor.eu',
   // 'logLevel': the log level of the application
-  logLevel: 'INFO',
+  logLevel: 'DEBUG',
   // 'apiBaseUrl': base URL of the LifeMonitor API instance
   //               (e.g., https://api.lifemonitor.eu)
-  apiBaseUrl: '<LIFEMONITOR_API_BASE_URL>',
+  // apiBaseUrl: '<LIFEMONITOR_API_BASE_URL>',
   // 'socketBaseUrl': base URL of the LifeMonitor Socket endpoint
   //               (e.g., https://api.lifemonitor.eu)
-  socketBaseUrl: '<LIFEMONITOR_SOCKET_BASE_URL>',
+  // socketBaseUrl: '<LIFEMONITOR_SOCKET_BASE_URL>',
   // 'clientId': OAuth2 ClientID that can be obtained by registering
   //             an OAuth2 app with <LIFEMONITOR_API_BASE_URL>/profile -> OAuth Apps
-  clientId: '<LIFEMONITOR_OAUTH2_CLIENT_ID>',
+  // clientId: '<LIFEMONITOR_OAUTH2_CLIENT_ID>',
   // 'configFile': the path of a JSON resource containing
   //               the configuration properties that should be loaded
   //               and set without rebuild (e.g., apiBaseUrl, clientId).

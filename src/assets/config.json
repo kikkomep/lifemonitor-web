@@ -1,0 +1,15 @@
+{
+  "production": false,
+  "appDomain": "lm.mep.cloudns.cl",
+  "apiBaseUrl_": "https://mbpm1.mep.cloudns.cl:8000",
+  "__apiBaseUrl": "https://macmini.mep.cloudns.cl:8443/api",
+  "apiBaseUrl": "https://lm.mep.cloudns.cl:8000/api",
+  "socketBaseUrl": "https://lm.mep.cloudns.cl:8000/api",
+  "___apiBaseUrl": "https://lm.mep.cloudns.cl:4201/api",
+  "_apiBaseUrl": "https://lm.mep.cloudns.cl:8000",
+  "_local_clientId": "yiHA0XTnC3fu3tNjDNkoRIt2",
+  "clientId": "yiHA0XTnC3fu3tNjDNkoRIt2",
+  "_prod_clientId": "QBGbLXx2yTR8YkzPNnIEcIEC",
+  "syncInterval": 60000,
+  "logLevel": "DEBUG"
+}

@@ -116,7 +116,7 @@ export class RoCrate {
   }
 
   public get graphEntities(): [] {
-    return this.data && "@graph" in this.data ? this.data['@graph'] : null;
+    return this.data && "@graph" in this.data ? this.data['@graph'] as [] : null;
   }
 
   public listGraphEntityIdentifiers(): any[] {

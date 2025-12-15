@@ -518,7 +518,7 @@ export class WorkflowUploaderComponent
           (w: WorkflowVersion) =>
             w.version &&
             'links' in w.version &&
-            'origin' in w.version['links'] &&
+            'origin' in (w.version['links'] as object) &&
             w.version['links']['origin'] ==
               this.selectedRegistryWorkflow.links['origin']
         );
