@@ -23,7 +23,7 @@ SOFTWARE.
 import { registerLocaleData } from '@angular/common';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import localeEn from '@angular/common/locales/en';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule, inject, provideAppInitializer } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -214,18 +214,10 @@ export function initConfigService(
         // cookie consent
         NgcCookieConsentModule.forRoot(defaultCookieConfig)], providers: [
         AppConfigService,
-        {
-            provide: APP_INITIALIZER,
-            useFactory: initConfigService,
-            deps: [
-                AppConfigService,
-                NgcCookieConsentModule,
-                CachedHttpClientService,
-                AuthService,
-                ApiService,
-            ],
-            multi: true,
-        },
+        provideAppInitializer(() => {
+        const initializerFn = (initConfigService)(inject(AppConfigService), inject(NgcCookieConsentModule), inject(CachedHttpClientService), inject(AuthService), inject(ApiService));
+        return initializerFn();
+      }),
         // ApiSocketService,
         {
             // interceptor for HTTP errors

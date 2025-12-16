@@ -24,7 +24,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
-  name: 'arraySizeFilterPipe',
+    name: 'arraySizeFilterPipe',
+    standalone: false
 })
 export class ArraySizeFilterPipe implements PipeTransform {
 

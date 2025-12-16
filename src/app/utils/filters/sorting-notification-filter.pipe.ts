@@ -25,7 +25,8 @@ import { UserNotification } from 'src/app/models/notification.model';
 import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
-  name: 'sortingNotificationFilter',
+    name: 'sortingNotificationFilter',
+    standalone: false
 })
 export class SortingNotificationFilterPipe implements PipeTransform {
 

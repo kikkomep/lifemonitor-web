@@ -31,9 +31,10 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { User } from 'src/app/models/user.modes';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: false
 })
 export class LoginComponent implements OnInit, OnDestroy {
   public loginForm: UntypedFormGroup;

@@ -24,7 +24,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { Workflow } from 'src/app/models/workflow.model';
 
 @Pipe({
-  name: 'workflowOrderBy',
+    name: 'workflowOrderBy',
+    standalone: false
 })
 export class WorkflowOrderByPipe implements PipeTransform {
   private LATEST_VERSION_KEY = '__latest_version__';

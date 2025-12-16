@@ -25,7 +25,8 @@ import { AggregatedStatusStatsItem, StatsItem } from 'src/app/models/stats.model
 import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
-  name: 'itemFilterPipe',
+    name: 'itemFilterPipe',
+    standalone: false
 })
 export class ItemFilterPipe implements PipeTransform {
 

@@ -32,9 +32,10 @@ import {
 import { AuthService } from 'src/app/utils/services/auth.service';
 
 @Component({
-  selector: 'app-menu-sidebar',
-  templateUrl: './menu-sidebar.component.html',
-  styleUrls: ['./menu-sidebar.component.scss'],
+    selector: 'app-menu-sidebar',
+    templateUrl: './menu-sidebar.component.html',
+    styleUrls: ['./menu-sidebar.component.scss'],
+    standalone: false
 })
 export class MenuSidebarComponent implements OnInit, AfterViewInit {
   @ViewChild('mainSidebar', { static: false }) mainSidebar;

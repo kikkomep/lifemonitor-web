@@ -28,9 +28,10 @@ import { AppService } from 'src/app/utils/services/app.service';
 import { AppConfigService } from 'src/app/utils/services/config.service';
 
 @Component({
-  selector: 'workflow-header',
-  templateUrl: './workflow-header.component.html',
-  styleUrls: ['./workflow-header.component.scss'],
+    selector: 'workflow-header',
+    templateUrl: './workflow-header.component.html',
+    styleUrls: ['./workflow-header.component.scss'],
+    standalone: false
 })
 export class WorkflowHeaderComponent implements OnInit {
   @Input() workflow: WorkflowVersion;

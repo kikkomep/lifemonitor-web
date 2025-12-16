@@ -43,9 +43,10 @@ import { AppService } from 'src/app/utils/services/app.service';
 import { BaseDataViewComponent } from 'src/app/components/base-data-view/base-data-view.component';
 
 @Component({
-  selector: 'app-workflow',
-  templateUrl: './workflow.component.html',
-  styleUrls: ['./workflow.component.scss'],
+    selector: 'app-workflow',
+    templateUrl: './workflow.component.html',
+    styleUrls: ['./workflow.component.scss'],
+    standalone: false
 })
 export class WorkflowComponent
   extends BaseDataViewComponent

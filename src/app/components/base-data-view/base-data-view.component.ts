@@ -26,9 +26,10 @@ import { Observable, fromEvent } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-base-data-view',
-  templateUrl: './base-data-view.component.html',
-  styleUrls: ['./base-data-view.component.scss'],
+    selector: 'app-base-data-view',
+    templateUrl: './base-data-view.component.html',
+    styleUrls: ['./base-data-view.component.scss'],
+    standalone: false
 })
 export class BaseDataViewComponent implements OnInit {
   constructor(

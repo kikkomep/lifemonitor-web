@@ -45,9 +45,10 @@ declare var $: any;
 const minWidthForListLayout: number = 768;
 
 @Component({
-  selector: 'test-suites',
-  templateUrl: './test-suites.component.html',
-  styleUrls: ['./test-suites.component.scss'],
+    selector: 'test-suites',
+    templateUrl: './test-suites.component.html',
+    styleUrls: ['./test-suites.component.scss'],
+    standalone: false
 })
 export class TestSuitesComponent implements OnInit, OnChanges {
   @Input() suites: Suite[];

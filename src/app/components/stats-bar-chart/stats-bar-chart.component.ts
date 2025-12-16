@@ -43,10 +43,11 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { formatDuration } from 'src/app/utils/shared/utils';
 
 @Component({
-  selector: 'stats-bar-chart',
-  templateUrl: './stats-bar-chart.component.html',
-  styleUrls: ['./stats-bar-chart.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'stats-bar-chart',
+    templateUrl: './stats-bar-chart.component.html',
+    styleUrls: ['./stats-bar-chart.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class StatsBarChartComponent
   implements OnInit, OnChanges, AfterViewChecked {

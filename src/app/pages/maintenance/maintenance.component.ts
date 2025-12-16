@@ -24,9 +24,10 @@ import { Component, OnInit } from '@angular/core';
 import { AppConfigService } from 'src/app/utils/services/config.service';
 
 @Component({
-  selector: 'app-maintenance',
-  templateUrl: './maintenance.component.html',
-  styleUrls: ['./maintenance.component.scss']
+    selector: 'app-maintenance',
+    templateUrl: './maintenance.component.html',
+    styleUrls: ['./maintenance.component.scss'],
+    standalone: false
 })
 export class MaintenanceComponent implements OnInit {
 

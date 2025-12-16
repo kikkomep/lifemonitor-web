@@ -32,9 +32,10 @@ import { AppService } from './../../utils/services/app.service';
 import { AppConfigService } from 'src/app/utils/services/config.service';
 
 @Component({
-  selector: 'app-main',
-  templateUrl: './main.component.html',
-  styleUrls: ['./main.component.scss'],
+    selector: 'app-main',
+    templateUrl: './main.component.html',
+    styleUrls: ['./main.component.scss'],
+    standalone: false
 })
 export class MainComponent implements OnInit {
   public sidebarMenuOpened = true;

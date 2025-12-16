@@ -29,9 +29,10 @@ import { AppConfigService } from 'src/app/utils/services/config.service';
 declare var $: any;
 
 @Component({
-  selector: 'rocrate-logo',
-  templateUrl: './rocrate-logo.component.html',
-  styleUrls: ['./rocrate-logo.component.scss'],
+    selector: 'rocrate-logo',
+    templateUrl: './rocrate-logo.component.html',
+    styleUrls: ['./rocrate-logo.component.scss'],
+    standalone: false
 })
 export class RocrateLogoComponent implements OnInit {
   @Input() workflow: WorkflowVersion;

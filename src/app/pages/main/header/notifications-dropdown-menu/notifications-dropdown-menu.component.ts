@@ -40,9 +40,10 @@ import { AppService } from 'src/app/utils/services/app.service';
 import { InputDialogService } from 'src/app/utils/services/input-dialog.service';
 
 @Component({
-  selector: 'app-notifications-dropdown-menu',
-  templateUrl: './notifications-dropdown-menu.component.html',
-  styleUrls: ['./notifications-dropdown-menu.component.scss'],
+    selector: 'app-notifications-dropdown-menu',
+    templateUrl: './notifications-dropdown-menu.component.html',
+    styleUrls: ['./notifications-dropdown-menu.component.scss'],
+    standalone: false
 })
 export class NotificationsDropdownMenuComponent implements OnInit {
   @ViewChild('dropdownMenu', { static: false }) dropdownMenu: any;

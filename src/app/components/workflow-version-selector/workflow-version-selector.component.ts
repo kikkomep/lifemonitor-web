@@ -43,10 +43,11 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({
-  selector: 'workflow-version-selector',
-  templateUrl: './workflow-version-selector.component.html',
-  styleUrls: ['./workflow-version-selector.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'workflow-version-selector',
+    templateUrl: './workflow-version-selector.component.html',
+    styleUrls: ['./workflow-version-selector.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class WorkflowVersionSelectorComponent
   implements OnInit, OnChanges, OnDestroy, AfterViewChecked {

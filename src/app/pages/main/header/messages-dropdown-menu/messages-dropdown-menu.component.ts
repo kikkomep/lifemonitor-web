@@ -30,9 +30,10 @@ import {
 } from '@angular/core';
 
 @Component({
-  selector: 'app-messages-dropdown-menu',
-  templateUrl: './messages-dropdown-menu.component.html',
-  styleUrls: ['./messages-dropdown-menu.component.scss'],
+    selector: 'app-messages-dropdown-menu',
+    templateUrl: './messages-dropdown-menu.component.html',
+    styleUrls: ['./messages-dropdown-menu.component.scss'],
+    standalone: false
 })
 export class MessagesDropdownMenuComponent implements OnInit {
   @ViewChild('dropdownMenu', { static: false }) dropdownMenu;

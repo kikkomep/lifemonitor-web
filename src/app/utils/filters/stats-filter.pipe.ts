@@ -28,7 +28,8 @@ import {
 import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
-  name: 'statsFilterPipe',
+    name: 'statsFilterPipe',
+    standalone: false
 })
 export class StatsFilterPipe implements PipeTransform {
 

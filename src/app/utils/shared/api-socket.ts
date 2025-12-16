@@ -23,7 +23,7 @@ export class ApiSocket extends Socket {
       options: {
         // transports: ['websocket'],
       },
-    }, appRef);
+    });
 
     // register worker
     this.worker = worker;

@@ -39,10 +39,11 @@ import {
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 @Component({
-  selector: 'stats-pie-chart',
-  templateUrl: './stats-pie-chart.component.html',
-  styleUrls: ['./stats-pie-chart.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'stats-pie-chart',
+    templateUrl: './stats-pie-chart.component.html',
+    styleUrls: ['./stats-pie-chart.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class StatsPieChartComponent implements OnInit, OnChanges {
   _stats: AbstractStats = null;

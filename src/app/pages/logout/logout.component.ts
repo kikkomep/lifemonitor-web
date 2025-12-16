@@ -28,9 +28,10 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({
-  selector: 'app-logout',
-  templateUrl: './logout.component.html',
-  styleUrls: ['./logout.component.scss'],
+    selector: 'app-logout',
+    templateUrl: './logout.component.html',
+    styleUrls: ['./logout.component.scss'],
+    standalone: false
 })
 export class LogoutComponent implements OnInit, OnDestroy {
   // initialize logger

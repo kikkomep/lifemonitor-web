@@ -23,9 +23,10 @@ SOFTWARE.
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-button',
-  templateUrl: './app-button.component.html',
-  styleUrls: ['./app-button.component.scss'],
+    selector: 'app-button',
+    templateUrl: './app-button.component.html',
+    styleUrls: ['./app-button.component.scss'],
+    standalone: false
 })
 export class AppButtonComponent implements OnInit {
   @Input() type: string = 'button';

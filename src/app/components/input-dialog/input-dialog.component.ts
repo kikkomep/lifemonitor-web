@@ -30,9 +30,10 @@ import {
 declare var $: any;
 
 @Component({
-  selector: 'app-input-dialog',
-  templateUrl: './input-dialog.component.html',
-  styleUrls: ['./input-dialog.component.scss'],
+    selector: 'app-input-dialog',
+    templateUrl: './input-dialog.component.html',
+    styleUrls: ['./input-dialog.component.scss'],
+    standalone: false
 })
 export class InputDialogComponent implements OnInit {
   @Input() title = null;

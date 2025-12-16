@@ -53,9 +53,10 @@ interface RegistrationError {
 }
 
 @Component({
-  selector: 'app-workflow-uploader',
-  templateUrl: './workflow-uploader.component.html',
-  styleUrls: ['./workflow-uploader.component.scss'],
+    selector: 'app-workflow-uploader',
+    templateUrl: './workflow-uploader.component.html',
+    styleUrls: ['./workflow-uploader.component.scss'],
+    standalone: false
 })
 export class WorkflowUploaderComponent
   implements OnInit, AfterViewChecked, AfterViewInit {

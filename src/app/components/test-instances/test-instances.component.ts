@@ -46,9 +46,10 @@ declare var $: any;
 const minWidthForListLayout: number = 768;
 
 @Component({
-  selector: 'test-instances',
-  templateUrl: './test-instances.component.html',
-  styleUrls: ['./test-instances.component.scss'],
+    selector: 'test-instances',
+    templateUrl: './test-instances.component.html',
+    styleUrls: ['./test-instances.component.scss'],
+    standalone: false
 })
 export class TestInstancesComponent implements OnInit, OnChanges {
   @Input() workflow: WorkflowVersion;

@@ -25,7 +25,8 @@ import { StatsItem } from 'src/app/models/stats.model';
 import { Logger, LoggerManager } from '../logging';
 
 @Pipe({
-  name: 'sortingFilter',
+    name: 'sortingFilter',
+    standalone: false
 })
 export class SortingFilterPipe implements PipeTransform {
 

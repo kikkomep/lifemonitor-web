@@ -34,9 +34,10 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { Logger, LoggerManager } from 'src/app/utils/logging';
 
 @Component({
-  selector: 'item-search-bar',
-  templateUrl: './search-bar.component.html',
-  styleUrls: ['./search-bar.component.scss'],
+    selector: 'item-search-bar',
+    templateUrl: './search-bar.component.html',
+    styleUrls: ['./search-bar.component.scss'],
+    standalone: false
 })
 export class SearchBarComponent implements OnInit {
   _actualFilterValue: string;

@@ -38,9 +38,10 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({
-  selector: 'app-user-dropdown-menu',
-  templateUrl: './user-dropdown-menu.component.html',
-  styleUrls: ['./user-dropdown-menu.component.scss'],
+    selector: 'app-user-dropdown-menu',
+    templateUrl: './user-dropdown-menu.component.html',
+    styleUrls: ['./user-dropdown-menu.component.scss'],
+    standalone: false
 })
 export class UserDropdownMenuComponent implements OnInit, OnDestroy {
   public user: User;

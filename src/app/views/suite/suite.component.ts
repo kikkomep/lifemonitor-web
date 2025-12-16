@@ -39,9 +39,10 @@ import { Logger, LoggerManager } from 'src/app/utils/logging';
 import { AppService } from 'src/app/utils/services/app.service';
 
 @Component({
-  selector: 'test-suite',
-  templateUrl: './suite.component.html',
-  styleUrls: ['./suite.component.scss'],
+    selector: 'test-suite',
+    templateUrl: './suite.component.html',
+    styleUrls: ['./suite.component.scss'],
+    standalone: false
 })
 export class SuiteComponent extends BaseDataViewComponent implements OnInit {
   @Input() suite: Suite;

@@ -872,14 +872,15 @@ export class ApiService {
 
     return forkJoin(queries).pipe(
       map((result) => {
+        const results = result as any[];
         w.update(result[0]);
-        if (options.load_status) w.status = result[1];
-        this.logger.debug('The complete workflow version SUITEs', result[2]);
+        if (options.load_status) w.status = results[1];
+        this.logger.debug('The complete workflow version SUITEs', results[2]);
         w.suites = new AggregatedStatusStats(
           options.load_status && options.load_suites
-            ? result[2]
+            ? results[2]
             : options.load_suites
-            ? result[1]
+            ? results[1]
             : []
         );
         this.logger.debug('The complete workflow version', w);
