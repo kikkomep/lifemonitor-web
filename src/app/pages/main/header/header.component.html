@@ -49,31 +49,34 @@ SOFTWARE.
         height: 70px;
       " />
     <!-- <img
-      src="/assets/img/logo/lm/LifeMonitor_Text.svg"
-      style="color: white"
-      alt="LifeMonitor Web App"
-      height="2.4rem"
-      class="brand-image m-1"
+    src="/assets/img/logo/lm/LifeMonitor_Text.svg"
+    style="color: white"
+    alt="LifeMonitor Web App"
+    height="2.4rem"
+    class="brand-image m-1"
     /> -->
   </a>
 
-  <a *ngIf="!isUserLogged && !maintenanceMode" [routerLink]="['/login']" class="btn btn-primary btn-lg mr-4"
-    role="button">
-    <i class="fas fa-sign-in-alt mr-2"></i>Sign In
-  </a>
+  @if (!isUserLogged && !maintenanceMode) {
+    <a [routerLink]="['/login']" class="btn btn-primary btn-lg mr-4"
+      role="button">
+      <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+    </a>
+  }
 
   <!-- <button
-    *ngIf="isUserLogged"
-    class="navbar-toggler navbar-toggler-right"
-    type="button"
-    data-html="true"
-    data-toggle="collapse"
-    data-target=".navbar-collapse"
-    style="color: white;"
+  *ngIf="isUserLogged"
+  class="navbar-toggler navbar-toggler-right"
+  type="button"
+  data-html="true"
+  data-toggle="collapse"
+  data-target=".navbar-collapse"
+  style="color: white;"
   >
-    ☰
-  </button> -->
-  <nav *ngIf="isUserLogged" class="navbar">
+  ☰
+</button> -->
+@if (isUserLogged) {
+  <nav class="navbar">
     <ul class="nav ml-auto float-right">
       <!-- <app-messages-dropdown-menu></app-messages-dropdown-menu> -->
       <app-notifications-dropdown-menu (openUserProfile)="openUserProfile()">
@@ -81,4 +84,5 @@ SOFTWARE.
       <app-user-dropdown-menu #userDropdownMenu></app-user-dropdown-menu>
     </ul>
   </nav>
+}
 </nav>

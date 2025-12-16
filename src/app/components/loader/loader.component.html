@@ -20,23 +20,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<div *ngIf="enabled" class="row">
-  <div id="loader" [ngStyle]="{ 'margin-top': marginTop + 'px' }">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="loading">
-      <div *ngIf="loadingText" class="spinner-message text-primary font-weight-light">
-        <b [outerHTML]="loadingText"></b>
+@if (enabled) {
+  <div class="row">
+    <div id="loader" [ngStyle]="{ 'margin-top': marginTop + 'px' }">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="loading">
+        @if (loadingText) {
+          <div class="spinner-message text-primary font-weight-light">
+            <b [outerHTML]="loadingText"></b>
+          </div>
+        }
+        @if (loadingProgress) {
+          <div class="spinner-message text-primary">{{ loadingProgress }}%</div>
+        }
       </div>
-      <div *ngIf="loadingProgress" class="spinner-message text-primary">{{ loadingProgress }}%</div>
     </div>
   </div>
-</div>
+}

@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
+import { Component, Inject, OnInit, DOCUMENT } from '@angular/core';
 import { Observable, fromEvent } from 'rxjs';
 import { map } from 'rxjs/operators';
 

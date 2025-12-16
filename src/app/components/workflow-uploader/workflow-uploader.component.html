@@ -25,19 +25,27 @@ SOFTWARE.
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
-      <div *ngIf="processing()" class="overlay m-auto p-0 text-center bg-gradient-white">
-        <div style="display: table; width: 100%; height: 100%">
-          <app-loader [enabled]="processing" loadingText="... registering ..."></app-loader>
+      @if (processing()) {
+        <div class="overlay m-auto p-0 text-center bg-gradient-white">
+          <div style="display: table; width: 100%; height: 100%">
+            <app-loader [enabled]="processing" loadingText="... registering ..."></app-loader>
+          </div>
         </div>
-      </div>
+      }
 
       <div class="text-center text-primary mt-4">
-        <i *ngIf="!iconImage && iconClass" class="{{ iconClass }} {{ iconClassSize }}"></i>
-        <img *ngIf="iconImage" src="{{ iconImage }}" width="{{ iconImageSize }}">
+        @if (!iconImage && iconClass) {
+          <i class="{{ iconClass }} {{ iconClassSize }}"></i>
+        }
+        @if (iconImage) {
+          <img src="{{ iconImage }}" width="{{ iconImageSize }}">
+        }
       </div>
-      <div *ngIf="title" class="modal-header text-center m-auto">
-        <h3 class="modal-title text-weight-bold" [innerHtml]="title"></h3>
-      </div>
+      @if (title) {
+        <div class="modal-header text-center m-auto">
+          <h3 class="modal-title text-weight-bold" [innerHtml]="title"></h3>
+        </div>
+      }
       <div class="modal-body">
         <div class="card card-default">
           <div class="card-body p-0">
@@ -92,181 +100,199 @@ SOFTWARE.
                         Registry Workflow
                         <span class="text-muted" style="font-weight: normal">(e.g. workflow registered on
                           <b>WorkflowHub</b>)</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- (1a) Select workflow RO-Crate file -->
-                  <div class="p-4">
-                    <div *ngIf="source === 'remoteRoCrate'">
-                      <div class="form-group">
-                        <label for="roCrateUrl" class="m-0">
-                          Remote RO-Crate Archive (<i class="fas fa-star-of-life fa-xs text-muted"></i>)
                         </label>
-                        <div class="text-muted font-weight-light">
-                          Enter the URL of the remote RO-Crate archive
-                          <span class="font-weight-light font-italic">(e.g. https://myrepo.org/wf1.zip)</span>
-                        </div>
-                        <input type="text" name="roCrateUrl" class="form-control" id="roCrateUrl"
-                          (change)="updateRoCrateUrl($event)" placeholder="https://myrepo.org/wf1.zip"
-                          aria-describedby="roCrateUrl-error" />
-                        <span id="roCrateUrl-error" *ngIf="this.roCrateURL" class="error invalid-feedback">{{
-                          this.roCrateURL.error }}</span>
                       </div>
+                    </div>
 
-                      <!-- RO-Crate authorization header -->
-                      <div class="float-right">
-                        <a class="text-primary collapsed" data-toggle="collapse" href="#authForm" role="button"
-                          aria-expanded="false" aria-controls="Advanced Setting">
-                          Advanced Settings
-                        </a>
-                      </div>
-
-                      <div id="authForm" class="collapse form-group mt-4">
-                        <label for="workflow-auth" class="m-0">Authorization Header</label>
-                        <div class="text-muted font-weight-light">
-                          Enter the optional authorization header if required to
-                          download the RO-Crate
-                        </div>
-                        <input id="workflow-auth" type="text" name="wf-auth" [(ngModel)]="authorizationHeader"
+                    <!-- (1a) Select workflow RO-Crate file -->
+                    <div class="p-4">
+                      @if (source === 'remoteRoCrate') {
+                        <div>
+                          <div class="form-group">
+                            <label for="roCrateUrl" class="m-0">
+                              Remote RO-Crate Archive (<i class="fas fa-star-of-life fa-xs text-muted"></i>)
+                            </label>
+                            <div class="text-muted font-weight-light">
+                              Enter the URL of the remote RO-Crate archive
+                              <span class="font-weight-light font-italic">(e.g. https://myrepo.org/wf1.zip)</span>
+                            </div>
+                            <input type="text" name="roCrateUrl" class="form-control" id="roCrateUrl"
+                              (change)="updateRoCrateUrl($event)" placeholder="https://myrepo.org/wf1.zip"
+                              aria-describedby="roCrateUrl-error" />
+                            @if (this.roCrateURL) {
+                              <span id="roCrateUrl-error" class="error invalid-feedback">{{
+                              this.roCrateURL.error }}</span>
+                            }
+                          </div>
+                          <!-- RO-Crate authorization header -->
+                          <div class="float-right">
+                            <a class="text-primary collapsed" data-toggle="collapse" href="#authForm" role="button"
+                              aria-expanded="false" aria-controls="Advanced Setting">
+                              Advanced Settings
+                            </a>
+                          </div>
+                          <div id="authForm" class="collapse form-group mt-4">
+                            <label for="workflow-auth" class="m-0">Authorization Header</label>
+                            <div class="text-muted font-weight-light">
+                              Enter the optional authorization header if required to
+                              download the RO-Crate
+                            </div>
+                            <input id="workflow-auth" type="text" name="wf-auth" [(ngModel)]="authorizationHeader"
                           [ngClass]="
                             !errors['authorization']
                               ? 'form-control'
                               : 'form-control is-invalid'
                           " placeholder="Bearer xxx__ZRBhqf9eeRasjqMw90pgEeMpTZ7__"
-                          aria-describedby="workflow-auth-error" aria-invalid="true" />
-                        <span id="workflow-auth-error" class="error invalid-feedback">{{ errors['authorization']
-                          }}</span>
-                      </div>
-                    </div>
-
-                    <!-- (1b) Select workflow RO-Crate file -->
-                    <div *ngIf="source === 'localRoCrate'" class="form-group">
-                      <label for="roCrateInputFile">Local RO-Crate Archive</label>
-                      <div class="input-group">
-                        <div class="custom-file">
-                          <input type="file" class="custom-file-input" id="roCrateInputFile" name="roCrateInputFile"
-                            accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"
-                            (change)="setRoCrateFile()" />
-                          <label class="custom-file-label" for="roCrateInputFile">
-                            {{
-                            roCrateFile && roCrateFile['files']
-                            ? roCrateFile['files']['0'].name
-                            : 'Choose a file'
-                            }}
-                          </label>
+                              aria-describedby="workflow-auth-error" aria-invalid="true" />
+                            <span id="workflow-auth-error" class="error invalid-feedback">{{ errors['authorization']
+                            }}</span>
+                          </div>
                         </div>
-                      </div>
+                      }
+
+                      <!-- (1b) Select workflow RO-Crate file -->
+                      @if (source === 'localRoCrate') {
+                        <div class="form-group">
+                          <label for="roCrateInputFile">Local RO-Crate Archive</label>
+                          <div class="input-group">
+                            <div class="custom-file">
+                              <input type="file" class="custom-file-input" id="roCrateInputFile" name="roCrateInputFile"
+                                accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"
+                                (change)="setRoCrateFile()" />
+                              <label class="custom-file-label" for="roCrateInputFile">
+                                {{
+                                roCrateFile && roCrateFile['files']
+                                ? roCrateFile['files']['0'].name
+                                : 'Choose a file'
+                                }}
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      }
+
+                      <!-- (1c) Select workflow from registry -->
+                      @if (source === 'registry') {
+                        <div>
+                          <div class="form-group">
+                            <label for="registrySelector">
+                              Registry
+                              <span class="ml-1">(<i class="fas fa-star-of-life fa-xs text-muted"></i>)</span>
+                            </label>
+                            <select id="registrySelector" class="form-control selectpicker show-tick"
+                              data-live-search="true" data-header="Choose a registry" style="width: 100%"
+                              (change)="selectRegistry($event.target.value)">
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label for="registryWorkflowSelector">
+                              Workflow
+                              <span class="ml-1">(<i class="fas fa-star-of-life fa-xs text-muted"></i>)</span>
+                            </label>
+                            <select id="registryWorkflowSelector" class="form-control selectpicker show-tick"
+                              (change)="selectRegistryWorkflow($event.target.value)" style="margin: 0 auto;"
+                              data-live-search="true" data-header="Choose a workflow">
+                            </select>
+                          </div>
+                        </div>
+                      }
+
+                      <!-- (1d) Select workflow from github repository -->
                     </div>
-
-                    <!-- (1c) Select workflow from registry -->
-                    <div *ngIf="source === 'registry'">
-                      <div class="form-group">
-                        <label for="registrySelector">
-                          Registry
-                          <span class="ml-1">(<i class="fas fa-star-of-life fa-xs text-muted"></i>)</span>
-                        </label>
-                        <select id="registrySelector" class="form-control selectpicker show-tick"
-                          data-live-search="true" data-header="Choose a registry" style="width: 100%"
-                          (change)="selectRegistry($event.target.value)">
-                        </select>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="registryWorkflowSelector">
-                          Workflow
-                          <span class="ml-1">(<i class="fas fa-star-of-life fa-xs text-muted"></i>)</span>
-                        </label>
-                        <select id="registryWorkflowSelector" class="form-control selectpicker show-tick"
-                          (change)="selectRegistryWorkflow($event.target.value)" style="margin: 0 auto;"
-                          data-live-search="true" data-header="Choose a workflow">
-                        </select>
-                      </div>
-                    </div>
-
-                    <!-- (1d) Select workflow from github repository -->
                   </div>
-                </div>
 
-                <!-- PART 2: Workflow details -->
-                <div id="workflow-part" class="content px-5" role="tabpanel" aria-labelledby="workflow-part-trigger">
-                  <!-- workflow UUID -->
-                  <div *ngIf="source !== 'registry'" class="form-group mt-4">
-                    <div *ngIf="!isEditingUUID">
-                      <label for="workflow-uuid" class="m-0">UUID</label>
-                      <div class="text-muted font-weight-light small">
-                        The following identifier will be assigned to the workflow
-                        <div class="float-right">
-                          <a *ngIf="canEditUUID()" class="btn btn-sm m-2" (click)="enableEditingUUID()"
-                            title="Click to change the identifier">
-                            <i class="far fa-edit"></i> edit
-                          </a>
-                        </div>
-                      </div>
-                      <div class='mr-4 text-muted'>
-                        <div class='badge badge-primary mr-1 d-inline'>LifeMonitor ID</div>
-                        <div class="d-inline mt-3" style="font-size: large; font-weight: 100;">
-                          {{ workflowUUID }}
-                        </div>
-                      </div>
-
-                    </div>
-                    <div *ngIf="isEditingUUID">
-                      <label for="workflow-uuid" class="m-0">UUID (<i class="fas fa-star-of-life fa-xs text-muted"></i>)
-                      </label>
-                      <div class="text-muted font-weight-light">
-                        Enter a UUID for the workflow
-                      </div>
+                  <!-- PART 2: Workflow details -->
+                  <div id="workflow-part" class="content px-5" role="tabpanel" aria-labelledby="workflow-part-trigger">
+                    <!-- workflow UUID -->
+                    @if (source !== 'registry') {
+                      <div class="form-group mt-4">
+                        @if (!isEditingUUID) {
+                          <div>
+                            <label for="workflow-uuid" class="m-0">UUID</label>
+                            <div class="text-muted font-weight-light small">
+                              The following identifier will be assigned to the workflow
+                              <div class="float-right">
+                                @if (canEditUUID()) {
+                                  <a class="btn btn-sm m-2" (click)="enableEditingUUID()"
+                                    title="Click to change the identifier">
+                                    <i class="far fa-edit"></i> edit
+                                  </a>
+                                }
+                              </div>
+                            </div>
+                            <div class='mr-4 text-muted'>
+                              <div class='badge badge-primary mr-1 d-inline'>LifeMonitor ID</div>
+                              <div class="d-inline mt-3" style="font-size: large; font-weight: 100;">
+                                {{ workflowUUID }}
+                              </div>
+                            </div>
+                          </div>
+                        }
+                        @if (isEditingUUID) {
+                          <div>
+                            <label for="workflow-uuid" class="m-0">UUID (<i class="fas fa-star-of-life fa-xs text-muted"></i>)
+                          </label>
+                          <div class="text-muted font-weight-light">
+                            Enter a UUID for the workflow
+                          </div>
                       <input type="text" name="wf-uuid" [ngClass]="
                           !errors['uuid']
                             ? 'form-control'
                             : 'form-control is-invalid'
                         " id="workflow-uuid" [(ngModel)]="workflowUUID" placeholder="Enter workflow UUID"
-                        aria-describedby="workflow-uuid-error" aria-invalid="true" />
-                      <span id="workflow-uuid-error" class="error invalid-feedback">{{ errors['uuid'] }}</span>
+                            aria-describedby="workflow-uuid-error" aria-invalid="true" />
+                          <span id="workflow-uuid-error" class="error invalid-feedback">{{ errors['uuid'] }}</span>
+                        </div>
+                      }
                     </div>
-                  </div>
+                  }
 
-                  <div *ngIf="source === 'registry' && selectedRegistry" class="form-group mt-4">
-                    <label for="workflow-registry-selected" class="m-0">Registry: </label>
-                    <span class='larger'> {{ patchRegistryName(selectedRegistry.name) }} </span>
-                    <span class='ml-1 text-muted small'>
-                      <a [href]='selectedRegistry.uri'>{{ selectedRegistry.uri }}</a>
-                    </span>
-                    <div class='mr-4 text-muted'>
-                      <span class='badge badge-primary mr-1'>LifeMonitor ID</span>
-                      <span class='small'>{{ selectedRegistry.uuid }}</span>
+                  @if (source === 'registry' && selectedRegistry) {
+                    <div class="form-group mt-4">
+                      <label for="workflow-registry-selected" class="m-0">Registry: </label>
+                      <span class='larger'> {{ patchRegistryName(selectedRegistry.name) }} </span>
+                      <span class='ml-1 text-muted small'>
+                        <a [href]='selectedRegistry.uri'>{{ selectedRegistry.uri }}</a>
+                      </span>
+                      <div class='mr-4 text-muted'>
+                        <span class='badge badge-primary mr-1'>LifeMonitor ID</span>
+                        <span class='small'>{{ selectedRegistry.uuid }}</span>
+                      </div>
                     </div>
-                  </div>
+                  }
 
-                  <div *ngIf="source === 'registry' && selectedRegistryWorkflow" class="form-group mt-4">
-                    <label for="workflow-registry-selected" class="m-0">Workflow: </label>
-                    <span class='larger'> {{ selectedRegistryWorkflow.name }} </span>
-                    <div class='mr-4 text-muted'>
-                      <span class='badge badge-primary mr-1'>{{selectedRegistry.type}} ID</span>
-                      <span class='small'><a [href]='selectedRegistry.uri'>{{ selectedRegistryWorkflow.links['origin']
-                          }}</a></span>
+                  @if (source === 'registry' && selectedRegistryWorkflow) {
+                    <div class="form-group mt-4">
+                      <label for="workflow-registry-selected" class="m-0">Workflow: </label>
+                      <span class='larger'> {{ selectedRegistryWorkflow.name }} </span>
+                      <div class='mr-4 text-muted'>
+                        <span class='badge badge-primary mr-1'>{{selectedRegistry.type}} ID</span>
+                        <span class='small'><a [href]='selectedRegistry.uri'>{{ selectedRegistryWorkflow.links['origin']
+                        }}</a></span>
+                      </div>
                     </div>
-                  </div>
+                  }
 
                   <!-- workflow version -->
-                  <div *ngIf="source !== 'registry'" class="form-group mt-4">
-                    <label for="workflow-version" class="m-0">Version (<i
-                        class="fas fa-star-of-life fa-xs text-muted"></i>)</label>
-                    <div class="text-muted font-weight-light">
-                      Enter a version for the workflow (e.g.,
-                      <span class="font-italic">1.0</span>)
-                    </div>
+                  @if (source !== 'registry') {
+                    <div class="form-group mt-4">
+                      <label for="workflow-version" class="m-0">Version (<i
+                      class="fas fa-star-of-life fa-xs text-muted"></i>)</label>
+                      <div class="text-muted font-weight-light">
+                        Enter a version for the workflow (e.g.,
+                        <span class="font-italic">1.0</span>)
+                      </div>
                     <input type="text" name="wf-version" [ngClass]="
                         !errors['version']
                           ? 'form-control'
                           : 'form-control is-invalid'
                       " id="workflow-version" [(ngModel)]="workflowVersion" placeholder="Enter the workflow version"
-                      aria-describedby="workflow-version-error" aria-invalid="true" />
-                    <div id="workflow-version-error" class="error invalid-feedback">
-                      {{ errors['version'] }}
+                        aria-describedby="workflow-version-error" aria-invalid="true" />
+                      <div id="workflow-version-error" class="error invalid-feedback">
+                        {{ errors['version'] }}
+                      </div>
                     </div>
-                  </div>
+                  }
                   <!-- workflow name -->
                   <div class="form-group mt-4">
                     <label for="workflow-name" class="m-0">Name</label>
@@ -290,31 +316,39 @@ SOFTWARE.
             (<i class="fas fa-star-of-life fa-xs"></i>) required fields
           </div>
           <!-- /.card-body -->
-          <div *ngIf="registrationError" class="card-footer"
-            style="background: #ffe6e6; color: red; text-align: center">
-            <div class="text-bold">
-              <i class="fas fa-exclamation-circle mr-1"></i>
-              {{ registrationError.title }} (code: {{ registrationError.code }})
+          @if (registrationError) {
+            <div class="card-footer"
+              style="background: #ffe6e6; color: red; text-align: center">
+              <div class="text-bold">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                {{ registrationError.title }} (code: {{ registrationError.code }})
+              </div>
+              <div>{{ registrationError.message }}</div>
             </div>
-            <div>{{ registrationError.message }}</div>
-          </div>
+          }
         </div>
       </div>
       <div class="modal-footer">
         <div class="col-md-12 text-center p-2">
           <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal" style="width: 120px"
-            [innerHTML]="cancelText"></button>
-          <button *ngIf="currentStepIndex > 0" class="btn btn-lg btn-warning m-1" (click)="previous()"
-            style="width: 120px">
-            Previous
-          </button>
-          <button *ngIf="currentStepIndex != 1" class="btn btn-lg btn-primary m-1" (click)="next()" style="width: 120px"
-            [attr.disabled]="!validateWorkflowSource() ? '' : null">
-            Next
-          </button>
-          <button *ngIf="currentStepIndex == 1" id="registerWorkflow" type="button" class="btn btn-primary btn-lg"
-            style="width: 120px" (click)="confirm()" [innerHTML]="confirmText"
+          [innerHTML]="cancelText"></button>
+          @if (currentStepIndex > 0) {
+            <button class="btn btn-lg btn-warning m-1" (click)="previous()"
+              style="width: 120px">
+              Previous
+            </button>
+          }
+          @if (currentStepIndex != 1) {
+            <button class="btn btn-lg btn-primary m-1" (click)="next()" style="width: 120px"
+              [attr.disabled]="!validateWorkflowSource() ? '' : null">
+              Next
+            </button>
+          }
+          @if (currentStepIndex == 1) {
+            <button id="registerWorkflow" type="button" class="btn btn-primary btn-lg"
+              style="width: 120px" (click)="confirm()" [innerHTML]="confirmText"
             [attr.disabled]="!validateWorkflowDetails() ? '' : null"></button>
+          }
         </div>
       </div>
     </div>

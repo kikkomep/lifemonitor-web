@@ -26,12 +26,16 @@ SOFTWARE.
       <div class="col-2 align-middle header-title-icon" style="color: {{ workflow.color }}">
         <i class="{{ workflow.statusIcon }}"></i>
       </div>
-      <div *ngIf="!suite" class="col-10 header-title-text" style="color: {{ workflow.color }};">
-        {{ workflow.name }}
-      </div>
-      <div *ngIf="suite" class="col-10 header-title-text" style="color: {{ workflow.color }};">
-        {{ workflow.name }}: <span class="font-weight-bolder">{{ suite.name }}</span>
-      </div>
+      @if (!suite) {
+        <div class="col-10 header-title-text" style="color: {{ workflow.color }};">
+          {{ workflow.name }}
+        </div>
+      }
+      @if (suite) {
+        <div class="col-10 header-title-text" style="color: {{ workflow.color }};">
+          {{ workflow.name }}: <span class="font-weight-bolder">{{ suite.name }}</span>
+        </div>
+      }
     </div>
     <!-- row -->
   </div>
@@ -40,14 +44,16 @@ SOFTWARE.
 <div class="row mx-lg-2 mx-sm-0 mt-0 h-100 align-items-top" style="font-weight: 300; color: gray;">
   <div class="col-12 col-lg-9 col-xl-6">
 
-    <div *ngIf="suite" class="row" style="font-size: 1.0rem;">
-      <div class="col-2 p-0 text-center" style="max-width: 50px">
-        <i class="fas fa-solid fa-cubes"></i>
+    @if (suite) {
+      <div class="row" style="font-size: 1.0rem;">
+        <div class="col-2 p-0 text-center" style="max-width: 50px">
+          <i class="fas fa-solid fa-cubes"></i>
+        </div>
+        <div class="col-9">
+          <b>suite uuid: </b>{{ suite.uuid }}
+        </div>
       </div>
-      <div class="col-9">
-        <b>suite uuid: </b>{{ suite.uuid }}
-      </div>
-    </div>
+    }
     <!-- row -->
 
     <div class="row" style="font-size: 1.0rem;">
@@ -94,85 +100,108 @@ SOFTWARE.
     </div>
     <!-- row -->
 
-    <div *ngIf="workflow?.submitter" class="row" style="font-size: 1.0rem;">
-      <div class="col-2 p-0 text-center" style="max-width: 50px">
-        <i class="fas fa-solid fa-user"></i>
-      </div>
-      <div class="col-10">
-        <b>workflow submitter: </b>{{ workflow.submitter['username'] }}
-      </div>
-    </div>
-    <!-- row -->
-
-    <div *ngIf="workflow.version && workflow.authors && workflow.authors.length > 0" class="row"
-      style="font-size: 1.0rem;">
-      <div class="col-2 p-0 text-center" style="max-width: 50px">
-        <i class="fas fa-solid fa-users"></i>
-      </div>
-      <div class="col-10">
-        <b>workflow author<span *ngIf="workflow.authors.length > 1">s</span>: </b>
-        <div class="d-inline" *ngFor="let author of workflow.authors; index as a_index;">
-          <div *ngIf="author.url" class="d-inline">
-            <a href="{{author.url}}">{{ author.name }}</a><span class="m-0 p-0"
-              *ngIf="a_index < workflow.authors.length - 1">, </span>
-          </div>
-          <div *ngIf="!author.url" class="d-inline">{{ author.name }}<span class="m-0 p-0"
-              *ngIf="a_index < workflow.authors.length - 1">, </span>
-          </div>
+    @if (workflow?.submitter) {
+      <div class="row" style="font-size: 1.0rem;">
+        <div class="col-2 p-0 text-center" style="max-width: 50px">
+          <i class="fas fa-solid fa-user"></i>
+        </div>
+        <div class="col-10">
+          <b>workflow submitter: </b>{{ workflow.submitter['username'] }}
         </div>
       </div>
-    </div>
+    }
     <!-- row -->
 
-    <div *ngIf="workflow.basedOnLink" class="row" style="font-size: 1.0rem;">
-      <div class="col-2 p-0 text-center" style="max-width: 50px">
-        <!-- <img class="mx-3" src="/assets/img/logo/brand/github-dark.png" height="20" /> -->
-        <i class="fab fa-github" style="font-size: 1.2rem;"></i>
-      </div>
-      <div class="col-10" style="color: gray;">
-        <b>workflow based on: </b>
-        <a href="{{ workflow.basedOnLink }}" target="_blank">
-          {{workflow.basedOnLink}}
-        </a>
-      </div>
+    @if (workflow.version && workflow.authors && workflow.authors.length > 0) {
+      <div class="row"
+        style="font-size: 1.0rem;">
+        <div class="col-2 p-0 text-center" style="max-width: 50px">
+          <i class="fas fa-solid fa-users"></i>
+        </div>
+        <div class="col-10">
+          <b>workflow author@if (workflow.authors.length > 1) {
+            <span>s</span>
+          }: </b>
+          @for (author of workflow.authors; track author; let a_index = $index) {
+            <div class="d-inline">
+              @if (author.url) {
+                <div class="d-inline">
+                  <a href="{{author.url}}">{{ author.name }}</a>@if (a_index < workflow.authors.length - 1) {
+                  <span class="m-0 p-0"
+                  >, </span>
+                }
+              </div>
+            }
+            @if (!author.url) {
+              <div class="d-inline">{{ author.name }}@if (a_index < workflow.authors.length - 1) {
+                <span class="m-0 p-0"
+                >, </span>
+              }
+            </div>
+          }
+        </div>
+      }
     </div>
-    <!-- /.row -->
-
-    <div *ngFor="let r of workflow.registries" class="row" style="font-size: 1.0rem;">
-      <div class="col-2 p-0 text-center" style="max-width: 50px">
-        <img class="mx-2" src="/assets/img/logo/registries/workflowhub.svg" height="25" />
-      </div>
-      <div class="col-10" style="color: gray;">
-        <b>workflow registered on {{ r.name }}: </b>
-        <a href="{{ workflow.getRegistryLink(r.identifier) }}" target="_blank">
-          {{workflow.getRegistryLink(r.identifier)}}
-          <i class="fas fa-xs fa-external-link-alt mx-2"></i>
-        </a>
-      </div>
-    </div>
-    <!-- /.row -->
-
-    <div *ngIf="workflow.basedOnLink" class="row" style="font-size: 1.0rem;">
-      <div class="col-2 p-0 text-center" style="max-width: 50px">
-        <img class="" src="/assets/img/logo/crates/ro-crate-w-text.png" height="25" />
-        <!-- <i class="fab fa-github ml-3"></i> -->
-      </div>
-      <div class="col-10" style="color: gray;">
-        <b>workflow ROCrate: </b>
-        <a href="{{roCrateDownloadUrl}}" (click)="downloadROCrate()">
-          {{roCrateDownloadUrl}}
-        </a>
-      </div>
-    </div>
-    <!-- /.row -->
   </div>
-  <!-- /.col -->
+}
+<!-- row -->
 
-  <!-- TODO: fix alignment with more than 2 registries -->
-  <div class="col-12 col-lg-3 col-xl-6 d-none d-lg-block">
-    <div class="d-flex flex-row justify-content-end align-items-end">
+@if (workflow.basedOnLink) {
+  <div class="row" style="font-size: 1.0rem;">
+    <div class="col-2 p-0 text-center" style="max-width: 50px">
+      <!-- <img class="mx-3" src="/assets/img/logo/brand/github-dark.png" height="20" /> -->
+      <i class="fab fa-github" style="font-size: 1.2rem;"></i>
+    </div>
+    <div class="col-10" style="color: gray;">
+      <b>workflow based on: </b>
+      <a href="{{ workflow.basedOnLink }}" target="_blank">
+        {{workflow.basedOnLink}}
+      </a>
+    </div>
+  </div>
+}
+<!-- /.row -->
 
-      <div class="xcol-xl-4 d-none d-xl-inline-block" *ngIf="firstRegistry">
+@for (r of workflow.registries; track r) {
+  <div class="row" style="font-size: 1.0rem;">
+    <div class="col-2 p-0 text-center" style="max-width: 50px">
+      <img class="mx-2" src="/assets/img/logo/registries/workflowhub.svg" height="25" />
+    </div>
+    <div class="col-10" style="color: gray;">
+      <b>workflow registered on {{ r.name }}: </b>
+      <a href="{{ workflow.getRegistryLink(r.identifier) }}" target="_blank">
+        {{workflow.getRegistryLink(r.identifier)}}
+        <i class="fas fa-xs fa-external-link-alt mx-2"></i>
+      </a>
+    </div>
+  </div>
+}
+<!-- /.row -->
+
+@if (workflow.basedOnLink) {
+  <div class="row" style="font-size: 1.0rem;">
+    <div class="col-2 p-0 text-center" style="max-width: 50px">
+      <img class="" src="/assets/img/logo/crates/ro-crate-w-text.png" height="25" />
+      <!-- <i class="fab fa-github ml-3"></i> -->
+    </div>
+    <div class="col-10" style="color: gray;">
+      <b>workflow ROCrate: </b>
+      <a href="{{roCrateDownloadUrl}}" (click)="downloadROCrate()">
+        {{roCrateDownloadUrl}}
+      </a>
+    </div>
+  </div>
+}
+<!-- /.row -->
+</div>
+<!-- /.col -->
+
+<!-- TODO: fix alignment with more than 2 registries -->
+<div class="col-12 col-lg-3 col-xl-6 d-none d-lg-block">
+  <div class="d-flex flex-row justify-content-end align-items-end">
+
+    @if (firstRegistry) {
+      <div class="xcol-xl-4 d-none d-xl-inline-block">
         <a style="margin-top: 25px;" class="hvr-float-shadow" data-html="true" data-toggle="tooltip" target="_blank"
           tooltipPosition="bottom"
           pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to see the workflow on <b>{{firstRegistry.name}}</b> registry<i class='fas fa-sm fa-external-link-alt mx-1'></i></div>"
@@ -184,9 +213,11 @@ SOFTWARE.
           </div>
         </a>
       </div>
-      <!-- /.row -->
+    }
+    <!-- /.row -->
 
-      <div *ngIf="workflow.githubOrigin" class="xcol-xl-4 d-none d-xl-inline-block">
+    @if (workflow.githubOrigin) {
+      <div class="xcol-xl-4 d-none d-xl-inline-block">
         <a style="margin-top: 40px;" class="hvr-float-shadow" data-html="true" data-toggle="tooltip" target="_blank"
           tooltipPosition="bottom"
           pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to see the workflow on <b>GitHub</b><i class='fas fa-sm fa-external-link-alt mx-1'></i></div>"
@@ -198,16 +229,17 @@ SOFTWARE.
           </div>
         </a>
       </div>
-      <!-- /.col -->
+    }
+    <!-- /.col -->
 
-      <div class="xcol-lg-12 col-xl-4 d-none d-lg-inline-block text-center ml-5 mr-0">
-        <div class="row" style="min-width: 190px;">
-          <rocrate-logo [workflow]="workflow"></rocrate-logo>
-        </div>
+    <div class="xcol-lg-12 col-xl-4 d-none d-lg-inline-block text-center ml-5 mr-0">
+      <div class="row" style="min-width: 190px;">
+        <rocrate-logo [workflow]="workflow"></rocrate-logo>
       </div>
-      <!-- /.col -->
     </div>
-    <!-- /.row -->
+    <!-- /.col -->
   </div>
+  <!-- /.row -->
+</div>
 </div>
 <!-- /.row -->

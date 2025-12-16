@@ -27,10 +27,11 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
+  DOCUMENT
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { DOCUMENT, Location, ViewportScroller } from '@angular/common';
+import { Location, ViewportScroller } from '@angular/common';
 import {
   AggregatedStatusStatsItem,
   AggregatedTestStatusMap,

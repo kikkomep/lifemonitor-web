@@ -27,49 +27,58 @@ SOFTWARE.
 </div>
 
 
-<div *ngIf="suites" class="card">
-  <div *ngIf="!suites" class="overlay dark">
-    <i class="fas fa-3x fa-sync-alt"></i>
-  </div>
-  <p-dataView #suitesDataView [value]="suites" [paginator]="true" [rows]="10" layout="list">
-    <ng-template pTemplate="header">
-      <div class="d-block m-0 p-0">
-        <div class="text-center text-md-right p-4">
-          <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
-        </div>
-        <div class="d-flex m-0 p-0">
-          <div class="d-inline row suite-list-item mt-4" *ngIf="dataView && dataView.layout === 'list'">
-            <div class="d-inline-block col-sm-1 col-md-1 col-xl-1 suite-list-item-header"></div>
-            <div class="d-inline-block col-sm-11 col-md-5 col-lg-4 col-xl-4 suite-list-item-header text-left">Workflow
-            </div>
-            <div class="d-none d-xl-inline-block col-xl-1 suite-list-item-header m-auto">Engine</div>
-            <div class="d-none d-lg-inline-block col-lg-2 col-xl-2 suite-list-item-header m-auto">Test Instances</div>
-            <div class="d-none d-md-inline-block col-md-6 col-lg-5 col-xl-4 suite-list-item-header m-auto">Latest Test
-              Builds
-            </div>
-          </div>
-        </div>
+@if (suites) {
+  <div class="card">
+    @if (!suites) {
+      <div class="overlay dark">
+        <i class="fas fa-3x fa-sync-alt"></i>
       </div>
-    </ng-template>
-    <ng-template let-suite pTemplate="listItem">
-      <div class="d-flex">
-        <div class="d-inline-flex row suite-list-item">
-          <div class="cd-inline-block col-sm-1 col-md-1 col-lg-1 col-xl-1 text-center">
-            <div class="suite-list-item-status" [ngClass]="suite.class" [pTooltip]="suite.statusText"
-              tooltipPosition="top" showDelay="1500">
-              <i class="{{ suite.statusIcon }} fa-2x"></i>
-            </div>
+    }
+    <p-dataView #suitesDataView [value]="suites" [paginator]="true" [rows]="10" layout="list">
+      <ng-template pTemplate="header">
+        <div class="d-block m-0 p-0">
+          <div class="text-center text-md-right p-4">
+            <p-dataViewLayoutOptions></p-dataViewLayoutOptions>
           </div>
-          <div class="d-inline-block col-sm-11 col-md-5 col-lg-4 col-xl-4">
-            <div class="suite-name">
-              <input *ngIf="suite.editingMode" type="text" [(ngModel)]="suite.name" autofocus
-                class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
-                placeholder="Enter suite name" (keyup.enter)="updateSuite(suite)" (keyup.esc)="restoreSuite(suite)">
-              <a *ngIf="!suite.editingMode" (click)="showSuiteDetails(suite)" (dblclick)="enableSuiteEditing(suite)"
+          <div class="d-flex m-0 p-0">
+            @if (dataView && dataView.layout === 'list') {
+              <div class="d-inline row suite-list-item mt-4">
+                <div class="d-inline-block col-sm-1 col-md-1 col-xl-1 suite-list-item-header"></div>
+                <div class="d-inline-block col-sm-11 col-md-5 col-lg-4 col-xl-4 suite-list-item-header text-left">Workflow
+                </div>
+                <div class="d-none d-xl-inline-block col-xl-1 suite-list-item-header m-auto">Engine</div>
+                <div class="d-none d-lg-inline-block col-lg-2 col-xl-2 suite-list-item-header m-auto">Test Instances</div>
+                <div class="d-none d-md-inline-block col-md-6 col-lg-5 col-xl-4 suite-list-item-header m-auto">Latest Test
+                  Builds
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </ng-template>
+      <ng-template let-suite pTemplate="listItem">
+        <div class="d-flex">
+          <div class="d-inline-flex row suite-list-item">
+            <div class="cd-inline-block col-sm-1 col-md-1 col-lg-1 col-xl-1 text-center">
+              <div class="suite-list-item-status" [ngClass]="suite.class" [pTooltip]="suite.statusText"
+                tooltipPosition="top" showDelay="1500">
+                <i class="{{ suite.statusIcon }} fa-2x"></i>
+              </div>
+            </div>
+            <div class="d-inline-block col-sm-11 col-md-5 col-lg-4 col-xl-4">
+              <div class="suite-name">
+                @if (suite.editingMode) {
+                  <input type="text" [(ngModel)]="suite.name" autofocus
+                    class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
+                    placeholder="Enter suite name" (keyup.enter)="updateSuite(suite)" (keyup.esc)="restoreSuite(suite)">
+                }
+                @if (!suite.editingMode) {
+                  <a (click)="showSuiteDetails(suite)" (dblclick)="enableSuiteEditing(suite)"
                 data-html="true" data-toggle="tooltip" tooltipPosition="top" showDelay="1500" pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to see <b>instances</b><i class='fas fa-external-link-alt mx-1'></i>
                   {{ isEditable(suite) ? 'or double click to edit' : ''}}</div>">
                 {{suite.name}}
               </a>
+}
             </div>
             <div class="suite-uuid text-sm">
               <i class="fas fa-xs fa-solid fa-fingerprint mr-1"></i>
@@ -79,8 +88,12 @@ SOFTWARE.
           <div class="d-none d-xl-inline-block col-xl-1 text-center m-auto">
             <!-- <div class="text-sm">engine</div> -->
             <div class="suite-list-item-engine-type">
-              <img *ngIf="suite.engineIcon" src="{{ suite.engineIcon }}" />
-              <i *ngIf="!suite.engineIcon" class="far fa-question-circle fa-2x text-muted"></i>
+              @if (suite.engineIcon) {
+<img src="{{ suite.engineIcon }}" />
+}
+              @if (!suite.engineIcon) {
+<i class="far fa-question-circle fa-2x text-muted"></i>
+}
             </div>
           </div>
           <div class="d-none d-lg-inline-block col-lg-2 col-xl-2 text-center m-auto">
@@ -96,7 +109,6 @@ SOFTWARE.
                 (selectedItem)="selectTestBuild($event)" [showTitle]="false"></stats-bar-chart>
             </div>
           </div>
-
         </div>
       </div>
     </ng-template>
@@ -104,9 +116,11 @@ SOFTWARE.
       <div class="col-lg-4 col-md-6 d-inline-block">
         <div class="suite-grid-item">
           <div class="suite-grid-item-top">
-            <div class="suite-grid-item-edit-action" *ngIf="isEditable(suite)">
-              <i class="far fa-edit" aria-hidden="true" (click)="enableSuiteEditing(suite)"></i>
-            </div>
+            @if (isEditable(suite)) {
+              <div class="suite-grid-item-edit-action">
+                <i class="far fa-edit" aria-hidden="true" (click)="enableSuiteEditing(suite)"></i>
+              </div>
+            }
           </div>
           <div class="suite-grid-item-content">
             <div class="suite-grid-item-status" [ngClass]="suite.class">
@@ -114,14 +128,18 @@ SOFTWARE.
             </div>
             <!-- Suite Name -->
             <div class="suite-name">
-              <input *ngIf="suite.editingMode" type="text" [(ngModel)]="suite.name" autofocus
-                class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
-                placeholder="Enter suite name" (keyup.enter)="updateSuite(suite)" (keyup.esc)="restoreSuite(suite)">
-              <a *ngIf="!suite.editingMode" (click)="showSuiteDetails(suite)" (dblclick)="enableSuiteEditing(suite)"
+              @if (suite.editingMode) {
+                <input type="text" [(ngModel)]="suite.name" autofocus
+                  class="form-control datatable-input-no-border" aria-describedby="suiteNameInput"
+                  placeholder="Enter suite name" (keyup.enter)="updateSuite(suite)" (keyup.esc)="restoreSuite(suite)">
+              }
+              @if (!suite.editingMode) {
+                <a (click)="showSuiteDetails(suite)" (dblclick)="enableSuiteEditing(suite)"
                 data-html="true" data-toggle="tooltip" tooltipPosition="right" pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i>click to see <b>instances</b> <i class='fas fa-external-link-alt mx-1'></i>
                     {{ isEditable(suite) ? 'or double click to edit' : ''}}</div>">
                 {{suite.name}}
               </a>
+}
             </div>
 
             <!-- Suite Identifier -->
@@ -134,8 +152,12 @@ SOFTWARE.
             <div class="suite-grid-item-engine">
               <div class="text-sm">engine</div>
               <div class="suite-grid-item-engine-type">
-                <img *ngIf="suite.engineIcon" src="{{ suite.engineIcon }}" />
-                <i *ngIf="!suite.engineIcon" class="far fa-question-circle fa-2x text-muted"></i>
+                @if (suite.engineIcon) {
+<img src="{{ suite.engineIcon }}" />
+}
+                @if (!suite.engineIcon) {
+<i class="far fa-question-circle fa-2x text-muted"></i>
+}
               </div>
             </div>
 
@@ -148,26 +170,26 @@ SOFTWARE.
                 <a [routerLink]="['/suite', { s: suite.asUrlParam() }]">
                   <stats-pie-chart [stats]="suite.instances" [titleText]="'# of test instances'"
                     [showTitle]="true"></stats-pie-chart>
-                </a>
-              </div>
-            </div>
-
-            <!-- Engine Type -->
-            <div class="suite-grid-item-builds">
-              <div class="text-smx">Latest Test Builds</div>
-              <div class="suite-grid-item-builds-chart">
-                <stats-bar-chart [stats]="suite.getLatestBuilds() | arraySizeFilterPipe: 10"
-                  (selectedItem)="selectTestBuild($event)" chartWidth="fit-content">
-                </stats-bar-chart>
-              </div>
+              </a>
             </div>
           </div>
-          <div class="suite-grid-item-bottom">
-            <button pButton type="button" iconPos="left" class="p-button-md" label="Details" icon="fa fa-info-circle"
-              (click)="showSuiteDetails(suite)"></button>
+          <!-- Engine Type -->
+          <div class="suite-grid-item-builds">
+            <div class="text-smx">Latest Test Builds</div>
+            <div class="suite-grid-item-builds-chart">
+              <stats-bar-chart [stats]="suite.getLatestBuilds() | arraySizeFilterPipe: 10"
+                (selectedItem)="selectTestBuild($event)" chartWidth="fit-content">
+              </stats-bar-chart>
+            </div>
           </div>
         </div>
+        <div class="suite-grid-item-bottom">
+          <button pButton type="button" iconPos="left" class="p-button-md" label="Details" icon="fa fa-info-circle"
+          (click)="showSuiteDetails(suite)"></button>
+        </div>
       </div>
-    </ng-template>
-  </p-dataView>
+    </div>
+  </ng-template>
+</p-dataView>
 </div>
+}

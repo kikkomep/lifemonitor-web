@@ -25,37 +25,51 @@ SOFTWARE.
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <div *ngIf="title" class="modal-header">
-        <h5 class="modal-title" [innerHTML]="title"></h5>
-      </div>
+      @if (title) {
+        <div class="modal-header">
+          <h5 class="modal-title" [innerHTML]="title"></h5>
+        </div>
+      }
       <div class="modal-body">
-        <button *ngIf="enableClose" type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        @if (enableClose) {
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        }
 
-        <div *ngIf="!iconImage" class="text-center p-5 text-primary">
-          <i class="{{iconClass}} {{iconClassSize}}"></i>
-        </div>
+        @if (!iconImage) {
+          <div class="text-center p-5 text-primary">
+            <i class="{{iconClass}} {{iconClassSize}}"></i>
+          </div>
+        }
 
-        <div *ngIf="iconImage" class="text-center p-5 text-primary">
-          <img src="{{iconImage}}" width="{{iconImageSize}}">
-        </div>
+        @if (iconImage) {
+          <div class="text-center p-5 text-primary">
+            <img src="{{iconImage}}" width="{{iconImageSize}}">
+          </div>
+        }
 
         <div class="text-center">
           <h2 class="font-weight-light" [innerHTML]="question"></h2>
           <h6 class="text-muted" [innerHTML]="description"></h6>
         </div>
       </div>
-      <div class="modal-footer" *ngIf="enableCancel || onConfirm">
-        <div class="col-md-12 text-center p-2">
-          <button *ngIf="enableCancel" type="button" class="btn btn-secondary btn-lg m-1" data-dismiss="modal" style="width: 100px;"
-            [innerHTML]="cancelText" (click)="cancel()">
-          </button>
-          <button *ngIf="onConfirm" type="button" class="btn btn-primary btn-lg m-1" style="width: 100px;" (click)="confirm()"
-            [innerHTML]="confirmText">
-          </button>
+      @if (enableCancel || onConfirm) {
+        <div class="modal-footer">
+          <div class="col-md-12 text-center p-2">
+            @if (enableCancel) {
+              <button type="button" class="btn btn-secondary btn-lg m-1" data-dismiss="modal" style="width: 100px;"
+                [innerHTML]="cancelText" (click)="cancel()">
+              </button>
+            }
+            @if (onConfirm) {
+              <button type="button" class="btn btn-primary btn-lg m-1" style="width: 100px;" (click)="confirm()"
+                [innerHTML]="confirmText">
+              </button>
+            }
+          </div>
         </div>
-      </div>
+      }
     </div>
   </div>
 </div>

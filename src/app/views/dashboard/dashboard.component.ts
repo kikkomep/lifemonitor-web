@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import { DOCUMENT, Location, ViewportScroller } from '@angular/common';
+import { Location, ViewportScroller } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -32,6 +32,7 @@ import {
   OnInit,
   SimpleChanges,
   ViewChild,
+  DOCUMENT
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';

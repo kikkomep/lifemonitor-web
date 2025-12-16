@@ -20,17 +20,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<div *ngIf="!stats" class="loading">
-  <div class="text-center">
-    <i class="fas fa-2x fa-sync-alt text-muted"></i>
+@if (!stats) {
+  <div class="loading">
+    <div class="text-center">
+      <i class="fas fa-2x fa-sync-alt text-muted"></i>
+    </div>
   </div>
-</div>
-<div *ngIf="stats && stats.length == 0" class="loading">
-  <div class="text-center">
-    <i class="fas fa-2x fa-ban text-muted"></i>
+}
+@if (stats && stats.length == 0) {
+  <div class="loading">
+    <div class="text-center">
+      <i class="fas fa-2x fa-ban text-muted"></i>
+    </div>
   </div>
-</div>
-<div *ngIf="stats && stats.length>0" class="wrapper text-center">
-  <p-chart type="bar" [data]="basicData" [options]="basicOptions" [width]="chartWidth" [height]="chartHeight"
+}
+@if (stats && stats.length>0) {
+  <div class="wrapper text-center">
+    <p-chart type="bar" [data]="basicData" [options]="basicOptions" [width]="chartWidth" [height]="chartHeight"
     (onDataSelect)="chartClicked($event)"></p-chart>
-</div>
+  </div>
+}

@@ -22,185 +22,201 @@ SOFTWARE.
 
 <app-loader [enabled]="!workflow || !suites" loadingText="... loading ..." marginTop="-300"></app-loader>
 
-<div *ngIf="workflow && suites" class="content-header">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-6">
-        <h1 class="m-0 text-dark"></h1>
+@if (workflow && suites) {
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark"></h1>
+        </div>
+        <!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-right mr-lg-4 mr-md-2">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
+            </li>
+            <li class="breadcrumb-item active">
+              <i class="fas fa-cogs p-1"></i>Workflow
+            </li>
+          </ol>
+        </div>
+        <!-- /.col -->
       </div>
-      <!-- /.col -->
-      <div class="col-sm-6">
-        <ol class="breadcrumb float-right mr-lg-4 mr-md-2">
-          <li class="breadcrumb-item">
-            <a [routerLink]="['/dashboard']"><i class="fas fa-home p-1"></i>Home</a>
-          </li>
-          <li class="breadcrumb-item active">
-            <i class="fas fa-cogs p-1"></i>Workflow
-          </li>
-        </ol>
-      </div>
-      <!-- /.col -->
+      <!-- /.row -->
+      <!-- /.workflow header -->
+      <workflow-header [workflow]="workflow"></workflow-header>
+      <!-- /.workflow header -->
     </div>
-    <!-- /.row -->
-
-    <!-- /.workflow header -->
-    <workflow-header [workflow]="workflow"></workflow-header>
-    <!-- /.workflow header -->
-
+    <!-- /.container-fluid -->
   </div>
-  <!-- /.container-fluid -->
-</div>
+}
 <!-- /.content-header -->
 
-<section *ngIf="workflow && suites" class="content mx-lg-4 p-2">
-  <!-- <div class="container-fluid"> -->
-  <div *ngIf="workflow && workflow.suites" style="margin-top: 50px">
-    <h3 style="color: var(--primary)">
-      <span *ngIf="!suiteNameFilter" data-toggle="tooltip" data-placement="right" data-html="true"
-        pTooltip="The dashboard collects test suites for the workflow '{{workflow.name}}'"
-        [showDelay]="1500">
-        Suites
-      </span>
-      <div *ngIf="suiteNameFilter">
-        <ng-container #searchResults>
-          <ng-container
-            *ngIf="((suites | itemFilterPipe: suiteNameFilter).length == 0); then noSuite; else foundSuites">
-          </ng-container>
-        </ng-container>
-        <ng-template #noSuite>
-          <ng-container *ngIf="suiteNameFilter == '______ALL_____'; then noSuiteFound; else noMatchingSuite;">
-          </ng-container>
-          <ng-template #noSuiteFound>No test suite found</ng-template>
-          <ng-template #noMatchingSuite>No test suite matching "<b>{{suiteNameFilter}}</b>"</ng-template>
-        </ng-template>
-        <ng-template #foundSuites>
-          <ng-container *ngIf="suiteNameFilter == '______ALL_____'; then allSuites; else matchingSuites;">
-          </ng-container>
-          <ng-template #allSuites>Suites</ng-template>
-          <ng-template #matchingSuites>Suites matching "<b>{{suiteNameFilter}}</b>"</ng-template>
-        </ng-template>
-      </div>
-    </h3>
-
-    <!-- Small boxes (Stat box) -->
-    <div class="row">
-      <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-primary" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
-          tooltipPosition="bottom" data-html="true" [showDelay]="1500"
-          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> suites</div>">
-          <div *ngIf="!workflow.suites" class="overlay dark">
-            <i class="fas fa-3x fa-sync-alt"></i>
+@if (workflow && suites) {
+  <section class="content mx-lg-4 p-2">
+    <!-- <div class="container-fluid"> -->
+    @if (workflow && workflow.suites) {
+      <div style="margin-top: 50px">
+        <h3 style="color: var(--primary)">
+          @if (!suiteNameFilter) {
+            <span data-toggle="tooltip" data-placement="right" data-html="true"
+              pTooltip="The dashboard collects test suites for the workflow '{{workflow.name}}'"
+              [showDelay]="1500">
+              Suites
+            </span>
+          }
+          @if (suiteNameFilter) {
+            <div>
+              <ng-container #searchResults>
+                @if (((suites | itemFilterPipe: suiteNameFilter).length == 0)) {
+                  @if (suiteNameFilter == '______ALL_____') {
+                    No test suite found
+                  } @else {
+                    No test suite matching "<b>{{suiteNameFilter}}</b>"
+                  }
+                } @else {
+                  @if (suiteNameFilter == '______ALL_____') {
+                    Suites
+                  } @else {
+                    Suites matching "<b>{{suiteNameFilter}}</b>"
+                  }
+                }
+              </ng-container>
+            </div>
+          }
+        </h3>
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-primary" (click)="filterByStatus('all_passing')" data-toggle="tooltip"
+              tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+              pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter <b>passing</b> suites</div>">
+              @if (!workflow.suites) {
+                <div class="overlay dark">
+                  <i class="fas fa-3x fa-sync-alt"></i>
+                </div>
+              }
+              @if (suites && statusFilter && statusFilter != 'all_passing') {
+                <div class="overlay dark"></div>
+              }
+              <div class="inner">
+                <h3>
+                  {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.all_passing, suiteNameFilter) : 0 }}
+                </h3>
+                <p>Passing</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-thumbs-up"></i>
+              </div>
+              <div class="small-box-footer" style="height: 22px">
+                <div style="display: inline-block; padding: 0"></div>
+                <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+              </div>
+            </div>
           </div>
-          <div *ngIf="suites && statusFilter && statusFilter != 'all_passing'" class="overlay dark"></div>
-          <div class="inner">
-            <h3>
-              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.all_passing, suiteNameFilter) : 0 }}
-            </h3>
-            <p>Passing</p>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
+              tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+              pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter partially <b>passing</b> suites</div>">
+              @if (!workflow.suites) {
+                <div class="overlay dark">
+                  <i class="fas fa-3x fa-sync-alt"></i>
+                </div>
+              }
+              @if (suites && statusFilter && statusFilter != 'some_passing') {
+                <div class="overlay dark"></div>
+              }
+              <div class="inner">
+                <h3>
+                  {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.some_passing, suiteNameFilter) : 0
+                  }}
+                </h3>
+                <p>Some passing</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-radiation"></i>
+              </div>
+              <div class="small-box-footer" style="height: 22px">
+                <div style="display: inline-block; padding: 0"></div>
+                <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+              </div>
+            </div>
           </div>
-          <div class="icon">
-            <i class="fa fa-thumbs-up"></i>
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
+              tooltipPosition="bottom" data-html="true" [showDelay]="1500"
+              pTooltip="<div class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> suites</div>">
+              @if (!workflow.suites) {
+                <div class="overlay dark">
+                  <i class="fas fa-3x fa-sync-alt"></i>
+                </div>
+              }
+              @if (suites && statusFilter && statusFilter != 'all_failing') {
+                <div class="overlay dark"></div>
+              }
+              <div class="inner">
+                <h3>
+                  {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.all_failing, suiteNameFilter) : 0 }}
+                </h3>
+                <p>Failing</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-thumbs-down"></i>
+              </div>
+              <div class="small-box-footer" style="height: 22px">
+                <div style="display: inline-block; padding: 0"></div>
+                <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+              </div>
+            </div>
           </div>
-          <div class="small-box-footer" style="height: 22px">
-            <div style="display: inline-block; padding: 0"></div>
-            <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+          <!-- ./col -->
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-gray" (click)="filterByStatus('unknown')" data-html="true" data-toggle="tooltip"
+              tooltipPosition="bottom" [showDelay]="1500" tooltipPosition="bottom"
+              pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter suites in <b>unknown</b> state</div>">
+              @if (!workflow.suites) {
+                <div class="overlay dark">
+                  <i class="fas fa-3x fa-sync-alt"></i>
+                </div>
+              }
+              @if (suites && statusFilter && statusFilter != 'unknown') {
+                <div class="overlay dark"></div>
+              }
+              <div class="inner">
+                <h3>
+                  {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.unknown, suiteNameFilter) : 0 }}
+                </h3>
+                <p>Unavailable</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-question-circle"></i>
+              </div>
+              <div class="small-box-footer" style="height: 22px">
+                <div style="display: inline-block; padding: 0"></div>
+                <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
+              </div>
+            </div>
           </div>
+          <!-- ./col -->
         </div>
+        <!-- /.row -->
       </div>
-      <!-- ./col -->
-      <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-warning" (click)="filterByStatus('some_passing')" data-toggle="tooltip"
-          tooltipPosition="bottom" data-html="true" [showDelay]="1500"
-          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter partially <b>passing</b> suites</div>">
-          <div *ngIf="!workflow.suites" class="overlay dark">
-            <i class="fas fa-3x fa-sync-alt"></i>
-          </div>
-          <div *ngIf="suites && statusFilter && statusFilter != 'some_passing'" class="overlay dark"></div>
-          <div class="inner">
-            <h3>
-              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.some_passing, suiteNameFilter) : 0
-              }}
-            </h3>
-
-            <p>Some passing</p>
-          </div>
-          <div class="icon">
-            <i class="fas fa-radiation"></i>
-          </div>
-          <div class="small-box-footer" style="height: 22px">
-            <div style="display: inline-block; padding: 0"></div>
-            <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </div>
-        </div>
-      </div>
-      <!-- ./col -->
-      <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-danger" (click)="filterByStatus('all_failing')" data-toggle="tooltip"
-          tooltipPosition="bottom" data-html="true" [showDelay]="1500"
-          pTooltip="<div class='text-xs'><i class='fas fa-question-circle mx-1'></i> click to filter <b>failing</b> suites</div>">
-          <div *ngIf="!workflow.suites" class="overlay dark">
-            <i class="fas fa-3x fa-sync-alt"></i>
-          </div>
-          <div *ngIf="suites && statusFilter && statusFilter != 'all_failing'" class="overlay dark"></div>
-          <div class="inner">
-            <h3>
-              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.all_failing, suiteNameFilter) : 0 }}
-            </h3>
-            <p>Failing</p>
-          </div>
-          <div class="icon">
-            <i class="fa fa-thumbs-down"></i>
-          </div>
-          <div class="small-box-footer" style="height: 22px">
-            <div style="display: inline-block; padding: 0"></div>
-            <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </div>
-        </div>
-      </div>
-      <!-- ./col -->
-
-      <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-gray" (click)="filterByStatus('unknown')" data-html="true" data-toggle="tooltip"
-          tooltipPosition="bottom" [showDelay]="1500" tooltipPosition="bottom"
-          pTooltip="<div class='text-xs text-center'><i class='fas fa-question-circle mx-1'></i> click to filter suites in <b>unknown</b> state</div>">
-          <div *ngIf="!workflow.suites" class="overlay dark">
-            <i class="fas fa-3x fa-sync-alt"></i>
-          </div>
-          <div *ngIf="suites && statusFilter && statusFilter != 'unknown'" class="overlay dark"></div>
-          <div class="inner">
-            <h3>
-              {{ workflow.suites ? workflow.suites.getStatsLength(workflow.suites.unknown, suiteNameFilter) : 0 }}
-            </h3>
-            <p>Unavailable</p>
-          </div>
-          <div class="icon">
-            <i class="fa fa-question-circle"></i>
-          </div>
-          <div class="small-box-footer" style="height: 22px">
-            <div style="display: inline-block; padding: 0"></div>
-            <!-- More info <i class="fas fa-arrow-circle-right"></i> -->
-          </div>
-        </div>
-      </div>
-      <!-- ./col -->
-    </div>
-    <!-- /.row -->
-  </div>
-
-  <!-- scroll top button -->
-  <app-scroll [hidden]="!(showScroll$ | async)" (scrollToTop)="scrollTop()"></app-scroll>
-
-  <!-- Search Bar -->
-  <item-search-bar elementType="suites" [(filterValue)]="suiteNameFilter"
+    }
+    <!-- scroll top button -->
+    <app-scroll [hidden]="!(showScroll$ | async)" (scrollToTop)="scrollTop()"></app-scroll>
+    <!-- Search Bar -->
+    <item-search-bar elementType="suites" [(filterValue)]="suiteNameFilter"
     [(sortingOrder)]="suiteSortingOrder"></item-search-bar>
-
   <test-suites [suites]="
       suites
         | itemFilterPipe: suiteNameFilter
         | sortingFilter: suiteSortingOrder
     "></test-suites>
-</section>
+  </section>
+}

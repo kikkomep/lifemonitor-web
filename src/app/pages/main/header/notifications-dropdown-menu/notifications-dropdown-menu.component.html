@@ -20,89 +20,94 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<li class="nav-item dropdown" *ngIf="notifications">
-  <a class="nav-link" data-html="true" data-toggle="dropdown" (click)="toggleDropdownMenu()">
-    <i class="far fa-bell"></i>
-    <span *ngIf="notificationsToRead.length > 0" class="badge badge-warning navbar-badge text-bold">
-      {{ notificationsToRead.length }}
-    </span>
-  </a>
-  <div #dropdownMenu class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-    <div style="max-height: 200px; overflow-y: scroll">
-      <ng-container *ngFor="let nd of notificationDates">
-        <div class="text-center text-muted mt-2" style="font-size: 9pt">
-          <span class="text-bold">{{ nd | date: 'fullDate' }}</span>
-        </div>
-        <div class="dropdown-divider"></div>
-        <ng-container *ngFor="
-            let n of getNotificationOfDay(nd)
-              | sortingNotificationFilter: 'desc';
-            index as i;
-            first as isFirst
-          " class="w-100">
-          <div class="dropdown-item {{ n.read ? 'text-muted' : '' }}" style="{{ n.read ? 'opacity: 60%;' : '' }}">
-            <div *ngIf="n.event === 'UNCONFIGURED_EMAIL'" class="dropdown-item-content row">
-              <div class="col-11" (click)="readNotification(n)">
-                <div class="row">
-                  <div class="col-1">
-                    <i class="{{ n.icon }} mr-1" style="color: {{ n.color }}"></i>
+@if (notifications) {
+  <li class="nav-item dropdown">
+    <a class="nav-link" data-html="true" data-toggle="dropdown" (click)="toggleDropdownMenu()">
+      <i class="far fa-bell"></i>
+      @if (notificationsToRead.length > 0) {
+        <span class="badge badge-warning navbar-badge text-bold">
+          {{ notificationsToRead.length }}
+        </span>
+      }
+    </a>
+    <div #dropdownMenu class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+      <div style="max-height: 200px; overflow-y: scroll">
+        @for (nd of notificationDates; track nd) {
+          <div class="text-center text-muted mt-2" style="font-size: 9pt">
+            <span class="text-bold">{{ nd | date: 'fullDate' }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          @for (
+            n of getNotificationOfDay(nd)
+            | sortingNotificationFilter: 'desc'; track
+            n; let i = $index; let isFirst = $first) {
+            <ng-container class="w-100">
+              <div class="dropdown-item {{ n.read ? 'text-muted' : '' }}" style="{{ n.read ? 'opacity: 60%;' : '' }}">
+                @if (n.event === 'UNCONFIGURED_EMAIL') {
+                  <div class="dropdown-item-content row">
+                    <div class="col-11" (click)="readNotification(n)">
+                      <div class="row">
+                        <div class="col-1">
+                          <i class="{{ n.icon }} mr-1" style="color: {{ n.color }}"></i>
+                        </div>
+                        <div class="col-10">
+                          No email address configured to receive notifications
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-1">
+                      <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                        <i class="far fa-trash-alt"></i>
+                      </a>
+                    </div>
                   </div>
-                  <div class="col-10">
-                    No email address configured to receive notifications
-                  </div>
-                </div>
-              </div>
-              <div class="col-1">
-                <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
-                  <i class="far fa-trash-alt"></i>
-                </a>
-              </div>
-            </div>
-
-            <!-- Render GITHUB_WORKFLOW_VERSION notifications-->
-            <div class="dropdown-item-content" *ngIf="n.event === 'GITHUB_WORKFLOW_VERSION'">
+                }
+                <!-- Render GITHUB_WORKFLOW_VERSION notifications-->
+                @if (n.event === 'GITHUB_WORKFLOW_VERSION') {
+                  <div class="dropdown-item-content">
               <div class="row {{
                   n.read
                     ? 'text-muted'
                     : ''
                 }}" (click)="readNotification(n)">
-                <div class="col-1" [ngStyle]="{'color': n.color}">
-                  <i class="{{ n.icon }}" style="margin: 2px;"></i>
-                </div>
-                <div class="col-10">
-                  <div class="mb-1">
-                    Github workflow version {{n.data.action}}
+                      <div class="col-1" [ngStyle]="{'color': n.color}">
+                        <i class="{{ n.icon }}" style="margin: 2px;"></i>
+                      </div>
+                      <div class="col-10">
+                        <div class="mb-1">
+                          Github workflow version {{n.data.action}}
+                        </div>
+                      </div>
+                      <div class="col-1">
+                        <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                          <i class="far fa-trash-alt"></i>
+                        </a>
+                      </div>
+                      <div class="offset-1 col-11 text-small {{ n.read ? 'text-muted' : '' }}"
+                        style="font-size: 9pt; color: black">
+                        <div class="row">
+                          <div class="col-3 text-bold">repo:</div>
+                          <div class="col-9">{{ n.data.repository.full_name }}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-3 text-bold">version:</div>
+                          <div class="col-9">{{ n.data.workflow_version.version.version }}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-3 text-bold">name:</div>
+                          <div class="col-9">{{ n.data.workflow_version.name }}</div>
+                        </div>
+                        <div class="row">
+                          <div class="col-3 text-bold">uuid:</div>
+                          <div class="col-9">{{ n.data.workflow_version.uuid }}</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class="col-1">
-                  <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
-                    <i class="far fa-trash-alt"></i>
-                  </a>
-                </div>
-                <div class="offset-1 col-11 text-small {{ n.read ? 'text-muted' : '' }}"
-                  style="font-size: 9pt; color: black">
-                  <div class="row">
-                    <div class="col-3 text-bold">repo:</div>
-                    <div class="col-9">{{ n.data.repository.full_name }}</div>
-                  </div>
-                  <div class="row">
-                    <div class="col-3 text-bold">version:</div>
-                    <div class="col-9">{{ n.data.workflow_version.version.version }}</div>
-                  </div>
-                  <div class="row">
-                    <div class="col-3 text-bold">name:</div>
-                    <div class="col-9">{{ n.data.workflow_version.name }}</div>
-                  </div>
-                  <div class="row">
-                    <div class="col-3 text-bold">uuid:</div>
-                    <div class="col-9">{{ n.data.workflow_version.uuid }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Render notifications for BUILD_FAILED and BUILD_RECOVERED events -->
-            <div class="dropdown-item-content" *ngIf="n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED'">
+                }
+                <!-- Render notifications for BUILD_FAILED and BUILD_RECOVERED events -->
+                @if (n.event === 'BUILD_FAILED' || n.event === 'BUILD_RECOVERED') {
+                  <div class="dropdown-item-content">
               <div class="row {{
                   n.read
                     ? 'text-muted'
@@ -110,86 +115,100 @@ SOFTWARE.
                     ? 'text-red'
                     : 'text-primary'
                 }}" (click)="readNotification(n)">
-                <div class="col-1">
-                  <i class="{{ n.icon }}"></i>
-                </div>
-                <div class="col-10">
-                  Test instance
-                  <span class="text-bold">
-                    {{ n.data.build.instance.name }}
-                  </span>
-                  <span *ngIf="n.event === 'BUILD_FAILED'">is failing</span>
-                  <span *ngIf="n.event === 'BUILD_RECOVERED'">has recovered</span>
-                </div>
-                <div class="col-1">
-                  <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
-                    <i class="far fa-trash-alt"></i>
-                  </a>
-                </div>
-                <div class="offset-1 col-11 text-small {{ n.read ? 'text-muted' : '' }}"
-                  style="font-size: 9pt; color: black">
-                  <div>
-                    <span class="text-bold">build: </span>
-                    <span>#{{ n.data.build.build_id }}</span>
+                      <div class="col-1">
+                        <i class="{{ n.icon }}"></i>
+                      </div>
+                      <div class="col-10">
+                        Test instance
+                        <span class="text-bold">
+                          {{ n.data.build.instance.name }}
+                        </span>
+                        @if (n.event === 'BUILD_FAILED') {
+                          <span>is failing</span>
+                        }
+                        @if (n.event === 'BUILD_RECOVERED') {
+                          <span>has recovered</span>
+                        }
+                      </div>
+                      <div class="col-1">
+                        <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                          <i class="far fa-trash-alt"></i>
+                        </a>
+                      </div>
+                      <div class="offset-1 col-11 text-small {{ n.read ? 'text-muted' : '' }}"
+                        style="font-size: 9pt; color: black">
+                        <div>
+                          <span class="text-bold">build: </span>
+                          <span>#{{ n.data.build.build_id }}</span>
+                        </div>
+                        <div>
+                          <span class="text-bold">suite: </span>
+                          <span>{{ n.data.build.suite.name }}</span>
+                        </div>
+                        <div>
+                          <span class="text-bold">start time: </span>
+                          <span>{{ formatTimestamp(n.data.build.timestamp) }}</span>
+                        </div>
+                        <div class="row">
+                          <div class="col-3 text-bold">workflow:</div>
+                          <div class="col-9">{{ n.data.build.workflow.name }}</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <span class="text-bold">suite: </span>
-                    <span>{{ n.data.build.suite.name }}</span>
-                  </div>
-                  <div>
-                    <span class="text-bold">start time: </span>
-                    <span>{{ formatTimestamp(n.data.build.timestamp) }}</span>
-                  </div>
-                  <div class="row">
-                    <div class="col-3 text-bold">workflow:</div>
-                    <div class="col-9">{{ n.data.build.workflow.name }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- generic notifications -->
-            <div class="dropdown-item-content"
-              *ngIf="!['BUILD_FAILED', 'BUILD_RECOVERED', 'GITHUB_WORKFLOW_VERSION', 'GITHUB_WORKFLOW_ISSUE'].includes(n.event)">
+                }
+                <!-- generic notifications -->
+                @if (!['BUILD_FAILED', 'BUILD_RECOVERED', 'GITHUB_WORKFLOW_VERSION', 'GITHUB_WORKFLOW_ISSUE'].includes(n.event)) {
+                  <div class="dropdown-item-content"
+                    >
               <div class="row {{
                   n.read
                     ? 'text-muted'
                     : ''
                 }}" (click)="readNotification(n)">
-                <div class="col-1" [ngStyle]="{'color': n.color}">
-                  <i class="{{ n.icon }}"></i>
-                </div>
-                <div class="col-10">
-                  {{n.name}}
-                </div>
-                <div class="col-1">
-                  <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
-                    <i class="far fa-trash-alt"></i>
-                  </a>
-                </div>
+                      <div class="col-1" [ngStyle]="{'color': n.color}">
+                        <i class="{{ n.icon }}"></i>
+                      </div>
+                      <div class="col-10">
+                        {{n.name}}
+                      </div>
+                      <div class="col-1">
+                        <a class="trash-notification" (click)="deleteNotitification(n)" title="click to delete">
+                          <i class="far fa-trash-alt"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                }
               </div>
-            </div>
-          </div>
-        </ng-container>
-      </ng-container>
+            </ng-container>
+          }
+        }
+      </div>
+      <!--<div class="dropdown-divider"></div>
+      <a href="#" class="dropdown-item">
+        <i class="fas fa-file mr-2"></i> 3 new reports
+        <span class="float-right text-muted text-sm">2 days</span>
+      </a>-->
+      <!--<div class="dropdown-divider"></div>
+      <a href="#" class="dropdown-item dropdown-footer">
+        Mark as read all {{ !notifications ? 0 : notifications.length }} notifications
+      </a>-->
+      @if (notifications && notifications.length > 0) {
+        <div class="dropdown-divider"></div>
+      }
+      @if (notifications && notifications.length > 0) {
+        <a class="dropdown-item dropdown-footer"
+          (click)="deleteAllNotifications()">
+          <i class="fas fa-trash-alt mr-1"></i> Clear all notifications ({{ !notifications ? 0 : notifications.length
+          }})
+        </a>
+      }
+      @if (notifications && notifications.length == 0) {
+        <div class="dropdown-item dropdown-footer">
+          No notifications found
+        </div>
+      }
     </div>
-    <!--<div class="dropdown-divider"></div>
-    <a href="#" class="dropdown-item">
-      <i class="fas fa-file mr-2"></i> 3 new reports
-      <span class="float-right text-muted text-sm">2 days</span>
-    </a>-->
-    <!--<div class="dropdown-divider"></div>
-    <a href="#" class="dropdown-item dropdown-footer">
-      Mark as read all {{ !notifications ? 0 : notifications.length }} notifications
-    </a>-->
-    <div *ngIf="notifications && notifications.length > 0" class="dropdown-divider"></div>
-    <a *ngIf="notifications && notifications.length > 0" class="dropdown-item dropdown-footer"
-      (click)="deleteAllNotifications()">
-      <i class="fas fa-trash-alt mr-1"></i> Clear all notifications ({{ !notifications ? 0 : notifications.length
-      }})
-    </a>
-    <div *ngIf="notifications && notifications.length == 0" class="dropdown-item dropdown-footer">
-      No notifications found
-    </div>
-  </div>
-</li>
+  </li>
+}
