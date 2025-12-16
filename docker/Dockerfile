@@ -1,7 +1,9 @@
 ##############################################################
 # "builder" stage: build webapp with npm and Angular-CLI
 ##############################################################
-FROM node:15.4-alpine as builder
+FROM node:22-alpine AS builder
+
+RUN echo $(npm --version && node --version)
 
 # Set the working dir
 WORKDIR /app
@@ -10,7 +12,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install -g @angular/cli@11.2.14 && npm ci
+RUN npm update -g npm && npm install -g @angular/cli@20.3.13 && npm ci --force --legacy-peer-deps
 
 # Copy sources from a clone of the repository @ https://github.com/crs4/LifeMonitorWeb
 COPY  . .
@@ -29,7 +31,7 @@ FROM crs4/lifemonitor-web:base
 # Copy the compiled angular app from the 'frontend-build' stage
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy NGINX site configuration
-COPY --from=builder /app/dist/lifemonitor /app
+COPY --from=builder /app/dist/lifemonitor/browser /app
 
 # Fix permissions
 RUN mkdir -p /var/cache/nginx /var/log/nginx \
