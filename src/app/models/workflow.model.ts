@@ -22,7 +22,7 @@ SOFTWARE.
 
 import { Model } from './base.models';
 import { RoCrate } from './common.models';
-import { Registry } from './registry.models';
+import { Registry, RegistryWorkflow } from './registry.models';
 import {
   AggregatedStatusStats,
   AggregatedStatusStatsItem,
@@ -174,7 +174,7 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
   version: Object;
   status: Status;
   _previous_versions: WorkflowVersionDescriptor[];
-  registries: Registry[];
+  registries: RegistryWorkflow[];
   _type: string;
   _rocrate: RoCrate;
   _suites: AggregatedStatusStats;
@@ -226,7 +226,7 @@ export class WorkflowVersion extends AggregatedStatusStatsItem {
     return null;
   }
 
-  public get authors(): [] {
+  public get authors(): any[] {
     return this.version ? this.version['authors'] : [];
   }
 

@@ -25,7 +25,7 @@ import { Suite } from './suite.models';
 
 export class UserNotification extends Model {
   id: string;
-  data: object;
+  data: any;
   created: number;
   read: number;
   uuid: string;
@@ -36,6 +36,7 @@ export class UserNotification extends Model {
   lang: string;
   tag: string;
   event: string;
+  name: string;
 
   constructor(rawData?: Object, skip?: []) {
     super(rawData, skip);
