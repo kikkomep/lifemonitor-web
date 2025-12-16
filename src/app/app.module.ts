@@ -21,7 +21,7 @@ SOFTWARE.
 */
 
 import { registerLocaleData } from '@angular/common';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import localeEn from '@angular/common/locales/en';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -140,104 +140,99 @@ export function initConfigService(
   };
 }
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    MainComponent,
-    LoginComponent,
-    HeaderComponent,
-    FooterComponent,
-    MenuSidebarComponent,
-    BlankComponent,
-    DashboardComponent,
-    MessagesDropdownMenuComponent,
-    NotificationsDropdownMenuComponent,
-    AppButtonComponent,
-    UserDropdownMenuComponent,
-    WorkflowComponent,
-    StatsPieChartComponent,
-    StatsBarChartComponent,
-    TestSuitesComponent,
-    SuiteComponent,
-    TestInstancesComponent,
-    OrderByPipe,
-    WorkflowOrderByPipe,
-    StatsFilterPipe,
-    ItemFilterPipe,
-    SortingNotificationFilterPipe,
-    ArraySizeFilterPipe,
-    SortingFilterPipe,
-    SearchBarComponent,
-    TrimPipe,
-    LoaderComponent,
-    RocrateLogoComponent,
-    WorkflowHeaderComponent,
-    InputDialogComponent,
-    WorkflowUploaderComponent,
-    WorkflowVersionSelectorComponent,
-    LogoutComponent,
-    ScrollComponent,
-    BaseDataViewComponent,
-    MaintenanceComponent,
-  ],
-  imports: [
-    // PrimeNg Modules
-    // ChartModule,
-    DropdownModule,
-    DataViewModule,
-    TableModule,
-    ButtonModule,
-    PaginatorModule,
-    TooltipModule,
-    ProgressBarModule,
-    ToggleButtonModule,
-    DataTablesModule,
-    FormsModule,
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    ChartModule,
-    HttpClientModule,
-    ToastrModule.forRoot({
-      timeOut: 10000,
-      positionClass: 'toast-bottom-right',
-      preventDuplicates: true,
-    }),
-    NgbModule,
-    SocketIoModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: environment.production,
-      // Register the ServiceWorker as soon as the application is stable
-      // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000',
-    }),
-    // cookie consent
-    NgcCookieConsentModule.forRoot(defaultCookieConfig),
-  ],
-  providers: [
-    AppConfigService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initConfigService,
-      deps: [
+@NgModule({ declarations: [
+        AppComponent,
+        HomeComponent,
+        MainComponent,
+        LoginComponent,
+        HeaderComponent,
+        FooterComponent,
+        MenuSidebarComponent,
+        BlankComponent,
+        DashboardComponent,
+        MessagesDropdownMenuComponent,
+        NotificationsDropdownMenuComponent,
+        AppButtonComponent,
+        UserDropdownMenuComponent,
+        WorkflowComponent,
+        StatsPieChartComponent,
+        StatsBarChartComponent,
+        TestSuitesComponent,
+        SuiteComponent,
+        TestInstancesComponent,
+        OrderByPipe,
+        WorkflowOrderByPipe,
+        StatsFilterPipe,
+        ItemFilterPipe,
+        SortingNotificationFilterPipe,
+        ArraySizeFilterPipe,
+        SortingFilterPipe,
+        SearchBarComponent,
+        TrimPipe,
+        LoaderComponent,
+        RocrateLogoComponent,
+        WorkflowHeaderComponent,
+        InputDialogComponent,
+        WorkflowUploaderComponent,
+        WorkflowVersionSelectorComponent,
+        LogoutComponent,
+        ScrollComponent,
+        BaseDataViewComponent,
+        MaintenanceComponent,
+    ],
+    bootstrap: [AppComponent], imports: [
+        // PrimeNg Modules
+        // ChartModule,
+        DropdownModule,
+        DataViewModule,
+        TableModule,
+        ButtonModule,
+        PaginatorModule,
+        TooltipModule,
+        ProgressBarModule,
+        ToggleButtonModule,
+        DataTablesModule,
+        FormsModule,
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        ChartModule,
+        ToastrModule.forRoot({
+            timeOut: 10000,
+            positionClass: 'toast-bottom-right',
+            preventDuplicates: true,
+        }),
+        NgbModule,
+        SocketIoModule,
+        ServiceWorkerModule.register('ngsw-worker.js', {
+            enabled: environment.production,
+            // Register the ServiceWorker as soon as the application is stable
+            // or after 30 seconds (whichever comes first).
+            registrationStrategy: 'registerWhenStable:30000',
+        }),
+        // cookie consent
+        NgcCookieConsentModule.forRoot(defaultCookieConfig)], providers: [
         AppConfigService,
-        NgcCookieConsentModule,
-        CachedHttpClientService,
-        AuthService,
-        ApiService,
-      ],
-      multi: true,
-    },
-    // ApiSocketService,
-    {
-      // interceptor for HTTP errors
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpErrorInterceptor,
-      multi: true, // multiple interceptors are possible
-    },
-  ],
-  bootstrap: [AppComponent],
-})
+        {
+            provide: APP_INITIALIZER,
+            useFactory: initConfigService,
+            deps: [
+                AppConfigService,
+                NgcCookieConsentModule,
+                CachedHttpClientService,
+                AuthService,
+                ApiService,
+            ],
+            multi: true,
+        },
+        // ApiSocketService,
+        {
+            // interceptor for HTTP errors
+            provide: HTTP_INTERCEPTORS,
+            useClass: HttpErrorInterceptor,
+            multi: true, // multiple interceptors are possible
+        },
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule {}

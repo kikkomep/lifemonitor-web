@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import * as deepEqual from 'deep-equal';
+import deepEqual from 'deep-equal';
 import { Logger, LoggerManager } from '../../logging';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CacheRefreshStatus } from './cache.model';
