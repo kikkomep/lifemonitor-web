@@ -18,12 +18,14 @@ export class ApiSocket extends Socket {
     worker: Worker,
     appRef: ApplicationRef
   ) {
-    super({
-      url: configService.socketBaseUrl,
-      options: {
-        // transports: ['websocket'],
-      },
-    });
+    super(
+      {
+        url: configService.socketBaseUrl,
+        options: {
+          // transports: ['websocket'],
+        },
+      }
+    );
 
     // register worker
     this.worker = worker;

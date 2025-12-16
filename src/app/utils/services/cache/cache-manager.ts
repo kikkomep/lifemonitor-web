@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import deepEqual from 'deep-equal';
+// Helper function for deep equality comparison
+const deepEqual = (a: any, b: any): boolean => JSON.stringify(a) === JSON.stringify(b);
 import { Logger, LoggerManager } from '../../logging';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { CacheRefreshStatus } from './cache.model';
