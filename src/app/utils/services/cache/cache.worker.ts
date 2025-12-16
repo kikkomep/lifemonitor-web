@@ -381,6 +381,12 @@ function isAsync(fn: Function): boolean {
   return fn.constructor.name === 'AsyncFunction';
 }
 
+// Handler map to avoid using eval
+const messageHandlers: { [key: string]: (data: any) => void } = {
+  'onCacheEntriesGroupCreated': onCacheEntriesGroupCreated,
+  'onPing': onPing
+};
+
 addEventListener('message', ({ data }) => {
   const response = `worker response to ${data}`;
   logger.debug('Received message:', data);
@@ -391,11 +397,11 @@ addEventListener('message', ({ data }) => {
   logger.debug(
     `Candidate function name to handle message ${message.type}: ${fnName}`
   );
-  try {
-    const func: Function = eval(fnName);
-    // logger.debug('Candidate function', func);
+  
+  const func = messageHandlers[fnName];
+  if (func) {
     func(message.data);
-  } catch (ReferenceError) {
+  } else {
     logger.warn(`${fnName} is not a function`);
   }
 });
